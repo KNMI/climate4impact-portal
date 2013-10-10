@@ -1,0 +1,463 @@
+package tools;
+
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import sun.net.www.protocol.http.HttpURLConnection;
+import tools.HTTPTools.WebRequestBadStatusException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+
+public class MyXMLParser {
+  /**
+   * XML attribute 
+   * @author plieger
+   *
+   */
+	static public class XMLAttribute {
+		private String value = null;
+		private String name = null;
+	}
+	/**
+	 * XML element, the base to start parsing XML documents.
+	 * @author plieger
+	 *
+	 */
+	static public class XMLElement {
+		private Vector<XMLAttribute> attributes = null;
+		private Vector<XMLElement> xmlElements = null;
+		private String value = null;
+		private String name = null;
+		public XMLElement(){
+			attributes = new Vector<XMLAttribute>();
+			xmlElements = new Vector<XMLElement>();
+		}
+		public String getValue(){
+			return value;
+		}
+		
+		public Vector <XMLElement> getElements(){
+		  return xmlElements;
+		}
+		
+		public Vector <XMLAttribute> getAttributes(){
+      return attributes;
+    }
+		
+		public String getName(){
+		  return name;
+		}
+		
+		public XMLElement get(String s,int index) throws Exception{
+			int NR=0;
+			for(int j=0;j<xmlElements.size();j++){
+				if(xmlElements.get(j).name.equals(s)){
+					if(NR==index)return xmlElements.get(j);
+					NR++;
+				}
+			}
+			if(NR!=0){
+				throw new Exception("XML element \""+s+"\" with index \""+index+"\" out of bounds ("+NR+" available)");
+			}
+			throw new Exception("XML element \""+s+"\" with index \""+index+"\" not found");
+		}
+		public XMLElement get(String s) throws Exception{
+			return get(s,0);
+		}
+		public String getAttrValue(String name) throws Exception{
+			for(int j=0;j<attributes.size();j++){
+				if(attributes.get(j).name.equals(name))return attributes.get(j).value;
+			}
+			throw new Exception("XML Attribute \""+name+"\" not found in element "+this.name);
+		}
+		
+		/**
+		 * Parses document
+		 * @param document
+		 */
+		private void parse(Document document){
+			  name="root";
+			  value="root";
+			  NodeList nodeLst=	document.getChildNodes();
+			  parse(nodeLst);
+		}
+		
+		/** 
+		 * Parses a XML file on disk
+		 * @param file XML file on disk
+		 * @throws Exception
+		 */
+	  public void parseFile(String file) throws Exception {
+	    DebugConsole.println("Loading "+file);
+      try{
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        InputStream inputStream = new FileInputStream(file);
+        Document document = db.parse(inputStream);
+        parse(document);
+        inputStream.close();
+      } catch (SAXException e) {
+        String msg="SAXException: "+e.getMessage();
+        DebugConsole.errprintln(msg);
+        throw new SAXException(msg);
+    } catch (IOException e) {
+        String msg="IOException: "+e.getMessage();
+        DebugConsole.errprintln(msg);
+        throw new IOException(msg);
+    }catch(Exception e){
+      String msg="Exception: "+e.getMessage();
+      DebugConsole.errprintln(msg);
+      throw new Exception(msg);
+    }
+      
+    }
+	  
+	  /** 
+	   * Parses XML string 
+	   * @param string The XML formatted string
+	   * @throws Exception
+	   */
+	  public void parseString(String string) throws Exception {
+      try{
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+
+        InputStream inputStream = new ByteArrayInputStream(string.getBytes());
+
+        Document document = db.parse(inputStream);
+        parse(document);
+        inputStream.close();
+      } catch (SAXException e) {
+          String msg="SAXException: "+e.getMessage()+":\n\""+string+"\"";
+          DebugConsole.errprintln(msg);
+          throw new SAXException(msg);
+      } catch (IOException e) {
+          String msg="IOException: "+e.getMessage();
+          DebugConsole.errprintln(msg);
+          throw new IOException(msg);
+      }catch(Exception e){
+        String msg="Exception: "+e.getMessage();
+        DebugConsole.errprintln(msg);
+        throw new Exception(msg);
+      }
+      
+    }
+		
+	  /**
+	   * Parses remote XML file via URL 
+	   * @param url The URL to load
+	   * @throws Exception
+	   */
+		public void parse(URL url) throws WebRequestBadStatusException,Exception{
+		  //DebugConsole.println("Loading "+url);
+		  this.xmlElements.clear();
+		  HttpURLConnection connection = null;
+			try{
+				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+				DocumentBuilder db = dbf.newDocumentBuilder();
+			  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
+		    DebugConsole.println("  Making XML GET: "+url.toString());
+        	
+        connection = (HttpURLConnection) url.openConnection();
+        InputStream inputStream = connection.getInputStream();
+
+       
+				
+				Document document = db.parse(inputStream);
+				parse(document);
+				inputStream.close();
+				long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
+		    DebugConsole.println("Finished XML GET: "+url.toString()+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+		  } catch (SAXException e) {
+        String msg="SAXException: "+e.getMessage()+" for URL "+url.toString();
+        DebugConsole.errprintln(msg);
+        throw new SAXException(msg);
+    } catch (IOException e) {
+        String msg="IOException: "+e.getMessage()+" for URL "+url.toString();;
+        int statusCode = connection.getResponseCode();
+        if(statusCode>300){
+          throw new WebRequestBadStatusException(statusCode);
+        }
+        DebugConsole.errprintln("Status code: "+ connection.getResponseCode());
+        DebugConsole.errprintln(msg);
+        throw new IOException(msg);
+    }catch(Exception e){
+      String msg="Exception: "+e.getMessage()+" for URL "+url.toString();;
+      DebugConsole.errprintln(msg);
+      throw new Exception(msg);
+    }
+		}
+		
+		/**
+		 * Function which does a POST request
+		 * @param url The URL
+		 * @param data The data to post
+		 * @throws Exception
+		 */
+		public void parse(URL url,String data) throws Exception{
+      //DebugConsole.println("Loading "+url+" with data \n"+data);
+      try{
+        // Send data
+        URLConnection conn = url.openConnection();
+        conn.setDoOutput(true);
+        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+        wr.write(data);
+        wr.flush();
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+
+        Document document = db.parse(conn.getInputStream());
+        parse(document);
+        wr.close();
+       
+      } catch (SAXException e) {
+        String msg="SAXException: "+e.getMessage();
+        DebugConsole.errprintln(msg);
+        throw new SAXException(msg);
+    } catch (IOException e) {
+        String msg="IOException: "+e.getMessage();
+        DebugConsole.errprintln(msg);
+        throw new IOException(msg);
+    }catch(Exception e){
+      String msg="Exception: "+e.getMessage();
+      DebugConsole.errprintln(msg);
+      throw new Exception(msg);
+    }
+      DebugConsole.println("Ready");
+    }
+		
+		/** 
+		 * Parses to our XMLElement XMLAttribute tree
+		 * @param nodeLst
+		 */
+		private void parse(NodeList nodeLst){
+			for (int s = 0; s < nodeLst.getLength(); s++){
+				Node fstNode = nodeLst.item(s);
+				if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element fstElmnt = (Element) fstNode;
+					XMLElement child = new XMLElement();
+					xmlElements.add(child);
+					child.name=fstNode.getNodeName();
+					if(fstNode.hasAttributes()){
+						for(int a=0;a<fstNode.getAttributes().getLength();a++){
+							XMLAttribute attr=new XMLAttribute();
+							attr.name=fstNode.getAttributes().item(a).getNodeName();
+							attr.value=fstNode.getAttributes().item(a).getNodeValue();
+							child.attributes.add(attr);
+						}
+					}
+					
+					if(fstElmnt.getChildNodes().item(0)!=null){
+					      String nodeGetValue=fstElmnt.getChildNodes().item(0).getNodeValue();
+					      if(nodeGetValue!=null&&nodeGetValue.length()>0){
+					        
+					    	  child.value=nodeGetValue.trim();
+					      }
+			    	  }
+					NodeList childNodes = fstNode.getChildNodes();
+					if(childNodes.getLength()>0){
+						child.parse(childNodes);
+					}
+				}
+			}
+		}
+		public Vector<XMLElement> getList(String s) {
+			Vector<XMLElement> v = new Vector<XMLElement>();
+			for(int j=0;j<xmlElements.size();j++){
+				if(xmlElements.get(j).name.equals(s)){
+					v.add(xmlElements.get(j));
+				}
+			}
+			return v;
+		}
+    public XMLElement getFirst() {
+      return xmlElements.get(0);
+    }
+    
+    /**
+     * Convert XML element to a string, can be any element from the tree. The XML header is not given.
+     * @param el The element to convert to a string
+     * @param depth Depth (can be zero).
+     * @return String of the XML element
+     */
+    public String toXML(XMLElement el,int depth){
+      String data = "";
+      if(el==null)return data;
+      for(int i=0;i<depth;i++)data+="  ";
+      data+="<"+el.name;
+      for(int j=0;j<el.getAttributes().size();j++){
+        data+=" "+el.getAttributes().get(j).name+"=\""+el.getAttributes().get(j).value+"\"";
+      }
+      data+=">\n";
+      for(int j=0;j<el.xmlElements.size();j++){
+        data+=toXML(el.xmlElements.get(j),depth+1);
+      }
+      if(el.getValue()!=null){
+        if(el.getValue().length()>0){
+          for(int i=0;i<depth;i++)data+="  ";
+          data+="  "+el.getValue()+"\n";
+        }
+      }
+      for(int i=0;i<depth;i++)data+="  ";
+      data+= "</"+el.name+">\n";
+      return data;
+      
+    }
+    
+    /**
+     * Carriage returns in a JSON object are not allowed and should be replaced with the "\n" sequence
+     * @param in the unencoded JSON string
+     * @return the encoded JSON string
+     */
+    private String jsonEncode(String in){
+      in = in.replaceAll("\"", "\\\"");
+      in = in.replaceAll("\n", "\\n");
+      return in;
+    }
+    
+    /**
+     * Returns a String with the attributes of this XML element encoded to JSON
+     * @param el The XMLElement with attributes to convert to JSON formatted attributes
+     * @return String with JSON formatted data
+     */
+    private String printJSONAttributes(XMLElement el){
+      String data="";
+      if(el.getAttributes().size()>0){
+        data+="\"attr\":{";
+        for(int j=0;j<el.getAttributes().size();j++){
+          if(j>0)data+=",";
+          data+="\""+jsonEncode(el.getAttributes().get(j).name)+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
+        }
+        data+="}";
+      }
+      return data;
+    }
+    
+    /**
+     * Print the XMLElement's value in a JSON formatted way
+     * @param el The XMLElement value to be printed in a JSON formatted way
+     * @return String with JSON formatted data
+     */
+    private String printJSONValue(XMLElement el){
+      if(el.getValue()!=null){
+        if(el.getValue().length()>0){
+          return "\"value\":\""+jsonEncode(el.getValue())+"\"";
+        }
+      }
+      return "";
+    }
+        
+    /**
+     * Converts a list of XML elements all with the same name to a JSON string.
+     * @param vector The list of XML elements with the same name
+     * @param depth The depth of the XML elements
+     * @return JSON formatted string
+     */
+    private String xmlElementstoJSON(Vector<XMLElement> vector,int depth){
+      String data = "";
+      data+="\""+jsonEncode(vector.get(0).name)+"\":";
+      boolean isArray=false;
+      if(vector.size()>1)isArray=true;
+
+      if(isArray){
+        data+="[\n";
+      }
+      for(int j=0;j<vector.size();j++){
+         if(j>0){
+           data+=",\n";
+         }
+         data+="{";
+         data+=toJSON(vector.get(j),depth+1);
+         data+="}";
+      }
+      if(isArray){
+        data+="\n]";
+      }    
+      data+="";
+      return data;    
+    }
+     
+    /**
+     * Converts a XML element to JSON string and walks through all nested XML elements
+     * @param el The XML element to convert to a json string
+     * @param depth The current depth of the XML element
+     * @return JSON string
+     */
+    private String toJSON(XMLElement el,int depth){
+      String data = "";
+      if(el==null)return data;
+    
+      boolean firstDataDone=false;
+
+      //Print the json attributes
+      data+=printJSONAttributes(el);
+      if(el.attributes.size()>0)firstDataDone=true;
+      
+      //Make a Set of the XML elements names
+      Set<String> set = new HashSet<String>();
+      for(int j=0;j<el.xmlElements.size();j++){
+        set.add(el.xmlElements.get(j).getName());
+      }
+      
+      //Loop through the XML elements with unique names
+      for (String temp : set){
+        if(firstDataDone){data+=",\n";}firstDataDone=true;
+        data+=xmlElementstoJSON(el.getList(temp),depth+1);
+      }
+      //Clear and remove the set
+      set.clear();set=null;
+      
+      //Print the JSON value
+      String jsonValue=printJSONValue(el);
+      if(jsonValue.length()>0){
+        if(firstDataDone){data+=",\n";}firstDataDone=true;
+        data+=jsonValue;
+      }
+      
+     
+      
+      return data;
+    }
+    
+    /**
+     * Returns The XML object as a well formatted XML string.
+     */
+    public String toString(){
+      String data ="";
+      data="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+      data+=toXML(xmlElements.get(0),0);
+      return data;
+    }
+
+    /**
+     * Returns The XML object as a JSON string XML string.
+     * Values are denoted as 'value' and attributes with 'attr'.
+     */
+    public String toJSON(){
+      String data ="{\n";
+      data+=xmlElementstoJSON(xmlElements,0);
+      data+="\n}\n";
+      return data;
+      
+    }
+  
+	};
+}

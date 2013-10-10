@@ -1,0 +1,8 @@
+# use glob syntax.
+syntax: glob
+
+*.o
+.ccache/*
+*~
+*.a
+*.jar
