@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.net.UnknownHostException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -41,7 +41,7 @@ import ASyncRunner.MyRunnableWaiter;
 import tools.DebugConsole;
 import tools.HTTPTools;
 import tools.MyXMLParser;
-import tools.HTTPTools.WebRequestBadStatusException;
+
 import tools.MyXMLParser.XMLElement;
 
 /**
@@ -55,17 +55,31 @@ public class ESGFSearch {
    * @param identifier
    * @return null if not found
    */
-  private static String getDiskCachedString(String identifier){
-    DebugConsole.println("Getting from diskcache: "+identifier);
-    String diskCacheLocation = Configuration.getImpactWorkspace()+"/diskCache/";
+  private static String getFileFromImpactStorage(String identifier){
+    identifier = identifier.replaceAll("\\?", "_");
+    identifier = identifier.replaceAll("&", "_");
+    identifier = identifier.replaceAll(":", "_");
+    identifier = identifier.replaceAll("/", "_");
+    identifier = identifier.replaceAll("=", "_");
+    identifier+=".json";
+    DebugConsole.println("getDiskCachedString:: Getting from diskcache: "+identifier);
+    String diskCacheLocation = Configuration.getImpactWorkspace()+"/staticdata/";
     try {
-      return tools.Tools.readFile(diskCacheLocation+"/"+identifier+".dat");
+      return tools.Tools.readFile(diskCacheLocation+"/"+identifier);
     } catch (IOException e) {
+      DebugConsole.println("getDiskCachedString:: Diskcache not available for "+diskCacheLocation+"/"+identifier);
     }
     return null;
   }
   
   private static String getDiskCachedString(String uniqueId, int mustbeYoungerThanNSeconds) {
+    uniqueId = uniqueId.replaceAll("\\?", "_");
+    uniqueId = uniqueId.replaceAll("&", "_");
+    uniqueId = uniqueId.replaceAll(":", "_");
+    uniqueId = uniqueId.replaceAll("/", "_");
+    uniqueId = uniqueId.replaceAll("=", "_");
+    uniqueId+=".json";
+    
     DebugConsole.println("Getting from diskcache: "+uniqueId);
     String diskCacheLocation = Configuration.getImpactWorkspace()+"/diskCache/";
     try {
@@ -79,11 +93,11 @@ public class ESGFSearch {
         if(createdHowManySecondsAgo>mustbeYoungerThanNSeconds)
         {
           DebugConsole.println("Ignoring "+uniqueId+"Because too old.");
-          tools.Tools.rm(diskCacheLocation+"/"+uniqueId+".dat");
+          tools.Tools.rm(diskCacheLocation+"/"+uniqueId);
           return null;
         }
       }
-      return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId+".dat");
+      return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId);
     } catch (IOException e) {
     }
     return null;
@@ -95,12 +109,18 @@ public class ESGFSearch {
    * @param identifier The identifier of this string
    */
   private static void storeDiskCachedString(String data, String identifier){
+    identifier = identifier.replaceAll("\\?", "_");
+    identifier = identifier.replaceAll("&", "_");
+    identifier = identifier.replaceAll(":", "_");
+    identifier = identifier.replaceAll("/", "_");
+    identifier = identifier.replaceAll("=", "_");
+    identifier+=".json";
     DebugConsole.println("Storing to diskcache: "+identifier);
        String diskCacheLocation = Configuration.getImpactWorkspace()+"/diskCache/";
        
        try {
         tools.Tools.mksubdirs(diskCacheLocation);
-        tools.Tools.writeFile(diskCacheLocation+"/"+identifier+".dat", data);
+        tools.Tools.writeFile(diskCacheLocation+"/"+identifier, data);
       } catch (IOException e) {
 
         e.printStackTrace();
@@ -169,10 +189,14 @@ public class ESGFSearch {
    */  
   private static String queryDescribeService(String identifier){
     String data = null;
-    try {
-        DebugConsole.println("desribeservice "+identifier);
-        data = getDiskCachedString((String)identifier);
-        if(data ==null){
+ 
+    DebugConsole.println("desribeservice "+identifier);
+    data = getFileFromImpactStorage((String)identifier);
+    if(data == null){
+      DebugConsole.errprintln("Ünable to get descriptions for search items:"+identifier);
+    }
+    return data;
+      /*  if(data ==null){
             data = HTTPTools.makeHTTPGetRequest(Configuration.VercSearchConfig.__getDeprecatedVercSearchURL()+(String)identifier);
             if(data!=null){
               storeDiskCachedString(data,(String)identifier);
@@ -185,7 +209,7 @@ public class ESGFSearch {
     } catch (UnknownHostException e) {
       return null;
     }
-    return data;
+    return data;*/
         
   }
   /**
@@ -393,7 +417,7 @@ public class ESGFSearch {
    
     String descatFacet=facetToDo;
     if(descatFacet.equals("time_frequency"))descatFacet="frequency";
-    String data = queryDescribeService("distcribe?descat="+descatFacet);
+    String data = queryDescribeService("discribefacet?descat="+descatFacet);
     JSONObject queryResultsObject = null;
     try{
       queryResultsObject =  (JSONObject) new JSONTokener(data).nextValue();

@@ -12,7 +12,7 @@
 <div class="impactcontent">
   <h1> Redirecting to OpenID server, please wait...</h1>
       <form name="openid-form-redirection" action="${message.OPEndpoint}" method="post" accept-charset="utf-8">
-        <c:forEach var="parameter" items="${message.parameterMap}">
+        <c:forEach var="parameter" items="${message.parameterMap}"> 
         <input type="hidden" name="${parameter.key}" value="${parameter.value}"/>
         </c:forEach>
         <!-- <button type="submit">.</button> -->

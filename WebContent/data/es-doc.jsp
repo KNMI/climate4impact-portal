@@ -5,7 +5,7 @@
    
     <jsp:include page="../includes-ui.jsp" />
     <link href="http://prod.static.esdoc.webfactional.com/js_client/bin/latest/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
-   
+   <script src="http://prod.static.esdoc.webfactional.com/js_client/bin/latest/esdoc-min.js" type="text/javascript"></script>
     <script type="text/javascript">
 
     $(document).ready(function() {
@@ -71,11 +71,10 @@
   	
   	
   	</table>
-	
-	</tr></table>
+
   	<div class="es-doc-info"></div>
 	<jsp:include page="../footer.jsp" />
 	</div>
   </body>
-  <script src="http://prod.static.esdoc.webfactional.com/js_client/bin/latest/esdoc-min.js" type="text/javascript"></script>
+  
 </html>

@@ -32,7 +32,7 @@ import tools.Tools;
  * wget https://rainbow.llnl.gov/dist/certs/esg-truststore.ts
  * 
  * In: Run --> Run Configurations --> Arguments --> VM Arguments, add:
- * Djavax.net.ssl.trustStore="<pathto>esg-truststore.ts" -Djavax.net.ssl.trustStorePassword="changeit"
+ * -Djavax.net.ssl.trustStore="<pathto>esg-truststore.ts" -Djavax.net.ssl.trustStorePassword="changeit"
  * Or add these arguments to JAVA_OPTS in production environment
  * 
  * 

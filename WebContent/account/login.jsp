@@ -138,7 +138,7 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 	    if (session.getAttribute("openid_identifier")==null){ 
 	    	   %>
 	    	   <div class="impactcontent"><div class="cmscontent">
-	    	   	<div style="float:right;border:none;"><img src=../images/openid.jpg alt="openidlogo" width="300"></img></div>
+	    	   	<div style="float:right;border:none;"><img src="../images/openid.jpg" alt="openidlogo" width="300"></img></div>
 	
 	           <h1>Login with your OpenID account</h1>
            <br/>
