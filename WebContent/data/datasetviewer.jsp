@@ -108,7 +108,7 @@
 			<h1>NetCDF metadata viewer</h1>
 			<div class="bodycontent">    
 		
-   		 Dataset <a href="<%= dataset+".dds" %>"><%= dataset %></a><br/>
+   		 Dataset <a target="_blank" href="<%= dataset+".dds" %>"><%= dataset %></a><br/>
 			<div id="datasetinfo"/>
 				<table>
 					<tr>

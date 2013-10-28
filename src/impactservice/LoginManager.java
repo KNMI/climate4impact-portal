@@ -66,6 +66,9 @@ public class LoginManager {
       if(userName == null){
         userName = user.id;
       }
+      
+      DebugConsole.println("Setting username to "+userName+":"+Configuration.LoginConfig.getMyProxyDefaultPassword());
+      
       ExtendedGSSCredential cred= (ExtendedGSSCredential) myProxy.get(userName, Configuration.LoginConfig.getMyProxyDefaultPassword(), 60*60*24);
      
       try {
@@ -182,6 +185,8 @@ public class LoginManager {
       user.certificateFile = user.usersDir+"certs/"+"creds.pem";
     } catch (IOException e) {
       DebugConsole.errprintln(e.getMessage());
+      user.credentialError=true;
+      throw new Exception("Unable to create credential for user, server misconfiguration:"+user.id+"\n"+e.getMessage());
     }
     try{
     getCredential(user);

@@ -3,6 +3,84 @@ var impactWPSURL='/impactportal/ImpactService?';
 
 var configuredWPSItems = [];
 
+var showStatusReport = function(json){
+	var results= Ext.create('Ext.Window',{
+			width:900,height:600,autoScroll:true,autoDestroy:true,closeAction:'destroy',
+			frame:true,
+			title:'WPS report',
+			layout: {
+			    type: 'vbox',
+			    align : 'stretch',
+			    pack  : 'start'
+			},
+			items:[{
+				xtype:'panel',
+				layout:'fit',
+				autoScroll:true,
+				bodyStyle:"padding:10px;background:#FFFFFF;background-color:#FFFFFF",
+				collapsible:true,
+				minHeight:400,
+				
+				title:'Results',
+			
+				listeners:{
+					afterrender:{
+						fn:function(){
+							var failFn = function(){
+								alert("Unable to show report for  "+status.id);
+								wresults.close();
+							};
+							var passFn = function(data){
+								//alert("c");
+								results.getComponent(0).update(data.responseText);
+								results.doLayout();
+								//results.render();
+							};
+							try{
+								Ext.Ajax.request({
+									url: impactWPSURL+'service=processor&request=GetStatusReport&statusLocation='+json.wpsurl,
+									success: passFn,   
+									failure: failFn
+								});	
+							}catch(e){
+								alert('GetStatusReport: '+e);
+							}
+							
+						}
+					}					
+				}
+			},{
+				xtype:'panel',
+				collapsible:true,
+				title:'Inputs',
+				layout:'fit',
+				bodyStyle:"padding:10px;background:#FFFFFF;background-color:#FFFFFF",
+				listeners:{
+					afterrender:{
+						fn:function(){
+							var c=results.getComponent(1);
+							try{
+								var v=json.postData['wps:Execute']['wps:DataInputs'];
+								if(v){
+								c.update(dump(json.postData['wps:Execute']['wps:DataInputs']));
+								}else{
+									c.update("Unspecified");
+								}
+							}catch(e){
+								c.update("Invalid");
+							}
+						}
+					}
+				}					
+			
+			}]
+	
+	});
+		
+	
+	results.show();
+};
+
 var processProgressMonitoring = function(status){
 	
 	var uniqueId=status.uniqueid;
@@ -27,6 +105,8 @@ var processProgressMonitoring = function(status){
 		layout:'border',
 		items:[t,p],region:'center',frame:false,border:false,frameHeader:false,padding:0,margin:0
 	});
+	
+	
 	var w= Ext.create('Ext.Window',{
 		width:600,height:150,title:'Progress '+status.id,collapsible:true,layout:'border',
 		listeners:{
@@ -45,29 +125,13 @@ var processProgressMonitoring = function(status){
 		
 	});
 	
+
 	w.showResults = function(json){
 		p.updateProgress(1,100 + " %",true);
 		t.setValue("Completed: "+json.status);
 		b.enable();
 		c.enable();
-		if(!w.results){
-			w.results= Ext.create('Ext.Window',{
-				width:600,height:500,
-				listeners:{
-					beforeclose:{
-						fn:
-							function(){
-								w.results = undefined;
-							}
-					}
-				},
-				title:'WPS result',
-				collapsible:false,
-				html:"<img src='"+impactWPSURL+'service=processor&request=getimage&outputId=undefined&statusLocation='+json.wpsurl+"'></img>"
-			});
-			
-		}
-		w.results.show();
+		showStatusReport(json);
 	}
 	
 	w.show();
@@ -120,7 +184,7 @@ var processProgressMonitoring = function(status){
 		}catch(e){}
 		
 		if(!json.ready){
-			setTimeout(makeMonitorRequest,500);
+			setTimeout(makeMonitorRequest,2000);
 		}else{
 			results=json;
 			w.showResults(results);

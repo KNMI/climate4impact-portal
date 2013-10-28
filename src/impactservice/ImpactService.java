@@ -35,7 +35,7 @@ import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONMessageDecorator;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
-import wps.ProcessorRegister;
+import wps.WebProcessingInterface;
 //import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
 
@@ -89,7 +89,7 @@ public class ImpactService extends HttpServlet {
   		if(requestStr.equals("getProcessorStatusOverview")){
   		  GenericCart jobList = null;
   	    try{
-  	      response.setContentType("text/plain");
+  	      response.setContentType("text/html");
   	      jobList = User.getUser(request).getProcessingJobList();
   	      String html = GenericCart.CartPrinters.showJobList(jobList,request);
   	      response.getWriter().println(html);
@@ -110,7 +110,7 @@ public class ImpactService extends HttpServlet {
       			DebugConsole.errprint(e.getMessage());
       			return;
       		}
-  			Vector<ProcessorRegister.ProcessorDescriptor> listOfProcesses = ProcessorRegister.getProcessorsDescriptors();
+  			Vector<WebProcessingInterface.ProcessorDescriptor> listOfProcesses = WebProcessingInterface.getAvailableProcesses();
   			try {
   				JSONArray a = new JSONArray();
   				for(int j=0;j<listOfProcesses.size();j++){
@@ -142,7 +142,7 @@ public class ImpactService extends HttpServlet {
   			if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
   			 try {
   			    response.setContentType("application/json");
-            response.getWriter().print(ProcessorRegister.describeProcess(procId).toString());
+            response.getWriter().print(WebProcessingInterface.describeProcess(procId).toString());
           } catch (Exception e) {
             response.getWriter().print(e.getMessage());
             return;
@@ -159,7 +159,7 @@ public class ImpactService extends HttpServlet {
         if(dataInputs!=null){dataInputs=URLDecoder.decode(dataInputs,"UTF-8");}else{errorResponder.printexception("dataInputs="+dataInputs);return;}
          try {
             response.setContentType("application/json");
-            response.getWriter().print(ProcessorRegister.executeProcess(procId,dataInputs,request));
+            response.getWriter().print(WebProcessingInterface.executeProcess(procId,dataInputs,request));
           } catch (Exception e) {
             DebugConsole.errprintln(e.getMessage());
             try {
@@ -183,7 +183,7 @@ public class ImpactService extends HttpServlet {
         if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
          try {
             response.setContentType("application/json");
-            response.getWriter().print(ProcessorRegister.monitorProcess(procId,statusLocation).toString());
+            response.getWriter().print(WebProcessingInterface.monitorProcess(statusLocation).toString());
           } catch (Exception e) {
             response.getWriter().print(e.getMessage());
             return;
@@ -200,7 +200,27 @@ public class ImpactService extends HttpServlet {
         if(outputId!=null){outputId=URLDecoder.decode(outputId,"UTF-8");}else{errorResponder.printexception("outputId="+outputId);return;}
         ServletOutputStream out = response.getOutputStream();
          try {
-           out.write(ProcessorRegister.getImageFromStatusLocation(statusLocation,outputId));//.print(ProcessorRegister.getImageFromStatusLocation(statusLocation,outputId));
+           out.write(WebProcessingInterface.getImageFromStatusLocation(statusLocation,outputId));//.print(ProcessorRegister.getImageFromStatusLocation(statusLocation,outputId));
+          } catch (Exception e) {
+            out.print(e.getMessage());
+            return;
+         }
+      
+      }
+      
+      /**
+       * Get HTML from statuslocation
+       */
+      if(requestStr.equalsIgnoreCase("getstatusreport")){
+        
+        String statusLocation=request.getParameter("statusLocation");
+        if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
+        
+       
+        ServletOutputStream out = response.getOutputStream();
+         try {
+           response.setContentType("text/html");
+           out.write(WebProcessingInterface.generateReportFromStatusLocation(statusLocation).getBytes());//.print(ProcessorRegister.getImageFromStatusLocation(statusLocation,outputId));
           } catch (Exception e) {
             out.print(e.getMessage());
             return;

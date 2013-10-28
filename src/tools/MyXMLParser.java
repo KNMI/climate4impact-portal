@@ -18,6 +18,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import sun.net.www.protocol.http.HttpURLConnection;
 import tools.HTTPTools.WebRequestBadStatusException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -389,7 +392,7 @@ public class MyXMLParser {
          data+="}";
       }
       if(isArray){
-        data+="\n]";
+        data+="]\n";
       }    
       data+="";
       return data;    
@@ -443,7 +446,9 @@ public class MyXMLParser {
     public String toString(){
       String data ="";
       data="<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-      data+=toXML(xmlElements.get(0),0);
+      for(int j=0;j<xmlElements.size();j++){
+        data+=toXML(xmlElements.get(j),0);
+      }
       return data;
     }
 
@@ -457,6 +462,23 @@ public class MyXMLParser {
       data+="\n}\n";
       return data;
       
+    }
+    
+    /**
+     * Converts the XML document to JSON
+     * @return JSONObject representing the XML
+     */
+    public JSONObject toJSONObject(){
+      String jsonString = toJSON();
+      
+      JSONObject jsonObject=new JSONObject();
+      try {
+        jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
+      } catch (JSONException e) {
+        DebugConsole.errprintln("Unable to tokenize JSON string to JSONObject \n"+jsonString);
+        return null;
+      }
+      return jsonObject;
     }
   
 	};

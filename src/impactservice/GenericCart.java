@@ -24,7 +24,7 @@ import tools.DebugConsole;
 
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
-import wps.ProcessorRegister;
+import wps.WebProcessingInterface;
 
 
 
@@ -206,7 +206,7 @@ public class GenericCart {
           htmlResp+="<td>"+element.id+"</td>";
           
           
-          JSONObject progressObject = (JSONObject) ProcessorRegister.monitorProcess(element.id,statusLocation);
+          JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation);
           String progress= progressObject.getString("progress");
           
         
@@ -215,10 +215,12 @@ public class GenericCart {
           
           if(progress.equals("100")){
             htmlResp+="<td>ready</td>";
+            htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>";
           }else{
             htmlResp+="<td>"+progress+" % </td>";
+            htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>";
           }
-          htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>";
+          
         } catch (Exception e) {
           DebugConsole.println(e.getMessage());
           htmlResp+="<td>failed</td>";

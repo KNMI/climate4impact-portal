@@ -300,7 +300,7 @@ public class THREDDSCatalogBrowser {
   }
 
   private static boolean checkMaxChilds(JSONArray a) throws JSONException {
-    int maxNumberOfItems=2500;
+    int maxNumberOfItems=25000;
     if(a.length()>maxNumberOfItems){
       JSONObject b = new JSONObject();
       a.put(b);

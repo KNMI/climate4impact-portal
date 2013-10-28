@@ -18,23 +18,24 @@ import ogcservices.PyWPSServer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import tools.DebugConsole;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
 
-public class ProcessorRegister {
+public class WebProcessingInterface {
 
   //public static String WPSURL="http://webgis.nmdc.eu/cgi-bin/wps/pywps.cgi";
   //public static String WPSURL="http://bhw222.knmi.nl:8081/impactportal/WPS";
  // public static String WPSURL="http://climate4impact.eu/impactportal/WPS";
-   private static ProcessorRegister instance = null;
-   protected ProcessorRegister() {
+   private static WebProcessingInterface instance = null;
+   protected WebProcessingInterface() {
       // Exists only to defeat instantiation.
    }
-   public static ProcessorRegister getInstance() {
+   public static WebProcessingInterface getInstance() {
       if(instance == null) {
-         instance = new ProcessorRegister();
+         instance = new WebProcessingInterface();
       }
       return instance;
    }
@@ -56,7 +57,7 @@ public class ProcessorRegister {
 		}
 
 	};
-	public static Vector<ProcessorDescriptor> getProcessorsDescriptors() {
+	public static Vector<ProcessorDescriptor> getAvailableProcesses() {
 		
 		Vector <ProcessorDescriptor> processorList = null;
 		//if(processorList==null){
@@ -64,6 +65,7 @@ public class ProcessorRegister {
 			MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
 			try{
 				String getcaprequest=getWPSURL()+"service=WPS&request=getcapabilities";
+				DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
 				a.parse(new URL(getcaprequest));
 				System.out.println(a.get("wps:Capabilities").get("ows:ServiceIdentification").get("ows:Title").getValue());
 				Vector<MyXMLParser.XMLElement> listOfProcesses = a.get("wps:Capabilities").get("wps:ProcessOfferings").getList("wps:Process");
@@ -84,10 +86,20 @@ public class ProcessorRegister {
 		//return null;
 	}
 	
+	
+	/**
+	 * Returns the external URL of the Web Processing Service
+	 * @return the external URL of the Web Processing Service
+	 */
 	private static String getWPSURL() {
 	  return Configuration.GlobalConfig.getServerHomeURL()+Configuration.getHomeURL()+"/WPS?";
-    
   }
+	
+	/**
+	 * Encapsulates a String message into a JSON object which can be shown by the UI
+	 * @param message The error message to display
+	 * @return JSON Object which can be printed and is recognized by the UI
+	 */
   private static JSONObject returnErrorMessage(String message){
 	  try {
 	    DebugConsole.errprintln(message);
@@ -101,21 +113,27 @@ public class ProcessorRegister {
     return null;
 	}
 	
-	private static JSONObject checkException(MyXMLParser.XMLElement a,String extraInfo){
+  /**
+   * Checks whether the python Web Processing Service has raised an exception in the form of an XML serviceexception report document
+   * @param pyWPSXMLStructure The parsed XML document to check
+   * @param extraInfo Additional information to displayed with the error
+   * @return null if no exception occured, otherwise a JSON structure containing the message to display in the UI
+   */
+	private static JSONObject checkException(MyXMLParser.XMLElement pyWPSXMLStructure,String extraInfo){
 	   
 	    try{
 	      //DebugConsole.println(a.getFirst().getName());
-	      if(a.getFirst().getName().indexOf("ExceptionReport")>=0){
+	      if(pyWPSXMLStructure.getFirst().getName().indexOf("ExceptionReport")>=0){
 	        String message = "Web Proccessing Service Exception:\n";
 	        try{
-	          message+=a.getFirst().getFirst().getAttrValue("exceptionCode");
+	          message+=pyWPSXMLStructure.getFirst().getFirst().getAttrValue("exceptionCode");
 	          try{
 	          message+=" ";
-	          message+=a.getFirst().getFirst().getAttrValue("locator");
+	          message+=pyWPSXMLStructure.getFirst().getFirst().getAttrValue("locator");
 	          }catch(Exception e){}
 	          message+="\n";
 	          try{
-	            message+=a.getFirst().getFirst().get("ows:ExceptionText").getValue();
+	            message+=pyWPSXMLStructure.getFirst().getFirst().get("ows:ExceptionText").getValue();
 	          }catch(Exception e){}
 	        }catch(Exception e){}
 	        message+="\n\n"+extraInfo;
@@ -308,7 +326,12 @@ public class ProcessorRegister {
       data.put("statusLocation", statusLocation);
       data.put("creationTime", creationTime);
       data.put("id", procId);
-      data.put("postData", postData);
+      
+      MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
+      b.parseString(postData);
+      JSONObject inputDataAsJSON = b.toJSONObject();
+        
+      data.put("postData", inputDataAsJSON);
       String uniqueID=statusLocation.substring(statusLocation.lastIndexOf("/")+1);
       data.put("uniqueid", uniqueID);
       //Track this job
@@ -336,10 +359,16 @@ public class ProcessorRegister {
     
   }
   
-  public static JSONObject monitorProcess(String procId, String statusLocation) {
+  /**
+   * Reads a statuslocation and provides a JSON object with progress report
+   * @param statusLocation  The statuslocation to read (URL)
+   * @return  JSONObject with status information
+   */
+  public static JSONObject monitorProcess( String statusLocation) {
+    DebugConsole.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
-    DebugConsole.println("monitorProcess for "+procId+" with statusLocation "+statusLocation);
+    
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));
@@ -371,7 +400,7 @@ public class ProcessorRegister {
       try{
         DebugConsole.println("Process succeeded!: "+status.get("wps:ProcessSucceeded").getValue());
         data.put("progress",100 );
-        data.put("status","Process "+procId+" completed." );
+        data.put("status","Process completed." );
         data.put("ready", true);
         
        /* try {
@@ -399,12 +428,14 @@ public class ProcessorRegister {
   }
 	
   /**
-   * Returns an image based on statuslocation and identifier
+   * Returns an image based on statusLocation and identifier
    * @param statusLocation
+   * @param identifier
    * @return
    */
   public static byte[] getImageFromStatusLocation(String statusLocation,String identifier){
-     try {
+    DebugConsole.println("Get image from statusLocation "+statusLocation+" and id "+identifier);
+    try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));
       
@@ -412,9 +443,12 @@ public class ProcessorRegister {
         Vector<XMLElement> wpsData=b.get("wps:ExecuteResponse").get("wps:ProcessOutputs").getList("wps:Output");
         for(int j=0;j<wpsData.size();j++){
           try{
-            XMLElement complexData=wpsData.get(j).get("wps:Data").get("wps:ComplexData");
-            byte[] btDataFile = new sun.misc.BASE64Decoder().decodeBuffer( complexData.getValue().replaceAll("\n",""));  
-            return btDataFile;
+            String outputId=wpsData.get(j).get("ows:Identifier").getValue();
+            if(outputId.equals(identifier)){
+              XMLElement complexData=wpsData.get(j).get("wps:Data").get("wps:ComplexData");
+              byte[] btDataFile = new sun.misc.BASE64Decoder().decodeBuffer( complexData.getValue().replaceAll("\n",""));  
+              return btDataFile;
+            }
           }catch(Exception e){}
         }
       }catch(Exception e){
@@ -426,6 +460,64 @@ public class ProcessorRegister {
       return returnErrorMessage(e.getMessage()+"\n").toString().getBytes();
     }
     return null;
+  }
+  
+  
+  public static String generateReportFromStatusLocation(String statusLocation){
+    DebugConsole.println("Get HTML from statusLocation "+statusLocation);
+    String html = "";
+    html+="<link rel=\"stylesheet\" href=\"/impactportal/wps.css\" type=\"text/css\" />";
+
+    try {
+      MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
+      b.parse(new URL(statusLocation));
+      
+      html += "Report for "+b.get("wps:ExecuteResponse").get("wps:Process").get("ows:Title").getValue();
+      html+="<hr/>";
+      //html+=b.toString();
+      try {
+        html+="<table class=\"wpsreport\">";
+        html+="<tr><th>Identifier</th><th>Title</th><th>Value</th></tr>"; 
+        Vector<XMLElement> wpsData=b.get("wps:ExecuteResponse").get("wps:ProcessOutputs").getList("wps:Output");
+        
+        for(int j=0;j<wpsData.size();j++){
+          String identifier=wpsData.get(j).get("ows:Identifier").getValue();
+          String title=wpsData.get(j).get("ows:Title").getValue();
+          String data="";
+          XMLElement dataEl =wpsData.get(0).get("wps:Data");
+          //Literaldata are integers and strings
+          try{
+            data = dataEl.get("wps:LiteralData").getValue();
+          }catch(Exception e){}
+          
+          //Complextdata are images and netcdfs
+          
+          try{
+            dataEl.get("wps:ComplexData").getValue();
+            String mimeType = dataEl.get("wps:ComplexData").getAttrValue("mimeType");
+            DebugConsole.println("MimeType = "+mimeType);
+            if(mimeType.equalsIgnoreCase("image/png")){
+            //getImageFromStatusLocation
+              data+="<img height=360 src='"+Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"' />";
+            }
+             //data+=getWPSURL();
+          }catch(Exception e){}
+         // http://localhost:8080/impactportal/WPS?OUTPUT=/pywps-138296332037.xml
+          
+          
+          html+="<tr><td>"+identifier+"</td><td>"+title+"</td><td>"+data+"</td></tr>"; 
+        }
+        html+="</table>";
+      }catch(Exception e){
+        DebugConsole.errprintln("error");
+        return returnErrorMessage(e.getMessage()+"\n"+b.toString()).toString();
+      }
+    }catch(Exception e){
+      DebugConsole.errprintln("error");
+      return returnErrorMessage(e.getMessage()+"\n").toString();
+    }
+  
+    return html;
   }
   
 }
