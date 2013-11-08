@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -183,7 +184,7 @@ public class ImpactService extends HttpServlet {
         if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
          try {
             response.setContentType("application/json");
-            response.getWriter().print(WebProcessingInterface.monitorProcess(statusLocation).toString());
+            response.getWriter().print(WebProcessingInterface.monitorProcess(statusLocation,request).toString());
           } catch (Exception e) {
             response.getWriter().print(e.getMessage());
             return;
@@ -430,7 +431,7 @@ public class ImpactService extends HttpServlet {
   		PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
   		response.setContentType("text/plain");
   		try{
-  		  out1.println(NetCDFC.ncdump(LoginManager.getUser(request),requestStr));
+  		  out1.println(NetCDFC.executeNCDumpCommand(LoginManager.getUser(request),requestStr));
   		}catch(Exception e){
   			out1.println("Unable to get file "+requestStr);
   			e.printStackTrace(out1);
@@ -490,63 +491,67 @@ public class ImpactService extends HttpServlet {
 
         
         
-        ncdumpMessage=NetCDFC.ncdump(user,requestStr);
+        ncdumpMessage=NetCDFC.executeNCDumpCommand(user,requestStr);
         
         
         
-        
-        if(ncdumpMessage==""){
-          String msg="";
-          try{
-            String certificateLocation = null;
-            if(user!=null){
-              if(user.certificateFile != null){
-                certificateLocation = user.certificateFile;
+          if(ncdumpMessage==""){
+            String msg="";
+            try{
+              String certificateLocation = null;
+              if(user!=null){
+                if(user.certificateFile != null){
+                  certificateLocation = user.certificateFile;
+                }
               }
-            }
-            ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
-          }catch(UnknownHostException e){
-            msg="Unknown host '"+e.getMessage()+"'";
-            throw new Exception(msg);
-          }catch(WebRequestBadStatusException e){
-            msg=e.getMessage()+"<br/>";
-            if(e.getStatusCode()==401){
-              msg="HTTP status code "+e.getStatusCode()+": Unauthorized<br/>";
-              if(user == null){
-                msg+="<br/>Warning: You are not logged in.<br/>";
+              ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
+            }catch(SSLPeerUnverifiedException e){
+              msg="Peer unverified: "+e.getMessage();
+              throw new Exception(msg);
+            }catch(UnknownHostException e){
+              msg="Unknown host '"+e.getMessage()+"'";
+              throw new Exception(msg);
+            }catch(WebRequestBadStatusException e){
+              msg=e.getMessage()+"<br/>";
+              if(e.getStatusCode()==401){
+                msg="HTTP status code "+e.getStatusCode()+": Unauthorized<br/>";
+                if(user == null){
+                  msg+="<br/>Warning: You are not logged in.<br/>";
+                }
               }
-            }
-            if(e.getStatusCode()==403){
-              msg="HTTP status code "+e.getStatusCode()+": Forbidden<br/>";
-              if(user != null){
+              if(e.getStatusCode()==403){
+                msg="HTTP status code "+e.getStatusCode()+": Forbidden<br/>"+e.getResult();
+                if(user != null){
+                  msg+="<br/>You are logged in as "+user.id+"<br/>";
+                }
+              }
+              if(e.getStatusCode()==404)msg="HTTP status code "+e.getStatusCode()+": Not Found<br/>";
+              
+              /*else{
                 msg+="<br/>You are logged in as "+user.id+"<br/>";
-              }
+              }*/
+              /*String html = e.getResult();
+              
+              DebugConsole.println("Got:"+html+"]");
+              
+              DebugConsole.println("1");
+              HTMLParser htmlParser = new HTMLParser();
+              DebugConsole.println("2");
+              HTMLParserNode element = htmlParser.parseHTMLDocument(html);
+              DebugConsole.println("3");
+              HTMLParserNode body=htmlParser.getBody(element);
+              DebugConsole.println("4");
+              DebugConsole.println(body.printTree());
+              DebugConsole.println("5");
+              msg+=body;*/
+              throw new Exception(msg);
+            }catch(Exception e){
+              msg="Exception: "+e.getMessage();
+              throw new Exception(msg);
             }
-            if(e.getStatusCode()==404)msg="HTTP status code "+e.getStatusCode()+": Not Found<br/>";
-            
-            /*else{
-              msg+="<br/>You are logged in as "+user.id+"<br/>";
-            }*/
-            /*String html = e.getResult();
-            
-            DebugConsole.println("Got:"+html+"]");
-            
-            DebugConsole.println("1");
-            HTMLParser htmlParser = new HTMLParser();
-            DebugConsole.println("2");
-            HTMLParserNode element = htmlParser.parseHTMLDocument(html);
-            DebugConsole.println("3");
-            HTMLParserNode body=htmlParser.getBody(element);
-            DebugConsole.println("4");
-            DebugConsole.println(body.printTree());
-            DebugConsole.println("5");
-            msg+=body;*/
-            throw new Exception(msg);
-          }catch(Exception e){
-            msg="Exception: "+e.getMessage();
-            throw new Exception(msg);
           }
-        }
+        
+        DebugConsole.println("Trying to parse ncdump message");
         MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
         rootElement.parseString(ncdumpMessage);
         DebugConsole.println("Parsed");
@@ -675,21 +680,28 @@ public class ImpactService extends HttpServlet {
         rootElement = null;
         variables.clear();variables=null;
 
-      }catch(Exception e){
-        //e.printStackTrace();
-        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage();
+      }catch(WebRequestBadStatusException e){
+        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage()+"<br/>\n"+e.getResult();
         MessagePrinters.emailFatalErrorMessage("File access",msg);
-      
         DebugConsole.errprintln(msg);
         JSONArray errorVar = new JSONArray ();
-
         try {
           JSONObject error = new JSONObject();
           error.put("error",msg);
           errorVar.put(error);
         } catch (JSONException e1) {}
-        //e.printStackTrace(System.err);
+        out1.print(errorVar.toString()+"\n\n\n");
 
+      }catch(Exception e){
+        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage();
+        MessagePrinters.emailFatalErrorMessage("File access",msg);
+        DebugConsole.errprintln(msg);
+        JSONArray errorVar = new JSONArray ();
+        try {
+          JSONObject error = new JSONObject();
+          error.put("error",msg);
+          errorVar.put(error);
+        } catch (JSONException e1) {}
         out1.print(errorVar.toString()+"\n\n\n");
       }
 
@@ -1048,7 +1060,8 @@ public class ImpactService extends HttpServlet {
 		 * Handle NCDUMP requests
 		 */
 		if(serviceStr.equals("ncdump")){
-			handleNCDUMPRequest(request,response,errorResponder);
+			//handleNCDUMPRequest(request,response,errorResponder);
+		  DebugConsole.println("Deprecated command");
 		}
 		
 		/*

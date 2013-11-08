@@ -4,7 +4,6 @@ package ogcservices;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -14,9 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import tools.DebugConsole;
 import tools.MyXMLParser;
+import tools.MyXMLParser.Options;
 
 /**
  * Servlet implementation class AdagucViewer
@@ -240,7 +239,7 @@ public class AdagucViewer extends HttpServlet {
       
       
       //Output JSON using JSONP
-      out1.write((callbackStr+"("+rootElement.toJSON()+");").getBytes());
+      out1.write((callbackStr+"("+rootElement.toJSON(Options.NONE)+");").getBytes());
       rootElement = null;
       return;
       

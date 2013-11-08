@@ -63,9 +63,15 @@
 		<%
 		
 	
+
+		User user = null;
+		try{
+			user = LoginManager.getUser(request);
+		}catch(Exception e){
+			
+		}
 		
-		
-		 if (session.getAttribute("openid_identifier")==null){ 
+		 if (user==null){ 
 			%>
 			<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
 			<%

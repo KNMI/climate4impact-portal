@@ -2,8 +2,9 @@ var impactBase = '/impactportal/';
 var impactWPSURL='/impactportal/ImpactService?';
 
 var configuredWPSItems = [];
-
+var currentWPSId = undefined;
 var showStatusReport = function(json){
+	
 	var results= Ext.create('Ext.Window',{
 			width:900,height:600,autoScroll:true,autoDestroy:true,closeAction:'destroy',
 			frame:true,
@@ -18,10 +19,10 @@ var showStatusReport = function(json){
 				layout:'fit',
 				autoScroll:true,
 				bodyStyle:"padding:10px;background:#FFFFFF;background-color:#FFFFFF",
-				collapsible:true,
+				collapsible:false,
 				minHeight:400,
 				
-				title:'Results',
+				//title:'Results',
 			
 				listeners:{
 					afterrender:{
@@ -32,6 +33,10 @@ var showStatusReport = function(json){
 							};
 							var passFn = function(data){
 								//alert("c");
+								if(data.responseText.error){
+									alert(error);
+									return;
+								}
 								results.getComponent(0).update(data.responseText);
 								results.doLayout();
 								//results.render();
@@ -51,24 +56,70 @@ var showStatusReport = function(json){
 				}
 			},{
 				xtype:'panel',
-				collapsible:true,
-				title:'Inputs',
+				collapsible:false,
+				collapsed:false,
+				//title:'Used settings',
 				layout:'fit',
 				bodyStyle:"padding:10px;background:#FFFFFF;background-color:#FFFFFF",
+				items:{
+  		    			xtype:'panel',
+  						title:'Settings',
+  						id:'wpsparams2',
+  						layout: {
+  						    type: 'vbox',
+  						    align : 'stretch'
+  						}//,frame:true,border:false//,  						buttons:[{text:'Load preset',handler:function(){alert("not yet implemented");}},{text:'Save preset',handler:function(){alert("not yet implemented");}}]
+						
+  				},
 				listeners:{
 					afterrender:{
-						fn:function(){
+						fn:function(t){
 							var c=results.getComponent(1);
-							try{
-								var v=json.postData['wps:Execute']['wps:DataInputs'];
+							//try{
+								var v=json.postData;//.Execute.DataInputs;
+								console.log("Creating input settings list");
+								console.log(dump(json));
+								
+								var reRunProcessInputs = [];
+								//alert(id);
+								//return;
 								if(v){
-								c.update(dump(json.postData['wps:Execute']['wps:DataInputs']));
+									console.log("getting id");
+									var id = json.postData.Execute.Identifier.value;
+									console.log("id=="+id);
+									 var url = impactWPSURL+'service=processor&request=describeProcessor&id='+id;
+									 var failFn = function(){ alert("Unable to describe process:<br/>\n"+url);};
+									 var passFn = function(e){
+									   var json= Ext.JSON.decode(e.responseText);
+									   if(json.error){
+										   alert("Error:\n"+json.error);
+										   return;
+									   }
+								//	   alert(dump(v));
+									   
+									   var preConfiguredDefaultValues = v.Execute.DataInputs.Input;
+								
+								
+										var wpsInputList = undefined;
+										try{wpsInputList = json.ProcessDescriptions.ProcessDescription.DataInputs.Input;}catch(e){}
+										
+										var cmp = c.getComponent(0);
+										//cmp = Ext.getCmp('wpsparams2');
+										//alert(dump(wpsInputList)+dump(json.postData));
+										buildWPSInterface(cmp,wpsInputList,reRunProcessInputs,preConfiguredDefaultValues);
+										cmp.add({xtype:'button',text:'Re-run process '+id,handler:function(){startProcessing(reRunProcessInputs,id);}});
+									 };
+									 Ext.Ajax.request({
+									     url: url,
+									     success: passFn,   
+									     failure: failFn
+									  });
 								}else{
-									c.update("Unspecified");
+									c.getComponent(0).update("Unspecified");
 								}
-							}catch(e){
+							/*}catch(e){
 								c.update("Invalid");
-							}
+							}*/
 						}
 					}
 				}					
@@ -80,6 +131,8 @@ var showStatusReport = function(json){
 	
 	results.show();
 };
+
+
 
 var processProgressMonitoring = function(status){
 	
@@ -145,6 +198,42 @@ var processProgressMonitoring = function(status){
 		 };
 	
 	var makeMonitorRequest = function(){
+	
+		var failFn = function(){ alert("Unable to monitor progress for  "+status.id);w.close();};
+		var passFn = function(e){
+			
+			if(e){
+			  try{
+				  var json= Ext.JSON.decode(e.responseText);
+				  if(json.error){
+						alert("Error:\n"+json.error);
+						//  w.close();
+						return;
+				  }
+			  }catch(error){
+				  alert("Invalid JSON string: "+e.reponseText)
+				  w.close();
+				  return;
+			  }
+			  
+			}
+			try{
+				t.setValue(json.status);
+				
+				var percentage= json.progress/100;
+				var percentageText = parseInt(percentage*100) + " %";
+				p.updateProgress(percentage,percentageText,true);
+				w.setTitle('Progress '+status.id+" ("+percentageText+")");
+			}catch(e){}
+			//console.log(dump(json));
+			if(!json.ready){
+				setTimeout(makeMonitorRequest,2000);
+			}else{
+				results=json;
+				w.showResults(results);
+			}
+			
+		};
 		try{
 			Ext.Ajax.request({
 				url: impactWPSURL,
@@ -155,43 +244,7 @@ var processProgressMonitoring = function(status){
 		}catch(e){
 			alert('makeMonitorRequest: '+e);
 		}
-	}
-	var failFn = function(){ alert("Unable to monitor progress for  "+status.id);w.close();};
-	var passFn = function(e){
-		
-		if(e){
-		  try{
-			  var json= Ext.JSON.decode(e.responseText);
-			  if(json.error){
-					alert("Error:\n"+json.error);
-					//  w.close();
-					return;
-			  }
-		  }catch(error){
-			  alert("Invalid JSON string: "+e.reponseText)
-			  w.close();
-			  return;
-		  }
-		  
-		}
-		try{
-			t.setValue(json.status);
-			
-			var percentage= json.progress/100;
-			var percentageText = parseInt(percentage*100) + " %";
-			p.updateProgress(percentage,percentageText,true);
-			w.setTitle('Progress '+status.id+" ("+percentageText+")");
-		}catch(e){}
-		
-		if(!json.ready){
-			setTimeout(makeMonitorRequest,2000);
-		}else{
-			results=json;
-			w.showResults(results);
-		}
-		
 	};
-	 
 	makeMonitorRequest();
 	
 	
@@ -202,8 +255,8 @@ var processProgressMonitoring = function(status){
  * Scans all user input grids and fields and composes a JSON object with input information for the Process.
  * This information is posted to the server.
  */
-var startProcessing = function (){
-	 var wpsparams=Ext.getCmp('wpsparams');
+var startProcessing = function (configuredWPSItems,currentWPSId){
+	 //var wpsparams=Ext.getCmp('wpsparams');
 	 var wpsConfig;
 	 var h="[";
 	 for(var j=0;j<configuredWPSItems.length;j++){
@@ -226,7 +279,7 @@ var startProcessing = function (){
 	 wpsConfig={
 		 service:'processor',
 		 request:'executeProcessor',
-		 id:wpsparams.wpsid,
+		 id:currentWPSId,
 		 dataInputs:h
 	 };
 	 
@@ -253,23 +306,27 @@ var startProcessing = function (){
 	  });
 }
 
-var wpsProcessorDetails = function(id){
-	
-	    
-   var url = impactWPSURL+'service=processor&request=describeProcessor&id='+id;
-	
- 
-   /**
-    * Returns a grid component based on a json object with structure:
-    * id:'<id of the component>'
-    * title:'<title of the component displayed>;
-    * default:'<default values>' Can be a comma separted list.
-    * type:'<type, can be string, etc..>'
-    */
-   var createStringArrayGrid = function(input){
+/**
+ * Returns a grid component based on a json object with structure:
+ * id:'<id of the component>'
+ * title:'<title of the component displayed>;
+ * default:'<default values>' Can be a comma separted list.
+ * type:'<type, can be string, etc..>'
+ * 
+ * @param preConfiguredInput optional, a set of preconfigured values. For example from a previousely runned process
+ * 
+ */
+var createStringArrayGrid = function(input,preConfiguredInput){
 		 var data = [];
-		 var id='stringarraygrid_'+input.id;
-		 var values=input['default'].split(',');
+		 var identifier = input.Identifier.value;
+		 //var id=cmpidprefix+'stringarraygrid_'+identifier;
+		 var values=input.LiteralData.DefaultValue.value.split(',');
+		 if(preConfiguredInput){
+			 //console.log(dump(preConfiguredInput));
+			 try{
+				 values = preConfiguredInput.Data.LiteralData.value.split(',');
+			 }catch(e){}
+		}
 		 for(var j=0;j<values.length;j++){data.push({value:values[j],remove:'X',enabled:true})}
 	
 		 var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
@@ -281,20 +338,20 @@ var wpsProcessorDetails = function(id){
 			    	}
 			    }
 		 });
-			 
+		 var store = new Ext.data.Store({
+             fields: [{name: 'value',type: 'string'},
+                      {name: 'remove',type: 'float'},
+                      {name: 'enabled',type: 'bool'}
+             ],
+                       data: data
+             });	 
 		 var grid= {
-			   title:input.title,
-			   wpsid:input.id,
-			   wpstype:input.type,
-	           layout:'fit',xtype:'grid',frame:true,width:'auto',border:false, collapsible:true,collapsed:false,id:id,
+			   title:input.Title.value,
+			   wpsid:input.Identifier.value,
+			   wpstype:input.LiteralData.DataType.value,
+	           layout:'fit',xtype:'grid',frame:true,width:'auto',border:false, collapsible:true,collapsed:false,//,id:id,
 	           hideHeaders:true,
-	           store:  new Ext.data.Store({
-	                   fields: [{name: 'value',type: 'string'},
-	                            {name: 'remove',type: 'float'},
-	                            {name: 'enabled',type: 'bool'}
-	                   ],
-	                             data: data
-	                   }),
+	           store:  store,
 	           columns: [
 	                   {header: 'value', flex: 1, dataIndex: 'value',   editor: {allowBlank: false}},
 	                   {xtype: 'checkcolumn',header: 'use',dataIndex: 'enabled',width: 55},
@@ -305,16 +362,63 @@ var wpsProcessorDetails = function(id){
 	        	   itemdblclick:function(i,record){this.itemClicked(i,record);selectProcessor();}
 	           },
 	           itemClicked:function(i,record,item,index){selectedProcessor=record;},
-	           tbar:[{xtype:'label',text:input.title},{xtype:'tbseparator'},{xtype:'button',iconCls:'icon-add',text:'add new entry',handler:function(d){Ext.getCmp(id).addString();}}],
+	           tbar:[{xtype:'label',text:input.Title.value},{xtype:'tbseparator'},{xtype:'button',iconCls:'icon-add',text:'add new entry',handler:function(d){grid.addString();}}],
 	           plugins: [cellEditing],
 	           //selType: 'cellmodel',
 	           //selModel: {selType: 'cellmodel'},
 	           addString:function(){
-	           	this.getStore().add({value:'click to edit',remove:'X',enabled:true});
+	        	   store.add({value:'click to edit',remove:'X',enabled:true});
 	           }
 		 }
 		 return grid;
-   }
+};
+
+
+var buildWPSInterface = function(componentToBuild,wpsInputList,configuredWPSItems,preConfiguredDefaultValues){
+	//console.log(dump(preConfiguredDefaultValues));
+	if(!wpsInputList){return;}
+	for(j=0;j<wpsInputList.length;j++){
+		 var input = wpsInputList[j];
+		 if(input.LiteralData){
+			 
+			 var preConfiguredInput = undefined;
+			 if(preConfiguredDefaultValues){
+				 for(var i=0;i<preConfiguredDefaultValues.length;i++){
+					if(preConfiguredDefaultValues[i].Identifier.value==input.Identifier.value){
+						preConfiguredInput = preConfiguredDefaultValues[i];
+					}
+				 }
+			 }
+			 
+			 if(input.LiteralData.DataType.value='string'){
+				 var literalDataInput = input.LiteralData;
+				 try{
+					 if(literalDataInput.DefaultValue.value.indexOf(",")>0){
+						 var item =createStringArrayGrid(input,preConfiguredInput);
+						 if(configuredWPSItems)configuredWPSItems.push(item);
+						 componentToBuild.add(item);
+					 }else{
+						 var item =createStringArrayGrid(input,preConfiguredInput);
+						 if(configuredWPSItems)configuredWPSItems.push(item);
+						 try{
+							 componentToBuild.add(item);
+						 }catch(e){}
+					 }
+				 }catch(e){
+					 alert('Describe process: '+e);
+				 }
+			 }
+		 }
+	}
+};
+
+var wpsProcessorDetails = function(id){
+	
+	    
+   var url = impactWPSURL+'service=processor&request=describeProcessor&id='+id;
+	
+ 
+
    
    //List wpsProcessorDetails
    var failFn = function(){ alert("Unable to describe process:<br/>\n"+url);};
@@ -326,40 +430,30 @@ var wpsProcessorDetails = function(id){
 		 }
 		 //alert(e.responseText);
 		 //alert(json.inputs[0].type);
+		 //alert(json.ProcessDescriptions.ProcessDescription.DataInputs.Input)
 		 var wpsparams=Ext.getCmp('wpsparams');;
 		 
-		 wpsparams.wpsid=id;
+		 currentWPSId=id;
 		 
-		 configuredWPSItems = [];
-		 for(j=0;j<json.inputs.length;j++){
-			 var input = json.inputs[j];
-			 if(input.type='string'){
-				 try{
-					 if(input['default'].indexOf(",")>0){
-						 var item =createStringArrayGrid(input);
-						 configuredWPSItems.push(item);
-						 wpsparams.add(item);
-					 }else{
-						 var item =createStringArrayGrid(input);
-						 configuredWPSItems.push(item);
-						 try{
-						 wpsparams.add(item);
-						 }catch(e){}
-					 }
-				 }catch(e){
-					 alert('Describe process: '+e);
-				 }
-			 }
+		 var wpsInputList = undefined;
+		 try{wpsInputList = json.ProcessDescriptions.ProcessDescription.DataInputs.Input;}catch(e){}
+		 if(wpsInputList == undefined){
+			 //alert("No inputs available");
+			 //return;
+		 }else{
+			 
+			 configuredWPSItems = [];
+			 
+			buildWPSInterface(wpsparams,wpsInputList,configuredWPSItems);
+			 
 		 }
-		 
-		 
 		 
 		 var wpsstart=Ext.getCmp('wpsstart');;
 		 var html='<table class="wps">';
-		 html+='<tr><td>Title:</td><td>'+json.title+'</td></tr>';
-		 html+='<tr><td>Identifier:</td><td>'+json.id+'</td></tr>';
-		 html+='<tr><td>Abstract:</td><td>'+json.description+'</td></tr>';
-		 html+='<tr><td>Location:</td><td><a target="_blank" href="'+json.wpsurl+'">'+json.wpsurl+'</a></td></tr>';
+		 html+='<tr><td>Title:</td><td>'+json.ProcessDescriptions.ProcessDescription.Title.value+'</td></tr>';
+		 html+='<tr><td>Identifier:</td><td>'+json.ProcessDescriptions.ProcessDescription.Identifier.value+'</td></tr>';
+		 html+='<tr><td>Abstract:</td><td>'+json.ProcessDescriptions.ProcessDescription.Abstract.value+'</td></tr>';
+		 html+='<tr><td>Location:</td><td><a target="_blank" href="'+json.url+'">'+json.url+'</a></td></tr>';
 		 
 		 html+='</table>'
 		 

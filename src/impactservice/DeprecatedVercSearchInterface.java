@@ -1,8 +1,10 @@
 package impactservice;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.persistence.Query;
 
 import java.util.List;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
@@ -24,14 +26,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
 import org.hibernate.ejb.Ejb3Configuration;
 import org.slf4j.LoggerFactory; 
 
 import ASyncRunner.ASyncRunner;
 import ASyncRunner.MyRunnableWaiter;
 import DRS.DRS;
-
 import tools.DebugConsole;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
@@ -79,6 +79,12 @@ public class DeprecatedVercSearchInterface
         try {error.put("error", "Unable to make HTTP request, Exception: "+e.getMessage());return error;} catch (JSONException e1) {return null;}
       } catch (UnknownHostException e) {
         try {error.put("error", "Unable to make HTTP request, Exception: "+e.getMessage());return error;} catch (JSONException e1) {return null;}
+      } catch (SSLPeerUnverifiedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
       }
        
       JSONObject jsonData = new JSONObject();
@@ -414,6 +420,12 @@ public class DeprecatedVercSearchInterface
         } catch (UnknownHostException e) {
           fail("HTTP request "+URL+" failed: "+e.getMessage());
           return;
+        } catch (SSLPeerUnverifiedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
         }
         if(data!=null){
             succes(data);
@@ -436,6 +448,12 @@ public class DeprecatedVercSearchInterface
       return null;
     } catch (UnknownHostException e) {
       return null;
+    } catch (SSLPeerUnverifiedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
     return data;
         

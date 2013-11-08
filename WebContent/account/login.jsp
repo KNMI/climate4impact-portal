@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"   pageEncoding="UTF-8"  import="impactservice.ImpactService,tools.DebugConsole" import="javax.servlet.http.*" import="javax.servlet.http.Cookie"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"   pageEncoding="UTF-8"  import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.User" import="javax.servlet.http.*" import="javax.servlet.http.Cookie"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -134,8 +134,13 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 		
 		String Home="/impactportal/";
 	 	
+		User user = null;
+		try{
+			user = LoginManager.getUser(request);
+		}catch(Exception e){
+		}
 		
-	    if (session.getAttribute("openid_identifier")==null){ 
+	    if (user==null){ 
 	    	   %>
 	    	   <div class="impactcontent"><div class="cmscontent">
 	    	   	<div style="float:right;border:none;"><img src="../images/openid.jpg" alt="openidlogo" width="300"></img></div>
@@ -225,7 +230,7 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 				out.println("<div class=\"impactcontent\"><div class=\"cmscontent\">");
 			  	%>
 			  	
-			  	<h1>You are logged in</h1>You have successfully logged in with the following OpenID:<br/><br/><strong><%=session.getAttribute("openid_identifier") %></strong><br/><br/>
+			  	<h1>You are logged in</h1>You have successfully logged in with the following OpenID:<br/><br/><strong><%=user.id %></strong><br/><br/>
 			  	<b>Actions:</b>
 			 	<ul>
 			  	<li>If you are not a member of the CMIP5 group: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo: Create an ESGF account.</a><br/></li>
@@ -235,7 +240,7 @@ div#users-contain table td, div#users-contain table th { border: 1px solid #eee;
 			  	<%
 			   	    //Print warning when retrieving SLCS has failed.
 				try{
-				 	impactservice.LoginManager.checkLogin((String) session.getAttribute("openid_identifier"));
+				 	impactservice.LoginManager.checkLogin(user.id);
 				 }catch(Exception e){
 					impactservice.MessagePrinters.printWarningMessage(out, e);
 				}

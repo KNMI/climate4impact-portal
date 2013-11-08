@@ -40,7 +40,7 @@ public class GenericCart {
     
   }
 	
-	private class DataLocator{
+	public class DataLocator{
 		DataLocator(String id,String cartData){
 			this.id =id;
 			this.cartData=cartData;
@@ -58,12 +58,12 @@ public class GenericCart {
       this.addDate=addDate;
     }
 		String id = null;
-		String cartData = null;
+		public String cartData = null;
 		long addDateMilli = 0;
 	  String addDate = null;
 	}
 	
-	private Vector<DataLocator> dataLocatorList = new Vector<DataLocator>();
+	public Vector<DataLocator> dataLocatorList = new Vector<DataLocator>();
 	
 	/**
 	 * Adds a new dataset to the generic cart, based on its ID and URL. 
@@ -206,24 +206,24 @@ public class GenericCart {
           htmlResp+="<td>"+element.id+"</td>";
           
           
-          JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation);
-          String progress= progressObject.getString("progress");
-          
-        
-          
-          
-          
-          if(progress.equals("100")){
-            htmlResp+="<td>ready</td>";
+          JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
+          try{
+            String progress= progressObject.getString("progress");
+            if(progress.equals("100")){
+              htmlResp+="<td>ready</td>";
+              htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>";
+            }else{
+              htmlResp+="<td>"+progress+" % </td>";
+              htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>";
+            }
+          }catch(Exception e){
+            htmlResp+="<td>failed</td>";
             htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>";
-          }else{
-            htmlResp+="<td>"+progress+" % </td>";
-            htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>";
           }
           
         } catch (Exception e) {
           DebugConsole.println(e.getMessage());
-          htmlResp+="<td>failed</td>";
+          htmlResp+="<td>crashed</td>";
           htmlResp+="<td>-</td>";
           
           

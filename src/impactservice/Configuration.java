@@ -68,6 +68,13 @@ public class Configuration {
     public static void doConfig(MyXMLReader configReader) {
       serverHomeURL = configReader.getNodeValue("impactportal.serverurl");
     }
+    public static boolean isInOfflineMode() {
+      return false;
+    }
+    public static String getDefaultUser() {
+      //Only used in case of offline mode
+      return "https://pcmdi9.llnl.gov/esgf-idp/openid/maartenplieger";    
+    }
   }
   
   public static class DrupalConfig{

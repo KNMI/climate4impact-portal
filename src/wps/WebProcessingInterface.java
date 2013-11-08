@@ -5,10 +5,12 @@ import impactservice.Configuration;
 import impactservice.GenericCart;
 import impactservice.LoginManager;
 import impactservice.User;
+import impactservice.GenericCart.DataLocator;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import org.json.JSONTokener;
 
 import tools.DebugConsole;
 import tools.MyXMLParser;
+import tools.MyXMLParser.Options;
 import tools.MyXMLParser.XMLElement;
 
 public class WebProcessingInterface {
@@ -145,8 +148,15 @@ public class WebProcessingInterface {
 	  
 	}
 	
-	public static JSONObject describeProcess(String id){
-	 
+	/**
+	 * Describes the WPS process and returns a JSON object representing the process
+	 * @param id The identifier of the process
+	 * @return JSON representation of the XML describeProcess reslt
+	 * @throws Exception
+	 */
+	
+	public static JSONObject describeProcess(String id) throws Exception{
+	  DebugConsole.println("DescribeProcess "+id);
 	  String getcaprequest=getWPSURL()+"service=WPS&version=1.0.0&request=describeprocess&identifier="+id;
 	  MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
     try{
@@ -157,8 +167,17 @@ public class WebProcessingInterface {
     
     //Check if an Exception has been thrown:
     JSONObject exception = checkException(a,getcaprequest);
-    if(exception!=null)return exception;
+    if(exception!=null){
+      DebugConsole.println("Exception in DescribeProcess: "+exception.toString());
+      return exception;
+    }
+    //DebugConsole.println("toJSON");
+    //Convert the XML structure to JSOn
+    JSONObject jsonData = a.toJSONObject(MyXMLParser.Options.STRIPNAMESPACES);
+    jsonData.put("url",getcaprequest);
+    return jsonData;
     
+    /*
     DebugConsole.println(a.getFirst().getName());
     for(int j=0;j<a.getFirst().getElements().size();j++){
       DebugConsole.println("  "+a.getFirst().getElements().get(j).getName());
@@ -203,7 +222,7 @@ public class WebProcessingInterface {
       DebugConsole.errprintln("error");
       return returnErrorMessage(j.getMessage()+"\n"+a.toString());
     }
-    return data;
+    return data;*/
 	}
 	
 	public static String addLiteralData(String identifier,String value){
@@ -329,7 +348,7 @@ public class WebProcessingInterface {
       
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parseString(postData);
-      JSONObject inputDataAsJSON = b.toJSONObject();
+      JSONObject inputDataAsJSON = b.toJSONObject(Options.STRIPNAMESPACES);
         
       data.put("postData", inputDataAsJSON);
       String uniqueID=statusLocation.substring(statusLocation.lastIndexOf("/")+1);
@@ -364,7 +383,7 @@ public class WebProcessingInterface {
    * @param statusLocation  The statuslocation to read (URL)
    * @return  JSONObject with status information
    */
-  public static JSONObject monitorProcess( String statusLocation) {
+  public static JSONObject monitorProcess( String statusLocation,HttpServletRequest request) {
     DebugConsole.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
@@ -399,6 +418,8 @@ public class WebProcessingInterface {
       //If process is succeeded break!
       try{
         DebugConsole.println("Process succeeded!: "+status.get("wps:ProcessSucceeded").getValue());
+        JSONObject submittedData=getSubmittedJobInformation(statusLocation,request);
+        data.put("postData", submittedData);
         data.put("progress",100 );
         data.put("status","Process completed." );
         data.put("ready", true);
@@ -427,6 +448,33 @@ public class WebProcessingInterface {
     return data;
   }
 	
+  private static JSONObject getSubmittedJobInformation(String statusLocation,HttpServletRequest request) throws Exception {
+    DebugConsole.println("getSubmittedJobInformation with statusLocation"+statusLocation);
+    User user = LoginManager.getUser(request);
+   
+    Iterator<DataLocator> itr = user.getProcessingJobList().dataLocatorList.iterator();
+    while(itr.hasNext()) {
+      DataLocator element = itr.next(); 
+      try {
+        JSONObject elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
+        String jobStatusLocation = elementProps.getString("wpsurl");
+        if(statusLocation.equals(jobStatusLocation)){
+          DebugConsole.println("Found job with statusLocation"+statusLocation);
+          String id= elementProps.getString("id");
+          DebugConsole.println("This job has processor id "+id);
+         // return describeProcess(id);
+          return elementProps.getJSONObject("postData");
+        }
+      }catch(Exception e){
+        return null;
+        
+      }
+      
+     }
+      // String statusLocation = elementProps.getString("wpsurl");
+    // TODO Auto-generated method stub
+    return null;
+  }
   /**
    * Returns an image based on statusLocation and identifier
    * @param statusLocation
@@ -472,7 +520,8 @@ public class WebProcessingInterface {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));
       
-      html += "Report for "+b.get("wps:ExecuteResponse").get("wps:Process").get("ows:Title").getValue();
+      html += "<h1>Report for "+b.get("wps:ExecuteResponse").get("wps:Process").get("ows:Title").getValue()+"</h1>";
+      html+="See <a href=\""+statusLocation+"\">"+statusLocation+"</a> (XML).";
       html+="<hr/>";
       //html+=b.toString();
       try {
@@ -484,7 +533,7 @@ public class WebProcessingInterface {
           String identifier=wpsData.get(j).get("ows:Identifier").getValue();
           String title=wpsData.get(j).get("ows:Title").getValue();
           String data="";
-          XMLElement dataEl =wpsData.get(0).get("wps:Data");
+          XMLElement dataEl =wpsData.get(j).get("wps:Data");
           //Literaldata are integers and strings
           try{
             data = dataEl.get("wps:LiteralData").getValue();
@@ -509,12 +558,12 @@ public class WebProcessingInterface {
         }
         html+="</table>";
       }catch(Exception e){
-        DebugConsole.errprintln("error");
-        return returnErrorMessage(e.getMessage()+"\n"+b.toString()).toString();
+        DebugConsole.errprintln("error in generateReportFromStatusLocation: "+e.getMessage());
+        return "No results available";//(e.getMessage()+"\n"+b.toString()).toString();
       }
     }catch(Exception e){
       DebugConsole.errprintln("error");
-      return returnErrorMessage(e.getMessage()+"\n").toString();
+      return (e.getMessage()+"\n").toString();
     }
   
     return html;

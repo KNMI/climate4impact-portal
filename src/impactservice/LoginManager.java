@@ -55,6 +55,11 @@ public class LoginManager {
    * @throws Exception
    */
   public synchronized static void getCredential(User user) throws Exception{
+    
+    if(Configuration.GlobalConfig.isInOfflineMode()==true){
+      DebugConsole.println("offline mode");
+      return;
+    }
     MyProxy myProxy = new MyProxy(Configuration.LoginConfig.getMyProxyServerHost(),Configuration.LoginConfig.getMyProxyServerPort());
     //myProxy.setHost(Configuration.LoginConfig.getMyProxyServerHost());
     //myProxy.setPort(Configuration.LoginConfig.getMyProxyServerPort());
@@ -126,6 +131,9 @@ public class LoginManager {
     }*/
     HttpSession session = request.getSession();
     String id=(String) session.getAttribute("openid_identifier");
+    if(Configuration.GlobalConfig.isInOfflineMode()==true){
+      id=Configuration.GlobalConfig.getDefaultUser();
+    }
     DebugConsole.println("Getting user from session with id "+id);
     if(id==null){throw new Exception("You are not logged in...");}
     User user = getUser(id);

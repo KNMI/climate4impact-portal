@@ -1,12 +1,21 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.*"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+  <jsp:include page="../includes-ext.jsp" />
   <%
-  String processorId = request.getParameter("processor");
-  %>
-    <jsp:include page="../includes-ext.jsp" />
+  	String processorId = request.getParameter("processor");
+  	User user = null;
+	try{
+		user = LoginManager.getUser(request);
+	}catch(Exception e){
+	}
+	if(user!=null&&processorId!=null){
+	%>
+
+  
+  
+  
     
     <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" />
      
@@ -50,7 +59,7 @@
   			   			id:'wpsstart',
   			   			height:200, 
   			   			frame:true,border:false,
-  			   			buttons:[{text:'Start processing',handler:function(){startProcessing();}}],
+  			   			buttons:[{text:'Start processing',handler:function(){startProcessing(configuredWPSItems,currentWPSId);}}],
   			   		
   			   			
   			   				html:'<div id="wpsdivdescription" >Loading Web Processing Service description...</div><div id="wpsdivresult"/>'
@@ -76,6 +85,9 @@
     	wpsProcessorDetails('<%=processorId%>');
     });
     </script>
+    	 <%
+ 	}
+    %>
   </head>
   <body>
 		<jsp:include page="../header.jsp" /> 
@@ -87,21 +99,33 @@
 	
 		 
 		 <%
-		 if (session.getAttribute("openid_identifier")==null){
+
+			
+		 	if (user==null){
 			 %>
-			 <ul>
-			 <li><a href="wpsoverview.jsp">Go back to processing overview</a></li>
-			 <li>Before you can start processing, you need to <a target="_blank" href="../account/login.jsp">login</a>. When you are logged in, you can <a href="" onclick="document.location.reload(true);">refresh</a> this page.</li>
-			 <li>Please read why you need to login at <a href="../help/howto.jsp#why_login">Howto: Why Login?</a></li>
-			 </ul>
+			 	<ul>
+			 	<li><a href="wpsoverview.jsp">Go back to processing overview</a></li>
+			 	<li>Before you can start processing, you need to <a target="_blank" href="../account/login.jsp">login</a>. When you are logged in, you can <a href="" onclick="document.location.reload(true);">refresh</a> this page.</li>
+			 	<li>Please read why you need to login at <a href="../help/howto.jsp#why_login">Howto: Why Login?</a></li>
+			 	</ul>
 			 <%
-		 }else{
-			 %>
-			 	<a href="wpsoverview.jsp">Back to overview</a>
-			 <div id="content2"></div>
-			<div id="container" style="padding-bottom:20px; "></div>
+		 	}
+		 	
+		 	if(processorId == null){
+	 		%>
+			 	<ul>
+			 	<li>Before you can start processing, you need to select a processor</li>
+			 	<li><a href="wpsoverview.jsp">Go back to processing overview to select one.</a></li>
+			 	</ul>
+			<%	
+		 	}
+			if(user!=null&&processorId!=null){
+			%>
+				<a href="wpsoverview.jsp">Back to overview</a>
+				<div id="content2"></div>
+				<div id="container" style="padding-bottom:20px; "></div>
 			 <%
-		 }
+		 	}
 		 %>
 		 
 			

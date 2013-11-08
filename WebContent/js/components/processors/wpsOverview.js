@@ -10,7 +10,7 @@ var wpsProcessorDetails = function(record){
 			alert("Error<br/>"+json.error);
 			return;
 		 }
-		 alert(e.responseText);
+		 alert("wpsProcessorDetails: "+e.responseText);
    }
    Ext.Ajax.request({
      url: url,

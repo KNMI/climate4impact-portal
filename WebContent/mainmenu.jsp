@@ -1,4 +1,4 @@
-  <%@page import="tools.HTTPTools" import="impactservice.*"%>
+<%@page import="tools.HTTPTools" import="impactservice.*"%>
 <div class="topnav">
     <p>
  
@@ -99,7 +99,12 @@
 		}
 	}
 	
-
+	User user = null;
+	try{
+		user = LoginManager.getUser(request);
+	}catch(Exception e){
+		
+	}
 %>
 
 </div> 
@@ -115,7 +120,7 @@
    
     <!-- LOGIN  -->
     <li <% if(highLightLogin)out.print("class=\"sel\""); %>>
-    <% if(session.getAttribute("openid_identifier")!=null){
+    <% if(user!=null){
 	  out.print(" <a href="+HTTPTools.makeCleanURL(Home+currentLoginPage)+" >Account"+"</a>");
 	  out.print("</li><li><a href=\""+Home+"account/basket.jsp\"><code id='baskettext1' style=\"padding-left:20px;background-image:url('"+Home+"images/shoppingcart16.png');background-repeat:no-repeat;\">("+numProductsString+")</code></a></li>");
     }else{

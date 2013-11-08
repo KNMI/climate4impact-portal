@@ -4,6 +4,8 @@ package tools;
 
 
 
+import impactservice.Configuration;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,9 +27,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -158,13 +160,16 @@ public class HTTPTools extends HttpServlet {
 	}
   }
   
-  public static String makeHTTPGetRequest(String url) throws WebRequestBadStatusException, UnknownHostException{
+  public static String makeHTTPGetRequest(String url) throws WebRequestBadStatusException, IOException{
     return makeHTTPGetRequest(url,null,null,null);
   }
-  public static String makeHTTPGetRequest(String url,String pemFile,String trustRootsFile, String trustRootsPassword) throws WebRequestBadStatusException, UnknownHostException{
+  public static String makeHTTPGetRequest(String url,String pemFile,String trustRootsFile, String trustRootsPassword) throws WebRequestBadStatusException, IOException{
     String connectToURL=makeCleanURL(url);
     DebugConsole.println("  Making GET: "+connectToURL);
-    
+    if(Configuration.GlobalConfig.isInOfflineMode()==true){
+      DebugConsole.println("Offline mode");
+      return null;
+    }
     long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     
     String result=null;
@@ -182,7 +187,11 @@ public class HTTPTools extends HttpServlet {
       
       
       HttpGet httpget = new HttpGet(connectToURL);
-      HttpResponse response = httpclient.execute(httpget);
+      
+      HttpResponse response = null;
+     
+        response = httpclient.execute(httpget);
+    
       HttpEntity  entity  = response.getEntity();
       //DebugConsole.println("Result status  : " + response.getStatusLine());
       if(response.getStatusLine().getStatusCode()<200||response.getStatusLine().getStatusCode()>300){
@@ -209,6 +218,7 @@ public class HTTPTools extends HttpServlet {
       throw unknownHostException;
     } catch (IOException e) {
       DebugConsole.printStackTrace(e);
+      throw new WebRequestBadStatusException(403,"The specified credentials were not found. ");
     } catch (UnrecoverableKeyException e) {
       e.printStackTrace();
       throw new WebRequestBadStatusException(403);
@@ -226,6 +236,10 @@ public class HTTPTools extends HttpServlet {
       throw new WebRequestBadStatusException(403);
     } catch (GSSException e) {
       e.printStackTrace();
+      throw new WebRequestBadStatusException(403);
+    }catch(Exception e){
+      e.printStackTrace();
+      DebugConsole.println("HTTP Exception");
       throw new WebRequestBadStatusException(403);
     }
     if(redirectLocation!=null){

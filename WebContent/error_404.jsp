@@ -23,9 +23,9 @@
       <br/>
       <a href="javascript:javascript:history.go(-1)">Go back</a>
       <br/><br/>
-      <p>
+     <!--  <p>
       <img src="/impactportal/images/Stick_figure-wondering.png"/>
-      </p>
+      </p>-->
     </div>
     
     <!-- /Contents -->

@@ -1,5 +1,7 @@
 package tools;
 
+import impactservice.Configuration;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import org.xml.sax.SAXException;
 
 
 public class MyXMLParser {
+  public enum Options {NONE,STRIPNAMESPACES};
   /**
    * XML attribute 
    * @author plieger
@@ -177,7 +180,12 @@ public class MyXMLParser {
 				DocumentBuilder db = dbf.newDocumentBuilder();
 			  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
 		    DebugConsole.println("  Making XML GET: "+url.toString());
-        	
+		    if(Configuration.GlobalConfig.isInOfflineMode()==true){
+		      if(url.getHost().equals("localhost")==false){
+		        DebugConsole.println("Offline mode");
+		        throw new Exception("Offline mode.");
+		      }
+		    }	
         connection = (HttpURLConnection) url.openConnection();
         InputStream inputStream = connection.getInputStream();
 
@@ -347,7 +355,9 @@ public class MyXMLParser {
         data+="\"attr\":{";
         for(int j=0;j<el.getAttributes().size();j++){
           if(j>0)data+=",";
-          data+="\""+jsonEncode(el.getAttributes().get(j).name)+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
+          String name = el.getAttributes().get(j).name;
+          
+          data+="\""+jsonEncode(name.substring(name.indexOf(":")+1))+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
         }
         data+="}";
       }
@@ -374,9 +384,12 @@ public class MyXMLParser {
      * @param depth The depth of the XML elements
      * @return JSON formatted string
      */
-    private String xmlElementstoJSON(Vector<XMLElement> vector,int depth){
+    private String xmlElementstoJSON(Vector<XMLElement> vector,int depth,Options options){
       String data = "";
-      data+="\""+jsonEncode(vector.get(0).name)+"\":";
+      String name = vector.get(0).name;
+      name  =jsonEncode(name.substring(name.indexOf(":")+1));
+      //DebugConsole.println(name);
+      data+="\""+name+"\":";
       boolean isArray=false;
       if(vector.size()>1)isArray=true;
 
@@ -388,7 +401,7 @@ public class MyXMLParser {
            data+=",\n";
          }
          data+="{";
-         data+=toJSON(vector.get(j),depth+1);
+         data+=toJSON(vector.get(j),depth+1,options);
          data+="}";
       }
       if(isArray){
@@ -404,7 +417,7 @@ public class MyXMLParser {
      * @param depth The current depth of the XML element
      * @return JSON string
      */
-    private String toJSON(XMLElement el,int depth){
+    private String toJSON(XMLElement el,int depth,Options options){
       String data = "";
       if(el==null)return data;
     
@@ -417,13 +430,14 @@ public class MyXMLParser {
       //Make a Set of the XML elements names
       Set<String> set = new HashSet<String>();
       for(int j=0;j<el.xmlElements.size();j++){
-        set.add(el.xmlElements.get(j).getName());
+        String name = el.xmlElements.get(j).getName();
+        set.add(name);
       }
       
       //Loop through the XML elements with unique names
       for (String temp : set){
         if(firstDataDone){data+=",\n";}firstDataDone=true;
-        data+=xmlElementstoJSON(el.getList(temp),depth+1);
+        data+=xmlElementstoJSON(el.getList(temp),depth+1,options);
       }
       //Clear and remove the set
       set.clear();set=null;
@@ -456,21 +470,30 @@ public class MyXMLParser {
      * Returns The XML object as a JSON string XML string.
      * Values are denoted as 'value' and attributes with 'attr'.
      */
-    public String toJSON(){
+    public String toJSON(Options options){
       String data ="{\n";
-      data+=xmlElementstoJSON(xmlElements,0);
+      data+=xmlElementstoJSON(xmlElements,0,options);
       data+="\n}\n";
       return data;
       
     }
     
+    
     /**
      * Converts the XML document to JSON
      * @return JSONObject representing the XML
+     * @throws Exception 
      */
-    public JSONObject toJSONObject(){
-      String jsonString = toJSON();
-      
+    public JSONObject toJSONObject(Options options) throws Exception{
+      //DebugConsole.println("Constructing JSON");
+      String jsonString = null;
+      try{
+        jsonString = toJSON(options);
+      }catch(Exception e){
+        e.printStackTrace();
+        throw new Exception("Unable to convert XML to JSON: "+e.getMessage());
+      }
+      //DebugConsole.println("JSON constructed:"+jsonString);
       JSONObject jsonObject=new JSONObject();
       try {
         jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();

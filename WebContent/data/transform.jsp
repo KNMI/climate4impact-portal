@@ -12,7 +12,18 @@
  
 		<div class="impactcontent">
   	    <div class="cmscontent">
-  		<%try{out.print(DrupalEditor.showDrupalContent("?q=transformations",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+  		<%
+  		try{
+  			out.print(DrupalEditor.showDrupalContent("?q=transformations",request));
+ 		}catch(DrupalEditor.DrupalEditorException e){
+ 			out.print(e.getMessage());response.setStatus(e.getCode());
+ 			
+ 			out.println("<hr/><a href=\"wpsoverview.jsp\">Show the list of transformations</a>");
+ 			
+  		
+  		}
+  		
+  		%>
   		</div>
 		</div>
 	 
