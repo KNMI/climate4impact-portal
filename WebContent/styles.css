@@ -30,16 +30,16 @@ body, .x-body {
     /*font-family: tahoma,arial,verdana,sans-serif;*/
     font-family: Verdana,Geneva,Arial,sans-serif;;
     font-size: 12px;
-    font-style: 'normal';
-    font-variant: 'normal';
-    font-weight:'normal';
+    font-style: normal;
+    font-variant: normal;
+    font-weight:normal;
   
     /*min-width: 59em;
     max-width: 80em;
     min-width:960px;
     max-width: 90em;*/
   
-    color: #4c4e4f;
+    color: #3c3e4f;
      -moz-box-sizing: border-box;
     overflow: -moz-scrollbars-vertical;
   height: 100%;
@@ -53,6 +53,10 @@ body, .x-body {
     /*background: #F3F5F6 url(images/bg-page.png) top left repeat-x;*/
     background: #F3F3F3 url(images/bg-page.png) top left repeat-x;
    /*  overflow-y: scroll;*/
+}
+
+.headerlogo{
+	border:0;
 }
 
 /* More layout and styles */
@@ -283,9 +287,9 @@ div.impactcontent {
     line-height: 1.6;
   
     font-size: 13.5px;
-    font-style: 'normal';
-    font-variant: 'normal';
-    font-weight:'normal';
+    font-style: normal;
+    font-variant: normal;
+    font-weight:normal;
   /*border:1px solid blue;*/
   /*border-left:1px solid #EEE;
   border-right:1px solid #EEE;*/
@@ -353,9 +357,9 @@ div.impactcontent a{
   line-height: 1.5;
 
     /*font-size: 13px;*/
-    font-style: 'normal';
-    font-variant: 'normal';
-    font-weight:'normal';
+    font-style: normal;
+    font-variant: normal;
+    font-weight:normal;
    
   }
 
@@ -623,36 +627,36 @@ div.viewcode-block:target {
 .couriernew, textarea.couriernew{
   font-family: Arial, Helvetica, sans-serif;
     font-size: 24px;
-    font-style: 'normal';
-    font-variant: 'normal';
-    font-weight:'bold';
+    font-style: normal;
+    font-variant: normal;
+    font-weight:bold;
     color:#0F0;
     font:normal 12px courier new;
 }
 
 
-        #variable-results a {
-            color: #00F;
-            font:bold 14px tahoma, arial, helvetica, sans-serif;
-            text-decoration:none;
-            font-weight:normal;
-            cursor:pointer
-          
-        }
-        #variable-results img {
-            vertical-align:middle;
-        }
-        
-        #variable-results a:hover {
-            text-decoration:underline;
-            font-weight:bold;
-            cursor:pointer
-        }
-        
-        #variable-results p {
-            margin:3px !important;
-        }
-        
+.variable-results a {
+    color: #00F;
+    font:bold 14px tahoma, arial, helvetica, sans-serif;
+    text-decoration:none;
+    font-weight:normal;
+    cursor:pointer
+  
+}
+.variable-results img {
+    vertical-align:middle;
+}
+
+.variable-results a:hover {
+    text-decoration:underline;
+    font-weight:bold;
+    cursor:pointer
+}
+
+.variable-results p {
+    margin:3px !important;
+}
+
         .variable-item {
             font:normal 12px tahoma, arial, helvetica, sans-serif;
             /*padding:3px 10px 3px 10px;*/
@@ -669,11 +673,12 @@ div.viewcode-block:target {
          vertical-align:middle;
        }
       .variable-item a {
-            color: #F00;
-            font:bold 13px tahoma, arial, helvetica, sans-serif;
-            text-decoration:none;
-            font-weight:bold;
-            cursor:hand
+           color: #00F;
+    font:bold 14px tahoma, arial, helvetica, sans-serif;
+    text-decoration:none;
+    font-weight:normal;
+    cursor:pointer
+  
         }
         .variable-item h3 {
             display:block;
@@ -1666,7 +1671,7 @@ ul.pager {
 .pager-current {
     font-weight: bold;
     color: #0c3762;
-    border-bottom: '1px solid black';
+    border-bottom: 1px solid black;
 }
 
 
@@ -1693,7 +1698,7 @@ ul.pager {
 .ui-iconbutton {
   background: transparent;
   border: none;
-  display:'block';
+  display:block;
 }
 
 
@@ -1849,5 +1854,204 @@ ul.pager {
 	
 } 
        
+.no-close .ui-dialog-titlebar-close {
+	display: none;
+}      
+
+.noTitleStuff .ui-dialog-titlebar {display:none}
        
-       
+.ui-dialog{
+	z-index:100000;
+}
+
+.button_zoomfullextent {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: 0px -16px; 
+}
+.button_info {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -16px -32px !important; 
+}
+.button_getfeatureinfo {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -0px -32px !important; 
+}
+
+.button_metadata {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -80px -32px !important; 
+}
+.button_duplicate {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -48px -16px; 
+}
+.button_refresh {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -48px 0px; 
+}
+.button_layer_visible {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -80px -16px; 
+}
+.button_layer_hidden {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -96px -16px; 
+}
+.button_play_animation {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -16px 0px; 
+}
+.button_stop_animation {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -32px 0px; 
+}
+.button_stoploading{
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -96px 0px; 
+}
+.button_undo {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -32px -32px !important; 
+}
+.button_redo {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -48px -32px !important; 
+}
+.button_makeLink {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -64px -32px !important; 
+}
+.button_layerlist_layerup {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -80px 0px; 
+}
+.button_layerlist_layerdown {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -64px 0px; 
+
+}
+.button_layerlist_layernew {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -64px -16px !important; 
+
+}
+.button_layerlist_layerdelete {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -96px 0px; 
+}
+.button_remove {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -96px 0px; 
+}
+.button_nobackground{
+  background-image:none;
+  background:none;
+}
+.button_console_icon {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -32px -16px; 
+}
+.button_settings_icon {
+    background-image:url(images/adagucviewerlogos.png) !important;
+    width:16px;
+    height:16px;
+    background-position: -112px 0px !important;  
+}
+.button_legend_icon {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -80px 32px !important;  
+}
+
+
+.checkbox_legend_icon{
+  background-image:url(images/legend_icon.gif) !important;
+  background-repeat:no-repeat; 
+  padding-left:20px;
+  margin-left:5px;
+}
+
+.button_projection_icon {
+  background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -16px -16px !important;  
+}
+
+.button_link{
+    background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+  background-position: -64px -32px !important;  
+}
+
+.button_basket{
+    background-image:url(images/adagucviewerlogos.png) !important;
+  width:16px;
+  height:16px;
+ background-position: 0px -48px !important;  
+}
+
+
+.codeshoppingcarticon{
+	padding:0px 0px 0px 16px;
+	margin:0px;
+	 background-image:url(images/adagucviewerlogos.png) !important;
+	background-repeat:no-repeat;
+	background-position: 0px -48px !important;  
+}
+.codejobsicon{
+	padding:0px 0px 0px 16px;
+	margin:0px;
+	 background-image:url(images/adagucviewerlogos.png) !important;
+	background-repeat:no-repeat;
+	background-position: -112px -32px !important;  
+}
+.codeusersicon{
+	padding:0px 0px 0px 16px;
+	margin:0px;
+	 background-image:url(images/adagucviewerlogos.png) !important;
+	background-repeat:no-repeat;
+	background-position: -96px -32px !important;  
+}

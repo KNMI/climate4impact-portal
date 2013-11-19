@@ -3,15 +3,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-   
+   <%
+   String Home="/impactportal/"; 
+   %>
     <jsp:include page="../includes-ext.jsp" />
     
-    <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" />
+   <!--  <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" /> -->
      
     <script type="text/javascript" src="../js/components/processors/useProcessor.js"></script>
+    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
+    <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
+    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
     <script type="text/javascript">
-    var impactBase = '/impactportal/';
+    var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
     var task;
     var removeId = function(id){
@@ -64,7 +69,7 @@
     });
     Ext.Loader.setPath('Ext.ux', '../js/ux');
 
-    Ext.require([
+  /* Ext.require([
         'Ext.selection.CellModel',
         'Ext.grid.*',
         'Ext.data.*',
@@ -73,11 +78,13 @@
         'Ext.form.*',
         'Ext.ux.CheckColumn',
         'Ext.ux.ButtonColumn'
-    ]);
+    ]);*/
     Ext.QuickTips.init();
 
 
-    Ext.onReady(function(){ 
+    Ext.onReady(function(){
+    	//basketWidget.show();
+    	//datasetviewer.show('http://opendap.nmdc.eu/knmi/thredds/dodsC/IS-ENES/CERFACS/CERFACS-SCRATCH2010/ncar_ccsm3_0/annual/uvas_1d_2099_annual.nc');
 		var runner = new Ext.util.TaskRunner();
       	task = runner.newTask({
         	run: function () {
@@ -115,7 +122,11 @@
 			<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
 			<%
 		}else{
-			out.println("<div id='joblist'/>");
+			
+			
+			out.println("<div id='joblist'></div>");
+			
+			out.println("<br/><a href='"+Home+"/data/wpsoverview.jsp'>Go to transformations</a>");
 			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
 		}
 		%>

@@ -10,7 +10,7 @@
     Ext.Loader.setConfig({
       enabled: true
   });
-  Ext.Loader.setPath('Ext.ux', '../js/ux');
+/*  Ext.Loader.setPath('Ext.ux', '../js/ux');
 
   Ext.require([
       'Ext.selection.CellModel',
@@ -21,7 +21,7 @@
       'Ext.form.*',
       'Ext.ux.CheckColumn',
       'Ext.ux.ButtonColumn'
-  ]);
+  ]);*/
   Ext.QuickTips.init();
     Ext.onReady(function(){
     	var container = Ext.create('Ext.container.Container', {

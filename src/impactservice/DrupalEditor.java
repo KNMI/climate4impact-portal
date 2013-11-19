@@ -155,7 +155,8 @@ public class DrupalEditor {
 			returnMessage += titleNode.printTree();
 			
 			// Print body
-			HTMLParserNode body = htmlParser.searchTreeNodes(element,"div id=\"block-system-main\" class=\"block block-system\"");
+			//HTMLParserNode body = htmlParser.searchTreeNodes(element,"div id=\"block-system-main\" class=\"block block-system\"");
+			HTMLParserNode body = htmlParser.searchTreeNodes(element,"div class=\"field-item even\" property=\"content:encoded\"");
 			
 			class RemoveFieldImageAndLinkWrapper implements HTMLElementCallback{
 				public void callback(HTMLParserNode e){
@@ -173,6 +174,8 @@ public class DrupalEditor {
 			};
 			body.forEachElement(new RemoveFieldImageAndLinkWrapper ());
 			
+			returnMessage += "\n";
+			body.attributes = "";
 			returnMessage += body.printTree();
 			
 			
@@ -200,9 +203,9 @@ public class DrupalEditor {
 		returnMessage+="</script>\n";
 		if(showEditButton==true){
   		if(homeURL.indexOf("q=node")!=-1){
-  			returnMessage+=("<div class=\"editcms\"><a onclick=edit('"+homeURL+"/edit')>edit</a></div>");
+  			returnMessage+=("<div class=\"editcms\"><a onclick=\"edit('"+homeURL+"/edit')\">edit</a></div>");
   		}else{
-  			returnMessage+=("<div class=\"editcms\"><a onclick=edit('"+homeURL+"')>edit</a></div>");
+  			returnMessage+=("<div class=\"editcms\"><a onclick=\"edit('"+homeURL+"')\">edit</a></div>");
   		}
 		}
 		return returnMessage;

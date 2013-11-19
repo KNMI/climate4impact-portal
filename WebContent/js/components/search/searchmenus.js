@@ -72,7 +72,7 @@ var locations = Ext.create('Ext.data.Store', {
 /**
  * Posts file or dataset identifiers to the shoppingbasket
  */
-var postIdentifiersToBasket = function (jsonDataToPost){
+/*var postIdentifiersToBasket = function (jsonDataToPost){
 
   var passFn = function(e){
     var json= Ext.JSON.decode(e.responseText);
@@ -103,7 +103,7 @@ var postIdentifiersToBasket = function (jsonDataToPost){
     timeout:timeout,
     params: { json:Ext.encode(jsonDataToPost) }  
   });
-};
+};*/
 
 /**
  * Function which transfers search selection to the basket on the server
@@ -129,7 +129,7 @@ var addSearchSelectionToBasket = function(){
   if(skipMessage.length>0){
     alert("The following data resource(s) have no URL and have been skipped:\n"+skipMessage);
   }
-  postIdentifiersToBasket(jsonDataToPost);
+  basket.postIdentifiersToBasket(jsonDataToPost);
 
 };
 
@@ -195,7 +195,7 @@ var browseSearchSelection = function(){
 };*/
 
 
-var itemAddedToolTip = Ext.create('Ext.window.Window', {
+/*var itemAddedToolTip = Ext.create('Ext.window.Window', {
   title: 'Hello',
   height: 10,
   width: 230,
@@ -227,7 +227,7 @@ var itemAddedToolTip = Ext.create('Ext.window.Window', {
     this.task.start();
     this.showAt(x,y,a);
   }
-});
+});*/
  
 
 var HashSearch = new function () {

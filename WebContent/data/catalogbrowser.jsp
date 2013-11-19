@@ -23,7 +23,7 @@
 
   %>
     <jsp:include page="../includes.jsp" />
-
+    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
 	
     <script type="text/javascript">
 	    var preventSubmit = function(event) {
@@ -32,7 +32,7 @@
 	            setVarFilter();
 	            return false;
 	        }
-	    }
+	    };
 
 		var variableFilter = undefined;
 		var textFilter = undefined;
@@ -53,28 +53,17 @@
     		if(textFilter.length<1)textFilter = undefined;
     		
     		loadCatalogDescription(variableFilter,textFilter);
-    	}
-	    var postIdentifierToBasket = function(options){
-	    	var doneFunction = function(json){
-	    		if(json.error){customalert(json.error);}
-	    		adjustNumberOfDataSetsDisplayedInMenuBar(json);
-	    	}
-	    	
-	    	$.ajax({
-	    		type: "POST",
-	    		url: '/impactportal/ImpactService?service=basket&mode=add',
-	    		data: options,
-	    		success:doneFunction,
-	    		dataType: 'json'
-	    		});
-	    }
+    	};
+    	
+	   
+	    
   		var loadCatalogDescription = function(variableFilter,textFilter){   
   		  var catalogURL = '<%= request.getParameter("catalog").replaceAll(".html", ".xml").trim() %>';
  		  catalogURL = catalogURL.split("#")[0];
   		  $('#datasetinfo').html('<br/><table class=\"basket\"><tr><td><img src="/impactportal/images/ajax-loader.gif"/></td></tr></table>');
   		  var url='/impactportal/ImpactService?service=catalogbrowser&node='+encodeURI(catalogURL);
   		  //$('#catalogasjson').html('<a target="_blank" href="'+url+'&format=text/json">json</a>');
-  		  $('#catalogasjson').html("<span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+catalogURL+"',catalogURL:'"+catalogURL+"'})\"/>");
+  		  $('#catalogasjson').html("<span class=\"shoppingbasketicon\" onclick=\"basket.postIdentifiersToBasket({id:'"+catalogURL+"',catalogURL:'"+catalogURL+"'})\"/>");
   		  
   		  var filters = "";
   		  if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}

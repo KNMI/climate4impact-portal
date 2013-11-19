@@ -122,7 +122,7 @@
 
       
 	  var startBasicSearch = function(){
-		  $('#searchinfo').html("Searching <img src=\"/impactportal/images/ajax-bar.gif\"/>");
+		  $('#searchinfo').html("Searching <img src=\"/impactportal/images/ajax-bar.gif\" alt=\"loading...\"/>");
 		  var query="";
 		  var input = $("form input:checkbox");
 		  for(var j=0;j<input.length;j++){
@@ -170,9 +170,13 @@
 			 		  html+="<td>-</td>";
 			 	  }
 			 	  if(topics[j].OPENDAP||topics[j].HTTPServer){
-			 		 html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',HTTPServer:'"+topics[j].HTTPServer+"',OPENDAP:'"+topics[j].OPENDAP+"',catalogURL:'null'});\"></span></td>";
+			 	  	html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',HTTPServer:'"+topics[j].HTTPServer+"',OPENDAP:'"+topics[j].OPENDAP+"',catalogURL:'null'});\"></span></td>";
 			 	  }else{
-			 		 html+="<td>-</td>";
+			 	  	if(topics[j].catalogURL){
+			 	  	 html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',catalogURL:'"+topics[j].catalogURL+"'});\"></span></td>";
+			 	  	}else{
+			 			html+="<td>-</td>";
+			 	  	}
 			 	  }
 				  html+='</tr>';
 			  }

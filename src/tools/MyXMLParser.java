@@ -1,6 +1,6 @@
 package tools;
 
-import impactservice.Configuration;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -180,12 +180,12 @@ public class MyXMLParser {
 				DocumentBuilder db = dbf.newDocumentBuilder();
 			  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
 		    DebugConsole.println("  Making XML GET: "+url.toString());
-		    if(Configuration.GlobalConfig.isInOfflineMode()==true){
+		    /*if(Configuration.GlobalConfig.isInOfflineMode()==true){
 		      if(url.getHost().equals("localhost")==false){
 		        DebugConsole.println("Offline mode");
 		        throw new Exception("Offline mode.");
 		      }
-		    }	
+		    }	*/
         connection = (HttpURLConnection) url.openConnection();
         InputStream inputStream = connection.getInputStream();
 
@@ -349,15 +349,18 @@ public class MyXMLParser {
      * @param el The XMLElement with attributes to convert to JSON formatted attributes
      * @return String with JSON formatted data
      */
-    private String printJSONAttributes(XMLElement el){
+    private String printJSONAttributes(XMLElement el,Options options){
       String data="";
       if(el.getAttributes().size()>0){
         data+="\"attr\":{";
         for(int j=0;j<el.getAttributes().size();j++){
           if(j>0)data+=",";
           String name = el.getAttributes().get(j).name;
-          
-          data+="\""+jsonEncode(name.substring(name.indexOf(":")+1))+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
+          if(options == Options.STRIPNAMESPACES){
+            name = name.substring(name.indexOf(":")+1);
+          }
+          name  =jsonEncode(name);
+          data+="\""+name+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
         }
         data+="}";
       }
@@ -387,7 +390,11 @@ public class MyXMLParser {
     private String xmlElementstoJSON(Vector<XMLElement> vector,int depth,Options options){
       String data = "";
       String name = vector.get(0).name;
-      name  =jsonEncode(name.substring(name.indexOf(":")+1));
+      
+      if(options == Options.STRIPNAMESPACES){
+        name = name.substring(name.indexOf(":")+1);
+      }
+      name  =jsonEncode(name);
       //DebugConsole.println(name);
       data+="\""+name+"\":";
       boolean isArray=false;
@@ -424,7 +431,7 @@ public class MyXMLParser {
       boolean firstDataDone=false;
 
       //Print the json attributes
-      data+=printJSONAttributes(el);
+      data+=printJSONAttributes(el,options);
       if(el.attributes.size()>0)firstDataDone=true;
       
       //Make a Set of the XML elements names

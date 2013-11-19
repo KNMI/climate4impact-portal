@@ -6,22 +6,19 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Iterator;
-
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-
 import tools.DebugConsole;
-
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 import wps.WebProcessingInterface;
@@ -87,10 +84,10 @@ public class GenericCart {
   		saveToStore();
   	}
 
-  	public synchronized void addDataLocator(String id, String dataLocation,String addDate,long addDateMillis,boolean saveToStore) {
+  	public synchronized void addDataLocator(String id, String fileInfo,String addDate,long addDateMillis,boolean saveToStore) {
      // DebugConsole.println("Adding "+id+" with date "+addDate);
-      dataLocation=dataLocation.replace("http://cmip-dn.badc.rl.ac.uk", "http://cmip-dn1.badc.rl.ac.uk");
-      DataLocator d = new DataLocator(id,dataLocation,addDate,addDateMillis);
+      //dataLocation=dataLocation.replace("http://cmip-dn.badc.rl.ac.uk", "http://cmip-dn1.badc.rl.ac.uk");
+      DataLocator d = new DataLocator(id,fileInfo,addDate,addDateMillis);
       for(int j=0;j<dataLocatorList.size();j++){
         
         if(dataLocatorList.get(j).id.equals(id)){
@@ -253,7 +250,7 @@ public class GenericCart {
      * @param request
      * @return
      */
-    public static String showDataSetList(GenericCart genericCart,HttpServletRequest request){
+    public static String showDataSetListOld(GenericCart genericCart,HttpServletRequest request){
       DebugConsole.println("Show datasetlist");
       String htmlResp = "Basket for: <strong>"+User.getUserId(request)+"</strong><br/>";
       htmlResp += "<table class=\"basket\">";
@@ -302,7 +299,7 @@ public class GenericCart {
           if("null".equals(dapURL))dapURL = null;
           if("null".equals(httpURL))httpURL = null;
           
-          DebugConsole.println(element.id+"|"+catalogURL+"|"+dapURL+"|"+httpURL);
+          //DebugConsole.println(element.id+"|"+catalogURL+"|"+dapURL+"|"+httpURL);
           
           if(catalogURL==null){
             
@@ -367,8 +364,103 @@ public class GenericCart {
       return htmlResp; 
     }
 
-  }
+
+
   
+  
+  public static JSONObject showDataSetList(GenericCart genericCart,HttpServletRequest request) throws JSONException{
+    DebugConsole.println("Show datasetlist");
+   JSONObject datasetList = new JSONObject();
+   
+   JSONArray datasets = new JSONArray();
+   datasetList.put("children", datasets);
+   datasetList.put("text", "basket");
+   datasetList.put("leaf", false);
+   datasetList.put("viewer", Configuration.getHomeURL()+"/data/datasetviewer.jsp?");
+    Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
+    int j=1;
+
+    while(itr.hasNext()) {
+      DataLocator element = itr.next(); 
+
+      if(element.cartData.equals("null")){
+      }else{
+        JSONObject dataset = new JSONObject();
+        datasets.put(dataset);
+        JSONObject elementProps = null;
+        String dapURL = null;
+        String httpURL = null;
+        String catalogURL = null;
+        String fileSize = "-";
+        try {
+          elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
+          try{dapURL =elementProps.getString("OPENDAP");}catch(Exception e){}
+          try{httpURL =elementProps.getString("HTTPServer");}catch(Exception e){}
+          try{catalogURL =elementProps.getString("catalogURL");}catch(Exception e){}
+          try{fileSize =elementProps.getString("filesize");}catch(Exception e){}
+        } catch (Exception e) {
+          DebugConsole.errprintln(e.getMessage()+" on \n"+element.cartData);
+          catalogURL=element.cartData;
+        }
+        
+        if("null".equals(catalogURL))catalogURL = null;
+        if("null".equals(dapURL))dapURL = null;
+        if("null".equals(httpURL))httpURL = null;
+        
+        //DebugConsole.println(element.id+"|"+catalogURL+"|"+dapURL+"|"+httpURL);
+        
+        if(catalogURL==null){
+          
+          if(dapURL==null&&httpURL!=null){
+            if(httpURL.indexOf("fileServer")>0){
+              dapURL=httpURL.replace("fileServer", "dodsC");
+            }
+          }else{
+            if(dapURL!=null&&httpURL==null){
+              if(dapURL.indexOf("dodsC")>0){
+                if(dapURL.indexOf("aggregation")==-1){
+                  httpURL=dapURL.replace("dodsC","fileServer");
+                }
+              }
+            } 
+          }
+          
+         if(dapURL!=null){
+           dataset.put("dapurl",dapURL);
+         }
+         if(httpURL!=null){
+           dataset.put("httpurl",httpURL);
+           
+         }
+         dataset.put("type","file");
+        }else{
+          dataset.put("catalogurl",catalogURL);
+          dataset.put("type","catalog");
+        }
+        
+        dataset.put("id",element.id);
+        dataset.put("text",element.id);
+        dataset.put("leaf",true);
+        dataset.put("date",element.addDate);
+        dataset.put("filesize",fileSize);
+        dataset.put("index",j);
+      }
+      
+      j++;
+    } 
+    
+    
+    /*if(j>0){
+      try {
+        genericCart.saveToStore(User.getUser(request));
+      } catch (Exception e) {
+        DebugConsole.errprintln("Unable to save store to file: "+e.getMessage());
+      }
+    }*/
+    return datasetList; 
+  }
+
+}
 	
   
 }

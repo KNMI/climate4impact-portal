@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import ogcservices.PyWPSServer;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -123,7 +122,7 @@ public class WebProcessingInterface {
    * @return null if no exception occured, otherwise a JSON structure containing the message to display in the UI
    */
 	private static JSONObject checkException(MyXMLParser.XMLElement pyWPSXMLStructure,String extraInfo){
-	   
+	    if(extraInfo == null)extraInfo="";
 	    try{
 	      //DebugConsole.println(a.getFirst().getName());
 	      if(pyWPSXMLStructure.getFirst().getName().indexOf("ExceptionReport")>=0){
@@ -140,7 +139,7 @@ public class WebProcessingInterface {
 	          }catch(Exception e){}
 	        }catch(Exception e){}
 	        message+="\n\n"+extraInfo;
-	        DebugConsole.errprintln("error");
+	        DebugConsole.errprintln("error: "+message);
 	        return returnErrorMessage(message);
 	      }
 	    }catch(Exception e){}
@@ -525,10 +524,10 @@ public class WebProcessingInterface {
       html+="<hr/>";
       //html+=b.toString();
       try {
-        html+="<table class=\"wpsreport\">";
-        html+="<tr><th>Identifier</th><th>Title</th><th>Value</th></tr>"; 
+         
         Vector<XMLElement> wpsData=b.get("wps:ExecuteResponse").get("wps:ProcessOutputs").getList("wps:Output");
-        
+        html+="<table class=\"wpsreport\">";
+        html+="<tr><th>Identifier</th><th>Title</th><th>Value</th></tr>";
         for(int j=0;j<wpsData.size();j++){
           String identifier=wpsData.get(j).get("ows:Identifier").getValue();
           String title=wpsData.get(j).get("ows:Title").getValue();
@@ -559,7 +558,16 @@ public class WebProcessingInterface {
         html+="</table>";
       }catch(Exception e){
         DebugConsole.errprintln("error in generateReportFromStatusLocation: "+e.getMessage());
-        return "No results available";//(e.getMessage()+"\n"+b.toString()).toString();
+
+       // html+= "<h1>No results available</h1><br/>"+"See <a href=\""+statusLocation+"\">"+statusLocation+"</a> (XML).";
+        try{
+          String exceptionMessage= checkException(b.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessFailed"), null).getString("error");
+          DebugConsole.errprintln("Process failed: "+exceptionMessage);
+          html+="<h2>An error occured while executing the process:</h2>"+exceptionMessage;
+        }catch(Exception e2){
+          e2.printStackTrace();
+        }
+        return html;
       }
     }catch(Exception e){
       DebugConsole.errprintln("error");

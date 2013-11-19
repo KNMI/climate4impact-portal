@@ -1,4 +1,6 @@
- function IsNumeric(sText){
+var mouseXPosition;
+var mouseYPosition; 
+function IsNumeric(sText){
    var ValidChars = "0123456789.";
    var IsNumber=true;
    var Char;
@@ -69,7 +71,7 @@
   };
   var customalert = function(msg){
 	  if(!customAlertDiv){
-		  customAlertDiv = document.createElement('div');
+		 /* customAlertDiv = document.createElement('div');
 		  
 		  
 		  customAlertDiv.className+="customAlert";
@@ -96,12 +98,27 @@
 		  customAlertDiv.cnt=cnt;
 		  customAlertDiv.btn=btn;
 		  cnt.onkeypress = customAlertKeyPress;
-		  btn.onkeypress = customAlertKeyPress;
-		 
-	  }
-	  customAlertDiv.cnt.innerHTML = "<textarea style=\"display:block;padding:0px;margin:0;width:100%;height:200px;border:none;background-color:#DFE9FF;overflow:auto;\">"+msg+"</textarea>";
-	  document.body.appendChild(customAlertDiv);
-	  document.getElementById('customAlertButton').focus();
+		  btn.onkeypress = customAlertKeyPress;*/
+		  customAlertDiv = $( "<div/>");
+		  customAlertDiv.dialog({
+			  //modal: true,
+			  title:'Message',
+			  width:500,
+			  height:300,
+			  buttons: {
+			  'Ok': function() {
+			  $( this ).dialog( "close" );
+			  }
+			  }
+			  });
+	 }
+	  customAlertDiv.html(msg);
+	  customAlertDiv.dialog();
+	  //customAlertDiv.show();
+	  //customAlertDiv.dialog.open();
+	  //customAlertDiv.cnt.innerHTML = "<textarea style=\"display:block;padding:0px;margin:0;width:100%;height:200px;border:none;background-color:#DFE9FF;overflow:auto;\">"+msg+"</textarea>";
+	  //document.body.appendChild(customAlertDiv);
+	  //document.getElementById('customAlertButton').focus();
   };
   
   
@@ -154,11 +171,13 @@
 
   var alert = (function(msg) { return function(msg) {customalert(msg);}})();
   
+  
   /**
    * Updates the number of datasets in the basket in the menu bar
    */
   var adjustNumberOfDataSetsDisplayedInMenuBar = function(json){
   	var numproducts = json.numproducts;
+  
   	try{
   	    if(numproducts!=0){
   	      $('#baskettext1').html('('+numproducts+')');
@@ -169,6 +188,45 @@
   	    }
   	}catch(e){
   	}
+
+  	 var numproductsadded = json.numproductsadded;
+     if(numproductsadded == undefined){
+  		return;
+  	 }
+     var msgHTML='Added '+numproductsadded+' product(s) to your basket.</br></br>';
+
+     if(numproductsadded==0){
+       var msgHTML='This product is already in your basket.</br></br>';
+     }
+     
+     if(numproductsadded == undefined){
+    	 msgHTML = "";
+     }
+     
+     msgHTML+="You have "+numproducts+" product(s) in your basket.";
+     var itemAddedToolTip = $( "<div/>" );
+     itemAddedToolTip.dialog({
+    	 autoOpen: false,
+    	 dialogClass: "noTitleStuff",
+    	 height:90,
+    	 width:300,
+    	 show: {
+        	 effect: "fade",
+        	 duration: 100
+    	 },
+    	 hide: {
+        	 effect: "fade",
+        	 duration: 100
+    	 },
+    	 position:[mouseXPosition-360,mouseYPosition-40]
+    	 
+	 });
+
+	 itemAddedToolTip.dialog("open");
+    	 
+     itemAddedToolTip.html(msgHTML);
+     setTimeout(function(){itemAddedToolTip.dialog("close")},1000);
+    
   };
 
   /**
@@ -473,3 +531,11 @@
 	  }
 	}
 
+	
+	$(document).ready(function () {
+   
+        $(document).mousemove(function (e) {
+        	mouseXPosition = e.pageX- $(window).scrollLeft();
+        	mouseYPosition = e.pageY- $(window).scrollTop();
+        });
+	});

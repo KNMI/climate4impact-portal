@@ -1,19 +1,20 @@
 <%@page import="tools.HTTPTools" import="impactservice.*"%>
 <div class="topnav">
-    <p>
- 
+
+
 	<%
 	String Home="/impactportal/";
 	
-	int numProducts = 0;
+	
 	String numProductsString="-";
 	try{
-		numProducts = User.getUser(request).getShoppingCart().getNumProducts();
+		int numProducts = User.getUser(request).getShoppingCart().getNumProducts();
+		if(numProducts!=0){
+			numProductsString = ""+numProducts;
+		}
 	}catch(Exception e){				
 	}
-	if(numProducts!=0){
-		numProductsString = ""+numProducts;
-	}
+
 			
 
 	//String header=ImpactPages.createHeader(request.getServletPath());
@@ -61,21 +62,21 @@
 	else if(pageName.indexOf("resources.jsp")!=-1)highLightResources=true;
 	
 	//Store the current data page we were viewing.
-  	String currentDataPage=null;
+  	//String currentDataPage=null;
   	String currentLoginPage=null;
   	//currentDataPage=(String)session.getAttribute("currentdatapage");
   	currentLoginPage=(String)session.getAttribute("currentloginpage");
   	if(searchString.length()==0){
-		if(highLightData){
-	        session.setAttribute( "currentdatapage", pageName);
-	        currentDataPage=pageName;
-		}
+		//if(highLightData){
+	        //session.setAttribute( "currentdatapage", pageName);
+	        //currentDataPage=pageName;
+		//}
 		if(highLightLogin){
 	        session.setAttribute( "currentloginpage", pageName);
 	        currentLoginPage=pageName;
 		}
   	}
-	if(currentDataPage==null||currentDataPage.equals("null"))currentDataPage="/data/index.jsp";
+	//if(currentDataPage==null||currentDataPage.equals("null"))currentDataPage="/data/index.jsp";
 	if(currentLoginPage==null||currentLoginPage.equals("null"))currentLoginPage="/account/login.jsp";
 
 	//Get the current data page we were viewing.
@@ -107,28 +108,55 @@
 	}
 %>
 
-</div> 
+</div>
 
-  <div class="impacttopmenu mainmenu"> 
-  <ul>
-    <li <% if(highLightHome)out.print("class=\"sel\""); %>><a href="<%=Home%>general/index.jsp" >Home</a></li>
-    <li <% if(highLightData)out.print("class=\"sel\""); %>><a href="<%=HTTPTools.makeCleanURL(Home+currentDataPage)%>" >Data discovery</a></li>
-    <li <% if(highLightMapAndPlot)out.print("class=\"sel\""); %>><a href="<%=Home%>mapandplot.jsp" >Map &amp; Plot</a></li>
-    <li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>documentation/index.jsp" >Documentation</a></li>
-    <li <% if(highLightHelp)out.print("class=\"sel\""); %>><a href="<%=Home%>help/index.jsp" >Help</a></li>
-    <li <% if(highLightAbout)out.print("class=\"sel\""); %>><a href="<%=Home%>general/about.jsp" >About us</a></li>
-   
-    <!-- LOGIN  -->
-    <li <% if(highLightLogin)out.print("class=\"sel\""); %>>
-    <% if(user!=null){
-	  out.print(" <a href="+HTTPTools.makeCleanURL(Home+currentLoginPage)+" >Account"+"</a>");
-	  out.print("</li><li><a href=\""+Home+"account/basket.jsp\"><code id='baskettext1' style=\"padding-left:20px;background-image:url('"+Home+"images/shoppingcart16.png');background-repeat:no-repeat;\">("+numProductsString+")</code></a></li>");
+<div class="impacttopmenu mainmenu">
+	<ul>
+		<li <% if(highLightHome)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>general/index.jsp">Home</a></li>
+		<li <% if(highLightData)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>data/index.jsp">Data discovery</a></li>
+		<li <% if(highLightMapAndPlot)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>mapandplot.jsp">Map &amp; Plot</a></li>
+		<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>documentation/index.jsp">Documentation</a></li>
+		<li <% if(highLightHelp)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>help/index.jsp">Help</a></li>
+		<li <% if(highLightAbout)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>general/about.jsp">About us</a></li>
+
+		<!-- LOGIN  -->
+		<li <% if(highLightLogin)out.print("class=\"sel\""); %>>
+			<% if(user!=null){
+    	String accountTitle = "Account";
+    	if(currentLoginPage.indexOf("jobs")!=-1){
+    		accountTitle += "&nbsp;<code class=\"codejobsicon\"></code>";
+    	}
+    	if(currentLoginPage.indexOf("basket")!=-1){
+    		accountTitle += "&nbsp;<code class=\"codeshoppingcarticon\"></code>";
+    	}
+    	if(currentLoginPage.indexOf("login")!=-1){
+    		accountTitle += "&nbsp;<code class=\"codeusersicon\"></code>";
+    	}
+    	
+	  	out.println("<a href=\""+HTTPTools.makeCleanURL(Home+currentLoginPage)+"\">"+accountTitle+"</a>");
     }else{
 	  out.print("<a href=\""+Home+"account/login.jsp\">Log in</a>"); 
     }
-    %></li>
-    
-    </ul>  <span class="searchbox"><input id="searchbox" class="searchbox" type="text" size="16" value="<%=searchString%>" class="searchbox" onkeypress="startSearchKeyPressed(event,this.form)"/></span></div>
-    
-   <!-- &#160;</p> 
+    %>
+		</li>
+
+		<% if(user!=null){
+    		//out.println("<li><a href=\""+Home+"account/basket.jsp\"><code id='baskettext1' class=\"codeshoppingcarticon\">("+numProductsString+")</code></a></li>");
+	  		//out.println("<li><a href=\""+Home+"account/jobs.jsp\"><code id='jobtext1' style=\"padding-left:20px;background-image:url('"+Home+"images/calculator-icon-16x16.png');background-repeat:no-repeat;\"></code></a></li>");
+    	}
+    %>
+
+	</ul>
+	<span class="searchbox"><input id="searchbox" class="searchbox"
+		type="text" size="16" value="<%=searchString%>"
+		onkeypress="startSearchKeyPressed(event,this.form)" /></span>
+</div>
+
+<!-- &#160;</p> 
   </div> -->

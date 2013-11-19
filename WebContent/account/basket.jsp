@@ -4,84 +4,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
    <jsp:include page="../includes.jsp" />
-     
+    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript">
-    var impactBase = '/impactportal/';
-    var impactService=impactBase+'ImpactService?';
-  
-    var removeId = function(id){
-    	var doneFunction = function(json){
-    		 if(json.error){
-   		    	alert(json.error);
-    		    }else{
-    				adjustNumberOfDataSetsDisplayedInMenuBar(json);
-    		    }
-     		populateBasketList();
-    	}
-    	
-    	$.ajax({
-    		type: "GET",
-    		url: impactService,
-    		data: { service:'basket',request:'removeFromList',id:id }  ,
-    		success:doneFunction,
-    		dataType: 'json'
-    		});
-    	
-    
-    }
-    
-    var populateBasketList = function(){
-   	
-   		var passFn = function(data){
-    		$('#basketlist').html(data);
-   		}
-   		$.ajax({
-    		type: "GET",
-    		url: impactService,
-    		data: { service:'basket',request:'getoverview' }  ,
-    		success:passFn,
-    		dataType: 'html'
-    		});
-   		/*var failFn = function(msg){
-   			var data = {};
-   			data.responseText='Unable to retrieve basket from server';
-   			passFn(data);
-   		}*/
-   	 	
-    }
-    
-    $(document).ready(populateBasketList)
-
+    var impactService = '/impactportal/ImpactService?';
+    $(document).ready(function(){basket.populateBasketList($('#basketlist'))});
     </script>
   </head>
   <body>
-		<jsp:include page="../header.jsp" />
-		<!-- Contents -->
+	<jsp:include page="../header.jsp" />
+	<!-- Contents -->
 		<jsp:include page="../account/loginmenu.jsp" />
 		<div class="impactcontent">
 		<h1>Basket</h1>
 		<%
-		
-	
-
 		User user = null;
 		try{
 			user = LoginManager.getUser(request);
 		}catch(Exception e){
-			
 		}
-		
-		 if (user==null){ 
+		if (user == null){ 
 			%>
-			<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
+				<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
 			<%
 		}else{
+			out.println("Basket for: <strong>"+user.id+"</strong>");
 			out.println("<div id='basketlist'/>");
 		}
 		%>
 		</div>
-	 
-  <!-- /Contents -->
+	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />
   </body>
 </html>

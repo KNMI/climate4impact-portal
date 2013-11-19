@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
   <jsp:include page="../includes-ext.jsp" />
+  
   <%
   	String processorId = request.getParameter("processor");
   	User user = null;
@@ -17,15 +18,20 @@
   
   
     
-    <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" />
+    <!-- <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" /> -->
      
     <script type="text/javascript" src="../js/components/processors/useProcessor.js"></script>
+    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
+    <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
+    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
+
     
     <script type="text/javascript">
+    var impactService = '/impactportal/ImpactService?';
     Ext.Loader.setConfig({
         enabled: true
     });
-    Ext.Loader.setPath('Ext.ux', '../js/ux');
+    /*Ext.Loader.setPath('Ext.ux', '../js/ux');
 
     Ext.require([
         'Ext.selection.CellModel',
@@ -36,7 +42,7 @@
         'Ext.form.*',
         'Ext.ux.CheckColumn',
         'Ext.ux.ButtonColumn'
-    ]);
+    ]);*/
     Ext.QuickTips.init();
 
 

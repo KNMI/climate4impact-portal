@@ -243,14 +243,14 @@ public class ImpactService extends HttpServlet {
           String hrefURL=null;
           String catalogURL=null;
           String nodeText = null;
-          String dataSize = "";
+          String fileSize = "";
           JSONObject a=array.getJSONObject(j);
           nodeText = a.getString("text");
           try{openDAPURL = a.getString("OPENDAP");}catch (JSONException e) {}
           try{httpURL = a.getString("HTTPServer");}catch (JSONException e) {}
           try{catalogURL = a.getString("catalogURL");}catch (JSONException e) {}
           try{hrefURL = a.getString("href");}catch (JSONException e) {}
-          try{dataSize = a.getString("dataSize");}catch (JSONException e) {}
+          try{fileSize = a.getString("dataSize");}catch (JSONException e) {}
 
           oddEven = 1-oddEven;
           if(oddEven==0){
@@ -269,7 +269,7 @@ public class ImpactService extends HttpServlet {
           }
           
          // html+="<td>"+dataSize+"</td>";
-          html.append("<td>"+dataSize+"</td>");
+          html.append("<td>"+fileSize+"</td>");
           //html.append("<td>");html.append(dataSize);html.append("</td>");
           
           String dapLink = "";
@@ -292,7 +292,7 @@ public class ImpactService extends HttpServlet {
             html.append("</td><td>");
           }else{
             //html+="</td><td><span onclick=\"postIdentifierToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"'});\" class=\"shoppingbasketicon\"/>";
-            html.append("</td><td><span onclick=\"postIdentifierToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"'});\" class=\"shoppingbasketicon\"/>");
+            html.append("</td><td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/>\n");
           }
           
           
@@ -424,7 +424,7 @@ public class ImpactService extends HttpServlet {
       }
     }
     
-    private void handleNCDUMPRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
+    /*private void handleNCDUMPRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
   		DebugConsole.println("SERVICE NCDUMP: "+request.getQueryString());
   		String requestStr=request.getParameter("request");
   		if(requestStr!=null){requestStr=URLDecoder.decode(requestStr,"UTF-8");}else{errorResponder.printexception("urlStr="+requestStr);return;}
@@ -436,7 +436,7 @@ public class ImpactService extends HttpServlet {
   			out1.println("Unable to get file "+requestStr);
   			e.printStackTrace(out1);
   		}
-    }
+    }*/
     
     private void handleVariablesRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
       HttpSession session = request.getSession();
@@ -866,10 +866,10 @@ public class ImpactService extends HttpServlet {
       if(requestStr.equals("getoverview")){
         GenericCart basketList = null;
         try{
-          response.setContentType("text/plain");
+          response.setContentType("application/json");
           basketList = User.getUser(request).getShoppingCart();
-          String html = GenericCart.CartPrinters.showDataSetList(basketList,request);
-          response.getWriter().println(html);
+          JSONObject datasetList = GenericCart.CartPrinters.showDataSetList(basketList,request);
+          response.getWriter().println(datasetList.toString());
         }catch(Exception e){
           DebugConsole.printStackTrace(e);
           response.getWriter().println(e.getMessage());
@@ -918,6 +918,7 @@ public class ImpactService extends HttpServlet {
     		    el.put("OPENDAP", request.getParameter("OPENDAP"));
     		    el.put("HTTPServer", request.getParameter("HTTPServer"));
     		    el.put("catalogURL", request.getParameter("catalogURL"));
+    		    el.put("filesize", request.getParameter("filesize"));
     		    addFileToBasket(shoppingCart,el);
     		  }
 
@@ -964,29 +965,34 @@ public class ImpactService extends HttpServlet {
     long addDateMilli=cal.getTimeInMillis();
     String addDate=currentISOTimeString;
     DebugConsole.println("Adding dataset "+el.getString("id")+" with date "+addDate);
-    JSONObject url = new JSONObject();
+    JSONObject fileInfo = new JSONObject();
     try{
       String str=el.getString("OPENDAP");
       if(str.length()>0){
-        url.put("OPENDAP",str);
+        fileInfo.put("OPENDAP",str);
       }
     }catch(Exception e){}
     try{
       String str=el.getString("HTTPServer");
       if(str.length()>0){
-        url.put("HTTPServer",str);
+        fileInfo.put("HTTPServer",str);
       }
     }catch(Exception e){}
     try{
       String str=el.getString("catalogURL");
       if(str.length()>0){
-        url.put("catalogURL",str);
+        fileInfo.put("catalogURL",str);
       }
     }catch(Exception e){}
+    try{
+      String str=el.getString("filesize");
+      if(str.length()>0){
+        fileInfo.put("filesize",str);
+      }
+    }catch(Exception e){}
+    DebugConsole.println("Data="+fileInfo.toString());
     
-    DebugConsole.println("Data="+url.toString());
-    
-    shoppingCart.addDataLocator(el.getString("id"),url.toString(), addDate, addDateMilli,true);
+    shoppingCart.addDataLocator(el.getString("id"),fileInfo.toString(), addDate, addDateMilli,true);
       
   }
 

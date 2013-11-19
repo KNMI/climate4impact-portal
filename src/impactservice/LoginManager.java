@@ -134,7 +134,7 @@ public class LoginManager {
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       id=Configuration.GlobalConfig.getDefaultUser();
     }
-    DebugConsole.println("Getting user from session with id "+id);
+    //DebugConsole.println("Getting user from session with id "+id);
     if(id==null){throw new Exception("You are not logged in...");}
     User user = getUser(id);
     return user;
@@ -146,7 +146,7 @@ public class LoginManager {
    * @return The user object
    */
   public synchronized static User getUser(String userId){
-    DebugConsole.println("Looking up user "+userId);
+    //DebugConsole.println("Looking up user "+userId);
     //Lookup the user in the vector list
     if(userId==null)return null;
     for(int j=0;j<users.size();j++){
