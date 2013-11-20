@@ -158,6 +158,11 @@ public class DrupalEditor {
 			//HTMLParserNode body = htmlParser.searchTreeNodes(element,"div id=\"block-system-main\" class=\"block block-system\"");
 			HTMLParserNode body = htmlParser.searchTreeNodes(element,"div class=\"field-item even\" property=\"content:encoded\"");
 			
+			if(body == null){
+			  body = htmlParser.searchTreeNodes(element,"div id=\"block-system-main\" class=\"block block-system\"");
+			}
+			
+			
 			class RemoveFieldImageAndLinkWrapper implements HTMLElementCallback{
 				public void callback(HTMLParserNode e){
 					if(e.attributes.equals("div class=\"field field-name-field-image field-type-image field-label-above\"")){
@@ -193,6 +198,7 @@ public class DrupalEditor {
 		}catch(WebRequestBadStatusException e){
 			throw new DrupalEditorException("Could not obtain page "+homeURL+"<br/>\n"+e.getMessage()+"\n",e.getStatusCode());
 		}catch(Exception e){
+		
       throw new DrupalEditorException("Could not obtain page "+homeURL+"<br/>\n"+e.getMessage()+"\n");
     }
 

@@ -77,7 +77,7 @@
   
   <div class="content clearfix">
     <div class="field field-name-body field-type-text-with-summary field-label-hidden"><div class="field-items"><div class="field-item even"> <p>Using the filters below you can search throughout the <a class="lexicon-term" href="?q=climate4impactglossary#CMIP5"><acronym title="Coupled Model Intercomparison Project - Phase 5.Read more...&amp;nbsp;">CMIP5</acronym></a> data archives. You can also use this portal to access other data archives, or even add your own archive on the <a href="/impactportal/data/catalogs.jsp" id="catalogs." name="catalogs." title="catalogs.">catalogs page.</a></p>
-<p>Data you select for download will appear in your <a href="/impactportal/data/basket.jsp" id="basket." name="basket." title="basket.">basket.</a> You can also do some data processing on the <a href="/impactportal/data/transform.jsp" id="catalogs." name="transformations." title="transformations.">transformations page.</a></p>
+<p>Data you select for download will appear in your <a href="/impactportal/account/basket.jsp" id="basket." name="basket." title="basket.">basket.</a> You can also do some data processing on the <a href="/impactportal/data/transform.jsp" id="catalogs." name="transformations." title="transformations.">transformations page.</a></p>
 
 </div></div></div></div></div></div></div>		
 			<!-- Downloading data is possible for all institutes. However, viewing data is limited for institutes accepting climate4impact's security system.(<a href="/impactportal/documentation.jsp?q=esgfsecurity">more info</a>)--> 
