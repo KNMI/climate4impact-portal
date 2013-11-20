@@ -118,8 +118,8 @@ public class Configuration {
       myProxyServerPort=Integer.parseInt(configReader.getNodeValue("impactportal.loginconfig.myproxyserverport"));
       trustStoreFile=configReader.getNodeValue("impactportal.loginconfig.truststorefile");
       trustStorePassword=configReader.getNodeValue("impactportal.loginconfig.truststorepassword");
-      myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
       myProxyDefaultUserName = configReader.getNodeValue("impactportal.loginconfig.myproxyserverusernameoverride");
+      myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
     }
     
     public static String getMyProxyServerHost(){readConfig();return myProxyServerHost;}
@@ -128,6 +128,11 @@ public class Configuration {
     public static String getTrustStorePassword(){readConfig();return trustStorePassword;}
     public static String getMyProxyDefaultPassword(){readConfig();return myProxyDefaultPassword;}
     public static String getMyProxyDefaultUserName(){readConfig();return myProxyDefaultUserName;}
+
+    public static String getTrustRootsLocation() {
+      // TODO Auto-generated method stub
+      return "/usr/people/plieger/.globus/certificates/";
+    }
 
     
   }

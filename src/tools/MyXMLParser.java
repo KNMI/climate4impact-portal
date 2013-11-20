@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Calendar;
@@ -17,7 +18,7 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import sun.net.www.protocol.http.HttpURLConnection;
+
 import tools.HTTPTools.WebRequestBadStatusException;
 
 import org.json.JSONException;

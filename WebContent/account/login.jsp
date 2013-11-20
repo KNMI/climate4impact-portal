@@ -69,9 +69,10 @@ div#users-contain table td,div#users-contain table th {
 		}catch(Exception e){
 		}
 		
-	    if (user==null){ 
+	    if (user==null){
+	    	out.println("<div class=\"impactcontent\">");
 	    	   %>
-	<div class="impactcontent">
+	
 		<div class="cmscontent">
 			<div style="float: right; border: none;">
 				<img src="../images/openid.jpg" alt="openidlogo" width="300"></img>

@@ -14,6 +14,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+
+
+
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -165,6 +168,12 @@ public class HTTPTools extends HttpServlet {
   public static String makeHTTPGetRequest(String url,String pemFile,String trustRootsFile, String trustRootsPassword) throws WebRequestBadStatusException, IOException{
     String connectToURL=makeCleanURL(url);
     DebugConsole.println("  Making GET: "+connectToURL);
+    if(pemFile != null){
+      DebugConsole.println("  Using private key: "+pemFile);
+      DebugConsole.println("  Using trustRootsFile: "+trustRootsFile);
+      DebugConsole.println("  Using trustRootsPassword: "+trustRootsPassword);
+      
+    }
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       DebugConsole.println("Offline mode");
       return null;
@@ -216,6 +225,7 @@ public class HTTPTools extends HttpServlet {
     } catch(UnknownHostException unknownHostException){
       throw unknownHostException;
     } catch (IOException e) {
+      e.printStackTrace();
       DebugConsole.printStackTrace(e);
       throw new WebRequestBadStatusException(403,"The specified credentials were not found. ");
     } catch (UnrecoverableKeyException e) {
@@ -236,6 +246,8 @@ public class HTTPTools extends HttpServlet {
     } catch (GSSException e) {
       e.printStackTrace();
       throw new WebRequestBadStatusException(403);
+    }catch(WebRequestBadStatusException e){
+      throw e;
     }catch(Exception e){
       e.printStackTrace();
       DebugConsole.println("HTTP Exception");

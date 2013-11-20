@@ -13,6 +13,9 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Vector;
 
+
+import org.apache.commons.codec.binary.Base64;
+
 import javax.servlet.http.HttpServletRequest;
 
 import ogcservices.PyWPSServer;
@@ -493,7 +496,7 @@ public class WebProcessingInterface {
             String outputId=wpsData.get(j).get("ows:Identifier").getValue();
             if(outputId.equals(identifier)){
               XMLElement complexData=wpsData.get(j).get("wps:Data").get("wps:ComplexData");
-              byte[] btDataFile = new sun.misc.BASE64Decoder().decodeBuffer( complexData.getValue().replaceAll("\n",""));  
+              byte[] btDataFile = Base64.decodeBase64( complexData.getValue().replaceAll("\n",""));  
               return btDataFile;
             }
           }catch(Exception e){}

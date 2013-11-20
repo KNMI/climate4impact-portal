@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
+//import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.Oid;
 
 import tools.DebugConsole;
@@ -229,7 +230,8 @@ public class LoginManager {
         +"HTTP.COOKIEJAR="+user.usersDir+"/.dods_cookies\n"
         +"HTTP.SSL.CERTIFICATE="+user.certificateFile+"\n"
         +"HTTP.SSL.KEY="+user.certificateFile+"\n"
-        +"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
+        //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
+        +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
     DebugConsole.println("createNCResourceFile for user "+user.id+":\n"+fileContents);
     Tools.writeFile(user.usersDir+"/.httprc", fileContents) ;
     Tools.writeFile(user.usersDir+"/.dodsrc", fileContents) ;
