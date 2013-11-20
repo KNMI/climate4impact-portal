@@ -549,7 +549,7 @@ public class WebProcessingInterface {
             DebugConsole.println("MimeType = "+mimeType);
             if(mimeType.equalsIgnoreCase("image/png")){
             //getImageFromStatusLocation
-              data+="<img height=360 src='"+Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"' />";
+              data+="<img src='"+Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"' />";
             }
              //data+=getWPSURL();
           }catch(Exception e){}
