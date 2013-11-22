@@ -168,7 +168,7 @@ var processProgressMonitoring = function(status) {
 
   var uniqueId = status.uniqueid;
 
-  var results = undefined;
+  var results = status;
 
   var p = Ext.create('Ext.ProgressBar', {
     region : 'south'
@@ -189,7 +189,7 @@ var processProgressMonitoring = function(status) {
   });
   var c = Ext.create('Ext.button.Button', {
     text : 'close',
-    disabled : true,
+    //disabled : true,
     handler : function() {
       w.close();
     }
@@ -239,10 +239,10 @@ var processProgressMonitoring = function(status) {
   });
 
   w.showResults = function(json) {
-    p.updateProgress(1, 100 + " %", true);
+    /*p.updateProgress(1, 100 + " %", true);
     t.setValue("Completed: " + json.status);
     b.enable();
-    c.enable();
+    c.enable();*/
     showStatusReport(json);
   }
 
