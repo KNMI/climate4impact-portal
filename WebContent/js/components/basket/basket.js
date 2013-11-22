@@ -98,7 +98,7 @@ var Basket = function(){
 			if(json.error){customalert(json.error);}
 			adjustNumberOfDataSetsDisplayedInMenuBar(json);
 		}
-		
+		 //alert(dump(options));
 		$.ajax({
 			type: "POST",
 			url: '/impactportal/ImpactService?service=basket&mode=add',

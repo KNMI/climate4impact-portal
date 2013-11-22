@@ -102,14 +102,14 @@ var FileViewer = function() {
           text : 'Add to basket',
           iconCls : 'icon-shoppingbasket',
           handler : function() {
-            var identifiers = [];
+          
             var url = _this.getFileLocation();
             var id = url.substring(url.lastIndexOf("/") + 1);
-            identifiers.push({
+     
+            basket.postIdentifiersToBasket({
               id : id,
               OPENDAP : url
             });
-            basket.postIdentifiersToBasket(identifiers);
           }
         }],
     frame : false,

@@ -2055,3 +2055,9 @@ ul.pager {
 	background-repeat:no-repeat;
 	background-position: -96px -32px !important;  
 }
+
+.fancybox-overlay{
+	z-index:25000;
+
+	}
+}

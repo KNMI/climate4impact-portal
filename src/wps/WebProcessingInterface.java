@@ -549,7 +549,9 @@ public class WebProcessingInterface {
             DebugConsole.println("MimeType = "+mimeType);
             if(mimeType.equalsIgnoreCase("image/png")){
             //getImageFromStatusLocation
-              data+="<img src='"+Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"' />";
+              String imageUrl = Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"&image=img.png";
+              //data+="<a class=\"fancybox\" rel=\"group\" href=\"http://localhost:8080/impactportal/ImpactService?service=processor&request=getimage&outputId=buffer&statusLocation=http://localhost:8080/impactportal/WPS?OUTPUT=/pywps-138504392568.xml\"><img width=\"600\" src=\""+imageUrl+"\" alt=\"\"/></a>";
+              data+="<a class=\"fancybox\" rel=\"group\" href=\""+imageUrl+"\"><img width=\"600\" src=\""+imageUrl+"\" alt=\"\" /></a>";
             }
              //data+=getWPSURL();
           }catch(Exception e){}

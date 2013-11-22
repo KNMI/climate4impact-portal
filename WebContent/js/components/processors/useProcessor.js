@@ -15,6 +15,8 @@ var showStatusReport = function(json) {
             autoScroll : true,
             autoDestroy : true,
             maximizable : true,
+            //overflowX : 'scroll',
+            //overflowY : 'scroll',
             closeAction : 'destroy',
             frame : true,
             title : 'WPS report',
@@ -27,7 +29,7 @@ var showStatusReport = function(json) {
                 {
                   xtype : 'panel',
                   layout : 'fit',
-                  autoScroll : true,
+                  autoScroll : false,
                   bodyStyle : "padding:10px;background:#FFFFFF;background-color:#FFFFFF",
                   collapsible : false,
                   // minHeight:400,
@@ -179,8 +181,8 @@ var processProgressMonitoring = function(status) {
     margin : 0
   });
   var b = Ext.create('Ext.button.Button', {
-    text : 'view results',
-    disabled : true,
+    text : 'view details',
+    //disabled : true,
     handler : function() {
       w.showResults(results);
     }
