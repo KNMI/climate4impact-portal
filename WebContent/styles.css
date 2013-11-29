@@ -368,13 +368,13 @@ div.impactcontent a{
 
  
 div.editcms a{
-    margin-top:30px;
-    padding-top:30px;
-    line-height:30px;
+    margin-top:0px;
+    padding-top:0px;
+    line-height:0px;
     font-size: 10px;
     color:gray;
     font-weight:normal;
-  
+    float:right;
 }
 /* heading and navigation */
 
@@ -624,7 +624,7 @@ div.viewcode-block:target {
 }
 
 
-.couriernew, textarea.couriernew{
+.couriernew{
   font-family: Arial, Helvetica, sans-serif;
     font-size: 24px;
     font-style: normal;
@@ -996,15 +996,7 @@ div.viewcode-block:target {
 }
 
 
-.openid_identifier{
-  background: #fff url(images/openid.gif) no-repeat; 
-  background-position: 0 50%;  
-  padding-left: 18px;  
-  border:1px solid gray;
-  height:18px;
-  padding-top:3px;
-  padding-bottom:3px;
-}
+
 .searchbox span{
 	}
 
@@ -1178,7 +1170,7 @@ line-height:20px;
 }
 .drupal tr td,
 .drupal tr th {
-  padding: 4px 9px;
+  padding: 5px;
   border: 1px solid #fff;
   text-align: left; /* LTR */
  
@@ -1221,11 +1213,19 @@ div.textstandardleft{
   padding-left:15px;
   margin-left:30px;
   padding-right:15px; 
-  padding-top:2px;
+  padding-top:0px;
   padding-bottom:8px;
-  margin-top:20px;
+  margin-top:0px;
   text-align: justify;
   /*background: #FBFBFB;*/ 
+}
+
+div.alignleft{
+   width:900px; 
+}
+
+div.big{
+  text-align: left;
 }
 
 .textstandardleft ul li{
@@ -1241,6 +1241,11 @@ div.textstandardleft ol li{
 	list-style-position:outside;;
 }
 
+a:link {
+    font-weight: normal;
+    text-decoration: none;
+    color: #0071FF;
+}
 
 
 div.textcentered{ 
@@ -1322,7 +1327,8 @@ table.drupal {
 
 
 strong {
-  font-weight: bolder;
+
+  font-weight:bolder;
 }
 
 em {
@@ -1399,7 +1405,7 @@ margin:5px;
   width:200px; height:150px;
   
   
-  border: 1px solid gray;
+  border: none;
    z-index: 2000; 
   display:block;
   padding:0px;
@@ -1409,7 +1415,7 @@ margin:5px;
 
 div.tnimagetext{
  position: absolute;
-  top: 120px;
+  top: 114px;
   text-align: center;
   width:200px;
   font-weight: bold; 
@@ -1419,16 +1425,19 @@ padding:0px;
 margin:0px;
 line-height:0px;
 
+
 }
 
 
 .tnimagetext p{
   text-align: center;
+  vertical-align:middle;
   line-height:15px;
   font-size: 15px;
   color:#fff;
   margin:0px;
-  padding:0px;
+  padding:4px 0px 8px 0px;
+  background-color:rgba(20%, 20%, 20%, 0.8);
 }
 
 .tnimagetext a{
@@ -1549,8 +1558,8 @@ table.wps {
 
 
 a.lexicon-term{
-	 color: #333333; 
-	 border-bottom: thin dotted #C0C0FF;
+	 color: #3C3E4F; 
+	 border-bottom: thin dotted #3C3E4F;
 	 	font-weight: normal; 
 	 	 font-style: normal; 
 text-decoration:none;	 	 
@@ -2059,5 +2068,92 @@ ul.pager {
 .fancybox-overlay{
 	z-index:25000;
 
-	}
+	
+}
+
+input[type=text], textarea{
+    border:1px solid  #BFBDBD;
+  
+    box-shadow: 1px 1px 0 #828181 inset;
+}
+
+input[type=text]{	
+	height:18px;
+}
+
+input[type=button]
+{
+    background-color: #1E1E1E;
+    color: #979797;
+    height: 24px;
+    width: 103px;
+    color: #bbbbbb;
+    
+    box-shadow:-1px 2px #6E6B6A inset;
+}
+
+input[type=button], input[type=text],textarea
+{
+   
+    border-radius:3px;
+    
+}
+
+.alnright { text-align: right; }
+
+.inputinvalid{
+	background-color:#FFC0C0;
+	border:1px solid red;
+}
+
+.openid_identifier{
+  background: #fff url(images/openid.gif) no-repeat; 
+  background-position: 0 50%;  
+  padding-left: 18px;  
+  border:1px solid gray;
+  height:18px;
+  padding-top:3px;
+  padding-bottom:3px;
+  width:580px;
+}
+
+.logo_USA{
+    background-image:url(images/countries/USA.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_UK{
+    background-image:url(images/countries/UK.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_Sweden{
+    background-image:url(images/countries/Sweden.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_Germany{
+    background-image:url(images/countries/Germany.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_France{
+    background-image:url(images/countries/France.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_China{
+    background-image:url(images/countries/China.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_Italy{
+    background-image:url(images/countries/Italy.png) !important;
+    width:16px;
+    height:16px; 
+}
+.logo_Australie{
+    background-image:url(images/countries/Australia.png) !important;
+    width:16px;
+    height:16px; 
 }

@@ -308,7 +308,18 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			//out.println("OpenIDException occured: "+e.getMessage());
 			//httpReq.getSession().setAttribute("openid-disc", discovered);
 			//httpReq.setAttribute("message", "OpenIDException: "+e.getMessage());
-		  String errorMsg="OpenIDException occured:<br>"+e.getMessage();
+		  int code = e.getErrorCode();
+		  
+		  
+		  String errorMsg="We tried to login with your Open ID identifier, but something went wrong (Code "+code+").<br/>";
+		  errorMsg+="You entered:<br/><strong>"+userSuppliedString+"</strong><br/><br/>";
+		  if(code == 1798){
+		    errorMsg+="<strong>The OpenID identifier you entered does probably not exist.</strong><br/><br/>";
+		  }
+		  if(code == 1796){
+        errorMsg+="<strong>The OpenID provider is probably not recognized by climate4impact.</strong><br/><br/>";
+      }
+		      errorMsg+="The problem has the following details:<br/>"+e.getMessage();
 		  DebugConsole.errprintln(errorMsg);
 		  //DebugConsole.printStackTrace(e);
 

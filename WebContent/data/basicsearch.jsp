@@ -401,7 +401,7 @@
         	
         	
         	</div>
-     
+     </div>
 	 	
   <!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

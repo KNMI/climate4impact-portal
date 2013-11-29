@@ -10,12 +10,21 @@
     <!-- Contents -->
     
     <div class="impactcontent">
-      <h1>Exception occured</h1>
+     <div class="textstandardleft">
+      <h1>A problem occurred!</h1>
+
       <%
       out.print(session.getAttribute("message")); 
       %>
-      <br/>
-      <a href="javascript:javascript:history.go(-1)">Go back</a>
+      <br/><br/>
+      The system administrator has been notified.<br/>
+      <hr/>
+      <b>Actions:</b>
+      <ul>
+      <li><a href="/impactportal/help/contactexpert.jsp">Provide feedback via the contact form.</a></li>
+      <li><a href="javascript:javascript:history.go(-1)">Go back to previous page.</a></li>
+      </ul>
+    </div>
     </div>
     
     <!-- /Contents -->

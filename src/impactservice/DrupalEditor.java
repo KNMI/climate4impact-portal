@@ -2,7 +2,6 @@ package impactservice;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
-
 import java.net.UnknownHostException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -53,7 +52,7 @@ public class DrupalEditor {
 		try {
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostname = addr.getHostName();
-			contentsURL=contentsURL.replaceAll(hostname, "localhost");
+			/*contentsURL=contentsURL.replaceAll(hostname, "localhost");*/
 //			DebugConsole.println("hostname: '"+hostname+"'");
 			if(hostname.equals("bhlnmgis.knmi.nl")){
 				String externalName="://webgis.nmdc.eu";
@@ -69,7 +68,15 @@ public class DrupalEditor {
 	}
 
 	static public String showDrupalContent(String defaultPage,HttpServletRequest request) throws DrupalEditorException{
-	  return showDrupalContent(defaultPage,request, true);
+	  boolean showEditButton = false;
+	  try {
+      User user = User.getUser(request);
+      if(user!=null){
+        showEditButton = true;
+      }
+    } catch (Exception e) {
+    }
+	  return showDrupalContent(defaultPage,request, showEditButton );
 	}
 	static public String showDrupalContent(String defaultPage,HttpServletRequest request, boolean showEditButton) throws DrupalEditorException{
 		String returnMessage="";

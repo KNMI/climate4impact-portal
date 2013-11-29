@@ -101,7 +101,7 @@
 		<jsp:include page="datamenu.jsp" />
 		<div class="impactcontent"> 
 		<div class="cmscontent"> 
-		<h1>Use a Processing Service</h1><br/>
+		<h1>Use a Processing Service</h1>
 	
 		 
 		 <%
@@ -127,9 +127,14 @@
 		 	}
 			if(user!=null&&processorId!=null){
 			%>
-				<a href="wpsoverview.jsp">Back to overview</a>
+			<ul>
+				<li><a href="/impactportal//account/jobs.jsp">Submitted jobs and settings are stored in the joblist</a> </li>
+				<li><a href="wpsoverview.jsp">Go to the overview of available transformations</a></li>
+				</ul>
+				
 				<div id="content2"></div>
 				<div id="container" style="padding-bottom:20px; "></div>
+				
 			 <%
 		 	}
 		 %>

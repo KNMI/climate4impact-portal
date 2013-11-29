@@ -47,7 +47,7 @@
   <ul style="height:20px;">
   <!-- 	<li <% if(highLightHome)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Overview</a></li>-->
   <li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>
-    <li <% if(highLightAdvancedSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/advancedsearch.jsp" >Advanced Search</a></li>
+   <!--  <li <% if(highLightAdvancedSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/advancedsearch.jsp" >Advanced Search</a></li> -->
     <li <% if(highLightCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/catalogs.jsp" >Catalogs</a></li>
     <li <% if(highLightCustomCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/customcatalog.jsp" >Add catalogs</a></li>
     <li <% if(highLightTransform)out.print("class=\"sel\""); %>><a href="<%=Home%>data/transform.jsp" >Transformations</a></li>

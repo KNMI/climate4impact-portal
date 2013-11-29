@@ -1,9 +1,11 @@
-<%@page import="tools.HTMLParser"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="impactservice.DrupalEditor,org.apache.commons.lang3.StringEscapeUtils"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	pageEncoding="UTF-8"
+	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.User"
+	import="javax.servlet.http.*" import="javax.servlet.http.Cookie"
+	import="impactservice.DrupalEditor,org.apache.commons.lang3.StringEscapeUtils,tools.HTMLParser"
+	%><!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
+<head>
    <jsp:include page="../includes.jsp" />
    
   </head> 
@@ -22,11 +24,11 @@
 			String email =request.getParameter("email");
 			String comments = request.getParameter("comments");
 			boolean validInput = true;
-			if(name.length()<2||email.length()<1||comments.length()<2){
+			if(email.length()<3||comments.length()==0){
 				validInput=false;
 			}
 			if(validInput){
-				out.println("<h1>Your feedback has been sent</h1><br/>Your comments:");
+				out.println("<h1>Thanks for your feedback!</h1><div class=\"textstandardleft\">Your feedback has been sent to one of our experts. Your comments were:");
 				out.println("<div style=\"margin-top:10px;padding:10px;border-top:1px dashed #CCC;border-bottom:1px dashed #CCC;\">");
 				String mailMessage="From: "+name+"\n";
 				mailMessage+="Email: "+email+"\n\n";
@@ -43,15 +45,17 @@
 				
 				out.println(((HTMLParser.textToHTML(request.getParameter("comments")))));
 				out.println("</div>");
+				out.println("<br/>You will be contacted as soon as possible. </div>");
 			}else{
 				out.println("<h1>Your feedback could not be sent</h1>");
-				out.println("<div style=\"margin-top:20px;padding:10px;border-top:1px dashed #CCC;border-bottom:1px dashed #CCC;\">");
+				out.println("<div class=\"textstandardleft\"><div style=\"margin-top:20px;padding:10px;border-top:1px dashed #CCC;border-bottom:1px dashed #CCC;\">");
 				out.println("<table><tr><td>Message has not been sent because no comments were given.</td></tr>");
 				out.println("<tr><td style=\"text-align:center;\"><FORM><INPUT TYPE=\"button\" VALUE=\"Try again\" onClick=\"history.go(-1);return true;\"></FORM></td></tr></table>");
-				out.println("</div>");
+				out.println("</div></div>");
 			}
 			
 			%>
+			</div>
 		</div>
 		
 	

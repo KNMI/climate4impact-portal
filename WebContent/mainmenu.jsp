@@ -58,6 +58,7 @@
 	else if(pageName.indexOf("help")!=-1)highLightHelp=true;
 	else if(pageName.indexOf("feedback.jsp")!=-1)highLightFeedback=true;
 	else if(pageName.indexOf("account")!=-1)highLightLogin=true;
+	else if(pageName.indexOf("consumer")!=-1)highLightLogin=true;
 	else if(pageName.indexOf("mapandplot.jsp")!=-1)highLightMapAndPlot=true;
 	else if(pageName.indexOf("resources.jsp")!=-1)highLightResources=true;
 	

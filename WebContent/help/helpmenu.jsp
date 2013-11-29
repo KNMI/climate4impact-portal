@@ -14,6 +14,9 @@
 		for(int j=0;j<menuElements.length;j++){
 			if(pageName.indexOf(menuElements[j])!=-1)highLighted[j]=true;else highLighted[j]=false;
 		}
+		if(pageName.indexOf("sendfeedback")!=-1){
+			highLighted[2]=true;
+		}
 			out.print("<ul style=\"height:20px;\">");
 		for(int j=0;j<menuElements.length;j++){
 			out.print("<li ");
