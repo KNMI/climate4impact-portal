@@ -1,10 +1,35 @@
 
   var OpenIDProviders = {
-      'PCMDI':       {name:'PCMDI',url:'https://pcmdi9.llnl.gov/esgf-idp/openid/',logocls:'logo_USA'},
-      'CEDA':        {name:'BADC/CEDA',url:'https://ceda.ac.uk/openid/',logocls:'logo_UK'},
-      'DKRZ':        {name:'DKRZ',url:'https://esgf-data.dkrz.de/esgf-idp/openid/',logocls:'logo_Germany'},
-      'PIK':         {name:'PIK Potsdam',url:'https://esg.pik-potsdam.de/esgf-idp/openid/',logocls:'logo_Germany'},
-      'SMHI-LIU-NSC':{name:'SMHI-LIU-NSC',url:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',logocls:'logo_Sweden'}
+      'PCMDI':       {
+    	  name:'PCMDI'       ,
+    	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
+    	  createaccount:'https://pcmdi9.llnl.gov/esgf-web-fe/createAccount',
+    	  logocls:'logo_USA'},
+      'CEDA':        {
+    	  name:'BADC/CEDA'   ,
+    	  openidprefix:'https://ceda.ac.uk/openid/'                 ,
+    	  createaccount:'https://ceda.ac.uk/'                 ,
+    	  logocls:'logo_UK'},
+      'DKRZ':        {
+    	  name:'DKRZ'        ,
+    	  openidprefix:'https://esgf-data.dkrz.de/esgf-idp/openid/' ,
+    	  createaccount:'https://esgf-data.dkrz.de/esgf-web-fe/createAccount',
+    	  logocls:'logo_Germany'},
+	  /*'NCI':        {
+    	  name:'NCI'        ,
+    	  openidprefix:'https://esg2.nci.org.au/esgf-idp/openid/' ,
+    	  createaccount:'https://esg2.nci.org.au/esgf-web-fe/createAccount',
+    	  logocls:'logo_Germany'},*/
+      'PIK':         {
+    	  name:'PIK Potsdam' ,
+    	  openidprefix:'https://esg.pik-potsdam.de/esgf-idp/openid/',
+    	  createaccount:'https://esg.pik-potsdam.de/esgf-web-fe/createAccount',
+    	  logocls:'logo_Germany'},
+      'SMHI-LIU-NSC':{
+    	  name:'SMHI-LIU-NSC',
+    	  openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
+    	  createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
+    	  logocls:'logo_Sweden'}
   };
   
 
@@ -21,7 +46,7 @@ $( document ).ready(function() {
   var dataNodeButtons = $("#datanodebuttons");
   var html='<ul>';
   for(var id in OpenIDProviders){
-    html+='<li><button id="dnb_'+id+'" class="datanodebutton" onclick="openDialog(\''+id+'\');">'+OpenIDProviders[id].name+'</button> - '+ OpenIDProviders[id].url+ '&lt;username&gt;</li>' ;
+    html+='<li><button id="dnb_'+id+'" class="datanodebutton" onclick="openDialog(\''+id+'\');">'+OpenIDProviders[id].name+'</button></li>';// - '+ OpenIDProviders[id].url+ '&lt;username&gt;</li>' ;
     //alert(id.name);
   }
   html+='</ul>';
@@ -45,6 +70,15 @@ $(function() {
   });
   name.on('input',function(){
     composeId();
+  });
+  
+  // Following lines are for IE7 Fix:
+  var namebusy=false;
+  name.on('propertychange',function(){
+	  if(namebusy == true)return;
+	  namebusy = true;
+	  composeId();
+	  namebusy = false;
   });
   
   
@@ -89,7 +123,7 @@ $(function() {
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
     var username = name.val();
     var openid = "";
-    var dataCentreOpenIdProvider = OpenIDProviders[dataCentreName].url;
+    var dataCentreOpenIdProvider = OpenIDProviders[dataCentreName].openidprefix;
   
     
     openid = dataCentreOpenIdProvider+username;
@@ -105,8 +139,8 @@ $(function() {
   .dialog(
       {
         autoOpen : false,
-        height : 290,
-        width : 480,
+        height : 350,
+        width : 500,
         modal : true,
         buttons : {
           Cancel : function() {
@@ -138,5 +172,8 @@ var openDialog = function(datacentre) {
   
   $('#dialog-form').dialog('open');
   $('#dialog-form').dialog("option", "datacentre", datacentre);
-  $("#composedopenididentifier").text(OpenIDProviders[datacentre].url);
+  $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
+  if(OpenIDProviders[datacentre].createaccount){
+	  $("#datacentreurl").html("<a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a>");
+  }
 }

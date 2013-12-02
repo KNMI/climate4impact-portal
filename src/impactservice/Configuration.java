@@ -81,14 +81,20 @@ public class Configuration {
     private static String drupalHost="<drupalhost>";
     private static String drupalBaseURL="<drupalbaseurl>";
     private static String drupalDirectory="<drupaldirectory>";
+    private static String portalFilesLocation="http://climate4impact.eu/files/";
     public static void doConfig(MyXMLReader configReader){
       drupalHost=configReader.getNodeValue("impactportal.drupalconfig.drupalhost");
       drupalBaseURL=configReader.getNodeValue("impactportal.drupalconfig.drupalbaseurl");
       drupalDirectory=configReader.getNodeValue("impactportal.drupalconfig.drupaldirectory");
+      //portalFilesLocation=configReader.getNodeValue("impactportal.drupalconfig.portalfileslocation");
     }
     public static String getDrupalHost(){readConfig();return drupalHost;}
     public static String getDrupalBaseURL(){readConfig();return drupalBaseURL;}
     public static String getDrupalDirectory(){readConfig();return drupalDirectory;}
+    public static String getPortalFilesLocation() {
+      return portalFilesLocation;
+      
+    }
   }
   
   public static class VercSearchConfig{

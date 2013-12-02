@@ -41,6 +41,7 @@ div#users-contain table td,div#users-contain table th {
 
 .datanodebutton{
 	width:175px;
+	
 }
 #datanodebuttons{
 	padding:0px;
@@ -69,21 +70,27 @@ div#users-contain table td,div#users-contain table th {
 		if (user == null) {
 			out.println("<div class=\"impactcontent\">");
 	%>
-
-	<div class="cmscontent">
-		<div style="float: right; border: none;">
-			<img src="../images/openid.jpg" alt="openidlogo" width="300"></img>
-		</div>
+		
 		
 		<div id="dialog-form" title="Compose OpenID identifier">
-	Please fill in your username. Your OpenID identifier is automatically composed.
+	Please fill in your username. Your OpenID identifier will be automatically composed.
 		<p class="validateTips"></p>
 		<label for="name">Name:* </label> <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" /><br/><br/>
-		<br/><span id="composedopenididentifier"></span>
+		<br/><span id="composedopenididentifier"></span><br/><br></br>
+		<span id="datacentreurl"></span>
 	</div>
+	
+
+	<div class="cmscontent">
+	<div style="float: right;clear:both;overflow:none; border: none;">
+			<a target="_blank" href="http://openid.net"><img src="../images/openid.jpg" alt="openid logo" width="250"/></a><br/>
+			<a target="_blank" href="http://esgf.org"><img src="../images/esgf_network.png" alt="esgf network" width="250"/></a><br/>
+			<div align="center" style="width:250px;text-align:center;"><a target="_blank" href="http://esgf.org/">The ESGF Federation</a></div>
+			
+		</div>
 
 		<h1>Sign in with your ESGF OpenID account</h1>
-		<div class="textstandardleft alignleft big" >
+		<div class="textstandardleft  " >
 
 		<%
 			String openid_identifier = "";
@@ -109,15 +116,22 @@ div#users-contain table td,div#users-contain table th {
 						
 						+ "<input id=\"openid_identifier_input\" type=\"text\" name=\"openid_identifier\"  class=\"openid_identifier\" value=\""
 						+ openid_identifier
-						+ "\"/> <br/>"
-						+ " <span style=\"padding:0px;line-height:40px;\"><input id=\"login_button\" type=\"submit\" name=\"login\" value=\"Sign in\" /> "
-						+ " <input type=\"checkbox\" ");
+						+ "\"/><br/> ");
+				
+				
+				
+				//Remember me
+				out.print( "<span style=\"float:right;margin-top:2px;\"><span><input type=\"checkbox\" ");
+				if (checkKeepId)out.print("checked=\"checked\"");
+				out.print(" name=\"keepid\" onclick=\"checkOpenIdCookie(this);\"/> Remember me </span>");
 
-				if (checkKeepId)
-					out.print("checked=\"checked\"");
-
-				out.print(" name=\"keepid\" onclick=\"checkOpenIdCookie(this);\"/> Remember me</span>"
-						+ "<span style=\"padding:0px;margin:0px;float:right;\"><a href=\"/impactportal/help/howto.jsp?q=create_esgf_account\"><i>Not registered?</i></a></span>"
+				//Sign in
+				out.print("<input id=\"login_button\" type=\"submit\" name=\"login\" value=\"Sign in\" />");
+				out.print("</span>");
+				
+				//Not registered?				
+				out.print(
+						"<span style=\"padding:0px;margin:0px;float:left;\"><a href=\"/impactportal/help/howto.jsp?q=create_esgf_account\"><i>Not registered?</i></a></span>"
 						+ "</form>"
 				//+"<br/>A PCMDI OpenID identifier is usually in the form: <i>https://pcmdi3.llnl.gov/esgcet/myopenid/<b>username</b></i><br/><br/><br/>"        
 
@@ -125,10 +139,11 @@ div#users-contain table td,div#users-contain table th {
 		%>
 		
 		
-		<br/>
-		 You can compose your OpenID based on username and corresponding ESGF data node:<br/>
+		<br/><br/><br/>
+		 You can compose your OpenID based on user name and data node:<br/>
 			<div id="datanodebuttons"></div>
 
+	</div>
 		</div>
 <!-- 
 		<br /> <b>Don't have an account yet?</b>
@@ -178,7 +193,7 @@ div#users-contain table td,div#users-contain table th {
 		%>
 		<jsp:include page="loginmenu.jsp" />
 
-		<div class="impactcontent">
+		
 			<div class="cmscontent">
 			
 
@@ -204,10 +219,10 @@ div#users-contain table td,div#users-contain table th {
 					}
 				%>
 				<br />
-				
+			
 			</div>
 		</div>
-	</div>
+
 	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />
 </body>

@@ -103,7 +103,7 @@ public class DrupalEditor {
 		String drupalHost=Configuration.DrupalConfig.getDrupalHost();
     String drupalBaseURL=Configuration.DrupalConfig.getDrupalBaseURL();
     String drupalDirectory=Configuration.DrupalConfig.getDrupalDirectory();
-    
+    String portalFilesLocation =Configuration.DrupalConfig.getPortalFilesLocation();
     //DebugConsole.println("Requestedpage='"+requestedPage+"'");
     boolean validPage=true;
     if(requestedPage==null){
@@ -195,7 +195,7 @@ public class DrupalEditor {
 			returnMessage=returnMessage.replaceAll("href=\"/"+drupalBaseURL+drupalDirectory,"href=\"");
 			returnMessage=returnMessage.replaceAll("href=\"/"+drupalDirectory,"href=\"");
 			
-			returnMessage=returnMessage.replaceAll("/files/", drupalHost+"/files/");
+			returnMessage=returnMessage.replaceAll("/files/", portalFilesLocation);
 			
 			returnMessage=returnMessage.replaceAll("href=\"http://localhost/","href=\""+drupalHost);
 //			DebugConsole.println(drupalURL);
