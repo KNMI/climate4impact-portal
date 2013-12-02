@@ -68,7 +68,7 @@ div#users-contain table td,div#users-contain table th {
 		}
 
 		if (user == null) {
-			out.println("<div class=\"impactcontent\">");
+		
 	%>
 		
 		
@@ -80,7 +80,7 @@ div#users-contain table td,div#users-contain table th {
 		<span id="datacentreurl"></span>
 	</div>
 	
-
+<div class="impactcontent">
 	<div class="cmscontent">
 	<div style="float: right;clear:both;overflow:none; border: none;">
 			<a target="_blank" href="http://openid.net"><img src="../images/openid.jpg" alt="openid logo" width="250"/></a><br/>
@@ -193,7 +193,7 @@ div#users-contain table td,div#users-contain table th {
 		%>
 		<jsp:include page="loginmenu.jsp" />
 
-		
+			<div class="impactcontent">
 			<div class="cmscontent">
 			
 
@@ -207,7 +207,8 @@ div#users-contain table td,div#users-contain table th {
 							Create an ESGF account.</a><br /></li>
 					<li><a href="logout.jsp">Log out</a><br /></li>
 				</ul>
-
+				</div>
+			</div>
 				<%
 					//Print warning when retrieving SLCS has failed.
 						try {
