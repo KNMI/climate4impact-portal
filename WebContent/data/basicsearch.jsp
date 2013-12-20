@@ -242,17 +242,17 @@
 <body>
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="datamenu.jsp" />
-		<div class="impactcontent">
-		<!--  <div class="cmscontent"> 
+	
+	<div class="impactcontent" style="min-height:0px;height:0px;margin-top:10px;">
 
-      <%try{out.print(DrupalEditor.showDrupalContent("?q=dataoverview",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
-  			</div> --> 
+      <%try{out.print(DrupalEditor.showDrupalContent("?q=search_help",request,false,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+  			<div class="impactcontent">
   			<div id="info"></div>
-
+			<h1>Search</h1>
         	
         	
         	
-  			<h1>Search</h1>
+  			
         	<div class="collapsible" style="padding:0px;height:36px;"> 
 	        <table width="100%" ><tr><td class="collapsibletitle" >
 	        Variable 

@@ -63,6 +63,8 @@ public class PyWPSServer extends HttpServlet {
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
     DebugConsole.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
     
+    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userHomeDir+"/data");
+    
     CGIRunner.runCGIProgram(commands,environmentVariables,response,outputStream,dataToPost);
   }
   

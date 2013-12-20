@@ -78,7 +78,12 @@ public class DrupalEditor {
     }
 	  return showDrupalContent(defaultPage,request, showEditButton );
 	}
+	
 	static public String showDrupalContent(String defaultPage,HttpServletRequest request, boolean showEditButton) throws DrupalEditorException{
+	  return showDrupalContent(defaultPage,request,showEditButton,true);
+	}
+	  
+  static public String showDrupalContent(String defaultPage,HttpServletRequest request, boolean showEditButton, boolean showTitle) throws DrupalEditorException{
 		String returnMessage="";
 		//String homeURL=drupalHost+drupalBaseURL+drupalDirectory;
 		String homeURL=Configuration.DrupalConfig.getDrupalHost()+Configuration.DrupalConfig.getDrupalBaseURL()+Configuration.DrupalConfig.getDrupalDirectory();
@@ -159,7 +164,11 @@ public class DrupalEditor {
 			
 			
 			// Print title
-			returnMessage += titleNode.printTree();
+			DebugConsole.println(showTitle+""+titleNode.printTree());
+			if(showTitle == true){
+			  returnMessage += titleNode.printTree();
+			}
+			
 			
 			// Print body
 			//HTMLParserNode body = htmlParser.searchTreeNodes(element,"div id=\"block-system-main\" class=\"block block-system\"");
