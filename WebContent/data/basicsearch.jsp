@@ -243,7 +243,7 @@
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="datamenu.jsp" />
 	
-	<div class="impactcontent" style="min-height:0px;height:0px;margin-top:10px;">
+	<div style="line-height:0px;height:0px;margin:32px 10px;float: right;clear:both;overflow:none; border: none;">
 
       <%try{out.print(DrupalEditor.showDrupalContent("?q=search_help",request,false,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
   			<div class="impactcontent">
