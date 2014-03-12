@@ -30,13 +30,13 @@
       <div class="textstandardleft">
       <h2>Browse a catalog:</h2>
       <form method="get" action="/impactportal/data/catalogbrowser.jsp?">
-      <input type="text" name="catalog"  class="textbox" size="120" value=""/>
+      <input type="text" name="catalog"  class="textbox" size="100" value=""/>
       <input type="submit" name="login" value="Go" />
       </form> 
       
       <h2>Browse an OpenDAP file:</h2>
       <form method="get" action="/impactportal/data/datasetviewer.jsp?">
-      <input type="text" name="dataset"  class="textbox" size="120" value=""/>
+      <input type="text" name="dataset"  class="textbox" size="100" value=""/>
       <input type="submit" name="login" value="Go" />
       </form> 
       </div>

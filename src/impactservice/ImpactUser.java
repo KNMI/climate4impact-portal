@@ -24,6 +24,7 @@ public class ImpactUser {
  
 
   synchronized public GenericCart getProcessingJobList(){
+    DebugConsole.println("getProcessingJobList");
     try{
       if(processingJobsList==null){
         processingJobsList = new GenericCart("processingJobsList",this);
@@ -40,6 +41,7 @@ public class ImpactUser {
     return processingJobsList;  
   }
   synchronized public GenericCart getShoppingCart() {
+    DebugConsole.println("getShoppingCart");
     try{
       if(shoppingCart==null){
         shoppingCart = new GenericCart("shoppingCart",this);

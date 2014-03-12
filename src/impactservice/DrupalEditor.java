@@ -1,8 +1,12 @@
 package impactservice;
 
+
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
@@ -45,8 +49,22 @@ public class DrupalEditor {
       return code;
     }
   }
+  
+  
+  static class HttpFragmentObject{
+    public HttpFragmentObject(String message2, long i) {
+      this.message = message2;
+      this.date = i;
+    }
+    public long date;
+    public String message;
+  
+  }
+  
+  static Map<String, HttpFragmentObject> HttpragmentCache = new HashMap<String, HttpFragmentObject>(); 
 	
-	static String doGetRequest(String contentsURL) throws IOException, WebRequestBadStatusException{
+	static String doGetRequest(String contentsURL,boolean useCache) throws IOException, WebRequestBadStatusException{
+	  
 		//DebugConsole.println("doGetRequest: '"+contentsURL+"'");
 		//The server cannot access his own pages with the home address URL, therefore the home address URL needs to be replaced with localhost which is internally accessible.
 		try {
@@ -63,7 +81,25 @@ public class DrupalEditor {
 		} catch (UnknownHostException e) {
 		}
 		
-		return    HTTPTools.makeHTTPGetRequest(contentsURL);
+		if(useCache){
+  		HttpFragmentObject urlObject = (HttpFragmentObject) HttpragmentCache.get(contentsURL);
+  		if(urlObject!=null){
+  		  long timeInMillis = Calendar.getInstance().getTimeInMillis();
+  		  if(timeInMillis - urlObject.date < 60000){
+  		    DebugConsole.println("Returning message from cache");
+          return urlObject.message;
+  		  }else{
+  		    HttpragmentCache.remove(contentsURL);
+  		    DebugConsole.println("Too old");
+  		  }
+  		}
+		}
+		    
+		String message=HTTPTools.makeHTTPGetRequest(contentsURL);
+		
+		HttpragmentCache.put(contentsURL, new HttpFragmentObject(message,  Calendar.getInstance().getTimeInMillis()));
+		
+		return message;
 		
 	}
 
@@ -93,6 +129,7 @@ public class DrupalEditor {
 		String drupalURL=homeURL;
 		String requestedPageNumber = null;
 		String requestedPage=null;
+		boolean useCache = true;
 		if(request!=null){
 			requestedPage=request.getParameter("q");
 			
@@ -103,6 +140,13 @@ public class DrupalEditor {
 			}
 			
 			requestedPageNumber=request.getParameter("page");
+			
+			String useCacheParam = request.getParameter("cache");
+			if(useCacheParam!=null){
+			  if(useCacheParam.equalsIgnoreCase("false")){
+			    useCache = false;
+			  }
+			}
 		}
 		
 		String drupalHost=Configuration.DrupalConfig.getDrupalHost();
@@ -139,7 +183,7 @@ public class DrupalEditor {
 			int internalDivDepth=0;
 			int initialDivDepth=0;*/
 			String htmlData;
-			htmlData=doGetRequest(homeURL);
+			htmlData=doGetRequest(homeURL,useCache);
 			HTMLParser htmlParser = new HTMLParser();
 			
 			HTMLParserNode element = htmlParser.parseHTMLDocument(htmlData);

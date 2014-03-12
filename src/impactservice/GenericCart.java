@@ -121,6 +121,7 @@ public class GenericCart {
 	  }
 
 	public int getNumProducts(HttpServletRequest request){
+	  DebugConsole.println("GetNumProducts" );
 	  int numCustomFiles = 0;
 	  ImpactUser impactUser;
     try {

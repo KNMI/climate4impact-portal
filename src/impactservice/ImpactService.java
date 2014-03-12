@@ -574,10 +574,15 @@ public class ImpactService extends HttpServlet {
                 if(user != null){
                   msg+="<br/>You are logged in as "+user.id+"<br/>";
                 }
+              }else if(e.getStatusCode()==404){
+                msg+="HTTP status code "+e.getStatusCode()+": File not found<br/>";
+                if(user != null){
+                  msg+="<br/>You are logged in as "+user.id+"<br/>";
+                }
               }else{
                 msg="WebRequestBadStatusException: "+e.getStatusCode()+"<br/>";
               }
-              if(e.getStatusCode()==404)msg+="HTTP status code "+e.getStatusCode()+": Not Found<br/>";
+              
               
               /*else{
                 msg+="<br/>You are logged in as "+user.id+"<br/>";
