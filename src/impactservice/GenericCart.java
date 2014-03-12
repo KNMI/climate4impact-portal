@@ -2,6 +2,7 @@ package impactservice;
 
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -14,7 +15,6 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -27,10 +27,10 @@ import wps.WebProcessingInterface;
 
 
 public class GenericCart {
-  private User user = null;
+  private ImpactUser user = null;
   private  String genericId = "";
   
-  public  GenericCart(String id,User user){
+  public  GenericCart(String id,ImpactUser user){
     DebugConsole.println("Creating new GenericCart with id "+id+" for user "+user);
     this.genericId=id;
     this.user=user;
@@ -101,6 +101,15 @@ public class GenericCart {
 
 	 public synchronized void removeDataLocator(String id) {
 	    DebugConsole.println("Removing "+id);
+	    try {
+	      DebugConsole.println("Checking "+user.getDataDir()+"/"+id);
+        File file = new File(user.getDataDir()+"/"+id);
+        if(file.exists()){
+          file.delete();
+        }
+      } catch (IOException e) {
+     
+      }
 	    Iterator<DataLocator> itr = dataLocatorList.iterator();
 	    while(itr.hasNext()) {
 	      DataLocator element = itr.next(); 
@@ -111,8 +120,23 @@ public class GenericCart {
 	    saveToStore();
 	  }
 
-	public int getNumProducts(){
-		return dataLocatorList.size();
+	public int getNumProducts(HttpServletRequest request){
+	  int numCustomFiles = 0;
+	  ImpactUser impactUser;
+    try {
+      impactUser = LoginManager.getUser(request);
+      String dataDir = impactUser.getDataDir();
+      File dataDirFile = new File(dataDir);
+      
+     
+      if(dataDirFile.exists()){
+        numCustomFiles = dataDirFile.listFiles().length;
+      }
+    } catch (Exception e) {
+
+    }
+
+		return dataLocatorList.size()+numCustomFiles;
 	}
 	
 
@@ -128,6 +152,11 @@ public class GenericCart {
     }
    
     XMLElement sc=catalogElement.get("GenericCart");
+   
+    if(dataLocatorList.size()>0){
+      dataLocatorList.clear();
+    }
+    
     Vector<XMLElement>elements=sc.getList("element");
     for(int j=0;j<elements.size();j++){
       addDataLocator(elements.get(j).getAttrValue("id"),URLDecoder.decode(elements.get(j).getAttrValue("data"),"UTF-8"),elements.get(j).getAttrValue("adddate"),Long.parseLong(elements.get(j).getAttrValue("adddatemillis")),false);
@@ -165,10 +194,11 @@ public class GenericCart {
      * @param genericCart
      * @param request
      * @return
+     * @throws Exception 
      */
-    public static String showJobList(GenericCart genericCart,HttpServletRequest request){
+    public static String showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
       DebugConsole.println("Show joblist");
-      String htmlResp = "Jobs for: <strong>"+User.getUserId(request)+"</strong><br/>";
+      String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).id+"</strong><br/>";
       htmlResp += "<table class=\"basket\">";
       Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
       int j=1;
@@ -249,10 +279,11 @@ public class GenericCart {
      * @param genericCart
      * @param request
      * @return
+     * @throws Exception 
      */
-    public static String showDataSetListOld(GenericCart genericCart,HttpServletRequest request){
+  /*  public static String showDataSetListOld(GenericCart genericCart,HttpServletRequest request){
       DebugConsole.println("Show datasetlist");
-      String htmlResp = "Basket for: <strong>"+User.getUserId(request)+"</strong><br/>";
+      String htmlResp = "Basket for: <strong>"+LoginManager.getUserId(request,null)+"</strong><br/>";
       htmlResp += "<table class=\"basket\">";
       Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
       int j=1;
@@ -354,21 +385,15 @@ public class GenericCart {
       
       htmlResp+="</table>";
       
-      /*if(j>0){
-        try {
-          genericCart.saveToStore(User.getUser(request));
-        } catch (Exception e) {
-          DebugConsole.errprintln("Unable to save store to file: "+e.getMessage());
-        }
-      }*/
+
       return htmlResp; 
-    }
+    }*/
 
 
 
   
   
-  public static JSONObject showDataSetList(GenericCart genericCart,HttpServletRequest request) throws JSONException{
+  public static JSONObject showDataSetList(GenericCart genericCart,HttpServletRequest request) throws Exception{
     DebugConsole.println("Show datasetlist");
    JSONObject datasetList = new JSONObject();
    
@@ -376,7 +401,7 @@ public class GenericCart {
    datasetList.put("children", datasets);
    datasetList.put("text", "basket");
    datasetList.put("leaf", false);
-   datasetList.put("viewer", Configuration.getHomeURL()+"/data/datasetviewer.jsp?");
+   datasetList.put("viewer", "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?");
     Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
     int j=1;
 
@@ -449,7 +474,38 @@ public class GenericCart {
       j++;
     } 
     
-    
+    /** Add datasets added to the basket by processing, listed in the /data/ folder ***/
+    ImpactUser impactUser = LoginManager.getUser(request);
+    String dataDir = impactUser.getDataDir();
+    File dataDirFile = new File(dataDir);
+    if(dataDirFile.exists()){
+      File[] fileEntry = dataDirFile.listFiles();
+      for(int f=0;f<fileEntry.length;f++){
+        JSONObject dataset = new JSONObject();
+        datasets.put(dataset);
+        
+        //String dapLocationHTTP = Configuration.GlobalConfig.getServerHTTPURL()+Configuration.getHomeURL()+"/DAP/";
+        String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
+        
+        if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
+          dataset.put("dapurl",dapLocationHTTPS+impactUser.internalName+"/"+fileEntry[f].getName());
+        }
+        dataset.put("httpurl",dapLocationHTTPS+impactUser.internalName+"/"+fileEntry[f].getName());
+        dataset.put("id",fileEntry[f].getName());
+        dataset.put("type","file");
+        dataset.put("text",fileEntry[f].getName());
+        dataset.put("leaf",true);
+        String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+        //Calendar cal = Calendar.getInstance();
+        String currentISOTimeString = sdf.format(fileEntry[f].lastModified())+"Z";
+        String addDate = currentISOTimeString;
+        dataset.put("date",addDate);
+        dataset.put("filesize",fileEntry[f].length());
+        dataset.put("index",j);
+        j++;
+      }
+    }
     /*if(j>0){
       try {
         genericCart.saveToStore(User.getUser(request));

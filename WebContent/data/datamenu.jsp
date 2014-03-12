@@ -10,7 +10,7 @@
 		String numProductsString="-";
 		
 		try{
-			numProducts = User.getUser(request).getShoppingCart().getNumProducts();
+			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts(request);
 		}catch(Exception e){				
 		}
 		if(numProducts!=0){
@@ -49,8 +49,8 @@
   <li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>
    <!--  <li <% if(highLightAdvancedSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/advancedsearch.jsp" >Advanced Search</a></li> -->
     <li <% if(highLightCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/catalogs.jsp" >Catalogs</a></li>
-    <li <% if(highLightCustomCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/customcatalog.jsp" >Add catalogs</a></li>
-    <li <% if(highLightTransform)out.print("class=\"sel\""); %>><a href="<%=Home%>data/transform.jsp" >Transformations</a></li>
+    <li <% if(highLightCustomCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/customcatalog.jsp" >Add catalogs or files</a></li>
+    <li <% if(highLightTransform)out.print("class=\"sel\""); %>><a href="<%=Home%>data/transform.jsp" >Processing</a></li>
      <!--<li <% if(highLightBasket)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basket.jsp" >Basket (<%=numProductsString%>)</a></li>-->
     <!-- 
     	<li <% if(highLightUpload)out.print("class=\"sel\""); %>><a href="<%=Home%>data/upload.jsp" >Upload</a></li>

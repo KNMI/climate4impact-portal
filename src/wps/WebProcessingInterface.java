@@ -4,25 +4,21 @@ package wps;
 import impactservice.Configuration;
 import impactservice.GenericCart;
 import impactservice.LoginManager;
-import impactservice.User;
-import impactservice.GenericCart.DataLocator;
+import impactservice.ImpactUser;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.Vector;
 
-
-import org.apache.commons.codec.binary.Base64;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import ogcservices.PyWPSServer;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import tools.DebugConsole;
 import tools.MyXMLParser;
@@ -62,16 +58,20 @@ public class WebProcessingInterface {
 		}
 
 	};
-	public static Vector<ProcessorDescriptor> getAvailableProcesses() {
+	public static Vector<ProcessorDescriptor> getAvailableProcesses(HttpServletRequest request) {
 		
 		Vector <ProcessorDescriptor> processorList = null;
 		//if(processorList==null){
 			processorList= new Vector<ProcessorDescriptor>() ;
 			MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
 			try{
-				String getcaprequest=getWPSURL()+"service=WPS&request=getcapabilities";
+				String getcaprequest="service=WPS&request=GetCapabilities";
 				DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
-				a.parse(new URL(getcaprequest));
+				ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+	      PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
+	      a.parseString(stringOutputStream.toString());
+	      stringOutputStream = null;
+				//a.parse(new URL(getcaprequest));//For remote services...
 				System.out.println(a.get("wps:Capabilities").get("ows:ServiceIdentification").get("ows:Title").getValue());
 				Vector<MyXMLParser.XMLElement> listOfProcesses = a.get("wps:Capabilities").get("wps:ProcessOfferings").getList("wps:Process");
 				for(int j=0;j<listOfProcesses.size();j++){
@@ -97,7 +97,7 @@ public class WebProcessingInterface {
 	 * @return the external URL of the Web Processing Service
 	 */
 	private static String getWPSURL() {
-	  return Configuration.GlobalConfig.getServerHomeURL()+Configuration.getHomeURL()+"/WPS?";
+	  return Configuration.getHomeURLHTTP()+"/WPS?";
   }
 	
 	/**
@@ -107,7 +107,7 @@ public class WebProcessingInterface {
 	 */
   private static JSONObject returnErrorMessage(String message){
 	  try {
-	    DebugConsole.errprintln(message);
+	    //DebugConsole.errprintln(message);
 	    JSONObject error = new JSONObject();
       error.put("error",message);
       
@@ -157,15 +157,19 @@ public class WebProcessingInterface {
 	 * @throws Exception
 	 */
 	
-	public static JSONObject describeProcess(String id) throws Exception{
+	public static JSONObject describeProcess(HttpServletRequest request,String id) throws Exception{
 	  DebugConsole.println("DescribeProcess "+id);
-	  String getcaprequest=getWPSURL()+"service=WPS&version=1.0.0&request=describeprocess&identifier="+id;
+	  String getcaprequest="service=WPS&version=1.0.0&request=describeprocess&identifier="+id;
+	  
 	  MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
-    try{
-      a.parse(new URL(getcaprequest));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
+    ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+    PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
+    a.parseString(stringOutputStream.toString());
+    stringOutputStream = null;
+
+	  
+	
     
     //Check if an Exception has been thrown:
     JSONObject exception = checkException(a,getcaprequest);
@@ -176,7 +180,7 @@ public class WebProcessingInterface {
     //DebugConsole.println("toJSON");
     //Convert the XML structure to JSOn
     JSONObject jsonData = a.toJSONObject(MyXMLParser.Options.STRIPNAMESPACES);
-    jsonData.put("url",getcaprequest);
+    jsonData.put("url","/"+Configuration.getHomeURLPrefix()+"/WPS?"+getcaprequest);
     return jsonData;
     
     /*
@@ -249,8 +253,11 @@ public class WebProcessingInterface {
 	 * @throws Exception 
 	 */
 	
-  public static JSONObject executeProcess(String procId, String dataInputs, HttpServletRequest request) throws Exception {
-    User user = LoginManager.getUser(request);
+  public static JSONObject executeProcess(String procId, String dataInputs, HttpServletRequest request,HttpServletResponse response) throws Exception {
+    ImpactUser user = LoginManager.getUser(request,response);
+    if(user == null){
+      return null;
+    }
     //http://bhw222.knmi.nl:8080/cgi-bin/wps.cgi?version=1.0.0&service=WPS&request=execute&identifier=Rint&datainputs=[startIndex=1;stopIndex=100]
     DebugConsole.println("executeprocess "+procId+" datainput="+dataInputs);
     //String getcaprequest=WPSURL+"service=WPS&version=1.0.0&request=execute&identifier="+procId+"&datainputs=[startIndex=1;stopIndex=100]";
@@ -312,7 +319,7 @@ public class WebProcessingInterface {
       //We have composed the data to post, now post it to our internal CGI.
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       
-      PyWPSServer.runPyWPS(request,null,out,postData);
+      PyWPSServer.runPyWPS(request,null,out,null,postData);
       //a.parse(new URL(WPSURL),postData);
       DebugConsole.println(getWPSURL()+" for "+user.id);
       
@@ -369,7 +376,7 @@ public class WebProcessingInterface {
   }
   
   
-  private static void trackJobForUser(User user, String id, String data) {
+  private static void trackJobForUser(ImpactUser user, String id, String data) {
     try {
       GenericCart p=user.getProcessingJobList();
       p.addDataLocator(id, data);
@@ -420,8 +427,8 @@ public class WebProcessingInterface {
       //If process is succeeded break!
       try{
         DebugConsole.println("Process succeeded!: "+status.get("wps:ProcessSucceeded").getValue());
-        JSONObject submittedData=getSubmittedJobInformation(statusLocation,request);
-        data.put("postData", submittedData);
+        //JSONObject submittedData=getSubmittedJobInformation(statusLocation,request);
+        //data.put("postData", submittedData);
         data.put("progress",100 );
         data.put("status","Process completed." );
         data.put("ready", true);
@@ -450,10 +457,10 @@ public class WebProcessingInterface {
     return data;
   }
 	
-  private static JSONObject getSubmittedJobInformation(String statusLocation,HttpServletRequest request) throws Exception {
+  /*private static JSONObject getSubmittedJobInformation(String statusLocation,HttpServletRequest request,HttpServletResponse response) throws Exception {
     DebugConsole.println("getSubmittedJobInformation with statusLocation"+statusLocation);
-    User user = LoginManager.getUser(request);
-   
+    User user = LoginManager.getUser(request,response);
+    if(user == null)return null;
     Iterator<DataLocator> itr = user.getProcessingJobList().dataLocatorList.iterator();
     while(itr.hasNext()) {
       DataLocator element = itr.next(); 
@@ -476,7 +483,7 @@ public class WebProcessingInterface {
       // String statusLocation = elementProps.getString("wpsurl");
     // TODO Auto-generated method stub
     return null;
-  }
+  }*/
   /**
    * Returns an image based on statusLocation and identifier
    * @param statusLocation
@@ -536,13 +543,22 @@ public class WebProcessingInterface {
           String title=wpsData.get(j).get("ows:Title").getValue();
           String data="";
           XMLElement dataEl =wpsData.get(j).get("wps:Data");
+          //We are going to check if the data is one of wps:LiteralData or wps:CompexData: 
+          
           //Literaldata are integers and strings
           try{
-            data = dataEl.get("wps:LiteralData").getValue();
+            String literalDataValue = dataEl.get("wps:LiteralData").getValue();
+            //Check if this output is an OPENDAP URL, in that case we can make a link to our file viewer
+            if(literalDataValue.indexOf("DAP")!=-1&&literalDataValue.indexOf("http")!=-1&&literalDataValue.indexOf(".nc")!=-1){
+              //This is an OPENDAP URL
+              String datasetViewerLocation = "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?dataset=";
+              data+="<a target=\"_blank\" href=\""+datasetViewerLocation+URLEncoder.encode(literalDataValue,"UTF-8")+"\">"+literalDataValue+"</a>";
+            }else{
+              data = literalDataValue;
+            }
           }catch(Exception e){}
           
-          //Complextdata are images and netcdfs
-          
+          //Complexdata are images and netcdfs
           try{
             dataEl.get("wps:ComplexData").getValue();
             String mimeType = dataEl.get("wps:ComplexData").getAttrValue("mimeType");

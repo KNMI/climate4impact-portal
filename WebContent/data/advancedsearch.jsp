@@ -33,9 +33,9 @@
     Ext.onReady(function(){
 
 
-    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURL()%>/ImpactService?');  
-    	setDrupalServiceURL('<%=impactservice.Configuration.getHomeURL()%>/getDrupalNode.jsp?');
-    	setCatalogBrowserURL('<%=impactservice.Configuration.getHomeURL()%>/data/catalogbrowser.jsp?');
+    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?');  
+    	setDrupalServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/getDrupalNode.jsp?');
+    	setCatalogBrowserURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/data/catalogbrowser.jsp?');
     	var container = Ext.create('Ext.container.Container', {
             layout: 'fit',
     		renderTo:'container',

@@ -17,18 +17,18 @@
 		<div class="impactcontent">
 		<h1>Basket</h1>
 		<%
-		User user = null;
-		try{
+			ImpactUser user = null;
+				try{
 			user = LoginManager.getUser(request);
-		}catch(Exception e){
-		}
-		if (user == null){ 
-			%>
+				}catch(Exception e){
+				}
+				if (user == null){
+		%>
 				<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
 			<%
 		}else{
 			out.println("Basket for: <strong>"+user.id+"</strong>");
-			out.println("<div id='basketlist'/>");
+			out.println("<div id='basketlist'></div>");
 		}
 		%>
 		</div>

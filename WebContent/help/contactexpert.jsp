@@ -124,7 +124,7 @@
 						<td></td>
 					</tr>
 					<tr>
-						<td class='alnright'><label for="comments">Comment*: </label></td>
+						<td class='alnright'><label for="comments">Comment:* </label></td>
 						<td valign="top"><textarea id="comments" name="comments" cols="70"
 								rows="12"></textarea><br/><span
 							id="comments_message"></span></td>

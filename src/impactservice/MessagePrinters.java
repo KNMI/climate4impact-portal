@@ -59,7 +59,7 @@ public class MessagePrinters {
   public static void printWarningMessage(JspWriter out,String subject,Exception exception) throws IOException{
  
     emailFatalErrorException(subject,exception);
-    out.print("<p class=\"error\"><img src=\""+Configuration.getHomeURL()+"/images/warning.png\"/><br/>Warning:<br/>");
+    out.print("<p class=\"error\"><img src=\""+Configuration.getHomeURLPrefix()+"/images/warning.png\"/><br/>Warning:<br/>");
     out.print(tools.HTMLParser.textToHTML(exception.getMessage()));
     out.print("</p><br/>");
   }

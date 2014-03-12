@@ -72,12 +72,13 @@ public class ProcessRunner{
   	        environmentVars = Tools.appendString(environmentVars, "REQUEST_METHOD=POST");
   	        
   	        //environmentVars = Tools.appendString(environmentVars, "QUERY_STRING=SERVICE=WPS&REQUEST=EXECUTE&VERSION=1.0.0&IDENTIFIER=testcdo_dtdp");
-  	        for(int j=0;j<environmentVars.length;j++){
-  	          DebugConsole.println(environmentVars[j]);
-  	        }
+  	     
 	        }
 	      }
 	      
+	      /*for(int j=0;j<environmentVars.length;j++){
+          DebugConsole.println(environmentVars[j]);
+        }*/
 	    	child = Runtime.getRuntime().exec(commands,environmentVars);
 	      if(dataToPost!=null){
 	        if(dataToPost.length()>0){
@@ -85,7 +86,7 @@ public class ProcessRunner{
             wr.write(dataToPost);
             wr.flush();
            wr.close();
-           DebugConsole.println("Putting postdata\n"+dataToPost);
+           //DebugConsole.println("Putting postdata\n"+dataToPost);
            PrintWriter stdin = new PrintWriter(child.getOutputStream());
            stdin.print(dataToPost);
          

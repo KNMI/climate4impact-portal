@@ -1,5 +1,10 @@
 
   var OpenIDProviders = {
+      'SMHI-LIU-NSC':{
+        name:'SMHI-LIU-NSC',
+        openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
+        createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
+        logocls:'logo_Sweden'},
       'PCMDI':       {
     	  name:'PCMDI'       ,
     	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
@@ -25,11 +30,7 @@
     	  openidprefix:'https://esg.pik-potsdam.de/esgf-idp/openid/',
     	  createaccount:'https://esg.pik-potsdam.de/esgf-web-fe/createAccount',
     	  logocls:'logo_Germany'},
-      'SMHI-LIU-NSC':{
-    	  name:'SMHI-LIU-NSC',
-    	  openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
-    	  createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
-    	  logocls:'logo_Sweden'}
+      
   };
   
 
@@ -174,6 +175,7 @@ var openDialog = function(datacentre) {
   $('#dialog-form').dialog("option", "datacentre", datacentre);
   $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
   if(OpenIDProviders[datacentre].createaccount){
-	  $("#datacentreurl").html("<a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a>");
+	  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
+	  		"- <a href=\"http://localhost:8080/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
   }
 }

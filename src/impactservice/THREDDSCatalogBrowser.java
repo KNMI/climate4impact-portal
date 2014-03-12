@@ -35,12 +35,14 @@ public class THREDDSCatalogBrowser {
     }
   }
 
-  public static JSONArray browseThreddsCatalog(HttpServletRequest request,   HttpServletResponse response, JSONMessageDecorator errorResponder,String variableFilter,String textFilter) throws MalformedURLException, Exception {
+  public static JSONArray browseThreddsCatalog(HttpServletRequest request,   HttpServletResponse response, JSONMessageDecorator errorResponder1,String variableFilter,String textFilter) throws MalformedURLException, Exception {
     String nodeStr=request.getParameter("node");
     
-    if(nodeStr!=null){nodeStr=URLDecoder.decode(nodeStr,"UTF-8");}else{errorResponder.printexception("nodeStr="+nodeStr);return null;}
+    if(nodeStr!=null){nodeStr=URLDecoder.decode(nodeStr,"UTF-8");}else{
+      throw new Exception("Invalid node argument given");//errorResponder.printexception("nodeStr="+nodeStr);return null;
+    }
     if(nodeStr.indexOf("http")!=0){
-      errorResponder.printexception("Invalid URL given");return null;
+      throw new Exception("Invalid URL given");
     }
     
   

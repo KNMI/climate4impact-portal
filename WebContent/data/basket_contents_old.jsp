@@ -3,7 +3,7 @@
 			String removeId=request.getParameter("remove");
 				GenericCart shoppingCart = null;
 				try{
-			shoppingCart = User.getUser(request).getShoppingCart();
+			shoppingCart = LoginManager.getUser(request).getShoppingCart();
 			try{
 				if(removeId!=null){
 					shoppingCart.removeDataLocator(removeId);

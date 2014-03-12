@@ -74,14 +74,14 @@ var Basket = function(){
 			var child = json.children[j];
 			if(child.type=='file'){
 				if(child.httpurl){
-					get="<a target='_blank' href='"+child.httpurl+"'>get</a>";
+					get="<a target='_blank' href=\""+child.httpurl+"\">get</a>";
 				}
 				if(child.dapurl){
-					view="<a href='"+viewerurl+"dataset="+child.dapurl+"'>view</a>";
+					view="<a href='"+viewerurl+"dataset="+URLEncode(child.dapurl)+"'>view</a>";
 					subset="subset";
 				}
 			}else{
-				view="<a href='"+viewerurl+"dataset="+child.catalogurl+"'>browse</a>";
+				view="<a href='"+viewerurl+"dataset="+URLEncode(child.catalogurl)+"'>browse</a>";
 			}
 			remove="<a href=\"#\" onclick='basket.removeId(\""+child.id+"\");return false;'>X</a>";
 			html+="<tr>";

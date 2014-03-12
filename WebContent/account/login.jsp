@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"
-	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.User"
+	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.ImpactUser"
 	import="javax.servlet.http.*" import="javax.servlet.http.Cookie"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -61,14 +61,13 @@ div#users-contain table td,div#users-contain table th {
 	<%
 		String Home = "/impactportal/";
 
-		User user = null;
-		try {
-			user = LoginManager.getUser(request);
-		} catch (Exception e) {
-		}
+			ImpactUser user = null;
+			try {
+		user = LoginManager.getUser(request);
+			} catch (Exception e) {
+			}
 
-		if (user == null) {
-		
+			if (user == null) {
 	%>
 		
 		
@@ -144,7 +143,7 @@ div#users-contain table td,div#users-contain table th {
 			<div id="datanodebuttons"></div>
 
 	</div>
-		</div>
+		</div></div>
 <!-- 
 		<br /> <b>Don't have an account yet?</b>
 		<ul>
@@ -207,8 +206,8 @@ div#users-contain table td,div#users-contain table th {
 							Create an ESGF account.</a><br /></li>
 					<li><a href="logout.jsp">Log out</a><br /></li>
 				</ul>
-				</div>
-			</div>
+				</div>	</div>		</div>		
+		
 				<%
 					//Print warning when retrieving SLCS has failed.
 						try {
@@ -221,8 +220,7 @@ div#users-contain table td,div#users-contain table th {
 				%>
 				<br />
 			
-			</div>
-		</div>
+				
 
 	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

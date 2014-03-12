@@ -107,18 +107,15 @@
 		<div class="impactcontent">
 		<h1>Processing jobs</h1>
 		<%
-		
-	
-
-		User user = null;
-		try{
+			ImpactUser user = null;
+				try{
 			user = LoginManager.getUser(request);
-		}catch(Exception e){
+				}catch(Exception e){
 			
-		}
-		
-		 if (user==null){ 
-			%>
+				}
+				
+				 if (user==null){
+		%>
 			<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
 			<%
 		}else{
@@ -130,14 +127,9 @@
 			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
 		}
 		%>
-		
-		<!-- 
-  	    <div class="cmscontent">
-  		
+
   		</div>
-  		 -->
-  		
-		</div>
+		
 	 
   <!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

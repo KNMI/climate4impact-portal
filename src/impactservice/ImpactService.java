@@ -75,9 +75,9 @@ public class ImpactService extends HttpServlet {
           response.setContentType("text/plain");
           String procId=request.getParameter("id");
           if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-          jobList = User.getUser(request).getProcessingJobList();
+          jobList = LoginManager.getUser(request,response).getProcessingJobList();
           jobList.removeDataLocator(procId);
-          response.getWriter().println("{\"numproducts\":\""+(jobList.getNumProducts())+"\"}");
+          response.getWriter().println("{\"numproducts\":\""+(jobList.getNumProducts(request))+"\"}");
         }catch(Exception e){
           response.getWriter().println(e.getMessage());
         }
@@ -91,7 +91,7 @@ public class ImpactService extends HttpServlet {
   		  GenericCart jobList = null;
   	    try{
   	      response.setContentType("text/html");
-  	      jobList = User.getUser(request).getProcessingJobList();
+  	      jobList = LoginManager.getUser(request,response).getProcessingJobList();
   	      String html = GenericCart.CartPrinters.showJobList(jobList,request);
   	      response.getWriter().println(html);
   	    }catch(Exception e){
@@ -111,7 +111,12 @@ public class ImpactService extends HttpServlet {
       			DebugConsole.errprint(e.getMessage());
       			return;
       		}
-  			Vector<WebProcessingInterface.ProcessorDescriptor> listOfProcesses = WebProcessingInterface.getAvailableProcesses();
+  			Vector<WebProcessingInterface.ProcessorDescriptor> listOfProcesses = WebProcessingInterface.getAvailableProcesses(request);
+  			if(listOfProcesses == null){
+  			  out1.print("{\"error\":\"No processes available\"}");
+  			  return;
+  			}
+  			
   			try {
   				JSONArray a = new JSONArray();
   				for(int j=0;j<listOfProcesses.size();j++){
@@ -143,7 +148,7 @@ public class ImpactService extends HttpServlet {
   			if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
   			 try {
   			    response.setContentType("application/json");
-            response.getWriter().print(WebProcessingInterface.describeProcess(procId).toString());
+            response.getWriter().print(WebProcessingInterface.describeProcess(request,procId).toString());
           } catch (Exception e) {
             response.getWriter().print(e.getMessage());
             return;
@@ -160,7 +165,7 @@ public class ImpactService extends HttpServlet {
         if(dataInputs!=null){dataInputs=URLDecoder.decode(dataInputs,"UTF-8");}else{errorResponder.printexception("dataInputs="+dataInputs);return;}
          try {
             response.setContentType("application/json");
-            response.getWriter().print(WebProcessingInterface.executeProcess(procId,dataInputs,request));
+            response.getWriter().print(WebProcessingInterface.executeProcess(procId,dataInputs,request,response));
           } catch (Exception e) {
             DebugConsole.errprintln(e.getMessage());
             try {
@@ -231,7 +236,7 @@ public class ImpactService extends HttpServlet {
     }
     
     String buildHTML(JSONArray array,String root,int oddEven){
-      
+      if(array == null)return null;
       StringBuffer html = new StringBuffer();
       try {
         //Try to get the catalogURL 
@@ -316,21 +321,40 @@ public class ImpactService extends HttpServlet {
       String format= request.getParameter("format");
       if(format==null)format="";
   	  try{
-  	    String variableFilter=request.getParameter("variables");
-        if(variableFilter==null)variableFilter="";
-        String textFilter=request.getParameter("filter");
-        if(textFilter==null)textFilter="";
+  	    String variableFilter="",textFilter = "";
+  	    try{
+  	      variableFilter = HTTPTools.getHTTPParam(request, "variables");
+  	    }catch(Exception e){
+  	    }
+        
+  	    try{
+  	      textFilter = HTTPTools.getHTTPParam(request, "filter");
+  	    }catch(Exception e){
+  	    }
         
         HTTPTools.validateInputTokens(variableFilter);
         HTTPTools.validateInputTokens(textFilter);
         
   	    DebugConsole.println("Starting CATALOG: "+request.getQueryString());
   		  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
-  		  JSONArray treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request, response,errorResponder,variableFilter,textFilter); 
+  		  JSONArray treeElements = null;
+  		  try{
+  		    treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request, response,errorResponder,variableFilter,textFilter); 
+  		  }catch(Exception e){
+  		    response.setContentType("text/html");
+  		    response.getWriter().print("Unable to read catalog: "+e.getMessage());
+          return;
+  		  }
+  		  
         long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
         DebugConsole.println("Finished CATALOG: "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms) "+request.getQueryString());
 
-  		  
+        if(treeElements == null){
+          response.setContentType("text/html");
+          response.getWriter().print("Unable to read catalog");
+          return;
+        }
+          
   		  if(format.equals("text/html")){
           response.setContentType("text/html");
           String html="";
@@ -463,6 +487,22 @@ public class ImpactService extends HttpServlet {
 
         return;
       }
+      
+     /* //Check if this is a local file
+      
+      if(requestStr.indexOf("http://localhost:8080/impactportal/ImpactService?")==0){
+        DebugConsole.println("LOCAL FILE 1"+requestStr);
+        try {
+          requestStr = LoginManager.getUser(request).checkFileAndGetAbsolutePath(requestStr);
+          DebugConsole.println("LOCAL FILE 2"+requestStr);
+        } catch (FileAccessForbiddenException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }*/
 
       datasetViewerSession.datasetURL=requestStr;
 
@@ -477,13 +517,16 @@ public class ImpactService extends HttpServlet {
       //dodsRequest=dodsRequest.replaceFirst("https", "dods");
       //dodsRequest=dodsRequest.replaceFirst("http", "dods");
       try{
-
+        //Strip the # token.
+        requestStr = requestStr.split("#")[0];
         DebugConsole.println("dodsRequest="+requestStr);
 
         String ncdumpMessage = "";
-        User user = null;
+        ImpactUser user = null;
         try{
-          user=LoginManager.getUser(request);
+          user=LoginManager.getUser(request,response);
+          
+          if(user == null)return;
         }catch(Exception e){
           DebugConsole.println("WARNING: User not logged in");
         }
@@ -506,26 +549,35 @@ public class ImpactService extends HttpServlet {
               }
               ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
             }catch(SSLPeerUnverifiedException e){
-              msg="Peer unverified: "+e.getMessage();
+              
+              msg="SSLPeerUnverifiedException: Peer unverified: "+e.getMessage();
+              DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(UnknownHostException e){
-              msg="Unknown host '"+e.getMessage()+"'";
+              msg="UnknownHostException: '"+e.getMessage()+"'";
+              DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(WebRequestBadStatusException e){
-              msg=e.getMessage()+"<br/>";
-              if(e.getStatusCode()==401){
-                msg="HTTP status code "+e.getStatusCode()+": Unauthorized<br/>";
+              
+              if(e.getStatusCode()==400){
+                msg+="HTTP status code "+e.getStatusCode()+": Bad request<br/>";
                 if(user == null){
                   msg+="<br/>Warning: You are not logged in.<br/>";
                 }
-              }
-              if(e.getStatusCode()==403){
-                msg="HTTP status code "+e.getStatusCode()+": Forbidden<br/>"+e.getResult();
+              }else if(e.getStatusCode()==401){
+                msg+="HTTP status code "+e.getStatusCode()+": Unauthorized<br/>";
+                if(user == null){
+                  msg+="<br/>Warning: You are not logged in.<br/>";
+                }
+              }else if(e.getStatusCode()==403){
+                msg+="HTTP status code "+e.getStatusCode()+": Forbidden<br/>";
                 if(user != null){
                   msg+="<br/>You are logged in as "+user.id+"<br/>";
                 }
+              }else{
+                msg="WebRequestBadStatusException: "+e.getStatusCode()+"<br/>";
               }
-              if(e.getStatusCode()==404)msg="HTTP status code "+e.getStatusCode()+": Not Found<br/>";
+              if(e.getStatusCode()==404)msg+="HTTP status code "+e.getStatusCode()+": Not Found<br/>";
               
               /*else{
                 msg+="<br/>You are logged in as "+user.id+"<br/>";
@@ -544,6 +596,9 @@ public class ImpactService extends HttpServlet {
               DebugConsole.println(body.printTree());
               DebugConsole.println("5");
               msg+=body;*/
+              //String result = e.getResult();
+              //if(result!=null)msg+="\n"+result;
+              DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(Exception e){
               msg="Exception: "+e.getMessage();
@@ -681,7 +736,7 @@ public class ImpactService extends HttpServlet {
         variables.clear();variables=null;
 
       }catch(WebRequestBadStatusException e){
-        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage()+"<br/>\n"+e.getResult();
+        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage()+"<br/>\n";//+e.getResult();
         MessagePrinters.emailFatalErrorMessage("File access",msg);
         DebugConsole.errprintln(msg);
         JSONArray errorVar = new JSONArray ();
@@ -695,10 +750,11 @@ public class ImpactService extends HttpServlet {
       }catch(Exception e){
         String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage();
         MessagePrinters.emailFatalErrorMessage("File access",msg);
-        DebugConsole.errprintln(msg);
+        //DebugConsole.errprintln(msg);
         JSONArray errorVar = new JSONArray ();
         try {
           JSONObject error = new JSONObject();
+          msg = msg.replaceAll("esg-orp", "impactportal/esg-orp");
           error.put("error",msg);
           errorVar.put(error);
         } catch (JSONException e1) {}
@@ -849,7 +905,58 @@ public class ImpactService extends HttpServlet {
     }
     
  
+   /* private void handleDataRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws IOException  {
+      String fileId=null;
+      String requestStr=null;
+      
+      try {
+        requestStr=HTTPTools.getHTTPParam(request,"request");
+      } catch (Exception e3) {
+        requestStr="";
+      }
+      
+      try {
+        fileId=HTTPTools.getHTTPParam(request,"file");
+      } catch (Exception e3) {
+        fileId="";
+      }
+      
+      DebugConsole.print("Data request received "+requestStr+" for file "+fileId);
+      
+      ImpactUser user = null;
+      try{
+        user = LoginManager.getUser(request,response);
+      }catch(Exception e){
+        DebugConsole.println("Exception "+e.getMessage());
+      }
+      if(user == null){
+        errorResponder.printexception("You are not logged in");
+        return;
+      }
+      
+      String absoluteFile = null;
+      
+      try {
+        absoluteFile = user.checkFileAndGetAbsolutePath(fileId);
+      } catch(IOException e){
+        errorResponder.printexception("File not found");
+        response.setStatus(404);
+        return;
+      } catch (FileAccessForbiddenException e1) {
+        errorResponder.printexception(e1.getMessage());
+        response.setStatus(403);
+        return;
+      }
+      response.getWriter().println(absoluteFile);
+    }*/
     
+    
+ 
+
+    
+
+
+
     private void handleBasketRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
       
     	String mode=null;
@@ -867,7 +974,7 @@ public class ImpactService extends HttpServlet {
         GenericCart basketList = null;
         try{
           response.setContentType("application/json");
-          basketList = User.getUser(request).getShoppingCart();
+          basketList = LoginManager.getUser(request,response).getShoppingCart();
           JSONObject datasetList = GenericCart.CartPrinters.showDataSetList(basketList,request);
           response.getWriter().println(datasetList.toString());
         }catch(Exception e){
@@ -887,10 +994,10 @@ public class ImpactService extends HttpServlet {
           response.setContentType("text/plain");
           String procId=request.getParameter("id");
           if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-          basketList = User.getUser(request).getShoppingCart();
+          basketList = LoginManager.getUser(request,response).getShoppingCart();
           basketList.removeDataLocator(procId);
           response.setContentType("application/json");
-          response.getWriter().println("{\"numproducts\":\""+(basketList.getNumProducts())+"\"}");
+          response.getWriter().println("{\"numproducts\":\""+(basketList.getNumProducts(request))+"\"}");
         }catch(Exception e){
           response.getWriter().println(e.getMessage());
         }
@@ -906,11 +1013,11 @@ public class ImpactService extends HttpServlet {
     		if(mode.equals("add")){
     		
     		  GenericCart shoppingCart = null;
-    		  shoppingCart = User.getUser(request).getShoppingCart();
+    		  shoppingCart = LoginManager.getUser(request,response).getShoppingCart();
     		
     		  DebugConsole.println("Adding data to basket"+request.getParameter("id"));
     		  
-    		  int currentNumProducts=shoppingCart.getNumProducts();
+    		  int currentNumProducts=shoppingCart.getNumProducts(request);
     		  
     		  if(request.getParameter("id")!=null){
     		    JSONObject el=new JSONObject();
@@ -932,8 +1039,8 @@ public class ImpactService extends HttpServlet {
       			}
     			}catch(Exception e){}
     			PrintWriter out1 = getPrintWriter(response);
-    			String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
-    			result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
+    			String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts(request)-currentNumProducts)+"\",";
+    			result += "\"numproducts\":\""+(shoppingCart.getNumProducts(request))+"\"}";
     			
     			DebugConsole.println(result);
           response.setContentType("application/json");
@@ -1009,9 +1116,9 @@ public class ImpactService extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	  /*if(request.getQueryString()!=null){
+	  if(request.getQueryString()!=null){
 	    DebugConsole.println("Request received query string "+request.getQueryString());
-	  }*/
+	  }
 		JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
 		String serviceStr = null;
 
@@ -1097,7 +1204,15 @@ public class ImpactService extends HttpServlet {
 		if(serviceStr.equals("basicsearch")){
 			BasicSearch.handleBasicSearchRequest(request,response,errorResponder);
 		}
-		//asfkasd[pgkiasd[pgksdgk]]
+	
+		/*
+		 * Handle data requests
+		 */
+    /*if(serviceStr.equals("data")){
+      handleDataRequest(request,response,errorResponder);
+    }*/
+  
+		
 
 	}
   

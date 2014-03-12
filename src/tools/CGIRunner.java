@@ -30,6 +30,7 @@ public class CGIRunner {
   
      // boolean a = false;
       public void print(byte[] message,int bytesRead) {
+        //DebugConsole.print(new String(message));
     /*    if(a==false){
           a=true;
           for(int j=0;j<bytesRead;j++){
@@ -90,10 +91,15 @@ public class CGIRunner {
     ProcessRunner.StatusPrinterInterface stdoutPrinter = new StdoutPrinter(outputStream);
     ProcessRunner.StatusPrinterInterface stderrPrinter = new StderrPrinter();
 
-
-    /*for(int j=0;j<environmentVariables.length;j++){
+/*    DebugConsole.println("Environment:");
+    for(int j=0;j<environmentVariables.length;j++){
       DebugConsole.println(environmentVariables[j]);
+    }
+    DebugConsole.println("Commands:");
+    for(int j=0;j<commands.length;j++){
+      DebugConsole.println(commands[j]);
     }*/
+    
     ProcessRunner processRunner = new ProcessRunner (stdoutPrinter,stderrPrinter,environmentVariables);
     
   
@@ -104,12 +110,16 @@ public class CGIRunner {
       //postData
       processRunner.runProcess(commands,postData);
     }catch(Exception e){
+      DebugConsole.println("Exception in processRunner");
       DebugConsole.errprintln(e.getMessage());
+      
       throw(e);
     }
+    
     if(processRunner.exitValue()!=0){
       DebugConsole.errprintln("Warning: exit code: "+processRunner.exitValue());
-    }else{
+    }
+    else{
       DebugConsole.errprintln("Exit code 0 == OK");
     }
     
@@ -123,6 +133,6 @@ public class CGIRunner {
     }
     
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    DebugConsole.println("Finished CGI: "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+    DebugConsole.println("Finished CGI with code "+processRunner.exitValue()+": "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
   }
 }

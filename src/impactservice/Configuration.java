@@ -10,6 +10,8 @@ public class Configuration {
   static long readConfigPolInterval = 0;
   
   private static String impactWorkspace=null;//"/home/visadm/impactspace/";
+
+  
   public static String getImpactWorkspace(){readConfig();return impactWorkspace+"/";}
   
   
@@ -17,9 +19,18 @@ public class Configuration {
     return System.getProperty("user.home")+"/impactportal/";
   }
   
-  public static String getHomeURL(){
-    return "/impactportal";
+  public static String getHomeURLPrefix(){
+    return "impactportal";
   }
+  
+  public static String getHomeURLHTTP(){
+    return GlobalConfig.getServerHTTPSURL()+getHomeURLPrefix();
+  }
+  
+  public static String getHomeURLHTTPS(){
+    return GlobalConfig.getServerHTTPSURL()+getHomeURLPrefix();
+  }
+
   
   private static String getConfigFile(){
     return getHomePath()+"config.xml";
@@ -63,17 +74,36 @@ public class Configuration {
   }
   
   public static class GlobalConfig{
-    private static String serverHomeURL="";
-    public static String getServerHomeURL(){readConfig();return serverHomeURL;}
+    private static String serverURLHTTP="";
+    private static String serverURLHTTPS="";
+    
+    public static String offlineMode;
+    public static String defaultUserInOfflineMode;
+    
+    //public static String getServerHomeURL(){readConfig();return serverURLHTTP;}
     public static void doConfig(MyXMLReader configReader) {
-      serverHomeURL = configReader.getNodeValue("impactportal.serverurl");
+      serverURLHTTP = configReader.getNodeValue("impactportal.serverurl");
+      serverURLHTTPS = configReader.getNodeValue("impactportal.serverurlhttps");
+      offlineMode = configReader.getNodeValue("impactportal.offlinemode");
+      defaultUserInOfflineMode= configReader.getNodeValue("impactportal.defaultuseropenid");
+    }
+    public static String getServerHTTPURL(){
+      readConfig();
+      return serverURLHTTP;
+    }
+    public static String getServerHTTPSURL(){
+      readConfig();
+      return serverURLHTTPS;
     }
     public static boolean isInOfflineMode() {
+      readConfig();
+      if("true".equalsIgnoreCase(offlineMode))return true;
       return false;
     }
     public static String getDefaultUser() {
       //Only used in case of offline mode
-      return "https://pcmdi9.llnl.gov/esgf-idp/openid/maartenplieger";    
+      readConfig();
+      return defaultUserInOfflineMode;
     }
   }
   

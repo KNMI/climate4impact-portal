@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
   <display-name>impactportal</display-name>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
@@ -87,4 +87,29 @@
     <param-name>extjslocation</param-name>
     <param-value>/impactportal/js/extjs-4.2.1.883/</param-value>
   </context-param>
+
+  
+  <servlet>
+    <description></description>
+    <display-name>DapServlet</display-name>
+    <servlet-name>DapServlet</servlet-name>
+    <servlet-class>opendap.DapServlet</servlet-class>
+    
+  </servlet>
+  <servlet-mapping>
+  
+    <servlet-name>DapServlet</servlet-name>
+    <url-pattern>/DAP/*</url-pattern>
+  </servlet-mapping>
+ <security-constraint>
+    <web-resource-collection>
+        <web-resource-name>impactportal</web-resource-name>
+        <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <user-data-constraint>
+        <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+
+</security-constraint>
+ 
 </web-app>

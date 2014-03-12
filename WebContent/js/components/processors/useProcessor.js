@@ -219,7 +219,7 @@ var processProgressMonitoring = function(status) {
 
   var w = Ext.create('Ext.Window', {
     width : 600,
-    height : 150,
+    height : 250,
     title : 'Progress ' + status.id,
     collapsible : true,
     layout : 'border',

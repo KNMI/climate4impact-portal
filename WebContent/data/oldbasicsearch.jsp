@@ -8,7 +8,7 @@
      <script type="text/javascript">
       //Called by ExtJS when the library is ready
       Ext.onReady(function(){
-      	setSearchServiceURL('<%=impactservice.Configuration.getHomeURL()%>/ImpactService?');
+      	setSearchServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?');
       	initialize();
       });
      </script>

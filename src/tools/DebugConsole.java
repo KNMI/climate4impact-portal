@@ -103,4 +103,13 @@ public class DebugConsole {
     
   }
 
+
+  public static void println(String string, Exception e) {
+    println(string+" Message: "+e.getMessage());
+  }
+
+  public static void errprintln(String string, Exception e) {
+    errprintln(string+" Message: "+e.getMessage());
+  }
+
 }

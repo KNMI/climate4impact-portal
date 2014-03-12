@@ -5,14 +5,14 @@
   <jsp:include page="../includes-ext.jsp" />
   
   <%
-  	String processorId = request.getParameter("processor");
-  	User user = null;
-	try{
-		user = LoginManager.getUser(request);
-	}catch(Exception e){
-	}
-	if(user!=null&&processorId!=null){
-	%>
+    	String processorId = request.getParameter("processor");
+      	ImpactUser user = null;
+    	try{
+    		user = LoginManager.getUser(request);
+    	}catch(Exception e){
+    	}
+    	if(user!=null&&processorId!=null){
+    %>
 
   
   

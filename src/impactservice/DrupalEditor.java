@@ -70,7 +70,7 @@ public class DrupalEditor {
 	static public String showDrupalContent(String defaultPage,HttpServletRequest request) throws DrupalEditorException{
 	  boolean showEditButton = false;
 	  try {
-      User user = User.getUser(request);
+      ImpactUser user = LoginManager.getUser(request,null);
       if(user!=null){
         showEditButton = true;
       }
@@ -133,7 +133,7 @@ public class DrupalEditor {
 		}
 
 		try{
-			returnMessage="";
+			returnMessage="<div>";
 			/*int divDepth=0;
 			int contentStartDivDepth=0;
 			int internalDivDepth=0;
@@ -164,7 +164,7 @@ public class DrupalEditor {
 			
 			
 			// Print title
-			DebugConsole.println(showTitle+""+titleNode.printTree());
+			//DebugConsole.println(showTitle+""+titleNode.printTree());
 			if(showTitle == true){
 			  returnMessage += titleNode.printTree();
 			}

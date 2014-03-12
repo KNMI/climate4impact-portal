@@ -5,13 +5,13 @@
 
     <jsp:include page="../includes-ext.jsp" />
     <%
-    User user = null;
-	try{
-		user = LoginManager.getUser(request);
-	}catch(Exception e){
-	}
-	if(user!=null){
-	%>
+    	ImpactUser user = null;
+    	try{
+    		user = LoginManager.getUser(request);
+    	}catch(Exception e){
+    	}
+    	if(user!=null){
+    %>
     
     <script type="text/javascript" src="../js/components/processors/wpsOverview.js"></script>
     <script type="text/javascript">
@@ -46,7 +46,8 @@
 		if (user==null){
 			 %>
 			 	<ul>
-			 	<li>Before you can start processing, you need to <a target="_blank" href="../account/login.jsp">login</a>. When you are logged in, you can <a href="" onclick="document.location.reload(true);">refresh</a> this page.</li>
+			 	<li>Before you can start processing, you need to <a  href="" onclick="window.open('/impactportal/account/login.jsp','targetWindow','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=600')" >sign in</a>
+           and <a  href="" onclick='location.reload();'>refresh this page</a>.</li>
 			 	<li>Please read why you need to login at <a href="../help/howto.jsp#why_login">Howto: Why Login?</a></li>
 			 	</ul>
 			 <%

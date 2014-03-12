@@ -2,6 +2,7 @@ package ogcservices;
 
 import impactservice.Configuration;
 import impactservice.LoginManager;
+import impactservice.ImpactUser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import tools.CGIRunner;
 import tools.DebugConsole;
+import tools.HTTPTools;
 import tools.Tools;
 
 
@@ -36,23 +38,40 @@ public class PyWPSServer extends HttpServlet {
    * @param dataToPost optional, can be null, when given this data is posted to the CGI instead.
    * @throws Exception
    */
-  public static void runPyWPS(HttpServletRequest request,HttpServletResponse response,OutputStream outputStream,String dataToPost) throws Exception{
+  public static void runPyWPS(HttpServletRequest request,HttpServletResponse response,OutputStream outputStream,String queryString,String dataToPost) throws Exception{
     String[] environmentVariables = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
     
     //Try to get homedir
     String userHomeDir="";
+    ImpactUser user = null;
     try{
-      userHomeDir=LoginManager.getUser(request).getWorkspace();
-      DebugConsole.println("WPS for user: "+LoginManager.getUser(request).id);
+      user = LoginManager.getUser(request,response);
+      if(user == null)return;
+      userHomeDir=user.getWorkspace();
+      DebugConsole.println("WPS for user: "+user.id);
     }catch(Exception e){    
-      DebugConsole.println("Warning: Anonymous user: '"+e.getMessage()+"'");
-    }
-    if(userHomeDir.length()>0){
-      environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
+      throw new Exception("Warning: Anonymous user: '"+e.getMessage()+"'");
     }
     
+    if(userHomeDir.length()>0){
+      environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
+    }else{
+      throw new Exception("User : "+user.id+" has no home dir");
+    }
+    
+    String userDataDir = user.getDataDir();
+    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir);
+    
+    String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.internalName+"/";
+    pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
+    pofOutputURL = pofOutputURL.replace("?", "");
+    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
+    
     //Try to get query string
-    String queryString =request.getQueryString();
+    if(queryString == null){
+      queryString = request.getQueryString();
+    }
+                            
     if(queryString!=null){
       if(queryString.length()>0){
         environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
@@ -63,7 +82,9 @@ public class PyWPSServer extends HttpServlet {
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
     DebugConsole.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
     
-    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userHomeDir+"/data");
+
+    
+    
     
     CGIRunner.runCGIProgram(commands,environmentVariables,response,outputStream,dataToPost);
   }
@@ -91,10 +112,10 @@ public class PyWPSServer extends HttpServlet {
       } catch (Exception e) {  }
       postData = jb.toString();
       jb = null;
-      PyWPSServer.runPyWPS(request,response,out1,postData);
+      PyWPSServer.runPyWPS(request,response,out1,null,postData);
 
     } catch (Exception e) {
-      e.printStackTrace();
+      DebugConsole.printStackTrace(e);
       response.setStatus(401);
       try {
         if(e.getMessage()!=null){
@@ -119,8 +140,8 @@ public class PyWPSServer extends HttpServlet {
   
   protected void doGet(HttpServletRequest request, HttpServletResponse response) {
     
-  
-    //Check if this is a WPS status request, which means reading an XML file which resides on disk.
+    DebugConsole.println("PWS QueryString: "+request.getQueryString());
+    //Check if this is a WPS status request, which means reading a local XML file which resides on disk.
     try{
         String output = null;
         output = request.getParameter("OUTPUT");
@@ -135,6 +156,9 @@ public class PyWPSServer extends HttpServlet {
               }
             }
           }
+          
+          
+          
           //Remove first "/" token;
           output = output.substring(1);
           portalOutputPath = Tools.makeCleanPath(portalOutputPath);

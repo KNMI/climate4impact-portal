@@ -14,7 +14,7 @@ public class NetCDFC {
     }
 
      
-    public String doNCDump(User user,String url) throws Exception{
+    public String doNCDump(ImpactUser user,String url) throws Exception{
       ncdumpResult="";
      
      
@@ -42,7 +42,7 @@ public class NetCDFC {
   
   
   
-  public static String executeNCDumpCommand(User user,String url) throws Exception{
+  public static String executeNCDumpCommand(ImpactUser user,String url) throws Exception{
     DebugConsole.println("Execute ncdump on "+url);
     String result;
     NCDump doNCDump = new NCDump();

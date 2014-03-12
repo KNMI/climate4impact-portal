@@ -155,7 +155,7 @@
 				  if(!dataSize)dataSize="-";
 				  html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
 				  if(topics[j].catalogURL){
-					  html+='<td><a href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'">browse</a></td>';
+					  html+='<td><a target=\"_blank\" href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'">browse</a></td>';
 			 	  }else{
 			 		  html+="<td>-</td>";
 			 	  }
@@ -243,7 +243,7 @@
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="datamenu.jsp" />
 	
-	<div style="line-height:0px;height:0px;margin:32px 10px;float: right;clear:both;overflow:none; border: none;">
+	<div style="line-height:0px;height:0px;margin:32px 10px;float: right;clear:both;overflow:none; border: none;"></div>
 
       <%try{out.print(DrupalEditor.showDrupalContent("?q=search_help",request,false,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
   			<div class="impactcontent">
@@ -401,7 +401,7 @@
         	
         	
         	</div>
-     </div>
+   
 	 	
   <!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

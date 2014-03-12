@@ -52,7 +52,7 @@
     ]); 
 
     Ext.onReady(function(){
-    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURL()%>/ImpactService?'); 
+    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?'); 
     	var container = Ext.create('Ext.container.Container', {
             layout: 'fit',
     		renderTo:'container',

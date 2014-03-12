@@ -2,10 +2,11 @@ package impactservice;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Vector;
 
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.globus.myproxy.MyProxy;
@@ -48,14 +49,14 @@ import tools.Tools;
  */
 
 public class LoginManager {
-  static Vector<User> users = new Vector<User>();
+  static Vector<ImpactUser> users = new Vector<ImpactUser>();
   
   /**
    * Retrieves a SLC (short lived credential) from the SLCS and stores it in the users home directory 
    * @param user User object with identifier and home directory set
    * @throws Exception
    */
-  public synchronized static void getCredential(User user) throws Exception{
+  public synchronized static void getCredential(ImpactUser user) throws Exception{
     
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       DebugConsole.println("offline mode");
@@ -111,34 +112,83 @@ public class LoginManager {
  /**
   * Get the user object based on the http session
   * @param request The httpservletrequest
-  * @return The user object
+  * @return The user object or null when a redirect is requested.
   * @throws Exception
   */
-  public static User getUser(HttpServletRequest request) throws Exception {
-    /*try{
- 
-    X509Certificate certs[] = 
-        (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
-    // TODO ... Test if non-null, non-empty.
-
-    X509Certificate clientCert = certs[0];
-
-    // Get the Subject DN's X500Principal
-    X500Principal subjectDN = clientCert.getSubjectX500Principal();
-    String dn = subjectDN.getName();
-    DebugConsole.println("DN: "+dn);
-    }catch(Exception e){
-      e.printStackTrace();
-    }*/
+  public static ImpactUser getUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
+  
     HttpSession session = request.getSession();
     String id=(String) session.getAttribute("openid_identifier");
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       id=Configuration.GlobalConfig.getDefaultUser();
     }
+    
+    if(id == null && response != null){
+      //DebugConsole.println("Trying to getUser from CERT");
+      /*if(request.isSecure() == false){
+        String localContext = Configuration.getHomeURL();
+        String remoteContext = request.getContextPath();
+        if(localContext.equals(remoteContext)&&1==2){
+          DebugConsole.println("Forwarding: "+localContext+ " == "+remoteContext);
+                
+          
+          
+          DebugConsole.println("No user info in SESSION, forcing HTTPS --> redirecting to "+Configuration.GlobalConfig.getServerHTTPSURL()+request.getRequestURI());
+          response.setStatus(302);
+          response.setHeader( "Location", Configuration.GlobalConfig.getServerHTTPSURL()+request.getRequestURI()+"?"+request.getQueryString());
+          response.setHeader( "Connection", "close" );
+          return null;
+        }*/
+        //if(request.isSecure() == true){
+          //DebugConsole.println("Trying to get user info from X509 cert");
+          
+          String CertOpenIdIdentifier = null;
+          //org.apache.catalina.authenticator.SSLAuthenticator
+          X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+          if (null != certs && certs.length > 0) {
+            X509Certificate cert = certs[0];
+            
+              String subjectDN = cert.getSubjectDN().toString();
+              DebugConsole.println("getSubjectDN: "+subjectDN);
+              String[] dnItems = subjectDN.split(", ");
+              for(int j=0;j<dnItems.length;j++){
+                int CNIndex = dnItems[j].indexOf("CN");
+                if(CNIndex != -1){
+                  CertOpenIdIdentifier = dnItems[j].substring("CN=".length()+CNIndex);
+                }
+              }
+              //DebugConsole.println("CertOpenIdIdentifier=["+CertOpenIdIdentifier+"]");
+              
+          }else{
+            String message = "No user information available from either session or x509\n";
+            DebugConsole.errprintln(message);
+            /*response.setStatus(403);
+            response.getOutputStream().println(message);
+            throw new Exception("You are not logged in...");*/
+          }
+          
+          
+          if(  CertOpenIdIdentifier == null){
+            String message = "No valid ESGF certificate provided: no user found.";
+            DebugConsole.errprintln(message);
+            /*response.setStatus(403);
+            response.getOutputStream().println(message);
+            throw new Exception(message);*/
+          }else{
+            id = CertOpenIdIdentifier;
+          }
+        }
+     // }
+   // }
+      
     //DebugConsole.println("Getting user from session with id "+id);
-    if(id==null){throw new Exception("You are not logged in...");}
-    User user = getUser(id);
+    if(id == null)throw new Exception("You are not logged in...");
+    ImpactUser user = getUser(id);
     return user;
+  }
+  
+  public static ImpactUser getUser(HttpServletRequest request) throws Exception {
+    return getUser(request,null);
   }
 
   /**
@@ -146,20 +196,20 @@ public class LoginManager {
    * @param userId The userID, equal to the OpenID identifier
    * @return The user object
    */
-  public synchronized static User getUser(String userId){
+  public synchronized static ImpactUser getUser(String userId){
     //DebugConsole.println("Looking up user "+userId);
     //Lookup the user in the vector list
     if(userId==null)return null;
     for(int j=0;j<users.size();j++){
       if(users.get(j).id.equals(userId)){
-        User user = users.get(j);
-        DebugConsole.println("Found existing user "+userId);
+        ImpactUser user = users.get(j);
+        //DebugConsole.println("Found existing user "+userId);
         return user;
       }
     }
     //The user was not found, so create a new user
     DebugConsole.println("Creating new user object for "+userId);
-    User user = new User();
+    ImpactUser user = new ImpactUser();
     user.id=userId;
     users.add(user);
     try {checkLogin(userId);} catch (Exception e) { }
@@ -178,7 +228,7 @@ public class LoginManager {
     if(openIdIdentifier==null){
       DebugConsole.errprintln("No openIdIdentifier given");
     }
-    User user = getUser(openIdIdentifier);
+    ImpactUser user = getUser(openIdIdentifier);
     
     DebugConsole.println("Check login "+user.id);
     user.internalName = user.id.replace("http://", "");
@@ -214,7 +264,7 @@ public class LoginManager {
    * @param user The user object
    * @throws IOException
    */
-  public synchronized static void createNCResourceFile(User user) throws IOException{
+  public synchronized static void createNCResourceFile(ImpactUser user) throws IOException{
     //DebugConsole.println("createNCResourceFile for user "+user.id);
     /*
       .httprc/.dodsrc file contents:
@@ -230,6 +280,7 @@ public class LoginManager {
         +"HTTP.COOKIEJAR="+user.usersDir+"/.dods_cookies\n"
         +"HTTP.SSL.CERTIFICATE="+user.certificateFile+"\n"
         +"HTTP.SSL.KEY="+user.certificateFile+"\n"
+        //+"HTTP.SSL.SSLv3="+user.certificateFile+"\n"
         //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
         +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
     DebugConsole.println("createNCResourceFile for user "+user.id+":\n"+fileContents);

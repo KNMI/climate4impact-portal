@@ -166,7 +166,13 @@ public class DeprecatedVercSearchInterface
             // because otherwise we get only 1 distinct value for variable (namely psl).
             for(int i=0;i<categoryNames.length;i++){
               if(categoryNames[j].equalsIgnoreCase(categoryNames[i])==false){
-                List<String> value=HTTPTools.getKVPList(query,categoryNames[i]);
+                List<String> value = null;
+                try {
+                  value = HTTPTools.getKVPList(query,categoryNames[i]);
+                } catch (Exception e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+                }
                 if(value!=null){
                   searchFacets+=categoryNames[i]+"="+value.get(0)+"&";
                 }
