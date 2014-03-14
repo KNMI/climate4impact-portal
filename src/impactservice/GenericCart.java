@@ -403,6 +403,7 @@ public class GenericCart {
    datasetList.put("text", "basket");
    datasetList.put("leaf", false);
    datasetList.put("viewer", "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?");
+   datasetList.put("browser", "/"+Configuration.getHomeURLPrefix()+"/data/catalogbrowser.jsp?");
     Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
     int j=1;
 

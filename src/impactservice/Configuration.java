@@ -24,7 +24,7 @@ public class Configuration {
   }
   
   public static String getHomeURLHTTP(){
-    return GlobalConfig.getServerHTTPSURL()+getHomeURLPrefix();
+    return GlobalConfig.getServerHTTPURL()+getHomeURLPrefix();
   }
   
   public static String getHomeURLHTTPS(){

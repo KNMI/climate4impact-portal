@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
      <jsp:include page="../includes-ext.jsp" />
+     <script type="text/javascript" src="../js/components/basket/basket.js"></script>
     <script type="text/javascript" src="../js/components/search/searchmenus.js"></script>
 	<script type="text/javascript" src="../js/components/search/advancedsearch.js"></script>
 
@@ -33,9 +34,9 @@
     Ext.onReady(function(){
 
 
-    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?');  
-    	setDrupalServiceURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/getDrupalNode.jsp?');
-    	setCatalogBrowserURL('<%=impactservice.Configuration.getHomeURLPrefix()%>/data/catalogbrowser.jsp?');
+    	setSearchServiceURL('<%=impactservice.Configuration.getHomeURLHTTP()%>/ImpactService?');  
+    	setDrupalServiceURL('<%=impactservice.Configuration.getHomeURLHTTP()%>/getDrupalNode.jsp?');
+    	setCatalogBrowserURL('<%=impactservice.Configuration.getHomeURLHTTP()%>/data/catalogbrowser.jsp?');
     	var container = Ext.create('Ext.container.Container', {
             layout: 'fit',
     		renderTo:'container',

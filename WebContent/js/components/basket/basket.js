@@ -58,6 +58,7 @@ var Basket = function(){
 			return "An error occured while retrieving the basket: "+json.error;
 		}
 		var viewerurl = json.viewer;
+		var browserurl = json.browser;
 		html='<table class="basket">'
 		html+="<td style=\"width:150px;background-color:#DDD;\"><b>Added on:</b></td>";
 		html+="<td style=\"width:600px;background-color:#DDD;\"><b>Identifier</b></td>";
@@ -81,7 +82,7 @@ var Basket = function(){
 					subset="subset";
 				}
 			}else{
-				view="<a href='"+viewerurl+"dataset="+URLEncode(child.catalogurl)+"'>browse</a>";
+				view="<a href='"+browserurl+"catalog="+URLEncode(child.catalogurl)+"'>browse</a>";
 			}
 			remove="<a href=\"#\" onclick='basket.removeId(\""+child.id+"\");return false;'>X</a>";
 			html+="<tr>";
