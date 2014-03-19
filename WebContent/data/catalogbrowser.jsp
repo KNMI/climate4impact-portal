@@ -94,7 +94,11 @@
 		<div class="cmscontent"> 
 			<h1>Catalog browser</h1>
 			<div class="bodycontent">    
-			<table><tr><td>Catalog: </td><td> <a target="_blank" href="<%= request.getParameter("catalog").replace(".xml", ".html") %>"><%= request.getParameter("catalog").replace(".xml", ".html") %></a></td><td>&nbsp;</td><td>- </td><td><div id="catalogasjson"></div></td></tr></table>
+			<table>
+			<tr>
+			<td>Catalog: </td>
+			<td  style="max-width:860px;word-wrap: break-word;"> <a target="_blank" href="<%= request.getParameter("catalog").replace(".xml", ".html") %>"><%= request.getParameter("catalog").replace(".xml", ".html") %></a></td>
+			<td><div id="catalogasjson"></div></td></tr></table>
    		 
    		 	
    		 	

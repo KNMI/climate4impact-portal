@@ -142,7 +142,7 @@
     	
 	  	out.println("<a href=\""+HTTPTools.makeCleanURL(Home+currentLoginPage)+"\">"+accountTitle+"</a>");
     }else{
-	  out.print("<a href=\""+Home+"account/login.jsp\">Log in</a>"); 
+	  out.print("<a href=\""+Home+"account/login.jsp\">Sign in</a>"); 
     }
     %>
 		</li>

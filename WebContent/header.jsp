@@ -3,7 +3,7 @@
 <%
 	String Home="/impactportal/";
     out.println("<div id=\"bodycontainer\">");
-    String loginStr = "Login";
+    String loginStr = "Sign in";
     ImpactUser user = null;
     try{
     	user = LoginManager.getUser(request);

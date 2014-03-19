@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"
-	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.ImpactUser"
+	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.ImpactUser,impactservice.MessagePrinters"
 	import="javax.servlet.http.*" import="javax.servlet.http.Cookie"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -199,12 +199,18 @@ div#users-contain table td,div#users-contain table th {
 				<h1>You are signed in.</h1>
 				<div class="textstandardleft">
 				You have successfully signed in with the following OpenID:<br /> <br />
-				<strong><%=user.id%></strong><br /> <br /> <b>Actions:</b>
+				<strong><%=user.id%></strong><br /> <br />
+				
+				
+				
+				
+				<b>Actions:</b>
 				<ul>
+					<li>View account details: <span id="accountinfo">-</span></li>
 					<li>If you are not a member of the CMIP5 group: <a
 						href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo:
 							Create an ESGF account.</a><br /></li>
-					<li><a href="logout.jsp">Log out</a><br /></li>
+					<li><a href="logout.jsp">Sign out</a><br /></li>
 				</ul>
 				</div>	</div>		</div>		
 		
@@ -221,7 +227,16 @@ div#users-contain table td,div#users-contain table th {
 				<br />
 			
 				
-
+				<% if(user!=null){ %>
+				<script>
+				var accountInfo = '';
+					try{
+						accountInfo = getOpenIDProviderFromOpenId('<%=user.id%>').accountinfo;
+					}catch(e){}
+					$('#accountinfo').html('<a href="'+accountInfo+'">'+accountInfo+'</a>');
+				</script>
+				<% } %>
+				
 	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />
 </body>

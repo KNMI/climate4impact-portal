@@ -4,21 +4,25 @@
         name:'SMHI-LIU-NSC',
         openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
         createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
+        accountinfo:'http://esg-dn1.nsc.liu.se/esgf-web-fe/accountsview',
         logocls:'logo_Sweden'},
       'PCMDI':       {
     	  name:'PCMDI'       ,
     	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
     	  createaccount:'https://pcmdi9.llnl.gov/esgf-web-fe/createAccount',
+    	  accountinfo:'http://pcmdi9.llnl.gov/esgf-web-fe/accountsview',
     	  logocls:'logo_USA'},
       'CEDA':        {
     	  name:'BADC/CEDA'   ,
-    	  openidprefix:'https://ceda.ac.uk/openid/'                 ,
-    	  createaccount:'https://ceda.ac.uk/'                 ,
+    	  openidprefix:'https://ceda.ac.uk/openid/',
+    	  createaccount:'https://ceda.ac.uk/',        
+    	  accountinfo:'https://ceda.ac.uk/',
     	  logocls:'logo_UK'},
       'DKRZ':        {
     	  name:'DKRZ'        ,
-    	  openidprefix:'https://esgf-data.dkrz.de/esgf-idp/openid/' ,
+    	  openidprefix:'https://esgf-data.dkrz.de/esgf-idp/openid/',
     	  createaccount:'https://esgf-data.dkrz.de/esgf-web-fe/createAccount',
+    	  accountinfo:'https://esgf-data.dkrz.de/esgf-web-fe/accountsview',
     	  logocls:'logo_Germany'},
 	  /*'NCI':        {
     	  name:'NCI'        ,
@@ -29,9 +33,20 @@
     	  name:'PIK Potsdam' ,
     	  openidprefix:'https://esg.pik-potsdam.de/esgf-idp/openid/',
     	  createaccount:'https://esg.pik-potsdam.de/esgf-web-fe/createAccount',
+    	  accountinfo:'https://esg.pik-potsdam.de/esgf-web-fe/accountsview',
     	  logocls:'logo_Germany'},
       
   };
+
+
+ var getOpenIDProviderFromOpenId = function(openidIdentifier){
+	 for(var id in OpenIDProviders){
+		 var provider = OpenIDProviders[id];
+		 if(openidIdentifier.indexOf(provider.openidprefix)!=-1){
+			 return provider;
+		 }
+	 }
+ }
   
 
 var checkOpenIdCookie = function(a) {

@@ -1763,7 +1763,7 @@ ul.pager {
 }
 
 .collapsible,.page_collapsible {
-	margin: 8px 2px 0px 2px;
+	margin: 4px 2px 0px 2px;
 	padding: 8px 8px 8px 16px;
 	height: 22px;
 	background: #E0E0E0;
@@ -1778,7 +1778,7 @@ ul.pager {
 .collapsibletitle {
 	font-weight: bold;
 	color: #0C3762;
-	padding: 6px 0px 6px 10px;
+	padding: 2px 0px 6px 10px;
 	font-size: 16px;
 	line-height: 20px;
 	width: 140px;
@@ -1791,9 +1791,9 @@ ul.pager {
 }
 
 .collapsibletable tr {
-	background: #E0E0E0;
-	height: 24px;
-	line-height: 28px;
+	/*background: #E0E0E0;*/
+	height: 20px;
+	line-height: 22px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1834,11 +1834,15 @@ div.collapsiblecontent {
 	border-right: 1px solid #BBB;
 	border-bottom: 1px solid #BBB;
 	margin: 0;
-	padding: 4px;
+	padding: 2px;
 	font-size: .9em;
 	line-height: 1.5em;
 	/*font-family:"Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
 	overflow: auto;
+}
+
+.facetoverview {
+	padding:0px;height:30px;
 }
 
 .tablenoborder table {
