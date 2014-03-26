@@ -236,12 +236,12 @@ public class LoginManager {
     user.internalName = user.internalName.replaceAll("/", ".");
     DebugConsole.println("internalName = "+user.internalName);
 
-    user.usersDir = Configuration.getImpactWorkspace()+user.internalName+"/";
+    user.setWorkspace(Configuration.getImpactWorkspace()+user.internalName+"/");
     try {
-      DebugConsole.println("Making dir "+user.usersDir);
-      Tools.mkdir(user.usersDir);
-      Tools.mkdir(user.usersDir+"certs");
-      user.certificateFile = user.usersDir+"certs/"+"creds.pem";
+      DebugConsole.println("Making dir "+user.getWorkspace());
+      Tools.mkdir(user.getWorkspace());
+      Tools.mkdir(user.getWorkspace()+"certs");
+      user.certificateFile = user.getWorkspace()+"certs/"+"creds.pem";
     } catch (IOException e) {
       DebugConsole.errprintln(e.getMessage());
       user.credentialError=true;
@@ -277,15 +277,15 @@ public class LoginManager {
 
     String fileContents =
         "HTTP.SSL.VALIDATE=0\n"
-        +"HTTP.COOKIEJAR="+user.usersDir+"/.dods_cookies\n"
+        +"HTTP.COOKIEJAR="+user.getWorkspace()+"/.dods_cookies\n"
         +"HTTP.SSL.CERTIFICATE="+user.certificateFile+"\n"
         +"HTTP.SSL.KEY="+user.certificateFile+"\n"
         //+"HTTP.SSL.SSLv3="+user.certificateFile+"\n"
         //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
         +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
     DebugConsole.println("createNCResourceFile for user "+user.id+":\n"+fileContents);
-    Tools.writeFile(user.usersDir+"/.httprc", fileContents) ;
-    Tools.writeFile(user.usersDir+"/.dodsrc", fileContents) ;
+    Tools.writeFile(user.getWorkspace()+"/.httprc", fileContents) ;
+    Tools.writeFile(user.getWorkspace()+"/.dodsrc", fileContents) ;
  }
  
 }

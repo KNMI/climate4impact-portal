@@ -49,6 +49,7 @@
 		boolean highLightMapAndPlot =false;
 		boolean highLightResources = false;
 		boolean highLightAbout = false;
+		boolean highLightDownscaling = false;
 
 		
 		if(pageName.indexOf("/data/")!=-1)highLightData=true; 
@@ -61,6 +62,7 @@
 		else if(pageName.indexOf("consumer")!=-1)highLightLogin=true;
 		else if(pageName.indexOf("mapandplot.jsp")!=-1)highLightMapAndPlot=true;
 		else if(pageName.indexOf("resources.jsp")!=-1)highLightResources=true;
+		else if(pageName.indexOf("downscaling")!=-1)highLightDownscaling = true;
 		
 		//Store the current data page we were viewing.
 	  	//String currentDataPage=null;
@@ -117,8 +119,8 @@
 			href="<%=Home%>general/index.jsp">Home</a></li>
 		<li <% if(highLightData)out.print("class=\"sel\""); %>><a
 			href="<%=Home%>data/index.jsp">Data discovery</a></li>
-		<li <% if(highLightMapAndPlot)out.print("class=\"sel\""); %>><a
-			href="<%=Home%>mapandplot.jsp">Map &amp; Plot</a></li>
+		<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a
+			href="<%=Home%>downscaling/downscalingdocs.jsp">Downscaling</a></li>
 		<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a
 			href="<%=Home%>documentation/guidanceandusecases.jsp">Documentation</a></li>
 		<li <% if(highLightHelp)out.print("class=\"sel\""); %>><a

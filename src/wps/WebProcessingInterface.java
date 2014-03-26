@@ -63,17 +63,27 @@ public class WebProcessingInterface {
 		Vector <ProcessorDescriptor> processorList = null;
 		//if(processorList==null){
 			processorList= new Vector<ProcessorDescriptor>() ;
-			MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
+			MyXMLParser.XMLElement  getCapabilitiesTree = new MyXMLParser.XMLElement();
 			try{
 				String getcaprequest="service=WPS&request=GetCapabilities";
 				DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
-				ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
-	      PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
-	      a.parseString(stringOutputStream.toString());
-	      stringOutputStream = null;
+				
+			
+		   
+		    if(isLocal() == false){
+		      getCapabilitiesTree.parse(new URL(getWPSURL()+getcaprequest));
+		  
+		    }
+		    
+		    if(isLocal() == true){
+  				ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+  	      PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
+  	      getCapabilitiesTree.parseString(stringOutputStream.toString());
+  	      stringOutputStream = null;
+		    }
 				//a.parse(new URL(getcaprequest));//For remote services...
-				System.out.println(a.get("wps:Capabilities").get("ows:ServiceIdentification").get("ows:Title").getValue());
-				Vector<MyXMLParser.XMLElement> listOfProcesses = a.get("wps:Capabilities").get("wps:ProcessOfferings").getList("wps:Process");
+				System.out.println(getCapabilitiesTree.get("wps:Capabilities").get("ows:ServiceIdentification").get("ows:Title").getValue());
+				Vector<MyXMLParser.XMLElement> listOfProcesses = getCapabilitiesTree.get("wps:Capabilities").get("wps:ProcessOfferings").getList("wps:Process");
 				for(int j=0;j<listOfProcesses.size();j++){
 					System.out.print(listOfProcesses.get(j).getAttrValue("wps:processVersion")+"\t");
 					System.out.print(listOfProcesses.get(j).get("ows:Identifier").getValue()+"\t");
@@ -97,8 +107,13 @@ public class WebProcessingInterface {
 	 * @return the external URL of the Web Processing Service
 	 */
 	private static String getWPSURL() {
+	  //return "http://mouflon.dkrz.de/wps?";
 	  return Configuration.getHomeURLHTTP()+"/WPS?";
   }
+	
+	private static boolean isLocal(){
+	  return true;
+	}
 	
 	/**
 	 * Encapsulates a String message into a JSON object which can be shown by the UI
@@ -163,10 +178,18 @@ public class WebProcessingInterface {
 	  
 	  MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
     DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
-    ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
-    PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
-    a.parseString(stringOutputStream.toString());
-    stringOutputStream = null;
+    
+    
+    if(isLocal() == false){
+      a.parse(new URL(getWPSURL()+getcaprequest));
+  
+    }
+    if(isLocal() == true){
+      ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+      PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
+      a.parseString(stringOutputStream.toString());
+      stringOutputStream = null;
+    }
 
 	  
 	
@@ -315,21 +338,32 @@ public class WebProcessingInterface {
       
       postData     +=  "    </wps:Execute>\n";
       
-      
-      //We have composed the data to post, now post it to our internal CGI.
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      
-      PyWPSServer.runPyWPS(request,null,out,null,postData);
-      //a.parse(new URL(WPSURL),postData);
-      DebugConsole.println(getWPSURL()+" for "+user.id);
-      
-      DebugConsole.println("Process has been started with the following command:.");
-      //DebugConsole.println(postData+"\nThe result is:\n"+a.toString());
-      DebugConsole.println("Process has been started.");
-    
-    
       MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
-      a.parseString(out.toString());
+      
+     
+      
+      if(isLocal() == false){
+        
+        a.parse(new URL(getWPSURL()),postData);
+    
+      }
+      if(isLocal() == true){
+        //We have composed the data to post, now post it to our internal CGI.
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        
+        PyWPSServer.runPyWPS(request,null,out,null,postData);
+        //a.parse(new URL(WPSURL),postData);
+        DebugConsole.println(getWPSURL()+" for "+user.id);
+        
+        DebugConsole.println("Process has been started with the following command:.");
+        //DebugConsole.println(postData+"\nThe result is:\n"+a.toString());
+        DebugConsole.println("Process has been started.");
+      
+      
+       
+        a.parseString(out.toString());
+        out = null;
+      }
        //Check if an Exception has been thrown:
       JSONObject exception = checkException(a,postData+"\n\n"+a.toString());
       if(exception!=null)return exception;
@@ -396,7 +430,7 @@ public class WebProcessingInterface {
     DebugConsole.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
-    
+    statusLocation = statusLocation.replace("8091", "80");
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));

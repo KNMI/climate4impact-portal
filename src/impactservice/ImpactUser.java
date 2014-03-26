@@ -11,7 +11,7 @@ import tools.Tools;
 public class ImpactUser {
 
   public String internalName = null;
-  public String usersDir = null;
+  private String usersDir = null;
   public String id = null;
   public String certificateFile = null;
   public boolean credentialError = false;
@@ -21,7 +21,9 @@ public class ImpactUser {
   public String getWorkspace(){
     return usersDir;
   }
- 
+  public void setWorkspace(String _usersDir){
+    usersDir = _usersDir;
+  }
 
   synchronized public GenericCart getProcessingJobList(){
     DebugConsole.println("getProcessingJobList");

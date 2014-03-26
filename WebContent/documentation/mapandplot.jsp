@@ -3,17 +3,18 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-   <jsp:include page="includes.jsp" />
+   <jsp:include page="../includes.jsp" />
   </head>
   <body>
-		<jsp:include page="header.jsp" />
+		<jsp:include page="../header.jsp" />
 		<!-- Contents -->
+		<jsp:include page="docmenu.jsp" />
 		<div class="impactcontent">
 		<div class="cmscontent">
        <%try{out.print(DrupalEditor.showDrupalContent("?q=node/3",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
 		  </div>
 	    </div>
   <!-- /Contents -->
-	<jsp:include page="footer.jsp" />
+	<jsp:include page="../footer.jsp" />
   </body>
 </html>

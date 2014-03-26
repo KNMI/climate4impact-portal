@@ -143,7 +143,7 @@ public class GenericCart {
 
   public void loadFromStore() throws Exception {
     DebugConsole.println("Loading from store");
-    String file=user.usersDir+"/"+genericId+".xml";
+    String file=user.getWorkspace()+"/"+genericId+".xml";
     XMLElement catalogElement = new XMLElement();
     try {
       catalogElement.parseFile(file);
@@ -168,7 +168,7 @@ public class GenericCart {
   }
   public synchronized void saveToStore(){
     DebugConsole.println("Saving to store");
-    String file=user.usersDir+"/"+genericId+".xml";
+    String file=user.getWorkspace()+"/"+genericId+".xml";
     String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     data+="<GenericCart>\n";
     Iterator<DataLocator> itr = dataLocatorList.iterator();

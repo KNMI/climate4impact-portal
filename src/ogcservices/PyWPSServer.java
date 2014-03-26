@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class PyWPSServer extends HttpServlet {
    */
   public static void runPyWPS(HttpServletRequest request,HttpServletResponse response,OutputStream outputStream,String queryString,String dataToPost) throws Exception{
     String[] environmentVariables = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
-    
+
     //Try to get homedir
     String userHomeDir="";
     ImpactUser user = null;
