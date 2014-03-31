@@ -36,6 +36,7 @@
   	<li <% if(pageName.indexOf("login.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/login.jsp" ><code class="codeusersicon"></code>&nbsp;Account</a></li>
    	<li  <% if(pageName.indexOf("basket.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/basket.jsp" ><code class="codeshoppingcarticon"></code>&nbsp;Basket <code id="baskettext2">(<%=numProductsString%>)</code></a></li>
   	<li  <% if(pageName.indexOf("jobs.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/jobs.jsp" ><code class="codejobsicon"></code>&nbsp;Jobs <code id="jobnumber">(<%=numJobsString%>)</code></a></li>
+  	
    
   </ul>  
  </div>

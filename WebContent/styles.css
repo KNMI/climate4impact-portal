@@ -2241,3 +2241,13 @@ input[type=text],textarea {
 a img {
 	border: none;
 }
+
+
+.logindialogfooter{
+	border:none;
+	padding:5px;
+	background:white;
+	color:#666;
+	font-size:12px;
+	margin:0px;
+}

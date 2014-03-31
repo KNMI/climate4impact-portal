@@ -268,15 +268,12 @@ function IsNumeric(sText){
     var timehandler='';
     var i = this;
     this.InitializeTimer = function(secstime,functionhandler){
-      // Set the length of the timer, in seconds
-      secs = secstime;
+      // Set the length of the timer, in tenths of seconds
+      secs = parseInt((secstime / 10)+0.5);
       initsecs=secs;
       timehandler=functionhandler;
       StopTheClock();
       if(secs>0)StartTheTimer();
-    };
-    this.ResetTimer =function(){
-      secs=initsecs;
     };
     this.StopTimer =function(){
       StopTheClock();

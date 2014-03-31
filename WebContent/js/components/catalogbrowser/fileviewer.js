@@ -125,7 +125,7 @@ var FileViewer = function() {
 
           '<div class="variable-error">{error}<br/>You can try the following:<ul>',
           '<li>Click directly on the link above, you will get a hint on what is going wrong.</li>',
-          '<li>If you are not signed in, <a onclick="window.open(\'/impactportal/account/login.jsp\',\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=600\')" >sign in</a>',
+          '<li>If you are not signed in, <a href="#" onclick="generateLoginDialog(true)">sign in</a>',
           ' and <a onclick=\'location.reload();\'>refresh this page</a>.</li>',
           '<li>If you are signed in but still cannot view the data, make sure you belong to the same group the data belongs to: <a target="_blank" href="/impactportal/help/howto.jsp?q=create_esgf_account">-> HowTo</a>.</li>',
           '<li><a onclick="window.open(\'/impactportal/help/contactexpert.jsp\',\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=800\')" >Request help</a>.</li>',

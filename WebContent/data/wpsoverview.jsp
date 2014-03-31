@@ -4,6 +4,7 @@
   <head>
 
     <jsp:include page="../includes-ext.jsp" />
+    <script type="text/javascript" src="/impactportal/account/login.js"></script>
     <%
     	ImpactUser user = null;
     	try{
@@ -14,6 +15,7 @@
     %>
     
     <script type="text/javascript" src="../js/components/processors/wpsOverview.js"></script>
+    
     <script type="text/javascript">
     Ext.Loader.setConfig({
       enabled: true
@@ -46,7 +48,7 @@
 		if (user==null){
 			 %>
 			 	<ul>
-			 	<li>Before you can start processing, you need to <a  href="" onclick="window.open('/impactportal/account/login.jsp','targetWindow','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=600')" >sign in</a>
+			 	<li>Before you can start processing, you need to <a href="#" onclick="generateLoginDialog(true)">sign in</a>
            and <a  href="" onclick='location.reload();'>refresh this page</a>.</li>
 			 	<li>Please read why you need to login at <a href="../help/howto.jsp#why_login">Howto: Why Login?</a></li>
 			 	</ul>

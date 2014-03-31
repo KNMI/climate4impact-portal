@@ -25,6 +25,7 @@ import javax.servlet.http.HttpSession;
 
 import ogcservices.AdagucServer;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -550,11 +551,15 @@ public class ImpactService extends HttpServlet {
               ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
             }catch(SSLPeerUnverifiedException e){
               
-              msg="SSLPeerUnverifiedException: Peer unverified: "+e.getMessage();
+              msg="The peer is unverified (SSL unverified): "+e.getMessage();
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(UnknownHostException e){
-              msg="UnknownHostException: '"+e.getMessage()+"'";
+              msg="The host is unknown: '"+e.getMessage()+"'<br/>";
+              DebugConsole.errprintln(msg);
+              throw new Exception(msg);
+            }catch(ConnectTimeoutException e) {
+              msg="The connection timed out: '"+e.getMessage()+"'<br/>";
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(WebRequestBadStatusException e){
@@ -605,10 +610,10 @@ public class ImpactService extends HttpServlet {
               //if(result!=null)msg+="\n"+result;
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
-            }catch(Exception e){
+            }/*catch(Exception e){
               msg="Exception: "+e.getMessage();
               throw new Exception(msg);
-            }
+            }*/
           }
         
         DebugConsole.println("Trying to parse ncdump message");
@@ -740,7 +745,7 @@ public class ImpactService extends HttpServlet {
         rootElement = null;
         variables.clear();variables=null;
 
-      }catch(WebRequestBadStatusException e){
+      /*}catch(WebRequestBadStatusException e){
         String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage()+"<br/>\n";//+e.getResult();
         MessagePrinters.emailFatalErrorMessage("File access",msg);
         DebugConsole.errprintln(msg);
@@ -752,9 +757,10 @@ public class ImpactService extends HttpServlet {
         } catch (JSONException e1) {}
         out1.print(errorVar.toString()+"\n\n\n");
 
+      */
       }catch(Exception e){
         String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage();
-        MessagePrinters.emailFatalErrorMessage("File access",msg);
+        MessagePrinters.emailFatalErrorMessage("File access: "+e.getMessage(),msg);
         //DebugConsole.errprintln(msg);
         JSONArray errorVar = new JSONArray ();
         try {

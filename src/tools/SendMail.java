@@ -12,7 +12,7 @@ public static void sendMail(String[] to,String from, String subject, String mess
    
    // Recipient's email ID needs to be mentioned.
    //TODO must be configurable
-   DebugConsole.println("Sending email from "+from);
+   DebugConsole.println("Sending email from "+from+" with subject "+subject);
    
    // Assuming you are sending email from localhost
    String host = "localhost";
@@ -49,9 +49,9 @@ public static void sendMail(String[] to,String from, String subject, String mess
       Transport.send(message);
       System.out.println("Sent message successfully....");
    }catch (MessagingException mex) {
-    // DebugConsole.printStackTrace(mex);
+     DebugConsole.printStackTrace(mex);
       //mex.printStackTrace();
-     throw new Exception("Unable to send mail");
+     throw new Exception("Unable to send mail with subject ["+subject+"] msg: "+mex.getMessage());
    }
 }
 }

@@ -1,10 +1,13 @@
 package openidhandling;
 
 
+import impactservice.Configuration;
 import impactservice.MessagePrinters;
 
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,9 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.openid4java.OpenIDException;
-
 import org.openid4java.consumer.ConsumerException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.InMemoryConsumerAssociationStore;
@@ -42,7 +43,7 @@ import org.openid4java.message.sreg.SRegResponse;
 import tools.DebugConsole;
 
 /**
- * @author Sutra Zhou
+ * @author Sutra Zhou, Maarten Plieger
  * 
  */
 public class ConsumerServlet extends javax.servlet.http.HttpServlet {
@@ -130,11 +131,13 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		} else {
 
 			String identifier = req.getParameter("openid_identifier");
-			
+			String referrer = req.getHeader("referer"); 
 			if (identifier != null) {
-				System.out.println("identifier == "+identifier);
-				identifier=identifier.trim();
 				
+				identifier=identifier.trim();
+				DebugConsole.println("User entered openid identifier ["+identifier+"]");
+ 			 
+				DebugConsole.println("IN: User came from path "+referrer);
 				if(keepId==true){
 			     if(identifier.startsWith("http")){
              addOpenIdCookie(req,resp,identifier);
@@ -144,8 +147,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 				this.authRequest(identifier, req, resp);
 			} else {
-			
-				this.getServletContext().getRequestDispatcher("/login.jsp")
+			  DebugConsole.println("No OpenID given: directing to login page");
+			  DebugConsole.println("INPUT ERROR: User came from path "+referrer);
+				this.getServletContext().getRequestDispatcher(referrer)
 						.forward(req, resp); 
 			}
 		}
@@ -185,23 +189,63 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
   private void processReturn(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+    DebugConsole.println("Validating request...");
 		Identifier identifier = this.verifyResponse(req);
 		log.debug("identifier: " + identifier);
-		if (identifier == null) {
-
-			this.getServletContext().getRequestDispatcher("/login.jsp")
-					.forward(req, resp);
-		} else {
+		if (identifier != null) {
+		  DebugConsole.println("Validation is OK");
 			req.setAttribute("identifier", identifier.getIdentifier());
-
-			//openid_identifier
 			req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());
-			this.getServletContext().getRequestDispatcher("/login.jsp")
-					.forward(req, resp);
+		}else{
+		  DebugConsole.println("Validation is INVALID");
 		}
+	 
+		String referrer = getValidReferrer(req);
+	 
+	  
+	  //this.getServletContext().getRequestDispatcher("/account/login_embed.jsp").forward(req, resp);
+		this.getServletContext().getRequestDispatcher(referrer).forward(req, resp);
 	}
 
-	// --- placing the authentication request ---
+	private String getValidReferrer(HttpServletRequest req) {
+	  String returnURL = "/account/login.jsp";
+	  String referrer = null; 
+    try {
+      referrer = URLDecoder.decode(req.getParameter("returnurl"),"UTF-8");
+    } catch (Exception e) {
+    }
+    
+    if(referrer==null){
+      String r=req.getHeader("referer");
+      if(r!=null){
+        referrer = r;
+      }
+    }
+	  
+	  if(referrer!=null){
+	    DebugConsole.println("Referrer was "+referrer);
+      if(referrer.startsWith("/") == false){
+        String homeURL=null;
+        if(referrer.startsWith("http")){
+          homeURL = Configuration.getHomeURLHTTP();
+        }
+        if(referrer.startsWith("https")){
+          homeURL = Configuration.getHomeURLHTTPS();
+        }
+        DebugConsole.println("HomeURL: "+homeURL);
+     
+        if(referrer.startsWith(homeURL)){
+          returnURL = referrer.substring(homeURL.length());
+        }
+      }else{
+        returnURL = referrer;
+      }
+    }
+  	DebugConsole.println("processReturn: User came from: "+returnURL);
+    return returnURL;
+  }
+
+  // --- placing the authentication request ---
 	@SuppressWarnings("unchecked")
 	public String authRequest(String userSuppliedString,
 			HttpServletRequest httpReq, HttpServletResponse httpResp)
@@ -210,7 +254,15 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// configure the return_to URL where your application will receive
 			// the authentication responses from the OpenID provider
 			// String returnToUrl = "http://example.com/openid";
-			String returnToUrl = httpReq.getRequestURL().toString() + "?fromopenid=true";
+			String returnToUrl = httpReq.getRequestURL().toString() + "?fromopenid=true&";
+			//DebugConsole.println("OriginURL="+httpReq.get);
+			//DebugConsole.println("OriginURL="+httpReq.getPathTranslated());
+			DebugConsole.println("ReturnURL= "+returnToUrl);
+			String referrer = getValidReferrer(httpReq);;
+      DebugConsole.println("User came from path "+referrer);
+      if(referrer!=null){
+        returnToUrl+="returnurl="+URLEncoder.encode(referrer, "UTF-8");
+      }
 
 			// perform discovery on the user-supplied identifier
 			List<DiscoveryInformation> discoveries = manager.discover(userSuppliedString);
@@ -296,7 +348,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 				RequestDispatcher dispatcher = getServletContext()
 						.getRequestDispatcher("/formredirection.jsp");
-				httpReq.setAttribute("prameterMap", httpReq.getParameterMap());
+				httpReq.setAttribute("parameterMap", httpReq.getParameterMap());
 				httpReq.setAttribute("message", authReq);
 				// httpReq.setAttribute("destinationUrl", httpResp
 				// .getDestinationUrl(false));

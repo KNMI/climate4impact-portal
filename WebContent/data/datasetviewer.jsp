@@ -33,6 +33,7 @@
     	var dataset=undefined;;
     	dataset='<%= dapURL %>';
     </script>
+    <script type="text/javascript" src="/impactportal/account/login.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script>
     <script type="text/javascript" src="../js/components/search/searchmenus.js"></script>
     <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>

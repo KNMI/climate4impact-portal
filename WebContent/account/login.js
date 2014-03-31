@@ -12,6 +12,12 @@
     	  createaccount:'https://pcmdi9.llnl.gov/esgf-web-fe/createAccount',
     	  accountinfo:'http://pcmdi9.llnl.gov/esgf-web-fe/accountsview',
     	  logocls:'logo_USA'},
+  	  'IPSL':       {
+        name:'IPSL'       ,
+        openidprefix:'https://esgf-node.ipsl.fr/esgf-idp/openid/',
+        createaccount:'https://esgf-node.ipsl.fr/esgf-web-fe/createAccount',
+        accountinfo:'http://esgf-node.ipsl.fr/esgf-web-fe/accountsview',
+        logocls:'logo_France'},
       'CEDA':        {
     	  name:'BADC/CEDA'   ,
     	  openidprefix:'https://ceda.ac.uk/openid/',
@@ -191,6 +197,112 @@ var openDialog = function(datacentre) {
   $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
   if(OpenIDProviders[datacentre].createaccount){
 	  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
-	  		"- <a href=\"http://localhost:8080/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
+	  		"- <a target=\"_blank\" href=\"http://localhost:8080/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
   }
 }
+
+var closeLoginPopupDialog = function(){
+  
+  var isDialogTrueOrWindowFalse = false;
+  
+  if(window.parent){
+    isDialogTrueOrWindowFalse = true;
+  }
+  
+  //console.log("closeLoginPopupDialog, isDialogTrueOrWindowFalse: "+isDialogTrueOrWindowFalse );
+  
+
+  var reloadWindow = function(){
+    //console.log('reloadWindow: isDialogTrueOrWindowFalse'+isDialogTrueOrWindowFalse);
+    var doReload = false;
+    if(isDialogTrueOrWindowFalse == false){
+      try{doReload = window.opener.getReloadAfterLogin();}catch(e){
+        //console.log("Window: opener window has no reload function: "+e);
+      }
+      if(doReload == true){
+        //console.log('start window');
+        window.opener.location.reload(true)
+      }
+    }
+    if(isDialogTrueOrWindowFalse == true){
+      try{doReload = window.parent. getReloadAfterLogin();}catch(e){
+        //console.log("Dialog: parent window has no reload function: "+e);
+      }
+      if(doReload == true){
+        //console.log('start reload dialog');
+        window.parent.location.reload(true);
+      }
+    }
+  }
+  if(isDialogTrueOrWindowFalse == true){
+    window.parent.$('#externalSite').dialog('close');
+    var t = new Timer();
+    //console.log('calling reload by timer');
+    t.InitializeTimer(50,reloadWindow);
+  }else{
+    //console.log('calling reload directly');
+    reloadWindow();
+  }
+  
+};
+
+var getUrlVar = function(key){
+  var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
+  return result && unescape(result[1]) || "";
+};
+
+var doReloadAfterLogin = false;
+/*Being called by the dialog popup*/
+var setReloadAfterLogin = function(reload){
+  //console.log("Reload function called with value "+reload);
+  if(reload == 'true'){
+    doReloadAfterLogin = true;
+  }
+}
+var getReloadAfterLogin = function(){
+  if(doReloadAfterLogin == false){
+    setReloadAfterLogin(getUrlVar('doreload')) ;
+  }
+  return doReloadAfterLogin;
+}
+
+var generateLoginDialog = function(doReload){
+//  console.log(generateLoginDialog);
+  var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" ></iframe>');
+  //var footer = $('<div class="logindialogfooter" ><a onclick="window.open(\'/impactportal/account/login_embed.jsp?doreload=true\',\'targetWindow\',\'toolbar=no,location=no,status=no,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=800,height=500\')" >Do you encounter an untrusted connection? Click here.</a></div>');
+  var footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'http://localhost/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
+  
+  
+    var loginDialog = $("<div id=\"externalSite\"></div>").append(iframe).append(footer).appendTo("body").dialog({
+        autoOpen: false,
+        modal: true,
+        resizable: false,
+        width: "auto",
+        height: "auto",
+        close: function () {
+            iframe.attr("src", "");
+        },
+        hide: {
+          effect: "fade",
+          duration: 200
+         }
+    });
+   
+      var src = "/impactportal/account/login_embed.jsp";
+      if(doReload == true){
+        src+="?doreload=true";
+      }
+      var title = "Login with your ESGF openid identifier";
+      var width = 900;
+      var height = 500;
+      iframe.attr({
+          width: +width,
+          height: +height,
+          src: src
+      });
+      if(loginDialog.dialog){
+        loginDialog.dialog("option", "title", title).dialog("open");
+      }
+
+}
+
