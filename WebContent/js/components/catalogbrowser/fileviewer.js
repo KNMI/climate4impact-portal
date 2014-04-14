@@ -77,7 +77,7 @@ var FileViewer = function() {
     xtype : 'panel',
     cls : 'variable-results',
     region : 'center',
-    title : 'File metadata',
+    title : 'File header',
     bbar : [
         {
           xtype : 'button',
@@ -93,7 +93,7 @@ var FileViewer = function() {
             if (downloadWin)
               downloadWin.close();
             downloadWin = window.open(downloadURL, 'jav',
-                'width=600,height=300,resizable=yes');
+                'width=900,height=600,resizable=yes');
           }
         },,{
           xtype : 'tbseparator'
@@ -113,6 +113,7 @@ var FileViewer = function() {
           }
         }],
     frame : false,
+    border:false,
     layout : 'fit',
     items : [{
       autoScroll : true,

@@ -7,17 +7,11 @@
     
   
 	  <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
+	  <script type="text/javascript" src="basicsearchsettings/variables.js"></script>
+	  <script type="text/javascript" src="basicsearch.js"></script>
 
       <script type="text/javascript">
-      $.widget('ui.iconbutton', $.extend({}, $.ui.button.prototype, {
-    	    _init: function() {
-    	        $.ui.button.prototype._init.call(this);
-    	        this.element.removeClass('ui-corner-all')
-    	                    .addClass('ui-iconbutton')
-    	                    .unbind('.button');
-    	    }           
-    	}));
-
+     
       var searchSession=undefined;  
       <%
       impactservice.SessionManager.SearchSession searchSession=(impactservice.SessionManager.SearchSession) session.getAttribute("searchsession");
@@ -27,168 +21,9 @@
       %>
       var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>service=search&';
     
-      var postIdentifierToBasket = function(options){
-	    	var doneFunction = function(json){
-	    		if(json.error){customalert(json.error);}
-	    		adjustNumberOfDataSetsDisplayedInMenuBar(json);
-	    	}
-	    	
-	    	$.ajax({
-	    		type: "POST",
-	    		url: '<%=impactservice.Configuration.getImpactServiceLocation()%>service=basket&mode=add',
-	    		data: options,
-	    		success:doneFunction,
-	    		dataType: 'json'
-	    		});
-	    }
       
-      var getTimeFrame = function(){
-    	  var timeFrame="";
-    	  var input = $("form input:radio");
-		  for(var j=0;j<input.length;j++){
-			  if(input[j].checked){
-				  if(input[j].name.indexOf('timebox_start')==0){
-					  var v=input[j].value;
-					  if(v.length>0)timeFrame+="tc_start="+v+"&";  
-				  }
-				  if(input[j].name.indexOf('timebox_stop')==0){
-					  var v=input[j].value;
-					  if(v.length>0)timeFrame+="tc_end="+v+"&";  
-				  }
-			  }
-		  }
-		  return timeFrame;
-      }
       
-    
-      var loadFacetList = function(facetType,collapse){
-    	  $('#refresh'+facetType+'info').html("Searching <img src=\"/impactportal/images/ajax-bar.gif\"/>");
-    	 // $('#modelselection').html("");
-    	  
-		  var success = function(json,query){
-			  if(json.error){
-				  failure(json.error);
-				  return;
-			  }
-			  html="Found "+(json.facets.length)+" "+facetType+"(s)";
-			  if(query.length>0){
-				  var queryt=query.replaceAll("&",", ");
-				  html+=" for "+queryt;
-			  }
-			  $('#refresh'+facetType+'info').html(html);
-			  
-			  var facets=json.facets;
-			  var html="<form><table class=\"modellist\">";
-			  html+="<tr ><td class=\"modellistheader\">No.</td><td class=\"modellistheader\">Name</td><td class=\"modellistheader\">Description</td></tr>"
-			  for(var j=0;j<facets.length;j++){
-				  var rowType="even";
-				  if(j%2==1)rowType="odd";
-				  var modelname = facets[j][0];
-				  html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" name="'+facetType+'_'+modelname+'">'+modelname+'</input></td><td>'+facets[j][1]+'</td></tr>';
-			  }
-			  html+="</table></form>";
-			  $('#'+facetType+'selection').html(html);
-			  
-			
-			  
-			  if(collapse === true){
-			  	$('#'+facetType+'header').collapsible('open');
-		  	  }
-		  };
-		
-		  
-		  var failure = function(data){
-			  $('#refresh'+facetType+'info').html('failed: '+data);
-		  } 
-		  
-		  //Get all checkboxes and compose query
-		  var query="";
-		  var input = $("form input:checkbox");
-		  for(var j=0;j<input.length;j++){ 
-			if(input[j].checked){
-				if(facetType!='project')       if(input[j].name.indexOf('project_')==0){query+="project="+input[j].name.substr(8)+"&";}
-				if(facetType!='variable')      if(input[j].name.indexOf('variable_')==0){query+="variable="+input[j].name.substr(9)+"&";}
-			  	if(facetType!='experiment')    if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
-			  	if(facetType!='time_frequency')if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
-			  	if(facetType!='model')         if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
-		  	}
-		  }
-		  query+=getTimeFrame();
-		  
-		  var url = impactservice+"mode=getfacet&facet="+facetType+"&type=dataset&query="+URLEncode(query);
-		  makeJSONRequest(url,function(data){success(data,query);},failure);
-      }; 
-      
-
-      
-	  var startBasicSearch = function(){
-		  $('#searchinfo').html("Searching <img src=\"/impactportal/images/ajax-bar.gif\" alt=\"loading...\"/>");
-		  var query="";
-		  var input = $("form input:checkbox");
-		  for(var j=0;j<input.length;j++){
-			if(input[j].checked){
-				if(input[j].name.indexOf('project_')==0){query+="project="+input[j].name.substr(8)+"&";}
-				if(input[j].name.indexOf('variable_')==0){query+="variable="+input[j].name.substr(9)+"&";}
-			  	if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
-			  	if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
-			  	if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
-		  	}
-		  }
-		  query+=getTimeFrame();
-		  //$('#info').html('Query2: '+query);
-		  
-		  var url = impactservice+"mode=search&limit=100&type=dataset&query="+URLEncode(query);
-		  var success = function(json){
-			  if(json.error){failure(json.error);return;}
-			  var html = "Found "+json.totalCount+" datasets. <a target=\"_blank\" href=\""+json.query+"\">(see esgf query)</a>"; 
-			  $('#searchinfo').html(html);
-			
-			  
-			  var html="<table class=\"modellist\">";
-			  html+="<tr ><td class=\"modellistheader\">No.</td><td class=\"modellistheader\">Name</td><td class=\"modellistheader\" >Size</td><td class=\"modellistheader\">catalog</td><td class=\"modellistheader\">OPENDAP</td><td class=\"modellistheader\">HTTP</td><td class=\"modellistheader\"><span class=\"shoppingbasketicon\"></span></td></tr>"
-			  var topics =  json.topics;
-			  for(var j=0;j<topics.length;j++){
-				  var rowType="even";
-				  if(j%2==1)rowType="odd";
-				  var fileid = topics[j].instance_id;
-				  var dataSize = topics[j].dataSize;
-				  if(!dataSize)dataSize="-";
-				  html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
-				  if(topics[j].catalogURL){
-					  html+='<td><a target=\"_blank\" href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'">browse</a></td>';
-			 	  }else{
-			 		  html+="<td>-</td>";
-			 	  }
-				  if(topics[j].OPENDAP){
-						  html+='<td><a href="/impactportal/data/datasetviewer.jsp?dataset='+URLEncode(topics[j].OPENDAP)+'">view</a></td>';
-				  }else{
-					  html+="<td>-</td>";
-				  }
-			 	  if(topics[j].HTTPServer){
-			  	  	html+='<td><a target="_blank" href="'+topics[j].HTTPServer+'">get</a></td>';
-			 	  }else{
-			 		  html+="<td>-</td>";
-			 	  }
-			 	  if(topics[j].OPENDAP||topics[j].HTTPServer){
-			 	  	html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',HTTPServer:'"+topics[j].HTTPServer+"',OPENDAP:'"+topics[j].OPENDAP+"',catalogURL:'null'});\"></span></td>";
-			 	  }else{
-			 	  	if(topics[j].catalogURL){
-			 	  	 html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',catalogURL:'"+topics[j].catalogURL+"'});\"></span></td>";
-			 	  	}else{
-			 			html+="<td>-</td>";
-			 	  	}
-			 	  }
-				  html+='</tr>';
-			  }
-			  html+="</table>";
-			  $('#searchresults').html(html);
-			  $('#searchresultsHeader').collapsible('open');
-			  
-		  };
-		  
-		  var failure = function(data){$('#refreshmodelsinfo').html('failed: '+data);} 
-		  makeJSONRequest(url,success,failure);
-	  };
+  
 	  
       var initializeBasicSearch = function(){
     	  
@@ -205,6 +40,11 @@
     	  $('#refreshmodels').click(function(){loadFacetList('model',true);}); 
     	  $('#refreshmodels').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
 
+    	  
+    	  $('#refreshdomain').css({width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'});
+    	  $('#refreshdomain').click(function(){loadFacetList('domain',true);}); 
+    	  $('#refreshdomain').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
+
     	  $('#refreshprojects').css({width:'0px',width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'});
     	  $('#refreshprojects').click(function(){loadFacetList('project',true);}); 
     	  $('#refreshprojects').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
@@ -215,15 +55,15 @@
 
     	  
     	  
-    	  $('#startsearch').css({width:'0px',margin:'8px 6px 0px 2px',paddingLeft:'24px'});
+    	  $('#startsearch').css({width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'}); 
     	  $('#startsearch').click(function(){startBasicSearch();}); 
-    	  $('#startsearch').iconbutton({text:false, icons:{primary:'refreshbutton24'},css:{width:'24px',display:'block'}});
-      };
+    	  $('#startsearch').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
+      };// /initializeBasicSearch
             
       
 	
      
-      
+       
       $(document).ready(function() {
           //collapsible management
           $('.collapsible').collapsible({
@@ -234,7 +74,7 @@
           loadFacetList('project');
           loadFacetList('model');
           //loadFacetList('variable');
-          loadFacetList('experiment');
+          //loadFacetList('experiment');
          // startBasicSearch();
         });
     </script>
@@ -253,41 +93,128 @@
         	
         	
         	
+  		
   			
-        	<div class="collapsible" style="padding:0px;height:36px;"> 
-	        <table width="100%" ><tr><td class="collapsibletitle" >
-	        Variable 
-	        </td><td  style="padding:0px;">
-			<form>
-  			<table class="collapsibletable" width="100%"><tr>
-  			<td><input type="checkbox" name="variable_psl"/>Pressure</td>
-  			<td><input type="checkbox" name="variable_tas"/>Temperature</td>
-  			<td><input type="checkbox" name="variable_pr"/>Precipitation</td>
-  			<td><input type="checkbox" name="variable_evspsbl"/>Evaporation</td>
-  			<td><input type="checkbox" name="variable_sfcWind"/>Wind</td>
-  			<td><input type="checkbox" name="variable_hur"/>Humidity</td>
-  			</tr></table>
-  			</form>
-	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
-	        <table class="tablenoborder"><tr><td><div id="refreshvariable"></div></td><td ><div id="refreshvariableinfo">Click to load list from server</div></td></tr></table>
-	       
+  			<!-- Project overview -->
+  			<div class="facetoverview collapsible" > 
+		        <table width="100%" >
+		       		<tr>
+				        <td class="collapsibletitle" >
+				        	Project 
+				        </td>
+				        <td style="padding:0px;">
+							<form>
+					  			<table class="collapsibletable" width="100%">
+						  			<tr>
+							  			<td><input type="checkbox" name="project_CMIP5"/><abbr title="Climate Model Intercomparison Project 5">CMIP5</abbr></td>
+							  			<td><input type="checkbox" name="project_CORDEX"/><abbr title="Coordinated Regional Climate Downscaling Experiment">CORDEX</abbr></td>
+						  			</tr>
+					  			</table>
+				  			</form>
+				        </td>
+				        <td style="padding:2px;"><span class="collapse-close"></span></td>
+			        </tr>
+		        </table>
+	        </div>
+	        
+	        <!-- Project details -->
+	        <div class="collapsiblecontainer">
+		        <div class="collapsiblecontent">
+		             <table width="100%" >
+			             <tr>
+		  					<td style="width:30px;"><div id="refreshprojects"></div></td>
+		  					<td style="height:25px;vertical-align:middle;"><span id="refreshprojectinfo"></span></td>
+		  				</tr>
+	  				</table>
+		        	<div id="projectselection"></div>
+	        	</div>
+        	</div>
+        	
+        	<!-- Variable Selection -->
+        	
+        	<div class="facetoverview collapsible" style="height:185px;"> 
+		        <table width="100%" ><tr><td class="collapsibletitle" >
+		        Variable 
+		        </td><td  style="padding:0px;">
+				<form>
+		  			<table class="collapsibletable" width="100%">
+		  			<tr>
+		  			
+		  			<td><input type="checkbox" name="variable_tas"/>Temperature</td>
+		  			<td><input type="checkbox" name="variable_pr"/>Precipitation</td>
+		  			<td><input type="checkbox" name="variable_sfcWind"/>Windspeed</td>
+		  			<td><input type="checkbox" name="variable_rsds"/>Shortwave radiation down</td>
+		  			<td><input type="checkbox" name="variable_huss"/>Surface specific humidity</td>
+
+		  			</tr><tr>
+
+		  			<td><input type="checkbox" name="variable_tasmin"/>Min temperature</td>
+		  			<td><input type="checkbox" name="variable_prc"/>Conv. precipitation</td>
+		  			<td><input type="checkbox" name="variable_sfcWindmax"/>Max windspeed</td>
+		  			<td><input type="checkbox" name="variable_rsus"/>Shortwave radiation up</td>
+		  			<td><input type="checkbox" name="variable_hurs"/>Surface relative humidity</td>
+		  			
+		  			</tr><tr>
+
+		  			<td><input type="checkbox" name="variable_tasmax"/>Max temperature</td>
+		  			<td><input type="checkbox" name="variable_prsn"/>Snow</td>
+		  			<td><input type="checkbox" name="variable_uas"/>Eastward wind</td>
+		  			<td><input type="checkbox" name="variable_rlds"/>Longwave radiation down</td>
+		  			<td><input type="checkbox" name="variable_hus"/>Specific humidity</td>
+		  			
+		  			</tr><tr>
+
+		  			<td>&nbsp;</td>
+		  			<td>&nbsp;</td>
+		  			<td><input type="checkbox" name="variable_vas"/>Northward wind</td>
+		  			<td><input type="checkbox" name="variable_rlus"/>Longwave radiation up</td>
+		  			<td><input type="checkbox" name="variable_hur"/>Relative humidity</td>
+		  			
+		  			</tr><tr>
+		  			<td>&nbsp;</td>
+		  			<td>&nbsp;</td>
+		  			<td>&nbsp;</td>
+		  			<td><input type="checkbox" name="variable_rsdsdiff"/>Diffuse radiation</td>
+		  			<td><input type="checkbox" name="variable_rhs"/>Surface relative humidity</td>
+		  			
+		  			</tr><tr>
+		  			<td><input type="checkbox" name="variable_evspsbl"/>Evaporation</td>
+		  			<td><input type="checkbox" name="variable_psl"/>Surface pressure</td>
+		  			<td>&nbsp;</td>
+		  			<td><input type="checkbox" name="variable_clt"/>Total cloud cover</td>
+		  			<td><input type="checkbox" name="variable_rhsmax"/>Max relative humidity</td>
+		  			
+		  			</tr>
+		  			<tr>
+		  			<td><input type="checkbox" name="variable_evspsblpot"/>Potential evaporation</td>
+		  			<td><input type="checkbox" name="variable_ps"/>Pressure</td>
+		  			<td>&nbsp;</td>
+		  			<td>&nbsp;</td>
+		  			<td><input type="checkbox" name="variable_rhsmin"/>Minimum relative humidity</td>
+		  			</tr>
+		  			</table>
+	  			</form>
+		        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table>
+	        </div>
+	        
+	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
+	        <table class="tablenoborder"><tr><td><div id="refreshvariable"></div></td><td ><div id="refreshvariableinfo">Click to load the full list with all possible variables matching the current query.</div></td></tr></table>
         	<div id="variableselection"></div>
         	</div></div>
         	
         	
-        	<div class="collapsible" style="padding:0px;height:36px;"> 
+        	<div class="facetoverview collapsible"> 
 	        <table width="100%" ><tr><td class="collapsibletitle" >
-	        Time frequency 
+	        Frequency 
 	        </td><td  style="padding:0px;">
 			<form>
   			<table class="collapsibletable" width="100%"><tr>
 			<td><input type="checkbox" name="time_frequency_3hr"/>3 hourly</td>
-  			<td><input type="checkbox" name="time_frequency_6hr"/>6 hourly</td>
   			<td><input type="checkbox" name="time_frequency_day"/>daily</td>
   			<td><input type="checkbox" name="time_frequency_mon"/>monthly</td>
   			</tr></table>
   			</form>
-	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
+	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
 	        <table class="tablenoborder"><tr><td><div id="refreshtime_frequency"></div></td><td ><div id="refreshtime_frequencyinfo">Click to load list from server</div></td></tr></table>
 	       
         	<div id="time_frequencyselection"></div>
@@ -298,9 +225,9 @@
   		 	
   		 	
 
-	        <div class="collapsible" id="timeframeheader" style="padding:0px;height:36px;"><table width="100%" ><tr><td class="collapsibletitle" >
+	        <div class="facetoverview collapsible" id="timeframeheader"><table width="100%" ><tr><td class="collapsibletitle" >
 	        Time frame 
-	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div>
+	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table></div>
     		<div class="collapsiblecontainer">
         	<div class="collapsiblecontent">
         	
@@ -340,28 +267,38 @@
   			
   		
   			
-	        <div class="collapsible" style="padding:0px;height:36px;"> 
+	        <div class="facetoverview collapsible"> 
 	        <table width="100%" ><tr><td class="collapsibletitle" >
 	        Experiment 
 	        </td><td  style="padding:0px;">
 			<form>
   			<table class="collapsibletable" width="100%"><tr>
-  			<td><input type="checkbox" name="experiment_piControl"/>piControl</td>
-  			<td><input type="checkbox" name="experiment_amip"/>amip</td>
-  			<td><input type="checkbox" name="experiment_rcp26"/>rcp26</td>
-  			<td><input type="checkbox" name="experiment_rcp45"/>rcp45</td>
-  			<td><input type="checkbox" name="experiment_rcp60"/>rcp60</td>
-  			<td><input type="checkbox" name="experiment_rcp85"/>rcp85</td> 
+  			<td><input type="checkbox" name="experiment_historical"/>Historical</td>
+  			<td><input type="checkbox" name="experiment_rcp26"/>RCP26</td>
+  			<td><input type="checkbox" name="experiment_rcp45"/>RCP45</td>
+  			<td><input type="checkbox" name="experiment_rcp85"/>RCP85</td> 
+  			<td><input type="checkbox" name="experiment_evaluation"/>Evaluation</td>
+  			
   			</tr></table>
   			</form>
-	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
+	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table></div>
+	        
+	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
+	        
+	        <form>
+  			<table class="collapsibletable" width="100%"><tr>
+	        <td><input type="checkbox" name="experiment_rcp60"/>RCP60</td>
+  			<td><input type="checkbox" name="experiment_1pctCO2"/>1pctCO2</td>
+  			</tr></table>
+  			</form>
+  			
 	        <table class="tablenoborder"><tr><td><div id="refreshexperiments"></div></td><td ><div id="refreshexperimentinfo">Click to load list from server</div></td></tr></table>
 	       
         	<div id="experimentselection"></div>
         	</div></div>
         	
         	
-        	
+        	<!--
 	        <div class="collapsible" id="projectheader" style="padding:0px;height:36px;"> 
 	        <table width="100%" ><tr><td class="collapsibletitle" >
 	        Project 
@@ -372,17 +309,51 @@
 	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div>
 	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
         	<div id="projectselection"></div>
+        	</div></div>  -->
+        	
+        	<div class="facetoverview collapsible" id="domainheader"> 
+	        	<table width="100%" >
+		        	<tr>
+			        	<td class="collapsibletitle">Domain</td>
+			        	<td style="padding:0px;">
+			  				<table class="collapsibletable" width="100%">
+			  					<tr>
+			  						<td>
+			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshdomain"></div>
+			  							<div style="display:inline;" id="refreshdomaininfo">Search domain (CORDEX)</div>
+			  						</td>
+			  					</tr>
+		  					</table>
+				        </td>
+			        	<td style="padding:2px;"><span class="collapse-close"></span></td>
+		        	</tr>
+		        </table>
+	        </div>
+	        
+	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
+        	<div id="domainselection"></div>
         	</div></div>
         	
 
-	        <div class="collapsible" id="modelheader" style="padding:0px;height:36px;"> 
-	        <table width="100%" ><tr><td class="collapsibletitle" >
-	        Models 
-	        </td><td  style="padding:0px;">
-  			<table class="collapsibletable" width="100%"><tr>
-  			<td><div  style="float:left;" id="refreshmodels"></div><div style="display:inline;" id="refreshmodelinfo"></div></td>
-  			</tr></table>
-	        </td><td style="padding:6px;"><span class="collapse-close"></span></td></tr></table></div>
+	        <div class="facetoverview collapsible" id="modelheader"> 
+	        	<table width="100%" >
+		        	<tr>
+			        	<td class="collapsibletitle">Models</td>
+			        	<td style="padding:0px;">
+			  				<table class="collapsibletable" width="100%">
+			  					<tr>
+			  						<td>
+			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshmodels"></div>
+			  							<div style="display:inline;" id="refreshmodelinfo">Search models</div>
+			  						</td>
+			  					</tr>
+		  					</table>
+				        </td>
+			        	<td style="padding:2px;"><span class="collapse-close"></span></td>
+		        	</tr>
+		        </table>
+	        </div>
+	        
 	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
         	<div id="modelselection"></div>
         	</div></div>
@@ -392,16 +363,43 @@
 
 
 			<h1>Search datasets</h1>
-  			<div style="float:left;display:block;" ><div id="startsearch"></div></div>
-	        <div class="collapsible" id="searchresultsHeader"><div style="float:left;display:inline;" id="searchinfo">No search started.</div><span class="collapse-close"></span></div> 
-    		<div class="collapsiblecontainer">
-        	<div class="collapsiblecontent">
-        	<div id="searchresults">
-        	</div></div></div>
+  			
+  			<table width="100%" ><tr><!-- <td style="width:200px;">
+	  			<div class="facetoverview collapsible" >
+	  			<div  class="collapsibletitle" style="margin:5px;">Facets</div>
+	  			Maarten is working on this topic (20140318)
+	  			</div>
+	  			
+  			</td> -->
+  			<td>
+	  			<!-- Search Panel -->
+	  			<div class="facetoverview collapsible" id="searchresultsHeader" >
+	  			<table width="100%" >
+			        	<tr>
+			        	
+				        	<td style="padding:0px;">
+			        			<table class="collapsibletable" width="100%">
+			       					<tr>
+					        			<td>
+					        				<div style="float:left;padding:0px;top:-2px;" id="startsearch"></div>
+					        				<div style="display:inline;" id="searchinfo">Start search</div>
+					        			</td>
+					        			<td style="padding:2px;"><span class="collapse-close"></span></td>
+				        			</tr>
+			        			</table>
+		        			</td>
+	        			</tr>
+	       			</table>
+		        </div>
+	    		<div class="collapsiblecontainer">
+	        		<div class="collapsiblecontent">
+	        			<div id="searchresults"></div>
+	       			</div>
+	     		</div>
+	        	<!-- /Search Panel -->
         	
-        	
-        	
-        	</div>
+        	</td></tr></table>
+      	</div>
    
 	 	
   <!-- /Contents -->

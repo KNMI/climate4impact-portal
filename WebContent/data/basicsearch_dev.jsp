@@ -40,6 +40,11 @@
     	  $('#refreshmodels').click(function(){loadFacetList('model',true);}); 
     	  $('#refreshmodels').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
 
+    	  
+    	  $('#refreshdomain').css({width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'});
+    	  $('#refreshdomain').click(function(){loadFacetList('domain',true);}); 
+    	  $('#refreshdomain').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
+
     	  $('#refreshprojects').css({width:'0px',width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'});
     	  $('#refreshprojects').click(function(){loadFacetList('project',true);}); 
     	  $('#refreshprojects').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
@@ -173,7 +178,7 @@
   			
   		 	
   		 	
-  		 	<!-- 
+  		 	
 
 	        <div class="facetoverview collapsible" id="timeframeheader"><table width="100%" ><tr><td class="collapsibletitle" >
 	        Time frame 
@@ -213,7 +218,7 @@
   			
   			</form>  		 
   			</div></div>
-  			 -->
+  			
   			
   		
   			
@@ -261,6 +266,29 @@
         	<div id="projectselection"></div>
         	</div></div>  -->
         	
+        	<div class="facetoverview collapsible" id="domainheader"> 
+	        	<table width="100%" >
+		        	<tr>
+			        	<td class="collapsibletitle">Domain</td>
+			        	<td style="padding:0px;">
+			  				<table class="collapsibletable" width="100%">
+			  					<tr>
+			  						<td>
+			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshdomain"></div>
+			  							<div style="display:inline;" id="refreshdomaininfo">Search domains</div>
+			  						</td>
+			  					</tr>
+		  					</table>
+				        </td>
+			        	<td style="padding:2px;"><span class="collapse-close"></span></td>
+		        	</tr>
+		        </table>
+	        </div>
+	        
+	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
+        	<div id="domainselection"></div>
+        	</div></div>
+        	
 
 	        <div class="facetoverview collapsible" id="modelheader"> 
 	        	<table width="100%" >
@@ -291,13 +319,13 @@
 
 			<h1>Search datasets</h1>
   			
-  			<table width="100%" ><tr><td style="width:200px;">
+  			<table width="100%" ><tr><!-- <td style="width:200px;">
 	  			<div class="facetoverview collapsible" >
 	  			<div  class="collapsibletitle" style="margin:5px;">Facets</div>
 	  			Maarten is working on this topic (20140318)
 	  			</div>
 	  			
-  			</td>
+  			</td> -->
   			<td>
 	  			<!-- Search Panel -->
 	  			<div class="facetoverview collapsible" id="searchresultsHeader" >

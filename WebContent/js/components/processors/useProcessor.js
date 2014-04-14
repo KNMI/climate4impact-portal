@@ -15,8 +15,8 @@ var showStatusReport = function(json) {
             autoScroll : true,
             autoDestroy : true,
             maximizable : true,
-            //overflowX : 'scroll',
-            //overflowY : 'scroll',
+            // overflowX : 'scroll',
+            // overflowY : 'scroll',
             closeAction : 'destroy',
             frame : true,
             title : 'WPS report',
@@ -182,14 +182,14 @@ var processProgressMonitoring = function(status) {
   });
   var b = Ext.create('Ext.button.Button', {
     text : 'view details',
-    //disabled : true,
+    // disabled : true,
     handler : function() {
       w.showResults(results);
     }
   });
   var c = Ext.create('Ext.button.Button', {
     text : 'close',
-    //disabled : true,
+    // disabled : true,
     handler : function() {
       w.close();
     }
@@ -239,10 +239,10 @@ var processProgressMonitoring = function(status) {
   });
 
   w.showResults = function(json) {
-    /*p.updateProgress(1, 100 + " %", true);
-    t.setValue("Completed: " + json.status);
-    b.enable();
-    c.enable();*/
+    /*
+     * p.updateProgress(1, 100 + " %", true); t.setValue("Completed: " +
+     * json.status); b.enable(); c.enable();
+     */
     showStatusReport(json);
   }
 
@@ -267,13 +267,17 @@ var processProgressMonitoring = function(status) {
         try {
           var json = Ext.JSON.decode(e.responseText);
           if (json.error) {
-            alert("Error:\n" + json.error);
-            // w.close();
+            if(json.error){
+              alert("Error:\n" + json.error);
+            }
+            w.close();
+            //setTimeout(makeMonitorRequest, 2000);
             return;
           }
         } catch (error) {
           alert("Invalid JSON string: " + e.reponseText)
-          w.close();
+          setTimeout(makeMonitorRequest, 2000);
+          //w.close();
           return;
         }
 
@@ -299,6 +303,7 @@ var processProgressMonitoring = function(status) {
     try {
       Ext.Ajax.request({
         url : impactWPSURL,
+        method: 'GET',
         success : passFn,
         failure : failFn,
         params : wpsConfig
@@ -434,6 +439,8 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
     xtype : 'grid',
     frame : true,
     width : 'auto',
+    margin:4,
+    
     border : false,
     collapsible : true,
     collapsed : false,// ,id:id,
@@ -457,7 +464,7 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
       width : 34,
       dataIndex : 'filler',
       items : [{
-        iconCls:'button_basket',
+        iconCls : 'button_basket',
         tooltip : 'Use an item from your basket...',
         handler : function(grid, rowIndex, colIndex) {
           basketWidget.show(function(selectedNodes) {
@@ -481,7 +488,7 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
       width : 34,
       dataIndex : 'remove',
       items : [{
-        iconCls:'button_remove',
+        iconCls : 'button_remove',
         tooltip : 'remove',
         handler : function(grid, rowIndex, colIndex) {
           grid.getStore().removeAt(rowIndex);

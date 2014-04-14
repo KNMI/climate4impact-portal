@@ -333,11 +333,35 @@ public class OpenDAP {
       attrStr+="\""+attr.getStringValue()+"\";\n";
     }else{
       Array vals = attr.getValues();
-      if(type == DataType.FLOAT){
+      
         for(int j=0;j<vals.getSize();j++){
-          attrStr+=vals.getFloat(j);
+          if(type == DataType.BYTE){
+            attrStr+=vals.getByte(j);
+          }
+          if(type == DataType.CHAR){
+            attrStr+=vals.getChar(j);
+          }
+          if(type == DataType.SHORT){
+            attrStr+=vals.getShort(j);
+          }
+          
+          if(type == DataType.STRUCTURE){
+            attrStr+="";
+          }
+
+          if(type == DataType.INT){
+            attrStr+=vals.getInt(j);
+          }
+          if(type == DataType.LONG){
+            attrStr+=vals.getLong(j);
+          }
+          if(type == DataType.FLOAT){
+            attrStr+=vals.getFloat(j);
+          }
+          if(type == DataType.DOUBLE){
+            attrStr+=vals.getDouble(j);
+          }
           if(j>0)attrStr+=",";
-        }
       }
       attrStr+=";\n";
     }
@@ -395,9 +419,19 @@ public class OpenDAP {
     //DebugConsole.println("userid: "+userIdFromPath);
     try {
       ImpactUser user =  LoginManager.getUser(request,response);
-      filename = user.getDataDir()+"/"+opendapNameFromPath;
-      fileNameFromPath = user.getDataDir()+"/"+fileNameFromPath;
-      if(user.internalName.equals(userIdFromPath) == false){
+      
+      
+      String filePath = userIdFromPath.substring(user.internalName.length());
+      
+      fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
+      
+      filename = user.getDataDir()+"/"+filePath+"/"+opendapNameFromPath;
+      
+      
+      DebugConsole.println("Local file name is "+filename);
+      
+      DebugConsole.println("Comparing "+user.internalName + "==" + userIdFromPath);
+      if(!userIdFromPath.startsWith(user.internalName)){
         response.setStatus(403);
         response.getOutputStream().print("403 Forbidden (Wrong user id)");
         return;

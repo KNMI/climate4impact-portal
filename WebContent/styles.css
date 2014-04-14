@@ -164,13 +164,15 @@ ol {
 	padding-left: 20px;
 }
 
-ul {
+ul,.ul {
 	padding-left: 5px;
 	margin-top: 3px;
+	margin-left:10px;
 }
 
-li {
+li,.li {
 	line-height: 1.3;
+	margin-left:10px;
 }
 
 #bodycontainer {
@@ -1572,6 +1574,8 @@ div.tnimagetext {
 	padding: 0 1em 0 0;
 }
 
+
+
 table.wps {
 	width: 100%;
 	border: 0;
@@ -1781,19 +1785,18 @@ ul.pager {
 	padding: 2px 0px 6px 10px;
 	font-size: 16px;
 	line-height: 20px;
-	width: 140px;
+	width: 100px;
 }
 
 .collapsibletable table {
 	margin: 0px;
 	padding: 0px;
 	width: 100%;
+	
 }
 
 .collapsibletable tr {
 	/*background: #E0E0E0;*/
-	height: 20px;
-	line-height: 22px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1801,8 +1804,13 @@ ul.pager {
 .collapsibletable td { /*border:0px solid #BBB;
 	 background:#F8F8F8;*/
 	padding: 0px;
-	margin: 0px;
+	margin: 1px;
+	height: 16px;
+	line-height: 22px;
+	vertical-align:top;
 }
+
+
 
 span.collapse-open {
 	display: block;
@@ -1916,7 +1924,7 @@ div.collapsiblecontent {
 	background-image: url("images/adagucviewerlogos.png") !important;
 	width: 16px;
 	height: 16px;
-	background-position: -48px 0px;
+	background-position: -48px 0px !important;
 }
 
 .button_layer_visible {
@@ -2007,7 +2015,7 @@ div.collapsiblecontent {
 	background-image: url("images/adagucviewerlogos.png") !important;
 	width: 16px;
 	height: 16px;
-	background-position: -96px 0px;
+	background-position: -96px 0px !important;
 }
 
 .button_nobackground {

@@ -15,10 +15,12 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import tools.DebugConsole;
+import tools.HTTPTools;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 import wps.WebProcessingInterface;
@@ -102,10 +104,24 @@ public class GenericCart {
 	 public synchronized void removeDataLocator(String id) {
 	    DebugConsole.println("Removing "+id);
 	    try {
+        id = HTTPTools.validateInputTokens(id);
+      } catch (Exception e1) {
+        DebugConsole.errprintln("Invalid tokens while removing "+id);
+        return;
+      }
+	    try {
 	      DebugConsole.println("Checking "+user.getDataDir()+"/"+id);
         File file = new File(user.getDataDir()+"/"+id);
         if(file.exists()){
-          file.delete();
+          if(file.isFile()){
+            DebugConsole.println("Deleting file "+file.getAbsolutePath());
+            file.delete();
+          }else{
+            if(file.isDirectory()){
+              DebugConsole.println("Deleting directory "+file.getAbsolutePath());
+              Tools.rmdir(file);
+            }
+          }
         }
       } catch (IOException e) {
      
@@ -400,10 +416,22 @@ public class GenericCart {
    
    JSONArray datasets = new JSONArray();
    datasetList.put("children", datasets);
-   datasetList.put("text", "basket");
+   datasetList.put("text", genericCart.user.id);
    datasetList.put("leaf", false);
    datasetList.put("viewer", "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?");
    datasetList.put("browser", "/"+Configuration.getHomeURLPrefix()+"/data/catalogbrowser.jsp?");
+   
+   JSONObject linkStorage = new JSONObject();
+   
+   linkStorage.put("text","Remote data");
+   linkStorage.put("date","");
+   linkStorage.put("leaf",false);
+   linkStorage.put("expanded",true);
+   
+   JSONArray linkStorageChilds = new JSONArray();
+   linkStorage.put("children",linkStorageChilds);
+   datasets.put(linkStorage);
+   
     Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
     int j=1;
 
@@ -413,7 +441,7 @@ public class GenericCart {
       if(element.cartData.equals("null")){
       }else{
         JSONObject dataset = new JSONObject();
-        datasets.put(dataset);
+        linkStorageChilds.put(dataset);
         JSONObject elementProps = null;
         String dapURL = null;
         String httpURL = null;
@@ -438,7 +466,7 @@ public class GenericCart {
         
         if(catalogURL==null){
           
-          if(dapURL==null&&httpURL!=null){
+          /*if(dapURL==null&&httpURL!=null){
             if(httpURL.indexOf("fileServer")>0){
               dapURL=httpURL.replace("fileServer", "dodsC");
             }
@@ -450,13 +478,15 @@ public class GenericCart {
                 }
               }
             } 
-          }
+          }*/
           
          if(dapURL!=null){
            dataset.put("dapurl",dapURL);
+           dataset.put("hasdap",true);
          }
          if(httpURL!=null){
            dataset.put("httpurl",httpURL);
+           dataset.put("hashttp",true);
            
          }
          dataset.put("type","file");
@@ -481,32 +511,17 @@ public class GenericCart {
     String dataDir = impactUser.getDataDir();
     File dataDirFile = new File(dataDir);
     if(dataDirFile.exists()){
-      File[] fileEntry = dataDirFile.listFiles();
-      for(int f=0;f<fileEntry.length;f++){
-        JSONObject dataset = new JSONObject();
-        datasets.put(dataset);
-        
-        //String dapLocationHTTP = Configuration.GlobalConfig.getServerHTTPURL()+Configuration.getHomeURL()+"/DAP/";
-        String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
-        
-        if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
-          dataset.put("dapurl",dapLocationHTTPS+impactUser.internalName+"/"+fileEntry[f].getName());
-        }
-        dataset.put("httpurl",dapLocationHTTPS+impactUser.internalName+"/"+fileEntry[f].getName());
-        dataset.put("id",fileEntry[f].getName());
-        dataset.put("type","file");
-        dataset.put("text",fileEntry[f].getName());
-        dataset.put("leaf",true);
-        String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-        //Calendar cal = Calendar.getInstance();
-        String currentISOTimeString = sdf.format(fileEntry[f].lastModified())+"Z";
-        String addDate = currentISOTimeString;
-        dataset.put("date",addDate);
-        dataset.put("filesize",fileEntry[f].length());
-        dataset.put("index",j);
-        j++;
-      }
+      JSONObject userStorage = new JSONObject();
+
+      userStorage.put("text","My data");
+      userStorage.put("date","");
+      userStorage.put("leaf",false);
+      userStorage.put("expanded",true);
+
+      JSONArray userStorageChilds = new JSONArray();
+      userStorage.put("children",userStorageChilds);
+      datasets.put(userStorage);
+      j=putFiles(userStorageChilds,"",dataDirFile,j,impactUser);
     }
     /*if(j>0){
       try {
@@ -517,6 +532,71 @@ public class GenericCart {
     }*/
     return datasetList; 
   }
+
+
+
+    private static int putFiles(JSONArray userStorageChilds, String path,File dataDirFile,int j,ImpactUser impactUser) throws JSONException {
+      File[] fileEntry = dataDirFile.listFiles();
+      for(int f=0;f<fileEntry.length;f++){
+        if(fileEntry[f].isDirectory()){
+          JSONObject childrenObject = new JSONObject();
+          //userStorage.put("type","folder");
+          childrenObject.put("text",fileEntry[f].getName());
+          childrenObject.put("id",path+fileEntry[f].getName());
+          childrenObject.put("leaf",false);
+          childrenObject.put("expanded",false);
+          childrenObject.put("type","folder");
+          JSONArray childArray = new JSONArray();
+          childrenObject.put("children",childArray);
+          userStorageChilds.put(childrenObject);
+          j=putFiles(childArray,path+fileEntry[f].getName()+"/",fileEntry[f],j, impactUser );
+        }
+        if(fileEntry[f].isFile()){
+          JSONObject dataset = new JSONObject();
+          userStorageChilds.put(dataset);
+          
+          //String dapLocationHTTP = Configuration.GlobalConfig.getServerHTTPURL()+Configuration.getHomeURL()+"/DAP/";
+          String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
+          
+          if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
+            dataset.put("dapurl",dapLocationHTTPS+impactUser.internalName+"/"+path+fileEntry[f].getName());
+            dataset.put("hasdap",true);
+          }
+          dataset.put("httpurl",dapLocationHTTPS+impactUser.internalName+"/"+path+fileEntry[f].getName());
+          dataset.put("hashttp",true);
+          dataset.put("id",path+fileEntry[f].getName());
+          dataset.put("type","file");
+          dataset.put("text",fileEntry[f].getName());
+          dataset.put("leaf",true);
+          String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+          SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+          //Calendar cal = Calendar.getInstance();
+          String currentISOTimeString = sdf.format(fileEntry[f].lastModified())+"Z";
+          String addDate = currentISOTimeString;
+          dataset.put("date",addDate);
+          
+          long fileSize = fileEntry[f].length();
+          float fileSizeF = fileSize;
+          String fileSizeH = "-";
+          if(fileSize>1000*1000*1000){
+            
+            fileSizeH = ((double)Math.round(fileSizeF/(1000*1000)))/1000+"G";
+          }else if(fileSize>1000*1000){
+            fileSizeH = ((double)Math.round(fileSizeF/(1000)))/1000+"M";
+          }else if(fileSize>1000){
+            fileSizeH = (fileSizeF/1000)+"K";
+          }else{
+            fileSizeH = fileSize+"B";
+          }
+  
+          
+          dataset.put("filesize",fileSizeH);
+          dataset.put("index",j);
+          j++;
+        }
+      }
+      return j;
+    }
 
 }
 	

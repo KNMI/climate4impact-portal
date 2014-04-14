@@ -51,20 +51,27 @@
        	var container = Ext.create('Ext.container.Container', {
   	        layout: 'fit',
   			renderTo:'container',
-  		   	minHeight:600,
+  		   	
+  		   	border:false,
   		    scripts:true,
-  		    autoScroll:false, 
+  		    autoScroll:false,
+
   		    items:[{
   				region:'center',
   				xtype:'panel',
   				minHeight:800,
+  				border:false,
+  				padding:'4 4 4 4',
+  				margin:'4 4 4 4',
   				items:[{
   			   			region:'south',
   			   			xtype:'panel',
-  			   			title:'Start' ,
+  			   			title:'Processing details and options' ,
   			   			id:'wpsstart',
-  			   			height:200, 
+  			   			height:220, 
   			   			frame:true,border:false,
+  			   			padding:4,
+  			  			margin:'0 0 4 0',
   			   			buttons:[{text:'Start processing',handler:function(){startProcessing(configuredWPSItems,currentWPSId);}}],
   			   		
   			   			
@@ -73,7 +80,9 @@
   			   		
   		    		},{
   		    			xtype:'panel',
-  						title:'Settings',
+  		    			
+  		    			
+  						title:'Options',
   						id:'wpsparams',
   						layout: {
   						    type: 'vbox',
@@ -128,8 +137,8 @@
 			if(user!=null&&processorId!=null){
 			%>
 			<ul>
-				<li><a href="/impactportal//account/jobs.jsp">Submitted jobs and settings are stored in the joblist</a> </li>
-				<li><a href="wpsoverview.jsp">Go to the overview of available transformations</a></li>
+				<li><a href="/impactportal//account/jobs.jsp">Go to the list of submitted jobs</a> </li>
+				<li><a href="wpsoverview.jsp">Go back to processing overview</a></li>
 				</ul>
 				
 				<div id="content2"></div>

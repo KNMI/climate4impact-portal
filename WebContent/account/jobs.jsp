@@ -88,13 +88,19 @@
 		var runner = new Ext.util.TaskRunner();
       	task = runner.newTask({
         	run: function () {
+        	  try{
         		populateJobList();
-       	},
+        	  }catch(e){
+        	    alert(e);
+        	    task.stop();
+       	      	task.start();
+        	  }
+       		},
         	repeat: 1,
         	interval:5000
        });
-       //task.start();
-     	populateJobList();
+       task.start();
+       populateJobList();
     });
     </script>
   </head>
@@ -105,7 +111,7 @@
 		<jsp:include page="loginmenu.jsp" />
  
 		<div class="impactcontent">
-		<h1>Processing jobs</h1>
+		<h1>Submitted processing jobs</h1>
 		<%
 			ImpactUser user = null;
 				try{
@@ -116,14 +122,15 @@
 				
 				 if (user==null){
 		%>
-			<p>You are not logged in, please go to the <a href="../login.jsp">login page</a> and log in</p>
+			<p>You are not logged in, please go to the <a href="/impactportal/account/login.jsp">login page</a> and log in</p>
 			<%
 		}else{
 			
 			
 			out.println("<div id='joblist'></div>");
 			
-			out.println("<br/><a href='"+Home+"/data/wpsoverview.jsp'>Go to transformations</a>");
+			
+			out.println("<br/><div class=\"textstandardleft\"><span ><a style=\"vertical-align:middle;\" href=\"/impactportal/data/wpsoverview.jsp\"><img style=\"height:32px;vertical-align:middle\" src=\"http://climate4impact.eu/files/calculator_0.png\" alt=\"Processing\"/> Go to processing.</a></span></div><br/>");
 			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
 		}
 		%>

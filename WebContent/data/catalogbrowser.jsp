@@ -62,6 +62,9 @@
   		  
   		  var filters = "";
   		  if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}
+  		  
+  		 // alert(variableFilter);
+  		  
   	  	  if(variableFilter!=undefined){filters+="&variables="+encodeURIComponent(variableFilter);}
   		
 		  $.get(url+'&format=text/html'+filters, function(data) {
@@ -73,7 +76,11 @@
 		    
 		  }); 
   		}
-  		$(document).ready(function(){loadCatalogDescription();});
+  		$(document).ready(function(){
+  		  var varFilter = window.location.hash.substring(1).split("#");
+  		  
+  		  loadCatalogDescription(varFilter);
+  		});
 	</script>
 	<style type="text/css">
      .catalogbrowser{

@@ -5,7 +5,6 @@ import impactservice.Configuration;
 import impactservice.MessagePrinters;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;

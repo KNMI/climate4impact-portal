@@ -307,7 +307,7 @@ public class ImpactService extends HttpServlet {
           try{
             JSONArray children = a.getJSONArray("children");
             //html+=buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",oddEven);
-            html.append(buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",oddEven));
+            html.append(buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",1-oddEven));
           } catch (JSONException e) {
           }
         }
@@ -577,7 +577,7 @@ public class ImpactService extends HttpServlet {
               }else if(e.getStatusCode()==403){
                 msg+="HTTP status code "+e.getStatusCode()+": Forbidden<br/>";
                 if(user != null){
-                  msg+="<br/>You are logged in as "+user.id+"<br/>";
+                  msg+="<br/>You are not authorized to view this resource, you are logged in as "+user.id+"<br/>";
                 }
               }else if(e.getStatusCode()==404){
                 msg+="HTTP status code "+e.getStatusCode()+": File not found<br/>";
@@ -982,10 +982,14 @@ public class ImpactService extends HttpServlet {
        *  get basket list as HTML
        */
       if(requestStr.equals("getoverview")){
+        ImpactUser user = null;
+        user = checkUserAndPrintJSONError(request,response);
+        if(user == null)return;
+        
         GenericCart basketList = null;
         try{
           response.setContentType("application/json");
-          basketList = LoginManager.getUser(request,response).getShoppingCart();
+          basketList = user.getShoppingCart();
           JSONObject datasetList = GenericCart.CartPrinters.showDataSetList(basketList,request);
           response.getWriter().println(datasetList.toString());
         }catch(Exception e){
@@ -996,7 +1000,7 @@ public class ImpactService extends HttpServlet {
       }
       
       /**
-       * Remove processor from status list
+       * Remove file from status list
        */
       if(requestStr.equals("removeFromList")){
      
@@ -1074,7 +1078,22 @@ public class ImpactService extends HttpServlet {
     
  
     
-	private void addFileToBasket(GenericCart shoppingCart,JSONObject el) throws JSONException {
+	private ImpactUser checkUserAndPrintJSONError(HttpServletRequest request,HttpServletResponse response) throws IOException {
+	  ImpactUser user = null;
+	  try{
+      user = LoginManager.getUser(request,response);
+    }catch(Exception e){
+      response.setContentType("application/json");
+      //response.setStatus(401);  <--Does not work with ExtJS proxy 
+      response.getWriter().println("{ \"success\": \"false\",\"statuscode\":401,\"message\":\"You are not signed in\"}");
+      return null;
+    }
+    return user;
+  }
+
+
+
+  private void addFileToBasket(GenericCart shoppingCart,JSONObject el) throws JSONException {
 	  DebugConsole.println(el.toString());
     String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);

@@ -1,4 +1,4 @@
 <%
-    response.sendRedirect("account.jsp");
+    response.sendRedirect("login.jsp");
 %>
  

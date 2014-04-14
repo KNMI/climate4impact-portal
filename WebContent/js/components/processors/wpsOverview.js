@@ -48,7 +48,7 @@ var wpsOverView = {
   items : [{
     region : 'center',
     xtype : 'grid',
-    title : 'WPS Overview',
+    title : 'Processing overview',
     store : new Ext.data.Store({
       autoLoad : true,
       fields : [{
@@ -71,11 +71,6 @@ var wpsOverView = {
       }
     }),
     columns : [{
-      text : "Identifier",
-      flex : 1,
-      dataIndex : 'id',
-      sortable : true
-    },{
       text : "Name",
       flex : 1,
       dataIndex : 'name',
@@ -86,6 +81,11 @@ var wpsOverView = {
       dataIndex : 'abstract',
       sortable : true,
       renderer : columnWrap
+    },{
+      text : "WPS identifier",
+      flex : 1,
+      dataIndex : 'id',
+      sortable : true
     }
 
     ],
@@ -93,6 +93,7 @@ var wpsOverView = {
     listeners : {
       itemclick : function(i, record) {
         this.itemClicked(i, record);
+        selectProcessor();
       },
       itemdblclick : function(i, record) {
         this.itemClicked(i, record);

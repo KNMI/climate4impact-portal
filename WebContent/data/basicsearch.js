@@ -90,6 +90,7 @@ var loadFacetList = function(facetType,collapse){
 		  	if(facetType!='experiment')    if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
 		  	if(facetType!='time_frequency')if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
 		  	if(facetType!='model')         if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
+		  	if(facetType!='domain')         if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(6)+"&";}
 	  	}
 	  }
 	  query+=getTimeFrame();
@@ -104,13 +105,20 @@ var startBasicSearch = function(){
 	  $('#searchinfo').html("Searching <img src=\"/impactportal/images/ajax-bar.gif\" alt=\"loading...\"/>");
 	  var query="";
 	  var input = $("form input:checkbox");
+	  var selectedVariables = "";
 	  for(var j=0;j<input.length;j++){
-		if(input[j].checked){
-			if(input[j].name.indexOf('project_')==0){query+="project="+input[j].name.substr(8)+"&";}
-			if(input[j].name.indexOf('variable_')==0){query+="variable="+input[j].name.substr(9)+"&";}
+  		if(input[j].checked){
+  			if(input[j].name.indexOf('project_')==0){query+="project="+input[j].name.substr(8)+"&";}
+  			if(input[j].name.indexOf('variable_')==0){
+  			  var v = input[j].name.substr(9);
+			    if(selectedVariables.length>0)selectedVariables+='|';
+  			  selectedVariables+=v;
+  			  query+="variable="+v+"&";
+			  }
 		  	if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
 		  	if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
 		  	if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
+		  	if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(6)+"&";}
 	  	}
 	  }
 	  query+=getTimeFrame();
@@ -134,7 +142,7 @@ var startBasicSearch = function(){
 			  if(!dataSize)dataSize="-";
 			  html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
 			  if(topics[j].catalogURL){
-				  html+='<td><a target=\"_blank\" href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'">browse</a></td>';
+				  html+='<td><a target=\"_blank\" href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'#'+selectedVariables+'">browse</a></td>';
 		 	  }else{
 		 		  html+="<td>-</td>";
 		 	  }

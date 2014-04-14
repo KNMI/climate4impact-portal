@@ -375,4 +375,8 @@ public class Tools {
     }
     return input;
   }
+
+  public static void rmdir(File file) {
+   rmdir(file.getAbsolutePath());
+  }
 }

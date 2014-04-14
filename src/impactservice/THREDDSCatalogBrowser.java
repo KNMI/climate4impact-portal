@@ -87,7 +87,7 @@ public class THREDDSCatalogBrowser {
     b.put("children",c);
     a.put(b);*/
     long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    addDatasets(rootCatalog,hostPath,supportedServices,a,catalogElement.get("catalog"),variableFilter,textFilter);
+    addDatasets(rootCatalog,hostPath,supportedServices,a,catalogElement.get("catalog"),variableFilter,textFilter,null);
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
     DebugConsole.println("Finished parsing THREDDS catalog to JSON in ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
     return a;
@@ -96,6 +96,8 @@ public class THREDDSCatalogBrowser {
   
   private static boolean checkNodeNameForFilter(String nodeName,String textFilter){
     if(textFilter!=null&&nodeName!=null){
+      textFilter = textFilter.toLowerCase();
+      nodeName = nodeName.toLowerCase();
       if(textFilter.length()>0){
         String [] filters = textFilter.split("\\||\\+| ");
         for(int f=0;f<filters.length;f++){
@@ -108,37 +110,43 @@ public class THREDDSCatalogBrowser {
     return true;
   }
 
-  private static boolean addDatasets(String rootCatalog,String hostPath,Vector<Service> supportedServices, JSONArray a, XMLElement xmlElement,String variableFilter,String textFilter) throws Exception {
+  private static boolean addDatasets(String rootCatalog,String hostPath,Vector<Service> supportedServices, JSONArray a, XMLElement xmlElement,String variableFilter,String textFilter,XMLElement parent) throws Exception {
  
     Vector<XMLElement> datasets = xmlElement.getList("dataset");
     for(int j=0;j<datasets.size();j++){
-
+      
       XMLElement dataset = datasets.get(j);
       JSONArray c = new JSONArray();
-      boolean succeeded = addDatasets(rootCatalog,hostPath,supportedServices,c,datasets.get(j),variableFilter,textFilter);
+      
+      boolean succeeded = addDatasets(rootCatalog,hostPath,supportedServices,c,dataset,variableFilter,textFilter,xmlElement);
       
       if(c.length()>0){
-        JSONObject b = new JSONObject();
+        //Make a folder
+        JSONObject folder = new JSONObject();
         String name = dataset.getAttrValue("name");
-        a.put(b);
-        b.put("text", name);
-        b.put("children",c);
-        b.put("expanded", true);
-        b.put("cls", "folder");
-        putVariableInfo(b,dataset);
-
-        if(succeeded==false)return false;
+        a.put(folder);
+        folder.put("text", name);
+        folder.put("children",c);
+        folder.put("expanded", true);
+        folder.put("cls", "folder");
+        folder.put("variables",putVariableInfo(dataset));
+        folder.put("variables2",putVariableInfo(xmlElement));
+       
+        if(succeeded==false){
+          DebugConsole.errprint("Did not succeed!");
+          return false;
+        }
       }else{
-      
+        //This node has no childs
         //if(dataset.getAttrValue("name").indexOf("tas")!=-1)
         {
           //Create a leaf by default
-          JSONObject b = new JSONObject();
+          JSONObject leaf = new JSONObject();
           if(checkMaxChilds(a))return false;
           
           
        
-          b.put("leaf", true);
+          leaf.put("leaf", true);
           
           //DebugConsole.println("Leaf "+dataset.getAttrValue("name"));
           
@@ -158,7 +166,7 @@ public class THREDDSCatalogBrowser {
           if(service!=null){
             for(int i=0;i<service.accesTypes.size();i++){
               try{
-                b.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
+                leaf.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
                 //DebugConsole.println("--serviceType:"+service.accesTypes.get(i).serviceType);
                 if(supportedServicesString.length()>0)supportedServicesString+=",";
                 supportedServicesString+=service.accesTypes.get(i).serviceType;
@@ -177,7 +185,7 @@ public class THREDDSCatalogBrowser {
               if(service!=null){
                 for(int i=0;i<service.accesTypes.size();i++){
                  
-                  b.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
+                  leaf.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
                   if(supportedServicesString.length()>0)supportedServicesString+=",";
                   supportedServicesString+=service.accesTypes.get(i).serviceType;
                   //DebugConsole.println("--accessServiceName:"+service.accesTypes.get(i).serviceType);
@@ -188,7 +196,7 @@ public class THREDDSCatalogBrowser {
           }catch(Exception e){}
           
           String nodeName =  dataset.getAttrValue("name");
-          b.put("text", nodeName);// - ("+supportedServicesString+")");
+          leaf.put("text", nodeName);// - ("+supportedServicesString+")");
           
           String dataSize = "-";
           try{
@@ -199,36 +207,55 @@ public class THREDDSCatalogBrowser {
             if(units.equals("Kbytes"))units="K";
             dataSize = dataset.get("dataSize").getValue()+""+units;
           }catch(Exception e){}
-          b.put("dataSize", dataSize);
+          leaf.put("dataSize", dataSize);
           
-          
-          putVariableInfo(b,dataset);
+         // if(parent!=null){
+           // putVariableInfo(b,parent);
+          //}else{
+          JSONArray variables = putVariableInfo(dataset);
+          if(variables.length() == 0){
+            variables = putVariableInfo(xmlElement);
+            
+          }
+          leaf.put("variables",variables);
+          //}
           
           boolean put = true;
           
           if(variableFilter!=null){
-            if(variableFilter.length()>0){
-              put=false;
-              JSONArray variableList=b.getJSONArray("variables");
-              for(int v=0;v<variableList.length();v++){
-                try{
-                  if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
-                    put=true;
-                    break;
+            try{
+              if(variableFilter.length()>0){
+                put=false;
+                JSONArray variableList=variables;
+              
+                for(int v=0;v<variableList.length();v++){
+                  try{
+                    if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
+                      put=true;
+                      break;
+                    }
+                  }catch(Exception e){
                   }
-                }catch(Exception e){
+                }
+                //if(variableList.length()==0)put=true;
+                if(variableList.length()==0){
+                  DebugConsole.println(leaf.getString("text")+" - "+c.length());
+                 // if(a!=null)put=true;
+                        
                 }
               }
-              //if(variableList.length()==0)put=true;
-              if(variableList.length()==0){
-                DebugConsole.println(b.getString("text")+" - "+c.length());      
-              }
+            }catch(Exception e){
+              DebugConsole.errprintln(e.getMessage());
+              put = true;
             }
           }
           
-          if(put){
+          if(put)
+          {
             put = checkNodeNameForFilter(nodeName,textFilter);
-            if(put)a.put(b);
+            if(put)a.put(leaf);
+            //b.put("put",put);
+           // a.put(b);
           }
           
         }
@@ -277,27 +304,30 @@ public class THREDDSCatalogBrowser {
     
   }
 
-  private static void putVariableInfo(JSONObject b, XMLElement dataset) throws JSONException {
+  private static JSONArray putVariableInfo(XMLElement dataset) throws JSONException {
     //Put variable info
     JSONArray variableInfos = new JSONArray(); 
-    try{
-      
-      Vector<XMLElement> variables = null;
+    if(dataset!=null){
       try{
-        variables = dataset.get("variables").getList("variable");
+        
+        Vector<XMLElement> variables = null;
+        try{
+          variables = dataset.get("variables").getList("variable");
+        }catch(Exception e){
+        }
+        for(int j1=0;j1<variables.size();j1++){
+          JSONObject varInfo = new JSONObject();
+          varInfo.put("name", variables.get(j1).getAttrValue("name"));
+          varInfo.put("vocabulary_name", variables.get(j1).getAttrValue("vocabulary_name"));
+          varInfo.put("long_name", variables.get(j1).getValue());
+          variableInfos.put(varInfo);
+        }
       }catch(Exception e){
+        //e.printStackTrace()
       }
-      for(int j1=0;j1<variables.size();j1++){
-        JSONObject varInfo = new JSONObject();
-        varInfo.put("name", variables.get(j1).getAttrValue("name"));
-        varInfo.put("vocabulary_name", variables.get(j1).getAttrValue("vocabulary_name"));
-        varInfo.put("long_name", variables.get(j1).getValue());
-        variableInfos.put(varInfo);
-      }
-    }catch(Exception e){
-      //e.printStackTrace()
     }
-    b.put("variables", variableInfos);
+    return variableInfos;
+    //b.put("variables", variableInfos);
     
   }
 

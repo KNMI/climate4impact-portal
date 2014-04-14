@@ -77,7 +77,7 @@
 		<tr><td>Description: </td><td><a target="_blank" href="<%= dataset+".dds"%>">Show opendap descriptor</a></td></tr>
 		</table>
 			<div id="datasetinfo"/>
-			<div id="container" ></div>
+			<div id="container" style="border:1px solid lightgray;"></div>
 			<!--
 				<table>
 					<tr>

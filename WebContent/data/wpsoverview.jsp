@@ -43,7 +43,7 @@
 		<jsp:include page="datamenu.jsp" />
 		<div class="impactcontent"> 
 		<div class="cmscontent"> 
-		<h1>Browse Web Processing Services</h1>
+		<h1>Processing overview</h1>
 		<%
 		if (user==null){
 			 %>

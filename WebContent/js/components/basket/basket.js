@@ -10,7 +10,9 @@ var Basket = function(){
 		    }else{
 				adjustNumberOfDataSetsDisplayedInMenuBar(json);
 		    }
-			t.populateBasketList(basketElement);
+			if(basketElement){
+			  t.populateBasketList(basketElement);
+			}
 		}
 	
 		$.ajax({
@@ -33,10 +35,12 @@ var Basket = function(){
 	};
     
     this.populateBasketList = function(jqelement){
+      if(!jqelement)return;
     	if(jqelement){
     		basketElement = jqelement;
+    		jqelement.html("Loading basket...");
     	}
-    	jqelement.html("Loading basket...");
+    	
    		var passFn = function(json){
    			jqelement.html(t.createBasketHTMLFromJSON(json));
    		}
@@ -53,6 +57,39 @@ var Basket = function(){
     	return t.createBasketHTMLFromJSON(json);
     };
     
+    
+  var makeHTMLFromJSONChilds = function(children,viewerurl,browserurl){
+    var html="";
+    for(var j=0;j<children.length;j++){
+      var view = "-"; //Either view or browse
+      var get = "-";
+      var subset = "-";
+      var remove = "";
+      var child = children[j];
+      if(child.type=='file'){
+        if(child.httpurl){
+          get="<a target='_blank' href=\""+child.httpurl+"\">get</a>";
+        }
+        if(child.dapurl){
+          view="<a href='"+viewerurl+"dataset="+URLEncode(child.dapurl)+"'>view</a>";
+          subset="subset";
+        }
+      }else{
+        if(!child.children){
+          view="<a href='"+browserurl+"catalog="+URLEncode(child.catalogurl)+"'>browse</a>";
+        }
+      }
+      remove="<a href=\"#\" onclick='basket.removeId(\""+child.id+"\");return false;'>X</a>";
+      html+="<tr>";
+      html+="<td>"+child.date+"</td><td>"+child.text+"</td><td>"+view+"</td><td>"+get+"</td><td>"+subset+"</td><td>"+remove+"</td>";
+      html+="</tr>";
+      if(child.children){
+        html+=makeHTMLFromJSONChilds(child.children,viewerurl,browserurl);
+      }
+      
+    }
+    return html;
+  }
 	this.createBasketHTMLFromJSON = function(json){
 		if(json.error){
 			return "An error occured while retrieving the basket: "+json.error;
@@ -67,29 +104,7 @@ var Basket = function(){
 		html+="<td style=\"background-color:#DDD;\"><b>Subset</b></td>";
 	  	html+="<td style=\"background-color:#DDD;\"><b>X</b></td>";
 	  	html+="</tr>";
-		for(var j=0;j<json.children.length;j++){
-			var view = "-"; //Either view or browse
-			var get = "-";
-			var subset = "-";
-			var remove = "";
-			var child = json.children[j];
-			if(child.type=='file'){
-				if(child.httpurl){
-					get="<a target='_blank' href=\""+child.httpurl+"\">get</a>";
-				}
-				if(child.dapurl){
-					view="<a href='"+viewerurl+"dataset="+URLEncode(child.dapurl)+"'>view</a>";
-					subset="subset";
-				}
-			}else{
-				view="<a href='"+browserurl+"catalog="+URLEncode(child.catalogurl)+"'>browse</a>";
-			}
-			remove="<a href=\"#\" onclick='basket.removeId(\""+child.id+"\");return false;'>X</a>";
-			html+="<tr>";
-			html+="<td>"+child.date+"</td><td>"+child.text+"</td><td>"+view+"</td><td>"+get+"</td><td>"+subset+"</td><td>"+remove+"</td>";
-			html+="</tr>";
-			
-		}
+	  html += makeHTMLFromJSONChilds(json.children,viewerurl,browserurl);
 		html+='</table>'
 		return html;
 	};

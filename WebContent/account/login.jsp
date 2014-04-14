@@ -73,9 +73,7 @@
 							Create an ESGF account.</a><br /></li>
 					<li><a href="/impactportal/account/logout.jsp">Sign out</a><br /></li>
 				</ul>
-			</div>
-		</div>
-	</div>
+	
 
 	<%
 					//Print warning when retrieving SLCS has failed.
@@ -84,6 +82,11 @@
 						} catch (Exception e) {
 							impactservice.MessagePrinters.printWarningMessage(out, e);
 						}
+		%>
+				</div>
+		</div>
+	</div>
+	<%
 
 					}
 				%>
