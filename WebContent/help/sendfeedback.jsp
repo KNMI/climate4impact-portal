@@ -25,7 +25,12 @@
 			String comments = request.getParameter("comments");
 			boolean validInput = true;
 			if(email.length()<3||comments.length()==0){
-				validInput=false;
+				validInput = false;
+			}
+			if(validInput){
+				if(!tools.SendMail.isValidEmailAddress(email)){
+					validInput = false;
+				}
 			}
 			if(validInput){
 				out.println("<h1>Thanks for your feedback!</h1><div class=\"textstandardleft\">Your feedback has been sent to one of our experts. Your comments were:");

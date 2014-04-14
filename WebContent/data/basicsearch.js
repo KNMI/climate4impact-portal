@@ -14,7 +14,7 @@
  	
  	$.ajax({
  		type: "POST",
- 		url: '<%=impactservice.Configuration.getImpactServiceLocation()%>service=basket&mode=add',
+ 		url: '/impactportal/ImpactService?service=basket&mode=add',
  		data: options,
  		success:doneFunction,
  		dataType: 'json'

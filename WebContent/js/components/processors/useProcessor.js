@@ -440,7 +440,8 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
     frame : true,
     width : 'auto',
     margin:4,
-    
+    autoScroll:false,
+    height:'auto',
     border : false,
     collapsible : true,
     collapsed : false,// ,id:id,
@@ -448,11 +449,12 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
     store : store,
     columns : [{
       header : 'value',
-      flex : 1,
+      width:720,
       dataIndex : 'value',
       editor : {
         allowBlank : false
-      }
+      },
+      autoScroll:false
     },{
       xtype : 'checkcolumn',
       header : 'use',
@@ -484,7 +486,7 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
       }]
     },{
       xtype : 'actioncolumn',
-      header : 'drop',
+      //header : 'drop',
       width : 34,
       dataIndex : 'remove',
       items : [{

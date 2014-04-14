@@ -6,8 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <jsp:include page="../includes-ui.jsp" />
-<link rel="stylesheet" href="/impactportal/account/login.css"
-	type="text/css" />
+<link rel="stylesheet" href="/impactportal/account/login.css" type="text/css" />
 <script type="text/javascript" src="/impactportal/account/login.js"></script>
 </head>
 <body>

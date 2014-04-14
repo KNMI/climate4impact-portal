@@ -517,13 +517,14 @@ public class ImpactService extends HttpServlet {
       //String dodsRequest=requestStr;
       //dodsRequest=dodsRequest.replaceFirst("https", "dods");
       //dodsRequest=dodsRequest.replaceFirst("http", "dods");
+      ImpactUser user = null;
       try{
         //Strip the # token.
         requestStr = requestStr.split("#")[0];
         DebugConsole.println("dodsRequest="+requestStr);
 
         String ncdumpMessage = "";
-        ImpactUser user = null;
+     
         try{
           user=LoginManager.getUser(request,response);
           
@@ -555,42 +556,42 @@ public class ImpactService extends HttpServlet {
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(UnknownHostException e){
-              msg="The host is unknown: '"+e.getMessage()+"'<br/>";
+              msg="The host is unknown: '"+e.getMessage()+"'\n";
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(ConnectTimeoutException e) {
-              msg="The connection timed out: '"+e.getMessage()+"'<br/>";
+              msg="The connection timed out: '"+e.getMessage()+"'\n";
               DebugConsole.errprintln(msg);
               throw new Exception(msg);
             }catch(WebRequestBadStatusException e){
               
               if(e.getStatusCode()==400){
-                msg+="HTTP status code "+e.getStatusCode()+": Bad request<br/>";
+                msg+="HTTP status code "+e.getStatusCode()+": Bad request\n";
                 if(user == null){
-                  msg+="<br/>Warning: You are not logged in.<br/>";
+                  msg+="\nWarning: You are not logged in.\n";
                 }
               }else if(e.getStatusCode()==401){
-                msg+="HTTP status code "+e.getStatusCode()+": Unauthorized<br/>";
+                msg+="HTTP status code "+e.getStatusCode()+": Unauthorized\n";
                 if(user == null){
-                  msg+="<br/>Warning: You are not logged in.<br/>";
+                  msg+="\nWarning: You are not logged in.\n";
                 }
               }else if(e.getStatusCode()==403){
-                msg+="HTTP status code "+e.getStatusCode()+": Forbidden<br/>";
+                msg+="HTTP status code "+e.getStatusCode()+": Forbidden\n";
                 if(user != null){
-                  msg+="<br/>You are not authorized to view this resource, you are logged in as "+user.id+"<br/>";
+                  msg+="\nYou are not authorized to view this resource, you are logged in as "+user.id+"\n";
                 }
               }else if(e.getStatusCode()==404){
-                msg+="HTTP status code "+e.getStatusCode()+": File not found<br/>";
+                msg+="HTTP status code "+e.getStatusCode()+": File not found\n";
                 if(user != null){
-                  msg+="<br/>You are logged in as "+user.id+"<br/>";
+                  msg+="\nYou are logged in as "+user.id+"\n";
                 }
               }else{
-                msg="WebRequestBadStatusException: "+e.getStatusCode()+"<br/>";
+                msg="WebRequestBadStatusException: "+e.getStatusCode()+"\n";
               }
               
               
               /*else{
-                msg+="<br/>You are logged in as "+user.id+"<br/>";
+                msg+="\nYou are logged in as "+user.id+"\n";
               }*/
               /*String html = e.getResult();
               
@@ -759,13 +760,20 @@ public class ImpactService extends HttpServlet {
 
       */
       }catch(Exception e){
-        String msg="Unable to get file "+requestStr+". <br/><br/>\n"+e.getMessage();
-        MessagePrinters.emailFatalErrorMessage("File access: "+e.getMessage(),msg);
+        String msg="Unable to get file "+requestStr+".\n\n"+e.getMessage();
+        
+        String userId = "No user.";
+        if(user!=null){
+          userId = user.id;
+        }
+        MessagePrinters.emailFatalErrorMessage("File access: "+e.getMessage(),msg+"\nUser: '"+userId+"'");
         //DebugConsole.errprintln(msg);
         JSONArray errorVar = new JSONArray ();
         try {
           JSONObject error = new JSONObject();
           msg = msg.replaceAll("esg-orp", "impactportal/esg-orp");
+          msg = msg.replaceAll("\n", "<br/>");
+          
           error.put("error",msg);
           errorVar.put(error);
         } catch (JSONException e1) {}

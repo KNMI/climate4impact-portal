@@ -39,3 +39,12 @@ div#users-contain table td,div#users-contain table th {
 	padding:0px;
 	margin:0px;
 }
+
+#loginDialog{
+	
+	overflow:hidden;
+	width: 900px;
+	height:100%;
+	margin:0px;
+	padding:0px;
+}
