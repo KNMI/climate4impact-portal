@@ -197,7 +197,7 @@ var openDialog = function(datacentre) {
   $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
   if(OpenIDProviders[datacentre].createaccount){
 	  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
-	  		"- <a target=\"_blank\" href=\"http://localhost:8080/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
+	  		"- <a target=\"_blank\" href=\"/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
   }
 }
 

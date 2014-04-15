@@ -150,7 +150,7 @@
 
 		  			<td><input type="checkbox" name="variable_tasmin"/><abbr title="tasmin - Daily Minimum Near-Surface Air Temperature">Min temperature</abbr></td>
 		  			<td><input type="checkbox" name="variable_prc"/><abbr title="prc - Convective Precipitation">Conv. precipitation</abbr></td>
-		  			<td><input type="checkbox" name="variable_sfcWindmax"/><abbr title="Daily Maximum Near-Surface Wind Speed">Max windspeed</abbr></td>
+		  			<td><input type="checkbox" name="variable_sfcWindmax"/><abbr title="sfcWindmax - Daily Maximum Near-Surface Wind Speed">Max windspeed</abbr></td>
 		  			<td><input type="checkbox" name="variable_rsus"/><abbr title="rsus - Surface Upwelling Shortwave Radiation">Shortwave radiation up</abbr></td>
 		  			<td><input type="checkbox" name="variable_hurs"/><abbr title="hurs - Near-Surface Relative Humidity">Surface relative humidity</abbr></td>
 		  			

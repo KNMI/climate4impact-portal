@@ -44,5 +44,6 @@
 
 <br />
 <br />
-<br /> You can compose your OpenID based on user name and data node:<br />
+<br /> You can compose your OpenID based on user name and corresponding index node:<br />
 <div id="datanodebuttons"></div>
+* You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a>
