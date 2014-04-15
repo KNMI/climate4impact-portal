@@ -23,9 +23,14 @@
 			String name =request.getParameter("name");
 			String email =request.getParameter("email");
 			String comments = request.getParameter("comments");
-			boolean validInput = true;
-			if(email.length()<3||comments.length()==0){
-				validInput = false;
+			boolean validInput = false;
+			if(name!=null&&email!=null&&comments!=null){
+				validInput = true;
+			}
+			if(validInput){
+				if(email.length()<3||comments.length()==0){
+					validInput = false;
+				}
 			}
 			if(validInput){
 				if(!tools.SendMail.isValidEmailAddress(email)){

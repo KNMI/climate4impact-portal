@@ -140,57 +140,57 @@
 		  			<table class="collapsibletable" width="100%">
 		  			<tr>
 		  			
-		  			<td><input type="checkbox" name="variable_tas"/>Temperature</td>
-		  			<td><input type="checkbox" name="variable_pr"/>Precipitation</td>
-		  			<td><input type="checkbox" name="variable_sfcWind"/>Windspeed</td>
-		  			<td><input type="checkbox" name="variable_rsds"/>Shortwave radiation down</td>
-		  			<td><input type="checkbox" name="variable_huss"/>Surface specific humidity</td>
+		  			<td><input type="checkbox" name="variable_tas"/><abbr title="tas - Near-Surface Air Temperature">Temperature</abbr></td>
+		  			<td><input type="checkbox" name="variable_pr"/><abbr title="pr - Total Precipitation">Precipitation</abbr></td>
+		  			<td><input type="checkbox" name="variable_sfcWind"/><abbr title="sfcWind - Near-Surface Wind Speed">Windspeed</abbr></td>
+		  			<td><input type="checkbox" name="variable_rsds"/><abbr title="rsds - Surface Downwelling Shortwave Radiation">Shortwave radiation down</abbr></td>
+		  			<td><input type="checkbox" name="variable_huss"/><abbr title="huss - Near-Surface Specific Humidity">Surface specific humidity</abbr></td>
 
 		  			</tr><tr>
 
-		  			<td><input type="checkbox" name="variable_tasmin"/>Min temperature</td>
-		  			<td><input type="checkbox" name="variable_prc"/>Conv. precipitation</td>
-		  			<td><input type="checkbox" name="variable_sfcWindmax"/>Max windspeed</td>
-		  			<td><input type="checkbox" name="variable_rsus"/>Shortwave radiation up</td>
-		  			<td><input type="checkbox" name="variable_hurs"/>Surface relative humidity</td>
+		  			<td><input type="checkbox" name="variable_tasmin"/><abbr title="tasmin - Daily Minimum Near-Surface Air Temperature">Min temperature</abbr></td>
+		  			<td><input type="checkbox" name="variable_prc"/><abbr title="prc - Convective Precipitation">Conv. precipitation</abbr></td>
+		  			<td><input type="checkbox" name="variable_sfcWindmax"/><abbr title="Daily Maximum Near-Surface Wind Speed">Max windspeed</abbr></td>
+		  			<td><input type="checkbox" name="variable_rsus"/><abbr title="rsus - Surface Upwelling Shortwave Radiation">Shortwave radiation up</abbr></td>
+		  			<td><input type="checkbox" name="variable_hurs"/><abbr title="hurs - Near-Surface Relative Humidity">Surface relative humidity</abbr></td>
 		  			
 		  			</tr><tr>
 
-		  			<td><input type="checkbox" name="variable_tasmax"/>Max temperature</td>
-		  			<td><input type="checkbox" name="variable_prsn"/>Snow</td>
-		  			<td><input type="checkbox" name="variable_uas"/>Eastward wind</td>
-		  			<td><input type="checkbox" name="variable_rlds"/>Longwave radiation down</td>
-		  			<td><input type="checkbox" name="variable_hus"/>Specific humidity</td>
+		  			<td><input type="checkbox" name="variable_tasmax"/><abbr title="tasmax - Daily Maximum Near-Surface Air Temperature">Max temperature</abbr></td>
+		  			<td><input type="checkbox" name="variable_prsn"/><abbr title="prsn - Snowfall flux">Snow</abbr></td>
+		  			<td><input type="checkbox" name="variable_uas"/><abbr title="uas - Eastward Near-Surface Wind">Eastward wind</abbr></td>
+		  			<td><input type="checkbox" name="variable_rlds"/><abbr title="rlds - Surface Downwelling Longwave Radiation">Longwave radiation down</abbr></td>
+		  			<td><input type="checkbox" name="variable_hus"/><abbr title="hus - Specific Humidity">Specific humidity</abbr></td>
 		  			
 		  			</tr><tr>
 
 		  			<td>&nbsp;</td>
 		  			<td>&nbsp;</td>
-		  			<td><input type="checkbox" name="variable_vas"/>Northward wind</td>
-		  			<td><input type="checkbox" name="variable_rlus"/>Longwave radiation up</td>
-		  			<td><input type="checkbox" name="variable_hur"/>Relative humidity</td>
+		  			<td><input type="checkbox" name="variable_vas"/><abbr title="vas - Northward Near-Surface Wind Speed">Northward wind</abbr></td>
+		  			<td><input type="checkbox" name="variable_rlus"/><abbr title="rlus - Surface Upwelling Longwave Radiation">Longwave radiation up</abbr></td>
+		  			<td><input type="checkbox" name="variable_hur"/><abbr title="hur - Relative Humidity">Relative humidity</abbr></td>
 		  			
 		  			</tr><tr>
 		  			<td>&nbsp;</td>
 		  			<td>&nbsp;</td>
 		  			<td>&nbsp;</td>
-		  			<td><input type="checkbox" name="variable_rsdsdiff"/>Diffuse radiation</td>
-		  			<td><input type="checkbox" name="variable_rhs"/>Surface relative humidity</td>
+		  			<td><input type="checkbox" name="variable_rsdsdiff"/><abbr title="rsdsdiff - Surface Diffuse Downwelling Shortwave Radiation">Diffuse radiation</abbr></td>
+		  			<td><input type="checkbox" name="variable_rhs"/><abbr title="rhs - Daily Near-Surface Specific Humidity">Surface relative humidity</abbr></td>
 		  			
 		  			</tr><tr>
-		  			<td><input type="checkbox" name="variable_evspsbl"/>Evaporation</td>
-		  			<td><input type="checkbox" name="variable_psl"/>Surface pressure</td>
+		  			<td><input type="checkbox" name="variable_evspsbl"/><abbr title="evspsbl - Actual Evaporation">Evaporation</abbr></td>
+		  			<td><input type="checkbox" name="variable_psl"/><abbr title="psl - Sea-Level Air Pressure">Surface pressure</abbr></td>
 		  			<td>&nbsp;</td>
-		  			<td><input type="checkbox" name="variable_clt"/>Total cloud cover</td>
-		  			<td><input type="checkbox" name="variable_rhsmax"/>Max relative humidity</td>
+		  			<td><input type="checkbox" name="variable_clt"/><abbr title="clt - Total Cloud Fraction">Total cloud cover</abbr></td>
+		  			<td><input type="checkbox" name="variable_rhsmax"/><abbr title="rhsmax - Daily Maximum Near-Surface Relative Humidity">Max relative humidity</abbr></td>
 		  			
 		  			</tr>
 		  			<tr>
-		  			<td><input type="checkbox" name="variable_evspsblpot"/>Potential evaporation</td>
-		  			<td><input type="checkbox" name="variable_ps"/>Pressure</td>
+		  			<td><input type="checkbox" name="variable_evspsblpot"/><abbr title="evspsblpot - Potential Evaporation">Potential evaporation</abbr></td>
+		  			<td><input type="checkbox" name="variable_ps"/><abbr title="ps - Surface Air Pressure">Pressure</abbr></td>
 		  			<td>&nbsp;</td>
 		  			<td>&nbsp;</td>
-		  			<td><input type="checkbox" name="variable_rhsmin"/>Minimum relative humidity</td>
+		  			<td><input type="checkbox" name="variable_rhsmin"/><abbr title="rhsmin - Daily Minimium Near-Surface Relative Humidity">Minimum relative humidity</abbr></td>
 		  			</tr>
 		  			</table>
 	  			</form>
@@ -209,9 +209,9 @@
 	        </td><td  style="padding:0px;">
 			<form>
   			<table class="collapsibletable" width="100%"><tr>
-			<td><input type="checkbox" name="time_frequency_3hr"/>3 hourly</td>
-  			<td><input type="checkbox" name="time_frequency_day"/>daily</td>
-  			<td><input type="checkbox" name="time_frequency_mon"/>monthly</td>
+			<td><input type="checkbox" name="time_frequency_3hr"/><abbr title="3 hourly sampling frequency">3 hourly</abbr></td>
+  			<td><input type="checkbox" name="time_frequency_day"/><abbr title="Daily sampling frequency">daily</abbr></td>
+  			<td><input type="checkbox" name="time_frequency_mon"/><abbr title="Monthly sampling frequency">monthly</abbr></td>
   			</tr></table>
   			</form>
 	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
@@ -273,11 +273,13 @@
 	        </td><td  style="padding:0px;">
 			<form>
   			<table class="collapsibletable" width="100%"><tr>
-  			<td><input type="checkbox" name="experiment_historical"/>Historical</td>
-  			<td><input type="checkbox" name="experiment_rcp26"/>RCP26</td>
-  			<td><input type="checkbox" name="experiment_rcp45"/>RCP45</td>
-  			<td><input type="checkbox" name="experiment_rcp85"/>RCP85</td> 
-  			<td><input type="checkbox" name="experiment_evaluation"/>Evaluation</td>
+  			<td><input type="checkbox" name="experiment_historical"/><abbr title="Historical">Historical</abbr></td>
+  			<td><input type="checkbox" name="experiment_rcp26"/><abbr title="Representative concentration pathway with radiative forcing of 2.6 W m-2">RCP26</abbr></td>
+  			<td><input type="checkbox" name="experiment_rcp45"/><abbr title="Representative concentration pathway with radiative forcing of 4.5 W m-2">RCP45</abbr></td>
+  			<td><input type="checkbox" name="experiment_rcp60"/><abbr title="Representative concentration pathway with radiative forcing of 6.0 W m-2">RCP60</abbr></td>
+  			<td><input type="checkbox" name="experiment_rcp85"/><abbr title="Representative concentration pathway with radiative forcing of 8.5 W m-2">RCP85</abbr></td> 
+  			<td><input type="checkbox" name="experiment_evaluation"/><abbr title="Evaluation">Evaluation</abbr></td>
+  			<td><input type="checkbox" name="experiment_1pctCO2"/><abbr title="1pctCO2">1pctCO2</abbr></td>
   			
   			</tr></table>
   			</form>
@@ -286,10 +288,10 @@
 	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
 	        
 	        <form>
-  			<table class="collapsibletable" width="100%"><tr>
-	        <td><input type="checkbox" name="experiment_rcp60"/>RCP60</td>
-  			<td><input type="checkbox" name="experiment_1pctCO2"/>1pctCO2</td>
-  			</tr></table>
+	        
+  			
+  			<ul><li><a target="_blank" href="http://cmip-pcmdi.llnl.gov/cmip5/docs/Taylor_CMIP5_dec31.pdf">A Summary of the CMIP5 Experiment Design (PDF)</a></li></ul>
+  			
   			</form>
   			
 	        <table class="tablenoborder"><tr><td><div id="refreshexperiments"></div></td><td ><div id="refreshexperimentinfo">Click to load list from server</div></td></tr></table>
