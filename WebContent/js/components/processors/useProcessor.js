@@ -104,9 +104,9 @@ var showStatusReport = function(json) {
                         // alert(id);
                         // return;
                         if (v) {
-                          console.log("getting id");
+                          //console.log("getting id");
                           var id = json.postData.Execute.Identifier.value;
-                          console.log("id==" + id);
+                          //console.log("id==" + id);
                           var url = impactWPSURL
                               + 'service=processor&request=describeProcessor&id='
                               + id;

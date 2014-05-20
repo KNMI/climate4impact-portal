@@ -1,5 +1,5 @@
-var facetsNames=['activity','product','institute','model','experiment','frequency','realm','MIP_table','ensemble','variable','search_id','id','url','instance_id','dataSize'];
-var categoryNames=['institute','model','experiment','frequency','realm','variable','project'];
+var facetsNames=['activity','product','institute','model','experiment','frequency','realm','MIP_table','ensemble','variable','search_id','id','url','instance_id','dataSize','domain'];
+var categoryNames=['institute','model','experiment','frequency','realm','variable','project','domain'];
 
 var searchServiceURL='searchServiceURL not set';//'http://localhost:8081/ImpactPortal/ImpactService?';
 var drupalServiceURL='drupalServiceURL not set';
@@ -146,6 +146,7 @@ var browseSearchSelection = function(){
   }
   var url=selection[0].get('url');
   if(url){ 
+	  url = url.split("#")[0];
 	  window.location.href=catalogBrowserURL+"catalog="+url;
   }
 };

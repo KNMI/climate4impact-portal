@@ -57,6 +57,8 @@ public class THREDDSCatalogBrowser {
     try {
       catalogElement.parse(new URL(rootCatalog));
     } catch (Exception e1) {
+   
+      MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
       DebugConsole.errprintln("Unable to load catalog: "+e1.getMessage());
       throw e1;
     }

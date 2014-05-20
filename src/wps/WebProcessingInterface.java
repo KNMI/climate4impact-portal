@@ -557,7 +557,7 @@ public class WebProcessingInterface {
   public static String generateReportFromStatusLocation(String statusLocation){
     DebugConsole.println("Get HTML from statusLocation "+statusLocation);
     String html = "";
-    html+="<link rel=\"stylesheet\" href=\"/impactportal/wps.css\" type=\"text/css\" />";
+    html+="<link rel=\"stylesheet\" href=\"/impactportal/styles.css\" type=\"text/css\" />";
 
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();

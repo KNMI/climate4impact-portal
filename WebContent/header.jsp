@@ -16,12 +16,13 @@
 %>
  
   <div class="eimpactheader" style="z-index:2;"> 
-    <div class="logo"><a href="https://is.enes.org/"><img class="headerlogo" src="<%=Home%>images/is-enes2-logo.png" alt="IS-ENES2 Logo"/></a></div>
+    <div class="logo"><a href="/impactportal/"><img class="headerlogo" src="<%=Home%>images/IS-ENES2_logo_small.png" alt="IS-ENES2 Logo"/></a></div>
     <div style="float: right; margin-top: 0.5em;">
       <a target="_blank" href="https://is.enes.org/">IS-ENES</a> | <a href="<%=Home%>help/contactexpert.jsp">Contact</a> | <a href="<%=Home%>account/login.jsp"><%=loginStr%></a>
     </div>
-    <h1 style="padding-top:26px;"><a href="<%=Home%>index.jsp">
-    <span >ENES Portal Interface for <br/>the Climate Impact Communities</span>
+    <h1 style="padding-top:36px;"><a href="<%=Home%>index.jsp">
+    <!-- <span >ENES Portal Interface for <br/>the Climate Impact Communities</span> -->
+    <i><span>Exploring climate model data</span></i> 
     </a></h1>
   </div>
   <div class="impactheader"><span></span> </div>

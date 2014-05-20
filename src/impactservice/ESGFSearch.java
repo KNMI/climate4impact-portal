@@ -50,6 +50,9 @@ import tools.MyXMLParser.XMLElement;
  *
  */
 public class ESGFSearch {
+  String[] facets = {"project","variable","time_frequency","institute","experiment","model","realm","domain"};
+
+  
   /**
    * Loads a string from the filesystem identified with an id
    * @param identifier
@@ -85,8 +88,10 @@ public class ESGFSearch {
     try {
       
       if(mustbeYoungerThanNSeconds!=0){
-        Path path = new File(diskCacheLocation).toPath();
-        BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+        Path fileCacheId = new File(diskCacheLocation+uniqueId).toPath();
+        
+        
+        BasicFileAttributes attributes = Files.readAttributes(fileCacheId, BasicFileAttributes.class);
         FileTime creationTime = attributes.creationTime();
         long createdHowManySecondsAgo = ( Calendar.getInstance().getTimeInMillis()-creationTime.toMillis())/1000;
         //DebugConsole.println("Created:"+createdHowManySecondsAgo);
@@ -95,6 +100,8 @@ public class ESGFSearch {
           DebugConsole.println("Ignoring "+uniqueId+"Because too old.");
           tools.Tools.rm(diskCacheLocation+"/"+uniqueId);
           return null;
+        }else{
+          DebugConsole.println(fileCacheId.toString()+"("+createdHowManySecondsAgo+"<"+mustbeYoungerThanNSeconds+")");
         }
       }
       return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId);
@@ -210,21 +217,24 @@ public class ESGFSearch {
    * @param includeQueryResults The JSONObject will contain the search results
    * @param dataSetType 0 = Dataset, 1 = File,  3 = aggregation
    * @return A JSON object with the results stored in "facets" and "topics"
+   * @throws Exception 
    */
-  static public JSONObject doCachedESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType){
+  static public JSONObject doCachedESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType) throws Exception{
     String uniqueId="ESGSearch_"+query+"_"+pageNumber+"_"+pageLimit+"_"+includeFacets+"_"+includeLongNameFacets+"_"+includeQueryResults+"_"+datasetType;
     DebugConsole.println("*** uniqueId "+uniqueId);
     
     
-    String data = getDiskCachedString(uniqueId,3600);//null;//getPersistentCachedString(uniqueId);
+    String data = getDiskCachedString(uniqueId,60);//null;//getPersistentCachedString(uniqueId);
     if(data ==null){
-      JSONObject d = doESGFSearchQuery(query,pageNumber,pageLimit,includeFacets,includeLongNameFacets,includeQueryResults,datasetType);
+      JSONObject d = null;
+      
+      d = doESGFSearchQuery(query,pageNumber,pageLimit,includeFacets,includeLongNameFacets,includeQueryResults,datasetType);
+      
       if(d==null){
         DebugConsole.errprintln("Unable to search  for identifier "+uniqueId);
         return null;
       }
        data=d.toString();
-      //storePersistentCachedString(data,uniqueId);
        storeDiskCachedString(data,uniqueId);
       return d;
     }
@@ -243,9 +253,9 @@ public class ESGFSearch {
   
 
 
-  static private JSONObject doESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType){
+  static private JSONObject doESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType) throws Exception{
     DebugConsole.println("Starting Search");
-    DebugConsole.println(query);
+    DebugConsole.println("Query: "+query);
     
     String[] queryParts=query.split("\\?");
 
@@ -253,64 +263,65 @@ public class ESGFSearch {
     if(queryParts.length==2)queryString=queryParts[1];else queryString = queryParts[0];
 
    
+    DebugConsole.println("queryString: "+queryString);
     
     JSONObject result = new JSONObject();
   
     JSONObject facets = new JSONObject();
-    try {
-      result.put("facets", facets);
+    //try {
+    result.put("facets", facets);
 
-      MyRunnableWaiter t = new MyRunnableWaiter();
-      t.setMaxThreads(10);
-      if(includeFacets){
-        t.add(new ASyncFacetFinder("project",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("variable",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("time_frequency",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("institute",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("experiment",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("model",queryString+"&type="+datasetType+"&"));
-        t.add(new ASyncFacetFinder("realm",queryString+"&type="+datasetType+"&"));
-      }
-      if(includeQueryResults){
-        String s=queryString+"&limit="+pageLimit+"&offset="+((pageNumber-1)*pageLimit)+"&";
-        s+="type="+datasetType+"&";
-        DebugConsole.println("Mainquery:"+s);
-        t.add(new ASyncSearch(s));
-      }
-     
-      DebugConsole.println("Waiting");
-      int returnCode = t.waitForCompletion();
-      if(returnCode != 0){
-        return null;
-      }
-      
-      if(includeFacets){
-        facets.put("project",((ASyncFacetFinder)t.get(0)).data);
-        facets.put("variable",((ASyncFacetFinder)t.get(1)).data);
-        facets.put("time_frequency",((ASyncFacetFinder)t.get(2)).data);
-        facets.put("institute",((ASyncFacetFinder)t.get(3)).data);
-        facets.put("experiment",((ASyncFacetFinder)t.get(4)).data);
-        facets.put("model",((ASyncFacetFinder)t.get(5)).data);
-        facets.put("realm",((ASyncFacetFinder)t.get(6)).data);
-      }
-      
-      if(includeQueryResults){
-        int offset = 0;
-        if(includeFacets)offset=7;
-        result.put("topics", ((ASyncSearch)t.get(offset)).data);
-        result.put("query", ((ASyncSearch)t.get(offset)).ESGFQuery);
-        result.put("totalCount", ((ASyncSearch)t.get(offset)).totalCount);
-        result.put("currentPage",pageNumber);
-        result.put("numPages", (((ASyncSearch)t.get(offset)).totalCount/pageLimit));
-      }
-      
-      
-    } catch (JSONException e) {
-      e.printStackTrace();
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    MyRunnableWaiter t = new MyRunnableWaiter();
+    t.setMaxThreads(10);
+    if(includeFacets){
+      t.add(new ASyncFacetFinder("project",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("variable",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("time_frequency",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("institute",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("experiment",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("model",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("realm",queryString+"&type="+datasetType+"&"));
+      t.add(new ASyncFacetFinder("domain",queryString+"&type="+datasetType+"&"));
     }
+    if(includeQueryResults){
+      String s=queryString+"&limit="+pageLimit+"&offset="+((pageNumber-1)*pageLimit)+"&";
+      s+="type="+datasetType+"&";
+      
+      DebugConsole.println("Mainquery:"+s);
+      t.add(new ASyncSearch(s));
+    }
+   
+    DebugConsole.println("Waiting");
+    int returnCode = t.waitForCompletion();
+    if(returnCode != 0){
+      DebugConsole.println("Error");
+      throw new Exception(t.getErrorMessage());
+    }
+    
+    DebugConsole.println("Finished");
+    
+    if(includeFacets){
+      facets.put("project",((ASyncFacetFinder)t.get(0)).data);
+      facets.put("variable",((ASyncFacetFinder)t.get(1)).data);
+      facets.put("time_frequency",((ASyncFacetFinder)t.get(2)).data);
+      facets.put("institute",((ASyncFacetFinder)t.get(3)).data);
+      facets.put("experiment",((ASyncFacetFinder)t.get(4)).data);
+      facets.put("model",((ASyncFacetFinder)t.get(5)).data);
+      facets.put("realm",((ASyncFacetFinder)t.get(6)).data);
+      facets.put("domain",((ASyncFacetFinder)t.get(7)).data);
+    }
+    
+    if(includeQueryResults){
+      int offset = 0;
+      if(includeFacets)offset=8;
+      result.put("topics", ((ASyncSearch)t.get(offset)).data);
+      result.put("query", ((ASyncSearch)t.get(offset)).ESGFQuery);
+      result.put("totalCount", ((ASyncSearch)t.get(offset)).totalCount);
+      result.put("currentPage",pageNumber);
+      result.put("numPages", (((ASyncSearch)t.get(offset)).totalCount/pageLimit));
+    }
+    
+      
     
     return result;
   }
@@ -318,6 +329,7 @@ public class ESGFSearch {
   
   private static JSONArray addFacet(String facetToDo, String queryString) throws MalformedURLException, Exception {
     String ESGFQueryString="";
+    DebugConsole.println("addFacet "+facetToDo+"["+queryString+"]");
     
     List<String> project = HTTPTools.getKVPList(queryString, "project");
     List<String> variable = HTTPTools.getKVPList(queryString, "variable");
@@ -326,11 +338,12 @@ public class ESGFSearch {
     List<String> experiment = HTTPTools.getKVPList(queryString, "experiment");
     List<String> model = HTTPTools.getKVPList(queryString, "model");
     List<String> realm = HTTPTools.getKVPList(queryString, "realm");
+    List<String> domain = HTTPTools.getKVPList(queryString, "domain");
     
    
     
     
-    
+   
     
     
     
@@ -361,6 +374,13 @@ public class ESGFSearch {
     if(!facetToDo.equals("realm")){
       for(int j=0;j<realm.size();j++){ESGFQueryString+="realm="+realm.get(j)+"&";} 
     }
+    if(!facetToDo.equals("domain")){
+      for(int j=0;j<domain.size();j++){ESGFQueryString+="domain="+domain.get(j)+"&";} 
+    }
+    
+    DebugConsole.println("addFacet "+ESGFQueryString);
+    
+    
     /*
     DebugConsole.println("From / To ="+startDate+"/"+stopDate);
     
@@ -481,6 +501,7 @@ public class ESGFSearch {
   private static class ASyncFacetFinder extends ASyncRunner{
     String facetToDo, queryString;
     boolean failed = false;
+    String errorMessage = "";
     public ASyncFacetFinder(String facetToDo, String queryString) {
         super();
         this.facetToDo=facetToDo;
@@ -493,6 +514,7 @@ public class ESGFSearch {
   
     public void fail(String message) {
       failed=true;
+      errorMessage = message;
       DebugConsole.println(message);
     }
     
@@ -508,6 +530,12 @@ public class ESGFSearch {
         fail(e.getMessage());
       }
     }
+
+    @Override
+    public String getErrorMessage() {
+
+      return errorMessage;
+    }
   }
   /**
    * Makes an asynchronous requests.
@@ -518,6 +546,7 @@ public class ESGFSearch {
     int totalCount = 1000;
     String queryString;
     String ESGFQuery = "";
+    String errorMessage = "";
     boolean failed = false;
     public ASyncSearch(String queryString) {
         super();
@@ -532,7 +561,8 @@ public class ESGFSearch {
     
     public void fail(String message) {
       failed= true;
-      DebugConsole.println(message);
+      errorMessage = message;
+      DebugConsole.errprintln(message);
     }
     
     public void execute(){
@@ -545,6 +575,9 @@ public class ESGFSearch {
         List<String> experiment = HTTPTools.getKVPList(queryString, "experiment");
         List<String> model = HTTPTools.getKVPList(queryString, "model");
         List<String> realm = HTTPTools.getKVPList(queryString, "realm");
+        
+        List<String> domain = HTTPTools.getKVPList(queryString, "domain");
+        
         String limit = HTTPTools.getKVPItem(queryString, "limit");
         String offset = HTTPTools.getKVPItem(queryString, "offset");
         String datasetType = HTTPTools.getKVPItem(queryString, "type");
@@ -563,12 +596,14 @@ public class ESGFSearch {
         for(int j=0;j<model.size();j++){ESGFQueryString+="model="+model.get(j)+"&";}
         for(int j=0;j<realm.size();j++){ESGFQueryString+="realm="+realm.get(j)+"&";}
         
+        for(int j=0;j<domain.size();j++){ESGFQueryString+="domain="+domain.get(j)+"&";}
+        
 
         
         if(limit!=null)ESGFQueryString+="limit="+limit+"&";
         if(offset!=null)ESGFQueryString+="offset="+offset+"&";
         if(datasetType!=null)ESGFQueryString+="type="+datasetType+"&";
-        ESGFQueryString+="latest=true&";
+        ESGFQueryString+="latest=true&replica=false&";
         
         if(startDate!=null)ESGFQueryString+="start="+startDate+"&";
         if(stopDate!=null)ESGFQueryString+="end="+stopDate+"&";
@@ -584,20 +619,7 @@ public class ESGFSearch {
         MyXMLParser.XMLElement result=el.get("response").get("result");
 
         JSONArray topics = new JSONArray();
-        /*JSONObject product = new JSONObject();
-        product.put("id", "cmip5.output1.MOHC.HadCM3.decadal1960.day.atmos.day.r10i2p1.v20110627.tasmax_day_HadCM3_decadal1960_r10i2p1_19601101-19901230.nc");
-        product.put("product", "output1");
-        product.put("institute", "MOHC");
-        product.put("model", "HadCM3");
-        product.put("realm", "atmos");
-        product.put("MIP_table", "day");
-        product.put("experiment", "decadal1960");
-        product.put("frequency", "day");
-        product.put("ensemble_member", "r10i2p1");
-        product.put("variable", "tasmax");
-        product.put("url", "http://cmip-dn.badc.rl.ac.uk/thredds/fileServer/esg_dataroot/cmip5/output1/MOHC/HadCM3/decadal1960/day/atmos/day/r10i2p1/v20110627/tasmax/tasmax_day_HadCM3_decadal1960_r10i2p1_19601101-19901230.nc");
-        topics.put(product);*/
-        
+
        
         totalCount=Integer.parseInt(result.getAttrValue("numFound"));
         
@@ -632,6 +654,7 @@ public class ESGFSearch {
                 if(arrName.equals("institute"))product.put("institute",arrValue);
                 if(arrName.equals("model"))product.put("model",arrValue);
                 if(arrName.equals("realm"))product.put("realm",arrValue);
+                if(arrName.equals("domain"))product.put("domain",arrValue);
                 if(arrName.equals("project"))product.put("project",arrValue);
                
                 //if(arrName.equals("cmor_table"))product.put("MIP_table",arrValue);
@@ -725,10 +748,15 @@ public class ESGFSearch {
         fail(e.getMessage());
       }
     }
+
+    
+    public String getErrorMessage() {
+      return errorMessage;
+    }
   }
   public static JSONObject getFacetForQuery(String facet, String queryStr) throws MalformedURLException, Exception {
     String uniqueId = "getFacetForQuery_"+facet+"_"+queryStr;
-    String data = getDiskCachedString(uniqueId,3600);//null;//getPersistentCachedString(uniqueId);
+    String data = getDiskCachedString(uniqueId,60);//null;//getPersistentCachedString(uniqueId);
     if(data ==null){
       JSONArray facets = addFacet(facet, queryStr);
       

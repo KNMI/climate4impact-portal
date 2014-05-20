@@ -90,7 +90,7 @@ var loadFacetList = function(facetType,collapse){
 		  	if(facetType!='experiment')    if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
 		  	if(facetType!='time_frequency')if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
 		  	if(facetType!='model')         if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
-		  	if(facetType!='domain')         if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(6)+"&";}
+		  	if(facetType!='domain')         if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(7)+"&";}
 	  	}
 	  }
 	  query+=getTimeFrame();
@@ -118,7 +118,7 @@ var startBasicSearch = function(){
 		  	if(input[j].name.indexOf('experiment_')==0){query+="experiment="+input[j].name.substr(11)+"&";}
 		  	if(input[j].name.indexOf('time_frequency_')==0){query+="time_frequency="+input[j].name.substr(15)+"&";}
 		  	if(input[j].name.indexOf('model_')==0){query+="model="+input[j].name.substr(6)+"&";}
-		  	if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(6)+"&";}
+		  	if(input[j].name.indexOf('domain_')==0){query+="domain="+input[j].name.substr(7)+"&";}
 	  	}
 	  }
 	  query+=getTimeFrame();
@@ -173,6 +173,9 @@ var startBasicSearch = function(){
 		  
 	  };
 	  
-	  var failure = function(data){$('#refreshmodelsinfo').html('failed: '+data);} 
+	  var failure = function(data){
+		  
+		  $('#searchinfo').html(data);
+	  } 
 	  makeJSONRequest(url,success,failure);
 };// /startbasicsearch

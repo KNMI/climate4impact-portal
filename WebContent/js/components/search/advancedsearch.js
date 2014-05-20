@@ -13,13 +13,14 @@ var callbackDrupalTips = function(data){
 Ext.regModel('ComboStoreBox', {
   fields: [
       {type: 'string', name: 'item'},
-//      {type: 'string', name: 'shortname'},
+// {type: 'string', name: 'shortname'},
       {type: 'string', name: 'description'}
   ]
 });
 
 /**
- * Constructor for custom comboboxes, which have a state which is remembered in JSP session
+ * Constructor for custom comboboxes, which have a state which is remembered in
+ * JSP session
  */
 ComboStoreBox = Ext.extend(Ext.form.field.ComboBox, {
   initComponent: function() {
@@ -38,6 +39,7 @@ ComboStoreBox = Ext.extend(Ext.form.field.ComboBox, {
       stateId:_this.id,
       labelAlign:'top',
       stateful:false,
+      style:{"background-color":"#DEEBFF"},
       stateEvents: ['select','change'],
       allowBlank :false,
       disabled:true,
@@ -75,8 +77,9 @@ ComboStoreBox = Ext.extend(Ext.form.field.ComboBox, {
 
 
 /**
- * Callback function from a JSON request which populates the values in the comboboxes.
- * This function is also called by populateSearchResults, for facetted update.
+ * Callback function from a JSON request which populates the values in the
+ * comboboxes. This function is also called by populateSearchResults, for
+ * facetted update.
  */
 var populateComboBoxes = function(data,forceData){
   if(!data){
@@ -94,8 +97,11 @@ var populateComboBoxes = function(data,forceData){
     if(remotecategories.facets){
       remotecategories=remotecategories.facets;
     }
-    // Remotecategories is a jsonobject with certain categories filled. The categories of the jsonobject match the categories in the comboboxes in certain cases
-    // Here we will match the remote categories to the combobox category and fill its value accordingly 
+    // Remotecategories is a jsonobject with certain categories filled. The
+	// categories of the jsonobject match the categories in the comboboxes in
+	// certain cases
+    // Here we will match the remote categories to the combobox category and
+	// fill its value accordingly
     for(var cmbIndex in comboBoxComponents){
       var comboBox=comboBoxComponents[cmbIndex];
       if(comboBox){
@@ -143,14 +149,14 @@ var disableComponents = function(includeSearchResults){
   Ext.getCmp('when_from_id').disable();
   Ext.getCmp('when_to_id').disable();
   Ext.getCmp('where_id').disable();
-  if(includeSearchResults){
+  //if(includeSearchResults){
    pagingToolbar.disable();
-   searchResultStore.fireEvent('beforeload');
-  }
+   searchResultGrid.setLoading(true, true);
+  //}
 };
 
-/** 
- * Enable all seach components when a call is finished 
+/**
+ * Enable all seach components when a call is finished
  */
 var enableComponents = function(){
   for(var j in comboBoxComponents)comboBoxComponents[j].enable();
@@ -159,7 +165,7 @@ var enableComponents = function(){
   Ext.getCmp('where_id').enable();
 
   pagingToolbar.enable();
-  searchResultStore.fireEvent('load');
+  searchResultGrid.setLoading(false);
 };
 
 /**
@@ -177,7 +183,7 @@ var setErrorForComponents = function(){
   Ext.getCmp('when_to_id').enable();
   Ext.getCmp('where_id').enable();
   pagingToolbar.enable();
-	  searchResultStore.fireEvent('load');
+  searchResultGrid.setLoading(false);
 };
 
 /**
@@ -213,7 +219,8 @@ var populateSearchResults = function(data){
 
 
 /**
- * Main function to start a search query, calls populatesearchResults as ajax callback
+ * Main function to start a search query, calls populatesearchResults as ajax
+ * callback
  */
 var startSearchRequest = function(includeSearchResults){
   includeSearchResults = true;
@@ -256,30 +263,30 @@ var startSearchRequest = function(includeSearchResults){
 
   
 
-  disableComponents(includeSearchResults);
+// disableComponents(includeSearchResults);
   
-  if(nrOfCategoriesSelected==0){
-    
-    searchResultStore.removeAll();
-    if(resetHasBeenRequested){
-      makeJSONRequest(searchServiceURL+'service=search&mode=distinct',populateComboBoxes,callbackError);
-    }else{
-      enableComponents();
-    }
-    return;
-  }
-  
-  if(nrOfCategoriesSelected==0){
-    if(includeSearchResults){
-      alert("Please select a category.");
-      includeSearchResults=false;
-    }
-  }
-  
+// if(nrOfCategoriesSelected==0){
+//    
+// searchResultStore.removeAll();
+// if(resetHasBeenRequested){
+// makeJSONRequest(searchServiceURL+'service=search&mode=distinct',populateComboBoxes,callbackError);
+// }else{
+// enableComponents();
+// }
+// return;
+// }
+//  
+// if(nrOfCategoriesSelected==0){
+// if(includeSearchResults){
+// alert("Please select a category.");
+// includeSearchResults=false;
+// }
+// }
+//  
  
   disableComponents(includeSearchResults);
-    //vercQuery+="datatype=file&";
-    //searchResultStore.searchQuery=URLEncode(vercQuery);
+    // vercQuery+="datatype=file&";
+    // searchResultStore.searchQuery=URLEncode(vercQuery);
   var impactQuery=searchServiceURL;
   if(includeSearchResults){
     impactQuery+='service=search&mode=search&query=';
@@ -289,7 +296,7 @@ var startSearchRequest = function(includeSearchResults){
   impactQuery+=URLEncode(vercQuery)+"&";
   impactQuery+='where='+URLEncode(Ext.getCmp('where_id').getValue());  
   impactQuery+='&';
-   //Add page to load
+   // Add page to load
   var pageToLoad=searchResultStore.pageToLoad;
   if(!pageToLoad)pageToLoad=1;
 
@@ -298,7 +305,7 @@ var startSearchRequest = function(includeSearchResults){
   impactQuery+="limit="+searchResultStore.pageSize+"&";
   impactQuery+="includefacets="+true;
   
-  //searchResultStore.fireEvent('beforeload');
+  // searchResultStore.fireEvent('beforeload');
 
   if(includeSearchResults){
     makeJSONRequest(impactQuery,populateSearchResults,callbackError);
@@ -312,6 +319,8 @@ var startSearchRequest = function(includeSearchResults){
 
  
  var resetAllComboBoxes = function(){
+	 
+
    disableComponents(false);
    searchResultStore.removeAll();
    for(var j in comboBoxComponents){
@@ -324,9 +333,9 @@ var startSearchRequest = function(includeSearchResults){
    
    Ext.getCmp('when_from_id').setValue("");
    Ext.getCmp('when_to_id').setValue("");
-   
+   startSearchRequest(false);
   // makeJSONRequest(searchServiceURL+'service=search&mode=distinct',populateComboBoxes,callbackError);
-   makeJSONRequest(searchServiceURL+'service=search&mode=distinct',populateComboBoxes,callbackError);
+   // makeJSONRequest(searchServiceURL+'service=search&mode=distinct',populateComboBoxes,callbackError);
  };
 
 
@@ -345,7 +354,9 @@ var pagingToolbar = Ext.create('Ext.PagingToolbar', {
     store: searchResultStore,
     displayInfo: true,
     displayMsg: 'Displaying results {0} - {1}. Found {2} results'
-    	//,    buttons:[{xtype:'tbseparator'},{xtype:'button',iconCls:'icon-shoppingbasket',text:'Add to basket',handler:addSearchSelectionToBasket}]
+    	// ,
+		// buttons:[{xtype:'tbseparator'},{xtype:'button',iconCls:'icon-shoppingbasket',text:'Add
+		// to basket',handler:addSearchSelectionToBasket}]
 });
 
 
@@ -376,34 +387,52 @@ var pagingToolbar = Ext.create('Ext.PagingToolbar', {
 	  }
 	});
 
-// Create the 'When' box 
+// Create the 'When' box
 var whenBox = new Ext.create('Ext.form.Panel', { 
-  //title: 'When:',
+  // title: 'When:',
   region:'center', 
-  border:'1 0 0 0',
-  frame:true,
-  layout: {type: 'table',columns:5},    
+  style:{"background-color":"#DEEBFF"},
+
+  padding:5,
+  
+  border: false,
+  style: {
+	  backgroundColor:"#DEEBFF", 
+      borderStyle: 'solid',
+      borderWidth: '1px',
+      
+      borderLeft: 0,
+      borderRight: 0
+   },
+
+  layout: {type: 'table',columns:5,
+	  tableAttrs: {
+		  style: {
+			  width: '100%',
+			  "background":"#DEEBFF"
+		  }
+  		}  
+   },    
   items: [new DateFieldStateFul({         
-    width:140,
+    width:180,
     name: 'fromDate',
     id:'when_from_id',
     fieldLabel: 'from',
     hideLabel:true,
     emptyText:'from (mm/dd/yyyy)',
-    allowBlank: true,
-    margin:'3 5 0 5'
+    allowBlank: true// , margin:'3 5 0 5'
 
   }),new DateFieldStateFul({
-    width:140,
+    width:180,
     name: 'toDate',
     id:'when_to_id',
     fieldLabel: 'to',
     emptyText:'to (mm/dd/yyyy)',
     hideLabel:true,
-    allowBlank: true,
-    margin:'3 5 0 5'
+    allowBlank: true,// margin:'3 5 0 5'
   }),{
-    xtype:'button',text:'clear',margin:'3 5 0 5',handler:function(){
+    xtype:'button',text:'clear',// margin:'3 5 0 5',
+      handler:function(){
       Ext.getCmp('when_from_id').setValue("");
       Ext.getCmp('when_to_id').setValue("");
       searchResultStore.pageToLoad=1;
@@ -412,7 +441,7 @@ var whenBox = new Ext.create('Ext.form.Panel', {
     }},
     {
       xtype:'combo',
-      margin:'3 5 0 148',
+      margin:'0 0 0 48',
       hideLabel:true,
       id: 'where_id',
       store: locations,
@@ -429,29 +458,38 @@ var whenBox = new Ext.create('Ext.form.Panel', {
     		  }
     	  }
       }
-    }/*,{
-      xtype:'button',text:'Search',margin:'3 5 0 5',handler:function(){
-        startSearchRequest();
-        
-      }}*/
+    }/*
+		 * ,{ xtype:'button',text:'Search',margin:'3 5 0 5',handler:function(){
+		 * startSearchRequest();
+		 *  }}
+		 */
     
     ]
 });
 
 var comboPanel = Ext.create('Ext.form.Panel', {
-  frame: true,border:false,
-  /*bodyPadding: 4,*/
+  border:false,frame:false,
+  extraCls: 'eproc_test',
   autoScroll: false,
-  layout: {type: 'table',columns: 3},
+  layout: {
+	  type: 'table',columns: 3,
+	  tableAttrs: {
+          style: {
+              width: '100%',
+              "background":"#DEEBFF"
+          }
+      }  
+  },
   region: 'north',
   items: [
-      new ComboStoreBox({fieldLabel:'Variable'  ,id:'ComboStoreBox_variable'  ,drupaltip:'searchcontext_variable',category:'variable'}),
+      new ComboStoreBox({fieldLabel:'Project'     ,id:'ComboStoreBox_project'     ,drupaltip:'searchcontext_project',category:'project'}),
+      new ComboStoreBox({fieldLabel:'Model'     ,id:'ComboStoreBox_model'     ,drupaltip:'searchcontext_model',category:'model'}),
       new ComboStoreBox({fieldLabel:'Frequency' ,id:'ComboStoreBox_frequency' ,drupaltip:'searchcontext_frequency',category:'time_frequency'}),
-	  new ComboStoreBox({fieldLabel:'Institute' ,id:'ComboStoreBox_institute' ,drupaltip:'searchcontext_institutes',category:'institute'}),
-	  new ComboStoreBox({fieldLabel:'Experiment',id:'ComboStoreBox_experiment',drupaltip:'searchcontext_experiment',category:'experiment'}),
-	  new ComboStoreBox({fieldLabel:'Model'     ,id:'ComboStoreBox_model'     ,drupaltip:'searchcontext_model',category:'model'}),
+      new ComboStoreBox({fieldLabel:'Experiment',id:'ComboStoreBox_experiment',drupaltip:'searchcontext_experiment',category:'experiment'}),
+      new ComboStoreBox({fieldLabel:'Variable'  ,id:'ComboStoreBox_variable'  ,drupaltip:'searchcontext_variable',category:'variable'}),
 	  new ComboStoreBox({fieldLabel:'Realm'     ,id:'ComboStoreBox_realm'     ,drupaltip:'searchcontext_realm',category:'realm'})  ,                           
-      new ComboStoreBox({fieldLabel:'Project'     ,id:'ComboStoreBox_project'     ,drupaltip:'searchcontext_project',category:'project'})
+	  new ComboStoreBox({fieldLabel:'Domain'     ,id:'ComboStoreBox_domain'     ,drupaltip:'searchcontext_domain',category:'domain'})  ,
+      new ComboStoreBox({fieldLabel:'Institute' ,id:'ComboStoreBox_institute' ,drupaltip:'searchcontext_institutes',category:'institute'})
 	]
 });
 
@@ -463,13 +501,17 @@ var searchResultGrid = Ext.create('Ext.grid.Panel', {
   region:'center',
   columns:[
    {id: 'id'  ,text: "dataset id" ,dataIndex: 'id'  ,width:360,hidden:false},
-   /* {id: 'activity'	,text: "activity"	,dataIndex: 'activity'	,width:60,hidden:true},
-   // {id: 'product'	,text: "product"	,dataIndex: 'product'	,width:60, hidden:true},
-    {id: 'institute',text: "Institute"	,dataIndex: 'institute'	,width:100,sortable:false},
-    {id: 'model'	,text: "Model"		,dataIndex: 'model'		,width:100,sortable:false},
-    {id: 'experiment',text: "Experiment",dataIndex: 'experiment',width:80,sortable:false},
-    {id: 'time_frequency',text: "Freq."	,dataIndex: 'time_frequency'	,width:45,sortable:false},
-    {id: 'realm'	,text: "Realm"		,dataIndex: 'realm'		,width:45,sortable:false},*/
+   /*
+	 * {id: 'activity' ,text: "activity" ,dataIndex: 'activity'
+	 * ,width:60,hidden:true}, // {id: 'product' ,text: "product" ,dataIndex:
+	 * 'product' ,width:60, hidden:true}, {id: 'institute',text: "Institute"
+	 * ,dataIndex: 'institute' ,width:100,sortable:false}, {id: 'model' ,text:
+	 * "Model" ,dataIndex: 'model' ,width:100,sortable:false}, {id:
+	 * 'experiment',text: "Experiment",dataIndex:
+	 * 'experiment',width:80,sortable:false}, {id: 'time_frequency',text:
+	 * "Freq." ,dataIndex: 'time_frequency' ,width:45,sortable:false}, {id:
+	 * 'realm' ,text: "Realm" ,dataIndex: 'realm' ,width:45,sortable:false},
+	 */
     {id: 'ensemble',text: "Ensemble",dataIndex: 'ensemble',width:60,sortable:true},
     {id: 'dataSize',text: "Size",dataIndex: 'dataSize',width:60,sortable:true},
     {id: 'variable'	,text: "Variables"	,dataIndex: 'variable'	,flex:1,sortable:true}
@@ -480,20 +522,32 @@ var searchResultGrid = Ext.create('Ext.grid.Panel', {
 
 
 var searchPanel = Ext.create('Ext.form.Panel', {
-  frame: true,
-  //height:492,
-  height:(492+27+20+34+30), 
+  
+  height:600,
+  // height:(492+27+20+34+80),
   autoScroll:false,
-  title: 'Search ESG nodes',
+ 
+  // title: 'Search ESG nodes',
+  frame:true,
+  
+  style:{"background-color":"#DEEBFF"}, 
+  padding:5,
   layout:'border', 
+  border:true,
   defaults:{ autoScroll:false }, 
    items: [ 
             { 
-              height:260,
+              height:256,
               xtype:'panel',
+              
+              
+              style: {
+            	  backgroundColor:"#DEEBFF", 
+              
+               },
               layout:'border',
               region:'north',
-              border:true,frame:true,
+              border:false,frame:false,
               items:[comboPanel,  whenBox],
               buttons:[               
                     {height:30,xtype:'button',text:'Browse',handler:browseSearchSelection},		
@@ -506,14 +560,15 @@ var searchPanel = Ext.create('Ext.form.Panel', {
 });
 
 /**
- * Initialization function which needs to be called for starting the search interface
+ * Initialization function which needs to be called for starting the search
+ * interface
  */
 var initialize=function(searchSession){
 	
 
   Ext.QuickTips.init();
-  //alert("INITIALIZED"+searchSession);
-  //Populate categories comboboxes 
+  // alert("INITIALIZED"+searchSession);
+  // Populate categories comboboxes
   if(searchSession!=undefined){
     var currentPage=searchSession.advancedsearchpagenr;
     if(!currentPage)currentPage=1
@@ -521,7 +576,7 @@ var initialize=function(searchSession){
   
   searchResultStore.pageToLoad=currentPage;
 
-  // Create a quick lookup to all combobox  components
+  // Create a quick lookup to all combobox components
   for(var categoryIndex in categoryNames) {comboBoxComponents.push(Ext.getCmp('ComboStoreBox_'+categoryNames[categoryIndex]));}
   searchResultStore.fireEvent('beforeload');
 
@@ -536,12 +591,13 @@ var initialize=function(searchSession){
             cmb.setValue(cmb.store.getAt(0));
           }
         }
-      }else{
-    	  if(cmb.category=='realm'){
-    		   cmb.store.add({item:'atmos',description:'atmosphere'});
-    	       cmb.setValue(cmb.store.getAt(0));
-    	  }
       }
+// else{
+// if(cmb.category=='realm'){
+// cmb.store.add({item:'atmos',description:'atmosphere'});
+// cmb.setValue(cmb.store.getAt(0));
+// }
+// }
     }
   }
   

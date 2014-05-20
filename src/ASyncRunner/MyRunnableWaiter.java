@@ -7,6 +7,7 @@ import tools.DebugConsole;
 
 public class MyRunnableWaiter {
   private long startTimeInMillis;
+  private String errorMessage = ""; 
   int maxThreadsRunning = 3;
   public void setMaxThreads(int numThreads){
     maxThreadsRunning=numThreads;
@@ -69,7 +70,10 @@ public class MyRunnableWaiter {
       }
       int success = 0;
       for(int j=0;j<jobPoller.threads.size();j++){
-        if(jobPoller.threads.get(j).hasFailed())success=1;
+        if(jobPoller.threads.get(j).hasFailed()){
+          success=1;
+          errorMessage+=jobPoller.threads.get(j).getErrorMessage()+"\n";
+        }
       }
       return success;
     }
@@ -112,5 +116,9 @@ public class MyRunnableWaiter {
   
   public void destroy(){
     jobPoller.destroy();
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }   
 }

@@ -73,90 +73,106 @@ var FileViewer = function() {
     }]
   // , autoLoad: true
   });
-  var fileViewerPanel = {
-    xtype : 'panel',
-    cls : 'variable-results',
-    region : 'center',
-    title : 'File header',
-    bbar : [
-        {
-          xtype : 'button',
-          text : 'Download',
-          iconCls : 'icon-download',
-          handler : function() {
-            var request = _this.getFileLocation();
-            if (request.indexOf('aggregation') > 0) {
-              alert('Aggregations cannot be downloaded directly.');
-              return;
-            }
-            var downloadURL = request.replace('dodsC', 'fileServer');
-            if (downloadWin)
-              downloadWin.close();
-            downloadWin = window.open(downloadURL, 'jav',
-                'width=900,height=600,resizable=yes');
-          }
-        },,{
-          xtype : 'tbseparator'
-        },{
-          xtype : 'button',
-          text : 'Add to basket',
-          iconCls : 'icon-shoppingbasket',
-          handler : function() {
-          
-            var url = _this.getFileLocation();
-            var id = url.substring(url.lastIndexOf("/") + 1);
-     
-            basket.postIdentifiersToBasket({
-              id : id,
-              OPENDAP : url
-            });
-          }
-        }],
-    frame : false,
-    border:false,
-    layout : 'fit',
-    items : [{
-      autoScroll : true,
-      minHeight : 300,
-      xtype : 'dataview',
-
-      tpl : new Ext.XTemplate(
-          '<tpl for=".">',
-          '<tpl if="error">',
-
-          '<div class="variable-error">{error}<br/>You can try the following:<ul>',
-          '<li>Click directly on the link above, you will get a hint on what is going wrong.</li>',
-          '<li>If you are not signed in, <a href="#" onclick="generateLoginDialog(true)">sign in</a>',
-          ' and <a onclick=\'location.reload();\'>refresh this page</a>.</li>',
-          '<li>If you are signed in but still cannot view the data, make sure you belong to the same group the data belongs to: <a target="_blank" href="/impactportal/help/howto.jsp?q=create_esgf_account">-> HowTo</a>.</li>',
-          '<li><a onclick="window.open(\'/impactportal/help/contactexpert.jsp\',\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=800\')" >Request help</a>.</li>',
-          '</ul></div>',
-          '</tpl>',
-          '<tpl if="variable">',
-          '<div class="variable-item">',
-          '<a onclick=toggleAttributes(\'{variable}\');><div id=\'{variable}-attricon\' class="attribute-icon-closed"></div></a><b>{variable}</b> - <i>{longname}</i> - (<tpl for="dimensions">{name}</tpl>)',
-          '<tpl for="isDimension"> dimension of length {length}. </tpl>',
-          '<tpl if="isViewable"> - ',
-          // '<a
-          // onclick={fileViewerPanel.fireEvent("visualize","{variable}","{service}");}>visualize</a>',
-          '<a onclick={visualizeVariable("{variable}","{service}");}>visualize</a>',
-          // ' - <a target="_blank"
-          // href='+adagucwmservice+'{service}&service=WCS&request=getcoverage&format=AAIGRID&coverage={variable}>get</a>',
-          '</tpl>', '<div id=\'{variable}-attr\' class="variable-attributes">',
-          '<ul><tpl for="attributes">', '<li>{name}: {value}</li>',
-          '</tpl></ul>', '</div>', '</div></tpl></tpl>'),
-
-      store : fileStore,
-      itemSelector : 'div.variable-item'
-
-    }]
-  };
+  var fileViewerPanel = Ext.create('Ext.panel.Panel', {
+	  xtype : 'panel',
+	  layout:'border',
+	  border:false,
+	
+	  items:[{
+		xtype : 'panel',
+		cls : 'variable-results',
+		region : 'north',
+		//title : 'File info',
+		itemId:'variableheader',
+		padding:5,
+		height:30
+	  },{
+		
+	    xtype : 'panel',
+	    cls : 'variable-results',
+	    region : 'center',
+	    autoScroll:true,
+	    title : 'File header',
+	    bbar : [
+	        {
+	          xtype : 'button',
+	          text : 'Download',
+	          iconCls : 'icon-download',
+	          handler : function() {
+	            var request = _this.getFileLocation();
+	            if (request.indexOf('aggregation') > 0) {
+	              alert('Aggregations cannot be downloaded directly.');
+	              return;
+	            }
+	            var downloadURL = request.replace('dodsC', 'fileServer');
+	            if (downloadWin)
+	              downloadWin.close();
+	            downloadWin = window.open(downloadURL, 'jav',
+	                'width=900,height=600,resizable=yes');
+	          }
+	        },{
+	          xtype : 'tbseparator'
+	        },{
+	          xtype : 'button',
+	          text : 'Add to basket',
+	          iconCls : 'icon-shoppingbasket',
+	          handler : function() {
+	          
+	            var url = _this.getFileLocation();
+	            var id = url.substring(url.lastIndexOf("/") + 1);
+	     
+	            basket.postIdentifiersToBasket({
+	              id : id,
+	              OPENDAP : url
+	            });
+	          }
+	        }],
+	    frame : false,
+	    border:false,
+	    layout : 'fit',
+	    items : [{
+	  
+	     
+	      xtype : 'dataview',
+	
+	      tpl : new Ext.XTemplate(
+	          '<tpl for=".">',
+	          '<tpl if="error">',
+	
+	          '<div class="variable-error">{error}<br/>You can try the following:<ul>',
+	          '<li>Click directly on the link above, you will get a hint on what is going wrong.</li>',
+	          '<li>If you are not signed in, <a href="#" onclick="generateLoginDialog(true)">sign in</a>',
+	          ' and <a onclick=\'location.reload();\'>refresh this page</a>.</li>',
+	          '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a target="_blank" href="/impactportal/help/howto.jsp?q=create_esgf_account">-> HowTo</a>.</li>',
+	          '<li><a onclick="window.open(\'/impactportal/help/contactexpert.jsp\',\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=800\')" >Request help</a>.</li>',
+	          '</ul></div>',
+	          '</tpl>',
+	          '<tpl if="variable">',
+	          '<div class="variable-item">',
+	          '<a onclick=toggleAttributes(\'{variable}\');><div id=\'{variable}-attricon\' class="attribute-icon-closed"></div></a><b>{variable}</b> - <i>{longname}</i> - (<tpl for="dimensions">{name}</tpl>)',
+	          '<tpl for="isDimension"> dimension of length {length}. </tpl>',
+	          '<tpl if="isViewable"> - ',
+	          // '<a
+	          // onclick={fileViewerPanel.fireEvent("visualize","{variable}","{service}");}>visualize</a>',
+	          '<a onclick={visualizeVariable("{variable}","{service}");}>visualize</a>',
+	          // ' - <a target="_blank"
+	          // href='+adagucwmservice+'{service}&service=WCS&request=getcoverage&format=AAIGRID&coverage={variable}>get</a>',
+	          '</tpl>', '<div id=\'{variable}-attr\' class="variable-attributes">',
+	          '<ul><tpl for="attributes">', '<li>{name}: {value}</li>',
+	          '</tpl></ul>', '</div>', '</div></tpl></tpl>'),
+	
+	      store : fileStore,
+	      itemSelector : 'div.variable-item'
+	
+	    }]
+	  }]
+  });
   this.load = function(_filelocation) {
     fileLocation = _filelocation;
     fileStore.fireEvent('load');
     var proxy = fileStore.getProxy();
     proxy.url = fileheaderservice + URLEncode(fileLocation);
-    
+    fileViewerPanel.getComponent('variableheader').update('<a target="_blank" href="'+_filelocation+'">'+_filelocation+'</a>');
     fileStore.load();
   };
 

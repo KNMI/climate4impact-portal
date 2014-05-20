@@ -30,7 +30,7 @@
 		
 
 		if(pageName.indexOf("data/basicsearch.jsp")!=-1)highLightBasicSearch=true;
-		else if(pageName.indexOf("data/advancedsearch.jsp")!=-1)highLightAdvancedSearch=true;
+		else if(pageName.indexOf("data/advancedsearch.jsp")!=-1)highLightBasicSearch=true;
 		else if(pageName.indexOf("data/download.jsp")!=-1)highLightDownload=true;
 		else if(pageName.indexOf("data/transform.jsp")!=-1)highLightTransform=true;
 		else if(pageName.indexOf("data/wps")!=-1)highLightTransform=true;

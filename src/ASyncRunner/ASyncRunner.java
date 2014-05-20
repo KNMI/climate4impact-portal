@@ -17,7 +17,7 @@ public abstract class ASyncRunner extends MyRunnable{
   
   public abstract void fail(String message);
   public abstract void execute();
-  
+  public abstract String getErrorMessage();
 
   public void run() {
    
@@ -28,4 +28,7 @@ public abstract class ASyncRunner extends MyRunnable{
     }
     isCompleted = true;
   }
+
+
+    
 }

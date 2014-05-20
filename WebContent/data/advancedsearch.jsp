@@ -87,7 +87,7 @@
 					<tr>
 						<td class="container"><div id="container" ></div></td>
 						<td class="split"></td>
-						<td class="contexthelp"><div id="contexthelp">
+						<td class="contexthelp"><div id="contexthelp" class="contexthelp">
 						<%try{out.print(DrupalEditor.showDrupalContent("?q=node/8",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
             </div></td>
 					</tr>

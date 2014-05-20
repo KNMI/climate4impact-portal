@@ -59,12 +59,13 @@
   		    items:[{
   				region:'center',
   				xtype:'panel',
+  				layout:'form',
   				minHeight:800,
   				border:false,
   				padding:'4 4 4 4',
   				margin:'4 4 4 4',
   				items:[{
-  			   			region:'south',
+  			   		
   			   			xtype:'panel',
   			   			title:'Processing details and options' ,
   			   			id:'wpsstart',
@@ -80,8 +81,8 @@
   			   		
   		    		},{
   		    			xtype:'panel',
-  		    			
-  		    			
+  		    
+  		    		
   						title:'Options',
   						id:'wpsparams',
   						layout: {
@@ -97,6 +98,7 @@
   		    loader: {} 
        	});
     	
+        
     	wpsProcessorDetails('<%=processorId%>');
     });
     </script>

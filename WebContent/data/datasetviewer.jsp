@@ -47,9 +47,9 @@
     	setSearchServiceURL('<%="/"+impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?'); 
     	var fileViewer = new FileViewer();
 		var container = Ext.create('Ext.container.Container', {
-		  layout: 'fit',
+	      layout:'fit',
 		  renderTo:'container',
-		  minHeight:600,
+		  height:600,
 		  scripts:true,
 		  autoScroll:false, 
 		  items:fileViewer.getViewer(),

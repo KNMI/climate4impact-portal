@@ -568,20 +568,20 @@ public class ImpactService extends HttpServlet {
               if(e.getStatusCode()==400){
                 msg+="HTTP status code "+e.getStatusCode()+": Bad request\n";
                 if(user == null){
-                  msg+="\nWarning: You are not logged in.\n";
+                  msg+="\nNote: you are not logged in.\n";
                 }
               }else if(e.getStatusCode()==401){
-                msg+="HTTP status code "+e.getStatusCode()+": Unauthorized\n";
+                msg+="Unauthorized (401)\n";
                 if(user == null){
-                  msg+="\nWarning: You are not logged in.\n";
+                  msg+="\nNote: you are not logged in.\n";
                 }
               }else if(e.getStatusCode()==403){
-                msg+="HTTP status code "+e.getStatusCode()+": Forbidden\n";
+                msg+="Forbidden (403)\n";
                 if(user != null){
                   msg+="\nYou are not authorized to view this resource, you are logged in as "+user.id+"\n";
                 }
               }else if(e.getStatusCode()==404){
-                msg+="HTTP status code "+e.getStatusCode()+": File not found\n";
+                msg+="File not found (404)\n";
                 if(user != null){
                   msg+="\nYou are logged in as "+user.id+"\n";
                 }
@@ -760,7 +760,7 @@ public class ImpactService extends HttpServlet {
 
       */
       }catch(Exception e){
-        String msg="Unable to get file "+requestStr+".\n\n"+e.getMessage();
+        String msg="Unable to get file <a target=\"_blank\" href=\""+requestStr+"\">"+requestStr+"</a>.\n\n"+e.getMessage();
         
         String userId = "No user.";
         if(user!=null){
@@ -863,6 +863,7 @@ public class ImpactService extends HttpServlet {
         searchSession.experiment=HTTPTools.getKVPItemDecoded(queryStr,"experiment");
         searchSession.model=HTTPTools.getKVPItemDecoded(queryStr,"model");
         searchSession.realm=HTTPTools.getKVPItemDecoded(queryStr,"realm");
+        
         searchSession.from=HTTPTools.getKVPItemDecoded(queryStr,"tc_start");
         searchSession.to=HTTPTools.getKVPItemDecoded(queryStr,"tc_end");
         searchSession.advancedsearchpagenr=currentPage;
@@ -884,7 +885,9 @@ public class ImpactService extends HttpServlet {
         if(mode.equals("distinct")){
           includeSearchResults = false;
         }
-        JSONObject resultJSON = ESGFSearch.doCachedESGFSearchQuery(query,currentPage,pageSize,includeFacets,false,includeSearchResults,dataSetType);
+        JSONObject resultJSON = null;
+        resultJSON = ESGFSearch.doCachedESGFSearchQuery(query,currentPage,pageSize,includeFacets,false,includeSearchResults,dataSetType);
+        
 //				DebugConsole.println("pageSize     : "+pageSize);
 //				DebugConsole.println("currentPage  : "+currentPage);
 				//DebugConsole.println("Start : "+start);
@@ -892,19 +895,22 @@ public class ImpactService extends HttpServlet {
 				DebugConsole.println("Query : "+query);
 //				DebugConsole.println("ResultLength: "+resultJSON.length());
 				PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
-				 response.setContentType("application/json");
-	    		out1.print(resultJSON.toString());
+				response.setContentType("application/json");
+				out1.print(resultJSON.toString());
 			}
 			
 			if(mode.equals("getfacet")){
 			  String facet=HTTPTools.getHTTPParam(request,"facet");
 			  
 			  String queryStr="";try{ queryStr=HTTPTools.getHTTPParam(request,"query");}catch(Exception e){}
-			  //DebugConsole.println("Facet to query = "+facet);
-			  JSONObject resultJSON = ESGFSearch.getFacetForQuery(facet,queryStr+"&type="+dataSetType);
-		     PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
-         response.setContentType("application/json");
-         out1.print(resultJSON.toString());
+			  DebugConsole.println("Facet to query = "+facet);
+			  DebugConsole.println("Facet queryStr = "+queryStr);
+
+			  JSONObject resultJSON = null;
+        resultJSON = ESGFSearch.getFacetForQuery(facet,queryStr+"&type="+dataSetType);
+ 	      PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
+        response.setContentType("application/json");
+        out1.print(resultJSON.toString());
 			}
 		}catch(Exception e){
       DebugConsole.printStackTrace(e);
@@ -912,7 +918,7 @@ public class ImpactService extends HttpServlet {
 
 			JSONObject error = new JSONObject();
 			try {
-				error.put("error",e.getMessage());
+				error.put("error","ESGF Query Error: "+e.getMessage());
 			} catch (JSONException e2) {
 				return;
 			}
@@ -1239,9 +1245,9 @@ public class ImpactService extends HttpServlet {
 		/*
 		 * Handle BasicSearch requests
 		 */ 
-		if(serviceStr.equals("basicsearch")){
-			BasicSearch.handleBasicSearchRequest(request,response,errorResponder);
-		}
+//		if(serviceStr.equals("basicsearch")){
+//			BasicSearch.handleBasicSearchRequest(request,response,errorResponder);
+//		}
 	
 		/*
 		 * Handle data requests

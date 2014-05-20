@@ -9,7 +9,8 @@ public class SessionManager {
     String institute="";
     String experiment="";
     String model="";
-    String realm="atmos";
+    String realm="";
+    String domain="";
     String from="";
     String to="";
     String where="";
@@ -23,7 +24,8 @@ public class SessionManager {
       if(institute==null)institute="";
       if(experiment==null)experiment="";
       if(model==null)model="";
-      if(realm==null)realm="atmos";
+      if(realm==null)realm="";
+      if(domain==null)domain="";
       if(from==null)from="";
       if(to==null)to="";
       if(where==null)where="";
@@ -35,6 +37,7 @@ public class SessionManager {
           "  \"experiment\":\""+experiment+"\",\n" +
           "  \"model\":\""+model+"\",\n" +
           "  \"realm\":\""+realm+"\",\n" +
+          "  \"domain\":\""+domain+"\",\n" +
           "  \"from\":\""+from+"\",\n" +
           "  \"to\":\""+to+"\",\n" +
           "  \"basicsearchpagenr\":\""+basicsearchpagenr+"\",\n" +
