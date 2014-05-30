@@ -74,25 +74,33 @@ var FileViewer = function() {
   // , autoLoad: true
   });
   var fileViewerPanel = Ext.create('Ext.panel.Panel', {
-	  xtype : 'panel',
+	  //title : 'NetCDF metadata',
 	  layout:'border',
 	  border:false,
-	
+	  frame:false,
+	  bodyStyle : "padding:00px;background:#DEEBFF;background-color:#DEEBFF",
 	  items:[{
 		xtype : 'panel',
+		border:false,frame:false,
 		cls : 'variable-results',
 		region : 'north',
-		//title : 'File info',
+		overflowY:'auto',
 		itemId:'variableheader',
-		padding:5,
-		height:30
+		padding:'5px',
+		margin:'5px',
+		height:50,
+		bodyStyle : "padding:00px;background:#DEEBFF;background-color:#DEEBFF"
+		
 	  },{
 		
 	    xtype : 'panel',
 	    cls : 'variable-results',
 	    region : 'center',
-	    autoScroll:true,
-	    title : 'File header',
+	    overflowY:'auto',
+	    border:false,frame:false,
+	    
+	    style: 'border-top: 1px solid #BBBBBB;border-bottom: 1px solid #BBBBBB;',
+	   // title : 'NetCDF metadata',
 	    bbar : [
 	        {
 	          xtype : 'button',
@@ -127,8 +135,7 @@ var FileViewer = function() {
 	            });
 	          }
 	        }],
-	    frame : false,
-	    border:false,
+
 	    layout : 'fit',
 	    items : [{
 	  
@@ -172,7 +179,7 @@ var FileViewer = function() {
     fileStore.fireEvent('load');
     var proxy = fileStore.getProxy();
     proxy.url = fileheaderservice + URLEncode(fileLocation);
-    fileViewerPanel.getComponent('variableheader').update('<a target="_blank" href="'+_filelocation+'">'+_filelocation+'</a>');
+    fileViewerPanel.getComponent('variableheader').update('File location: <a target="_blank" href="'+_filelocation+'">'+_filelocation+'</a>');
     fileStore.load();
   };
 

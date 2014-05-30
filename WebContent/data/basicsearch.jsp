@@ -5,10 +5,24 @@
    
     <jsp:include page="../includes-ui.jsp" />
     
-  
-	  <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
+    <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
+    <script type="text/javascript" src="/impactportal/adagucviewer/webmapjs/WMJSTools.js"></script>
 	  <script type="text/javascript" src="basicsearchsettings/variables.js"></script>
 	  <script type="text/javascript" src="basicsearch.js"></script>
+	  
+	  <style>
+		.refreshinfo{
+			
+			display:inline;
+			float:left;
+			overflow:hidden;
+			width:740px;
+			height:20px;
+			
+		}
+	  </style>
+	   
+	  
 
       <script type="text/javascript">
      
@@ -21,10 +35,6 @@
       %>
       var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>service=search&';
     
-      
-      
-  
-	  
       var initializeBasicSearch = function(){
     	  
        	  $('#refreshvariable').css({width:'0px',height:'18px',margin:'0px 6px 4px 2px',paddingLeft:'24px'});
@@ -58,6 +68,9 @@
     	  $('#startsearch').css({width:'0px',margin:'4px 6px 0px 2px',paddingLeft:'24px'}); 
     	  $('#startsearch').click(function(){startBasicSearch();}); 
     	  $('#startsearch').iconbutton({text:false, icons:{primary:'refreshbutton24'}});
+    	  
+    	  
+    	
       };// /initializeBasicSearch
             
       
@@ -69,13 +82,16 @@
           $('.collapsible').collapsible({
           });
           
-          //$('#timeframeheader').collapsible('open');
+
           initializeBasicSearch();
+          $("input:checkbox").prop('checked', false);
+          setCheckBoxes(true);
           loadFacetList('project');
           loadFacetList('model');
-          //loadFacetList('variable');
-          //loadFacetList('experiment');
-         // startBasicSearch();
+          if(window.location.hash.length>3){
+          	startBasicSearch(); 
+          }
+    	  
         });
     </script>
   </head>
@@ -96,7 +112,7 @@
   		
   			
   			<!-- Project overview -->
-  			<div class="facetoverview collapsible" > 
+  			<div class="facetoverview collapsible" id="projectheader" > 
 		        <table width="100%" >
 		       		<tr>
 				        <td class="collapsibletitle" >
@@ -123,7 +139,7 @@
 		             <table width="100%" >
 			             <tr>
 		  					<td style="width:30px;"><div id="refreshprojects"></div></td>
-		  					<td style="height:25px;vertical-align:middle;"><span id="refreshprojectinfo"></span></td>
+		  					<td style="height:25px;vertical-align:middle;"><span id="refreshprojectinfo" class="refreshinfo"></span></td>
 		  				</tr>
 	  				</table>
 		        	<div id="projectselection"></div>
@@ -132,7 +148,7 @@
         	
         	<!-- Variable Selection -->
         	
-        	<div class="facetoverview collapsible" style="height:185px;"> 
+        	<div class="facetoverview collapsible" id="variableheader" style="height:185px;"> 
 		        <table width="100%" ><tr><td class="collapsibletitle" >
 		        Variable 
 		        </td><td  style="padding:0px;">
@@ -198,7 +214,7 @@
 	        </div>
 	        
 	        <div class="collapsiblecontainer"><div class="collapsiblecontent">
-	        <table class="tablenoborder"><tr><td><div id="refreshvariable"></div></td><td ><div id="refreshvariableinfo">Click to load the full list with all possible variables matching the current query.</div></td></tr></table>
+	        <table class="tablenoborder"><tr><td><div id="refreshvariable"></div></td><td ><div id="refreshvariableinfo"  class="refreshinfo">Click to load the full list with all possible variables matching the current query.</div></td></tr></table>
         	<div id="variableselection"></div>
         	</div></div>
         	
@@ -215,7 +231,7 @@
   			</tr></table>
   			</form>
 	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table></div><div class="collapsiblecontainer"><div class="collapsiblecontent">
-	        <table class="tablenoborder"><tr><td><div id="refreshtime_frequency"></div></td><td ><div id="refreshtime_frequencyinfo">Click to load list from server</div></td></tr></table>
+	        <table class="tablenoborder"><tr><td><div id="refreshtime_frequency"></div></td><td ><div id="refreshtime_frequencyinfo"  class="refreshinfo">Click to load list from server</div></td></tr></table>
 	       
         	<div id="time_frequencyselection"></div>
         	</div></div>
@@ -294,7 +310,7 @@
   			
   			</form>
   			
-	        <table class="tablenoborder"><tr><td><div id="refreshexperiments"></div></td><td ><div id="refreshexperimentinfo">Click to load list from server</div></td></tr></table>
+	        <table class="tablenoborder"><tr><td><div id="refreshexperiments"></div></td><td ><div id="refreshexperimentinfo"  class="refreshinfo">Click to load list from server</div></td></tr></table>
 	       
         	<div id="experimentselection"></div>
         	</div></div>
@@ -321,8 +337,8 @@
 			  				<table class="collapsibletable" width="100%">
 			  					<tr>
 			  						<td>
-			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshdomain"></div>
-			  							<div style="display:inline;" id="refreshdomaininfo">Search domain (CORDEX)</div>
+			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshdomain" ></div>
+			  							<div style="display:inline;" id="refreshdomaininfo"  class="refreshinfo">Search domain (CORDEX)</div>
 			  						</td>
 			  					</tr>
 		  					</table>
@@ -346,7 +362,7 @@
 			  					<tr>
 			  						<td>
 			  							<div  style="float:left;padding:0px;top:-2px;" id="refreshmodels"></div>
-			  							<div style="display:inline;" id="refreshmodelinfo">Search models</div>
+			  							<div style="display:inline;" id="refreshmodelinfo"  class="refreshinfo">Search models</div>
 			  						</td>
 			  					</tr>
 		  					</table>

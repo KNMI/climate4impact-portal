@@ -11,8 +11,8 @@ var showStatusReport = function(json) {
           'Ext.Window',
           {
             width : 900,
-            height : 600,
-            autoScroll : true,
+            minHeight : 600,
+            //autoScroll : true,
             autoDestroy : true,
             maximizable : true,
             // overflowX : 'scroll',
@@ -449,7 +449,7 @@ var createStringArrayGrid = function(input, preConfiguredInput) {
     store : store,
     columns : [{
       header : 'value',
-      width:720,
+      width:780,
       dataIndex : 'value',
       editor : {
         allowBlank : false

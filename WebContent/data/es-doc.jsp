@@ -4,8 +4,11 @@
   <head>
    
     <jsp:include page="../includes-ui.jsp" />
-    <link href="http://prod.static.esdoc.webfactional.com/js_client/bin/latest/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
-   <script src="http://prod.static.esdoc.webfactional.com/js_client/bin/latest/esdoc-min.js" type="text/javascript"></script>
+    
+    	
+
+    <link href="/impactportal/js/es-doc/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
+   <script src="/impactportal/js/es-doc/esdoc-min.js" type="text/javascript"></script>
     <script type="text/javascript">
 
     $(document).ready(function() {

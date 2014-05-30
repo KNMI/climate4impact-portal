@@ -27,7 +27,7 @@
     	var container = Ext.create('Ext.container.Container', {
  	        layout: 'fit',
  			renderTo:'container',
- 		   	minHeight:600,
+ 		   	minHeight:500,
  		    scripts:true,
  		    autoScroll:false, 
  		    items:[wpsOverView],

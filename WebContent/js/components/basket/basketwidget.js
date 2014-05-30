@@ -219,7 +219,7 @@ var BasketWidget = function() {
           autoDestroy : true,
           closeAction : 'destroy',
           frame : false,
-          title : 'NetCDF header metadata',
+          title : 'NetCDF metadata',
           layout : 'fit',
           items : fileViewer.getViewer()
         });
@@ -236,6 +236,7 @@ var BasketWidget = function() {
       seArrows : true,
       multiSelect : true,
       singleExpand : false,
+      border:false,
       columns : [
           {
             xtype : 'treecolumn', // this is so we know which column will show the
@@ -301,6 +302,7 @@ var BasketWidget = function() {
         closeAction : 'hide',
         maximizable : true,
         frame : false,
+       
         title : 'Basket',
         layout : 'fit',
         items : tree
@@ -326,8 +328,8 @@ var BasketWidget = function() {
       renderTo:element,
       autoScroll : true,
       autoDestroy : false,
-      minHeight:550,
-      frame : false,
+      minHeight:480,
+      frame : true,
       border:false,
       //title : 'Basket',
       layout : 'fit',

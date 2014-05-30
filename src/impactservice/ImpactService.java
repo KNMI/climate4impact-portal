@@ -378,31 +378,35 @@ public class ImpactService extends HttpServlet {
             
             DebugConsole.println("variableFilter: '"+variableFilter+"'");
             DebugConsole.println("textFilter: '"+textFilter+"'");
-            html+="<form id=\"varFilter\">";
-            for(int j=0;j<availableVars.size();j++){
-              if(j!=0)html+="&nbsp;";
-              String checked="";//checked=\"yes\"";
-              if(variableFilter.length()>0){
-                checked="";
-                if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
+            html+="<div id=\"variableandtextfilter\"><form id=\"varFilter\">";
+            if(availableVars.size()>0){
+              html+="<b>Variables:</b>";
+              for(int j=0;j<availableVars.size();j++){
+                if(j!=0)html+="&nbsp;";
+                String checked="";//checked=\"yes\"";
+                if(variableFilter.length()>0){
+                  checked="";
+                  if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
+                }
+                html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
               }
-              html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
+              html+="<hr/>";
             }
-            html+="&nbsp;filter: <input type=\"textarea\" id=\"textfilter\" value=\""+textFilter+"\" />";
-            html+="&nbsp; <input type=\"button\" value=\"Filter\" onclick=\"setVarFilter();\"/>";
+            html+="<b>Text filter:</b> <input type=\"textarea\" id=\"textfilter\" value=\""+textFilter+"\" />";
+            html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
             
-            html+="</form>";
+            html+="</form></div>";
           }catch(Exception e){
             e.printStackTrace();
           }
           
-          html += "<table class=\"basket\">";
+          html += "<div id=\"datasetfilelist\"><table class=\"basket\">";
           html+="<tr><td width=\"100%\" class=\"basketheader\"><b>Title</b></td><td class=\"basketheader\"><b>Size</b></td><td class=\"basketheader\"><b>OPENDAP</b></td><td class=\"basketheader\"><b>HTTP</b></td><td class=\"basketheader\"><b>Basket</b></td></tr>";
           
           long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           
           
-          html+=buildHTML(treeElements,"",0)+"</table>";
+          html+=buildHTML(treeElements,"",0)+"</table></div>";
           long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           DebugConsole.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
   		    response.getWriter().print(html);

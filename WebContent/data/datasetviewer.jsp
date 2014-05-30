@@ -49,8 +49,11 @@
 		var container = Ext.create('Ext.container.Container', {
 	      layout:'fit',
 		  renderTo:'container',
-		  height:600,
+		  height:550,
 		  scripts:true,
+		  border:false,
+		  frame:false,
+	
 		  autoScroll:false, 
 		  items:fileViewer.getViewer(),
 		  loader: {} 
@@ -73,12 +76,12 @@
 		<div class="cmscontent"> 
 			<h1>File information</h1>
 			<div class="bodycontent">    
-		<table>
-		<tr><td>File: </td><td> <a target="_blank" href="<%= dataset%>"><%= dataset %></a></td></tr>
+		<!--<table>
+		 <tr><td>File: </td><td> <a target="_blank" href="<%= dataset%>"><%= dataset %></a></td></tr>
 		<tr><td>Description: </td><td><a target="_blank" href="<%= dataset+".dds"%>">Show opendap descriptor</a></td></tr>
-		</table>
+		</table>-->
 			<div id="datasetinfo"/>
-			<div id="container" style="border:1px solid lightgray;"></div>
+			<div id="container" style="border:1px solid lightgray;border-radius:4px;"></div>
 			<!--
 				<table>
 					<tr>
@@ -90,7 +93,7 @@
 			</div>
 		</div>
 	</div>
-	
+	</div>
 	<jsp:include page="../footer.jsp" />
   </body>
 </html>

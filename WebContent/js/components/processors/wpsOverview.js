@@ -42,13 +42,17 @@ var selectProcessor = function() {
 };
 
 var wpsOverView = {
-  xtype : 'container',
+  xtype : 'panel',
+  frame:false,
+  border:false,
   layout : 'border',
-  height : 500,
+  height :400,
   items : [{
     region : 'center',
     xtype : 'grid',
-    title : 'Processing overview',
+    frame:true,
+    border:false,
+    //title : 'Processing overview',
     store : new Ext.data.Store({
       autoLoad : true,
       fields : [{
@@ -89,7 +93,7 @@ var wpsOverView = {
     }
 
     ],
-    height : 250,
+   
     listeners : {
       itemclick : function(i, record) {
         this.itemClicked(i, record);

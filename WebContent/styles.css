@@ -332,7 +332,7 @@ div.bodycontent {
 }
 
 div.impactcontent {
-	min-height: 600px;
+	min-height: 560px;
 	/*margin-top: 24px;
     margin-left: 20px;
     margin-right: 20px;
@@ -413,7 +413,7 @@ div.impactcontent {
 }
 
 div.impactcontent a {
-	line-height: 1.5;
+	/*line-height: 1.5;*/
 	/*font-size: 13px;*/
 	font-style: normal;
 	font-variant: normal;
@@ -651,7 +651,7 @@ hr {
 	border-right: 0;
 	border-left: 0;
 	margin-bottom: 10px;
-	margin-top: 20px;
+	margin-top: 10px;
 }
 
 /* printer only pretty stuff */
@@ -772,18 +772,19 @@ div.viewcode-block:target {
 }
 
 .variable-error{
-	margin:5px;
+	margin:0px;
 	padding:10px;
-	border:1px solid #AAA;
-	background-color: #FFF5F3;
-	font-family: "Open Sans", "Helvetica Neue", sans-serif;
+	border:5px solid white;
+	/*background-color: #DEEBFF;*/
+	background-color: #F0F0F0;
+	/*font-family: "Open Sans", "Helvetica Neue", sans-serif;
 	font-size: 14px;
 	line-height: 20px;
 	font-style: normal;
 	font-variant: normal;
 	font-weight: normal;
 	-webkit-font-smoothing: antialiased;
-	color: black;
+	color: black;*/
 }
 
 .x-form-clear-trigger {
@@ -1103,7 +1104,7 @@ table.basket {
 	border: 0 none;
 	border-spacing: 0;
 	font-size: 0.857em;
-	margin: 10px 0;
+	margin: 0px 0;
 	width: 100%;
 	font-size: 11px;
 }
@@ -2324,11 +2325,78 @@ a img {
 }
 
 
-.x-panel-default-framed {
+.x-panel-default-framed ,.x-window-default{
     
-    border-radius: 4px 4px 4px 4px;
-    border-style: solid;
-    border-width: 2px;
+
+     border: 1px solid #BBBBBB;
     
 }
+.x-panel .x-panel-header-default-framed-top {
+	   /*border: 1px solid #BBBBBB;
+	   border-bottom-width: 1px !important;*/
+	   border:none;
+}
 
+.x-panel-default,.x-window-body-default  {
+	   border: none;
+	   border-bottom-width: 1px !important;
+}
+.x-panel{
+
+}
+.x-column-header-inner,.x-window-header-default{
+	   border: 0px solid #BBBBBB;
+	   border-bottom-width: 1px !important;
+}
+.x-column-header{
+	 border-bottom-width: 1px !important;
+}
+.x-panel-header,.x-window-header-default-top{
+		
+	background: none repeat scroll 0 0 #E0E0E0;
+	
+    padding: 5px 10px 6px 10px;
+}
+.x-window-header-default{ 
+	border: 1px solid #BBBBBB;
+	background-color: #E0E0E0;
+
+}
+.x-tool-img{
+	background-color: #E0E0E0  !important;
+	background-image:url("images/tool-sprites-negative.png");
+}
+.x-window-header-default .x-tool-img {
+    background-color: #E0E0E0;
+    
+}
+.x-border-layout-ct {
+    background-color: white;
+    border:none;
+}
+.x-panel-body-default {
+	border:none;
+
+	}
+.x-header-text{
+	color: #0C3762;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+     font-style: normal;
+    font-variant: normal;
+    font-family: "Open Sans","Helvetica Neue",sans-serif;
+}
+.x-panel-header-default,.x-window-header-default {
+    border: 1px solid #BBBBBB;
+    font-size: 13px;
+     border-width: 1px !important;
+}
+.x-column-header-inner{
+	border:none;
+	border-bottom:1px solid #BBBBBB;
+}
+.
+.x-column-header-inner {
+	border:none !important;
+}
