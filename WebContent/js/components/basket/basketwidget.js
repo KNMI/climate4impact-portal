@@ -149,9 +149,10 @@ var BasketWidget = function() {
               fn: function(btn){
                 if(btn == 'yes'){
                   var selectedNode = tree.getSelectionModel().getSelection();
+                  var itemsToRemove = [];
                   for(var j=0;j<selectedNode.length;j++){
                     if(selectedNode[j].data.id){
-                    basket.removeId(selectedNode[j].data.id);
+                      itemsToRemove.push(selectedNode[j].data.id);
                       if( selectedNode[j].data.leaf == true){
                         selectedNode[j].remove();
                       }else{
@@ -160,7 +161,9 @@ var BasketWidget = function() {
                         }
                       }
                     }
+                    
                   }
+                  basket.removeId(itemsToRemove);
                   store.sync();
                 }
               }

@@ -26,7 +26,7 @@
 		} catch (Exception e) {
 		}
 		if(user == null){
-		    response.sendRedirect("login.jsp");
+		    response.sendRedirect(Home+"/account/login.jsp");
 		}
 		if (user != null) {
 %>

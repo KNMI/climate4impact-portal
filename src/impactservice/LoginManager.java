@@ -235,8 +235,10 @@ public class LoginManager {
     user.internalName = user.internalName.replace("https://", "");
     user.internalName = user.internalName.replaceAll("/", ".");
     DebugConsole.println("internalName = "+user.internalName);
-
-    user.setWorkspace(Configuration.getImpactWorkspace()+user.internalName+"/");
+    String workspace = Configuration.getImpactWorkspace();
+    DebugConsole.println("Base workspace = "+workspace);
+    user.setWorkspace(workspace+user.internalName+"/");
+    DebugConsole.println("User workspace = "+user.getWorkspace());
     try {
       DebugConsole.println("Making dir "+user.getWorkspace());
       Tools.mkdir(user.getWorkspace());

@@ -1021,14 +1021,15 @@ public class ImpactService extends HttpServlet {
        * Remove file from status list
        */
       if(requestStr.equals("removeFromList")){
-     
+        
         GenericCart basketList = null;
         try{
           response.setContentType("text/plain");
-          String procId=request.getParameter("id");
-          if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
+          String[] procId=request.getParameterValues("id[]");
+          DebugConsole.println("Delete file from basket: "+procId);
+          //if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
           basketList = LoginManager.getUser(request,response).getShoppingCart();
-          basketList.removeDataLocator(procId);
+          basketList.removeDataLocators(procId);
           response.setContentType("application/json");
           response.getWriter().println("{\"numproducts\":\""+(basketList.getNumProducts(request))+"\"}");
         }catch(Exception e){

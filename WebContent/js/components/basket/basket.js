@@ -10,10 +10,10 @@ var Basket = function(){
 		    }else{
 				adjustNumberOfDataSetsDisplayedInMenuBar(json);
 		    }
-			if(basketElement){
+/*			if(basketElement){
 			  t.populateBasketList(basketElement);
 			}
-		}
+*/		}
 	
 		$.ajax({
 			type: "GET",

@@ -7,7 +7,7 @@ import tools.MyXMLReader;
 
 public class Configuration {
 
-  static long readConfigPolInterval = 0;
+  static long readConfigPolInterval = 0;;
   
   private static String impactWorkspace=null;//"/home/visadm/impactspace/";
 
@@ -43,7 +43,9 @@ public class Configuration {
   
   public static void readConfig(){
     //Re-read the config file every 10 seconds.
-    if(System.currentTimeMillis()<readConfigPolInterval+10000)return;
+    if(impactWorkspace != null && readConfigPolInterval != 0){
+      if(System.currentTimeMillis()<readConfigPolInterval+10000)return;
+    }
     readConfigPolInterval=System.currentTimeMillis(); 
     DebugConsole.println("Reading configfile "+getConfigFile());
     MyXMLReader configReader = new MyXMLReader();

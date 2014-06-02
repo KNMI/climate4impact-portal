@@ -33,7 +33,7 @@ public class GenericCart {
   private  String genericId = "";
   
   public  GenericCart(String id,ImpactUser user){
-    DebugConsole.println("Creating new GenericCart with id "+id+" for user "+user);
+    DebugConsole.println("Creating new GenericCart with id "+id+" for user "+user.id);
     this.genericId=id;
     this.user=user;
     
@@ -101,6 +101,11 @@ public class GenericCart {
       if(saveToStore)saveToStore();
     }
 
+	 public synchronized void removeDataLocators(String[] id) {
+	   for(int j=0;j<id.length;j++){
+	     removeDataLocator(id[j]);
+	   }
+	 }
 	 public synchronized void removeDataLocator(String id) {
 	    DebugConsole.println("Removing "+id);
 	    try {

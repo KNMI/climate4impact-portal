@@ -40,12 +40,16 @@ public class FileUploadHandler extends HttpServlet {
           user = null;
       }
       if(user == null){
-        request.getRequestDispatcher("/account/index.jsp").forward(request, response);
+        //request.getRequestDispatcher("/account/index.jsp").forward(request, response);
+        response.setContentType("application/json");
+        response.getOutputStream().print("{\"files\":[{\"name\":\"\",\"error\":\"You are not logged in.\"}]}");
         return;
       }
       
+      DebugConsole.println("Start upload for user "+user.id);
+      
       long BASKET_UPLOAD_MAX_FILE_SIZE = 100000000;
-      String [] allowedExtensions = {".nc",".shp",".sbx",".shx",".dbf",".sbn",".xml",".prj",".csv"};
+      String [] allowedExtensions = {".nc",".shp",".sbx",".shx",".dbf",".sbn",".xml",".prj",".csv",".h5"};
       
       //request.get
       String UPLOAD_DIRECTORY = null;
