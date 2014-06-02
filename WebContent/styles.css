@@ -46,6 +46,20 @@ body,.x-body {
 	/*  overflow-y: scroll;*/
 }
 
+*{
+	-moz-box-sizing:initial;
+}
+
+code{
+	background-color: initial;
+    color: white;
+    font-size: initial;
+   font-family: Verdana,Geneva,Arial,sans-serif;
+   padding:initial;
+    
+    
+}
+
 /* Nice fonts, but does not work well in Chrome at the moment*/
 @font-face {
 	font-family: 'Open Sans';
@@ -2170,6 +2184,26 @@ input[type=text] {
 	height: 18px;
 }
 
+div.fileinput {
+	position: relative;
+}
+
+div.fileinputfakefile {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+	height:32px;
+}
+
+input.file {
+	position: relative;
+	text-align: right;
+	-moz-opacity:0 ;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+	z-index: 2;
+}
 
 input[type=button],input[type=submit] {
 	cursor:pointer;
@@ -2328,7 +2362,7 @@ a img {
 .x-panel-default-framed ,.x-window-default{
     
 
-     border: 1px solid #BBBBBB;
+     border: 1px solid #BBBBBB !important;
     
 }
 .x-panel .x-panel-header-default-framed-top {

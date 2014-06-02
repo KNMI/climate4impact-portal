@@ -7,7 +7,7 @@
 <head>
 <jsp:include page="../includes-ui.jsp" />
 
-<script type="text/javascript" src="/impactportal/account/login.js"></script>
+<script type="text/javascript" src="/impactportal/account/js/login.js"></script>
 </head>
 <body>
 	<jsp:include page="../header.jsp" />

@@ -216,7 +216,7 @@
 		        <table width="100%" >
 		       		<tr> 
 				        <td class="collapsibletitle" style="width:300px;">
-				        	Metadata 
+				        	ES-DOC Metadata 
 				        </td>
 				        <td style="padding:2px;"><span id="buttonmetadataopen" class="collapse-close"></span></td>
 			        </tr>

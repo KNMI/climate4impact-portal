@@ -88,7 +88,16 @@
     <param-value>/impactportal/js/extjs-4.2.1.883/</param-value>
   </context-param>
 
-  
+   <servlet>
+    <description></description>
+    <display-name>FileUploadHandler</display-name>
+    <servlet-name>FileUploadHandler</servlet-name>
+    <servlet-class>impactservice.FileUploadHandler</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FileUploadHandler</servlet-name>
+    <url-pattern>/FileUploadHandler</url-pattern>
+  </servlet-mapping>
   <servlet>
     <description></description>
     <display-name>DapServlet</display-name>

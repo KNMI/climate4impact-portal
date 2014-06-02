@@ -16,7 +16,7 @@ body,.x-body {
 	overflow: hidden;
 }
 </style>
-<script type="text/javascript" src="/impactportal/account/login.js"></script>
+<script type="text/javascript" src="/impactportal/account/js/login.js"></script>
 <script type="text/javascript">
   try {
     opener.setReloadAfterLogin(getUrlVar('doreload') + '');

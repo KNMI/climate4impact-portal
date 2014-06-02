@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
     <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
-    <script type="text/javascript" src="/impactportal/account/login.js"></script>
+    <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript">
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
@@ -91,6 +91,7 @@
 		}else{
 			
 			%>
+		
 			<div id="basketwidget"></div>
 			<%
 			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));

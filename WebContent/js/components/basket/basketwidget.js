@@ -128,6 +128,12 @@ var BasketWidget = function() {
           }
         }
       },{
+          text : 'Upload file',
+          iconCls : 'icon-download',
+          handler : function() {
+        	 window.location='upload.jsp'; 
+          }
+        },{
         text : 'Delete file(s)',
         iconCls : 'button_remove',
         handler : function() {

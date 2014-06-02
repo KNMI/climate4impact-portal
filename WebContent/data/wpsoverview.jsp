@@ -5,7 +5,7 @@
 
     <jsp:include page="../includes-ext.jsp" />
     <link rel="stylesheet" href="/impactportal/account/login.css" type="text/css" />
-    <script type="text/javascript" src="/impactportal/account/login.js"></script>
+    <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <%
     	ImpactUser user = null;
     	try{

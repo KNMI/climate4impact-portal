@@ -268,9 +268,9 @@ var getReloadAfterLogin = function(){
 
 var generateLoginDialog = function(doReload){
 //  console.log(generateLoginDialog);
-  var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" scrolling="0" style="overflow:hidden;padding:0px;margin:0px;" ></iframe>');
+  var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" scrolling="0" style="overflow:auto;padding:0px;margin:0px;" ></iframe>');
   //var footer = $('<div class="logindialogfooter" ><a onclick="window.open(\'/impactportal/account/login_embed.jsp?doreload=true\',\'targetWindow\',\'toolbar=no,location=no,status=no,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=800,height=500\')" >Do you encounter an untrusted connection? Click here.</a></div>');
-  var footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'http://localhost/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
+  var footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
   
   
     var loginDialog = $("<div id=\"loginDialog\" class=\"loginDialog\" ></div>").append(iframe).append(footer).appendTo("body").dialog({
