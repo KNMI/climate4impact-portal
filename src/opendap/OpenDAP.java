@@ -8,7 +8,9 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -29,7 +31,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debug{
-  static boolean DebugOpenDAP =true;
+  static boolean DebugOpenDAP =false;
 }
 
 class DimInfo{
@@ -257,10 +259,12 @@ public class OpenDAP {
     //DebugConsole.println("DDS part:\n"+ddsResult.toString());
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     bos.write(ddsResult.toString().getBytes());
-
-    DataOutputStream dos = new DataOutputStream(bos);
+    bos.flush();
+  
 
     for(int j=0;j<varNames.length;j++){
+     
+     
       int subSetRequestP = varNames[j].indexOf(".");;
       String varName = varNames[j];
 
@@ -271,38 +275,61 @@ public class OpenDAP {
       int varSize = dimInfo[j].size;
       
       if(Debug.DebugOpenDAP){
-        System.out.println("name: "+varName+" size: "+varSize+ " all: " + (int) variable.getSize()+" type: "+variable.getDataType().toString());
+        DebugConsole.println(j+"): name: "+varName+" size: "+varSize+ " all: " + (int) variable.getSize()+" type: "+variable.getDataType().toString());
       }
 
       if(variable.isScalar()==false){
         //dos.writeInt(1);
         //dos.writeInt(0);
         //}else{
+        //dos.
+        //bos.write(b)
+        //os.writeInt(varSize);
+        DataOutputStream dos = new DataOutputStream(bos);
         dos.writeInt(varSize);
         dos.writeInt(varSize);
-
+        //dos.writeInt(varSize);
+        dos.flush();
+     
         //byte[] b = variable.read().getDataAsByteBuffer().array();
 
 
         byte[] b = null;
         try {
+          
+          //DebugConsole.println("ByteBuffer "+byteBuffer.hasArray()+" - "+b.length);
           ByteBuffer byteBuffer = variable.read(dimInfo[j].start, dimInfo[j].count).getDataAsByteBuffer();
           
           b = byteBuffer.array();
-          DebugConsole.println("ByteBuffer "+byteBuffer.hasArray()+" - "+b.length);
-
+          
+          
           CDMTypes type = ncTypeToCDMType(variable.getDataType().toString());
           int elsize = 1;
+          if(type == CDMTypes.Int16)elsize=2;
+          if(type == CDMTypes.Int32)elsize=4;
           if(type == CDMTypes.Float32)elsize=4;
           if(type == CDMTypes.Float64)elsize=8;
+          
+          //if(b.length!=varSize){
+            //DebugConsole.errprintln(""+b.length/elsize+" and "+varSize);
+          //}
+
+          //DebugConsole.println("ByteBuffer "+byteBuffer.hasArray()+" - "+b.length+" elsize="+elsize);
           byte[] c = new byte[elsize];
           
+          //DataOutputStream dos2 = new DataOutputStream(bos);
+          
           for(int g=0;g<b.length;g=g+elsize){
-            for(int i=0;i<elsize;i++)c[i]=b[i+g];
+            for(int i=0;i<elsize;i++){
+              c[i]=b[i+g];
+             // DebugConsole.println(""+c[i]);
+            }
+            //dos2.writeFloat(0);
             bos.write(c);
+            
           }
           c=null;
-          
+          bos.flush();
         } catch (InvalidRangeException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
@@ -316,12 +343,14 @@ public class OpenDAP {
           if(Debug.DebugOpenDAP)DebugConsole.println("X");
         }
       }else{
+        DataOutputStream dos = new DataOutputStream(bos);
         dos.writeInt(1);
-        dos.writeInt(0);
+        //dos.writeInt(0);
+        dos.flush();
       }
-
+      
     }
-
+    //return dos.g
     return bos.toByteArray();
   }
 
@@ -329,43 +358,72 @@ public class OpenDAP {
     DataType type = attr.getDataType();
     String attrStr = ("        "+CDMTypeToString(ncTypeToCDMType(type.toString()))+" "+attr.getName())+" ";
     //+" \""+attr.getStringValue()+"\";\n");
+    boolean foundType = false;
     if(type == DataType.STRING){
-      attrStr+="\""+attr.getStringValue()+"\";\n";
+      //attrStr+="\""+attr.getStringValue()+"\";\n";
+      String s = attr.getStringValue();
+      if(s == null) s = "";
+      
+      s = s.replaceAll(";", "");
+/*      if(attr.getName().startsWith("a"))s="";
+      if(attr.getName().startsWith("s"))s="";
+      if(attr.getName().startsWith("u"))s="";
+      if(attr.getName().startsWith("l"))s="";
+      if(attr.getName().startsWith("c"))s="";
+      if(attr.getName().startsWith("e"))s="";
+      if(attr.getName().startsWith("r"))s="";
+      s = s.replaceAll("<", "");
+      s = s.replaceAll(">", "");*/
+      s = s.replaceAll("\"", "\\\\\"");
+      //if(attr.getName().startsWith("p"))s="";
+      //DebugConsole.println(s);
+      attrStr+="\""+s+"\";\n";
+      foundType = true;
     }else{
       Array vals = attr.getValues();
       
         for(int j=0;j<vals.getSize();j++){
           if(type == DataType.BYTE){
             attrStr+=vals.getByte(j);
+            foundType = true;
           }
           if(type == DataType.CHAR){
             attrStr+=vals.getChar(j);
+            foundType = true;
           }
           if(type == DataType.SHORT){
             attrStr+=vals.getShort(j);
+            foundType = true;
           }
           
           if(type == DataType.STRUCTURE){
             attrStr+="";
+            foundType = true;
           }
 
           if(type == DataType.INT){
             attrStr+=vals.getInt(j);
+            foundType = true;
           }
           if(type == DataType.LONG){
             attrStr+=vals.getLong(j);
           }
           if(type == DataType.FLOAT){
             attrStr+=vals.getFloat(j);
+            foundType = true;
           }
           if(type == DataType.DOUBLE){
             attrStr+=vals.getDouble(j);
+            foundType = true;
           }
           if(j>0)attrStr+=",";
       }
       attrStr+=";\n";
     }
 
+    if(foundType == false){
+      DebugConsole.errprintln("Attribute type not known: "+type.toString());
+    }
     return attrStr;
 
   }

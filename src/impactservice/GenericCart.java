@@ -144,19 +144,19 @@ public class GenericCart {
 	public int getNumProducts(HttpServletRequest request){
 	  DebugConsole.println("GetNumProducts" );
 	  int numCustomFiles = 0;
-	  ImpactUser impactUser;
-    try {
-      impactUser = LoginManager.getUser(request);
-      String dataDir = impactUser.getDataDir();
-      File dataDirFile = new File(dataDir);
-      
-     
-      if(dataDirFile.exists()){
-        numCustomFiles = dataDirFile.listFiles().length;
-      }
-    } catch (Exception e) {
-
-    }
+//	  ImpactUser impactUser;
+//    try {
+//      impactUser = LoginManager.getUser(request);
+//      String dataDir = impactUser.getDataDir();
+//      File dataDirFile = new File(dataDir);
+//      
+//     
+//      if(dataDirFile.exists()){
+//        numCustomFiles = dataDirFile.listFiles().length;
+//      }
+//    } catch (Exception e) {
+//
+//    }
 
 		return dataLocatorList.size()+numCustomFiles;
 	}
