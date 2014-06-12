@@ -113,6 +113,12 @@ var FileViewer = function() {
 	              return;
 	            }
 	            var downloadURL = request.replace('dodsC', 'fileServer');
+	            if(openid){
+	              if(openid!=""){
+	                downloadURL+="?openid="+downloadURL;
+	              }
+	            }
+
 	            if (downloadWin)
 	              downloadWin.close();
 	            downloadWin = window.open(downloadURL, 'jav',

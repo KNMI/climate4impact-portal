@@ -224,7 +224,7 @@ public class ESGFSearch {
     DebugConsole.println("*** uniqueId "+uniqueId);
     
     
-    String data = getDiskCachedString(uniqueId,60);//null;//getPersistentCachedString(uniqueId);
+    String data = getDiskCachedString(uniqueId,600);//null;//getPersistentCachedString(uniqueId);
     if(data ==null){
       JSONObject d = null;
       
@@ -756,7 +756,7 @@ public class ESGFSearch {
   }
   public static JSONObject getFacetForQuery(String facet, String queryStr) throws MalformedURLException, Exception {
     String uniqueId = "getFacetForQuery_"+facet+"_"+queryStr;
-    String data = getDiskCachedString(uniqueId,60);//null;//getPersistentCachedString(uniqueId);
+    String data = getDiskCachedString(uniqueId,600);//null;//getPersistentCachedString(uniqueId);
     if(data ==null){
       JSONArray facets = addFacet(facet, queryStr);
       

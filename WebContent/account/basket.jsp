@@ -20,6 +20,7 @@
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
     var task;
+    var openid = "";
     var removeId = function(id){
     	
     	var passFn = function(e){
@@ -79,7 +80,7 @@
 		<%
 			ImpactUser user = null;
 				try{
-			user = LoginManager.getUser(request);
+					user = LoginManager.getUser(request);
 				}catch(Exception e){
 			
 				}
@@ -91,10 +92,12 @@
 		}else{
 			
 			%>
-		
+			<script type="text/javascript">
+				openid = '<%=user.id%>';
+			</script>
 			<div id="basketwidget"></div>
 			<%
-			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
+
 		}
 		%>
 

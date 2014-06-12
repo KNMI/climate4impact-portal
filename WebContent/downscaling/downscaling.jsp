@@ -22,6 +22,7 @@
   	  			out.print("<table class=\"drupal\">");
   	    		out.print("<tr><td>internalName</td><td>"+user.internalName+"</td></tr>");
   	    		out.print("<tr><td>certificateFile</td><td>"+user.certificateFile+"</td></tr>");
+  	    		out.print("<tr><td>email</td><td>"+user.getEmailAddress()+"</td></tr>");
   	    		out.print("<tr><td>id</td><td>"+user.id+"</td></tr>");
   	    		out.print("<tr><td>getDataDir()</td><td>"+user.getDataDir()+"</td></tr>");
   	    		out.print("<tr><td>getWorkspace()</td><td>"+user.getWorkspace()+"</td></tr>");

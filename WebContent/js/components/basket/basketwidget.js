@@ -116,6 +116,11 @@ var BasketWidget = function() {
             }
             selectedNode = selectedNode[0];
             var httpURL = selectedNode.data.httpurl;
+            if(openid){
+              if(openid!=""){
+                httpURL+="?openid="+openid;
+              }
+            }
             if(!httpURL){
               Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
               return;

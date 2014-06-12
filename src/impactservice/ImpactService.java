@@ -236,7 +236,7 @@ public class ImpactService extends HttpServlet {
       }
     }
     
-    String buildHTML(JSONArray array,String root,int oddEven){
+    String buildHTML(JSONArray array,String root,int oddEven,String openid){
       if(array == null)return null;
       StringBuffer html = new StringBuffer();
       try {
@@ -281,16 +281,24 @@ public class ImpactService extends HttpServlet {
           String dapLink = "";
           String httpLink = "";
           
-          if(openDAPURL == null && httpURL !=null){
-            openDAPURL = httpURL.replace("fileServer", "dodsC")+"#fromhttpurl";
-          }
+          /*
+           * Only show opendap when it is really advertised by the server.
+           * if(openDAPURL == null && httpURL !=null){
+            openDAPURL = httpURL.replace("fileServer", "dodsC")+"#";
+          }*/
           
           if(openDAPURL!=null){
             try {
               dapLink="<a href=\"/impactportal/data/datasetviewer.jsp?dataset="+URLEncoder.encode(openDAPURL,"UTF-8")+"\">view</a>";
             } catch (UnsupportedEncodingException e1) {}
           }
-          if(httpURL!=null)httpLink="<a href=\""+httpURL+"\">get</a>";
+          if(httpURL!=null){
+            if(openid!=null){
+              httpLink="<a target=\"_blank\" href=\""+httpURL+"?openid="+openid+"\">get</a>";
+            }else{
+              httpLink="<a href=\""+httpURL+"\">get</a>";
+            }
+          }
           //html+="</td><td>"+dapLink+"</td><td>"+httpLink;
           html.append("</td><td>");html.append(dapLink);html.append("</td><td>");html.append(httpLink);
           if(httpURL == null && openDAPURL == null && catalogURL == null){
@@ -307,7 +315,7 @@ public class ImpactService extends HttpServlet {
           try{
             JSONArray children = a.getJSONArray("children");
             //html+=buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",oddEven);
-            html.append(buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",1-oddEven));
+            html.append(buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",1-oddEven,openid));
           } catch (JSONException e) {
           }
         }
@@ -405,8 +413,12 @@ public class ImpactService extends HttpServlet {
           
           long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           
-          
-          html+=buildHTML(treeElements,"",0)+"</table></div>";
+          String openid = null;
+          try{
+            openid= LoginManager.getUser(request).id;
+          }catch(Exception e){            
+          }
+          html+=buildHTML(treeElements,"",0,openid)+"</table></div>";
           long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           DebugConsole.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
   		    response.getWriter().print(html);

@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.DrupalEditor,java.net.URLDecoder"%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.*,java.net.URLDecoder"%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
 	  <%
@@ -25,12 +25,23 @@
 			  dapURL = dapURL.substring(0,inda+3);
 			}
 		}
+		
+		ImpactUser user = null;
+		String openid="";
+		try{
+			user = LoginManager.getUser(request);
+			openid = user.id;
+		}catch(Exception e){
+		
+		}
+		
 	  %>
   
     <jsp:include page="../includes-ext.jsp" />
        <script type="text/javascript">
     	var serviceURL='/impactportal/ImpactService?';
     	var dataset=undefined;;
+    	var openid="<%=openid%>";
     	dataset='<%= dapURL %>';
     </script>
     <link rel="stylesheet" href="/impactportal/account/login.css" type="text/css" />

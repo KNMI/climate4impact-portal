@@ -103,7 +103,7 @@ var setCheckBoxes = function(addNonExistingCheckBoxes){
 				}
 				var lkey = items[0];
 				var json = [items[1],items[1]];
-				alert(lkey + inp);
+				//alert(lkey + inp);
 				theseCheckBoxesAreNotThere[lkey].push(json);
 			}
 			//Radio buttons
