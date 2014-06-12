@@ -183,7 +183,7 @@ public class LoginManager {
       
     //DebugConsole.println("Getting user from session with id "+id);
     if(id == null)throw new Exception("You are not logged in...");
-    ImpactUser user = getUser(id);
+    ImpactUser user = getUser(id,request);
     return user;
   }
   
@@ -196,7 +196,7 @@ public class LoginManager {
    * @param userId The userID, equal to the OpenID identifier
    * @return The user object
    */
-  public synchronized static ImpactUser getUser(String userId){
+  public synchronized static ImpactUser getUser(String userId,HttpServletRequest request){
     //DebugConsole.println("Looking up user "+userId);
     //Lookup the user in the vector list
     if(userId==null)return null;
@@ -212,7 +212,7 @@ public class LoginManager {
     ImpactUser user = new ImpactUser();
     user.id=userId;
     users.add(user);
-    try {checkLogin(userId);} catch (Exception e) { }
+    try {checkLogin(userId,request);} catch (Exception e) { }
     
     return user;
   }
@@ -222,13 +222,13 @@ public class LoginManager {
    * @param session
    * @throws Exception 
    */
-  public synchronized static void checkLogin(String openIdIdentifier) throws Exception{
+  public synchronized static void checkLogin(String openIdIdentifier,HttpServletRequest request) throws Exception{
 
     DebugConsole.println("checkLogin "+openIdIdentifier);
     if(openIdIdentifier==null){
       DebugConsole.errprintln("No openIdIdentifier given");
     }
-    ImpactUser user = getUser(openIdIdentifier);
+    ImpactUser user = getUser(openIdIdentifier,request);
     
     DebugConsole.println("Check login "+user.id);
     user.internalName = user.id.replace("http://", "");
@@ -250,13 +250,32 @@ public class LoginManager {
       throw new Exception("Unable to create credential for user, server misconfiguration:"+user.id+"\n"+e.getMessage());
     }
     try{
-    getCredential(user);
+      getCredential(user);
     }catch(Exception e){
       user.credentialError=true;
       throw new Exception("Unable to get credential for user "+user.id+"\n"+e.getMessage());
     }
     
     createNCResourceFile(user);
+    
+    //Get email
+    try{
+      String emailAddress = (String) request.getSession().getAttribute("emailaddress");
+      boolean foundEmail =false;
+      if(emailAddress!=null){
+        if(emailAddress.length()>0){
+          user.setEmailAddress(emailAddress);
+          foundEmail = true;
+          DebugConsole.println("Email: "+emailAddress);    
+        }
+      }
+      if(!foundEmail ){
+        MessagePrinters.emailFatalErrorMessage("User email is not found", "User email is not found for "+user.id);
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+    
     //createFontConfigFile(user);
     user.configured = true;
   }

@@ -18,6 +18,7 @@ public class ImpactUser {
   public boolean configured = false;
   private GenericCart shoppingCart = null;
   private GenericCart processingJobsList = null;
+  private String emailAddress;
   public String getWorkspace(){
     return usersDir;
   }
@@ -64,6 +65,12 @@ public class ImpactUser {
     String dataDir = Tools.makeCleanPath(getWorkspace()+"/data");
     Tools.mkdir(dataDir);
     return dataDir;
+  }
+  public String getEmailAddress() {
+    return emailAddress;
+  }
+  public void setEmailAddress(String emailAddress) {
+    this.emailAddress = emailAddress;
   }
   
   /**

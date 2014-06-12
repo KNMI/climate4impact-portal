@@ -7,8 +7,10 @@ import impactservice.MessagePrinters;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -38,6 +40,9 @@ import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
+
+
+
 
 import tools.DebugConsole;
 
@@ -194,6 +199,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		if (identifier != null) {
 		  DebugConsole.println("Validation is OK");
 			req.setAttribute("identifier", identifier.getIdentifier());
+			//req.setAttribute("email", identifier.getIdentifier());
 			req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());
 		}else{
 		  DebugConsole.println("Validation is INVALID");
@@ -270,6 +276,8 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// and retrieve one service endpoint for authentication
 			DiscoveryInformation discovered = manager.associate(discoveries);
 
+			
+			
 			// store the discovery information in the user's session
 			httpReq.getSession().setAttribute("openid-disc", discovered);
 
@@ -279,7 +287,23 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// Attribute Exchange example: fetching the 'email' attribute
 			FetchRequest fetch = FetchRequest.createFetchRequest();
 			SRegRequest sregReq = SRegRequest.createFetchRequest();
+			
+		/*	Enumeration<String> paramNames = httpReq.getParameterNames();
+			
+			while(paramNames.hasMoreElements()){
+			  String param = (String) paramNames.nextElement();
+			  DebugConsole.println("param "+param);
+		  }*/
+			
+			//fetch.addAttribute("urn:esg:email:address",true);
+			//fetch.addAttribute("esg:email:address",true);
+			//fetch.addAttribute("EmailAddress", "http://www.w3.org/2001/XMLSchema", true);
+			fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
 
+			//sregReq.addAttribute("urn:esg:email:address",true);
+			//sregReq.addAttribute("esg:email:address",true);
+			//sregReq.addAttribute("Email", "http://schema.openid.net/contact/email", true);
+			
 			if ("1".equals(httpReq.getParameter("nickname"))) {
 				// fetch.addAttribute("nickname",
 				// "http://schema.openid.net/contact/nickname", false);
@@ -328,7 +352,14 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 			// attach the extension to the authentication request
 			if (!sregReq.getAttributes().isEmpty()) {
+			  DebugConsole.println("SREG Attributes defined, adding extension");
 				authReq.addExtension(sregReq);
+			
+			}
+			
+			if(!fetch.getAttributes().isEmpty()){
+			  DebugConsole.println("AX Attributes defined, adding extension");
+        authReq.addExtension(fetch);
 			}
 
 			boolean useGetRequestInstead = true;
@@ -414,8 +445,15 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			if (verified != null) {
 				AuthSuccess authSuccess = (AuthSuccess) verification
 						.getAuthResponse();
+				DebugConsole.println("Verifications succesfull");
 
+				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG11)) {
+				  DebugConsole.println("Has extension OPENID_NS_SREG1");
+				}
+				
 				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
+				  DebugConsole.println("Has extension OPENID_NS_SREG");
+				  
 					MessageExtension ext = authSuccess
 							.getExtension(SRegMessage.OPENID_NS_SREG);
 					if (ext instanceof SRegResponse) {
@@ -423,24 +461,52 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 						for (Iterator<String> iter = sregResp.getAttributeNames()
 								.iterator(); iter.hasNext();) {
 							String name = (String) iter.next();
+							DebugConsole.println("name="+name);
 							String value = sregResp.getParameterValue(name);
 							httpReq.setAttribute(name, value);
 						}
 					}
 				}
+				
+        if (!authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
+          DebugConsole.errprintln("No extensions received from provider");
+        }
+        
+        
 				if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
+				  DebugConsole.println("Has extension OPENID_NS_AX");
 					FetchResponse fetchResp = (FetchResponse) authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
 
-					// List emails = fetchResp.getAttributeValues("email");
+					/*List emails1 = fetchResp.getAttributeValues("urn:esg:email:address");
+					List emails2 = fetchResp.getAttributeValues("esg:email:address");
+					DebugConsole.println("***********1 "+emails1.size());
+					DebugConsole.println("***********2 "+emails2.size());
+					
+				 */
+				 	
+			    String emailAddress = fetchResp.getAttributeValue("email");
+			    DebugConsole.println("User email is "+emailAddress);
+			    
+			    if(emailAddress!=null){
+			      if(emailAddress.length()>0){
+			        httpReq.getSession().setAttribute("emailaddress", emailAddress);
+			      }
+			    }
+			   
+				 
 					// String email = (String) emails.get(0);
 
 					List<String> aliases = fetchResp.getAttributeAliases();
+					
+					
+					//DebugConsole.println("Number of aliases: "+aliases.size());
 					for (Iterator<String> iter = aliases.iterator(); iter.hasNext();) {
 						String alias = (String) iter.next();
 						List<String> values = fetchResp.getAttributeValues(alias);
 						if (values.size() > 0) {
 							log.debug(alias + " : " + values.get(0));
+							DebugConsole.println("name="+alias+" value="+values.get(0));
 							httpReq.setAttribute(alias, values.get(0));
 						}
 					}

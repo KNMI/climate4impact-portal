@@ -61,10 +61,13 @@
 		<div class="cmscontent">
 
 
-			<h1>You are signed in.</h1>
+			<h1>You are signed in</h1>
 			<div class="textstandardleft">
-				You have successfully signed in with the following OpenID:<br /> <br />
-				<strong><%=user.id%></strong><br /> <br /> <b>Actions:</b>
+				
+				Your openid is:<br/><strong><%=user.id%></strong><br /><br/>
+				You email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
+				
+				 <b>Actions:</b>
 				<ul>
 					<li>View account details: <span id="accountinfo">-</span></li>
 					<li>If you are not a member of the CMIP5 group: <a
@@ -77,7 +80,7 @@
 	<%
 					//Print warning when retrieving SLCS has failed.
 						try {
-							impactservice.LoginManager.checkLogin(user.id);
+							impactservice.LoginManager.checkLogin(user.id,request);
 						} catch (Exception e) {
 							impactservice.MessagePrinters.printWarningMessage(out, e);
 						}
