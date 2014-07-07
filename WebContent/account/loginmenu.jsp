@@ -28,15 +28,20 @@
 				
 		String pageName=request.getServletPath();
 	
-		boolean highlightBasket = false;
+		boolean highlightBasket = false,highlightAccount = false;
 		if(pageName.indexOf("basket.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("upload.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("fileuploadresult")!=-1)highlightBasket = true;
+		
+		if(pageName.indexOf("login.jsp")!=-1)highlightAccount = true;
+		if(pageName.indexOf("getcredential.jsp")!=-1)highlightAccount = true;
+			
+		
 		//out.print(header); //returns file name and path
 		%>
 
   <ul style="height:20px;">
-  	<li <% if(pageName.indexOf("login.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/login.jsp" ><code class="codeusersicon"></code>&nbsp;Account</a></li>
+  	<li <% if(highlightAccount)out.print("class=\"sel\""); %>><a href="<%=Home%>account/login.jsp" ><code class="codeusersicon"></code>&nbsp;Account</a></li>
    	<li  <% if(highlightBasket)out.print("class=\"sel\""); %>><a href="<%=Home%>account/basket.jsp" ><code class="codeshoppingcarticon"></code>&nbsp;Basket <code id="baskettext2">(<%=numProductsString%>)</code></a></li>
   	<li  <% if(pageName.indexOf("jobs.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/jobs.jsp" ><code class="codejobsicon"></code>&nbsp;Jobs <code id="jobnumber">(<%=numJobsString%>)</code></a></li>
   	

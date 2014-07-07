@@ -7,10 +7,8 @@ import impactservice.MessagePrinters;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
