@@ -36,14 +36,14 @@ public class MyXMLReader {
 	 */
 	public String getNodeValue(String name){
 		if(config==null){
-			DebugConsole.errprintln("MyXMLReader: parseXML not called");
+			Debug.errprintln("MyXMLReader: parseXML not called");
 			return null;
 		}
 		return config.getValue(name);
 	}
 	public String[] getNodeValues(String name){
 		if(config==null){
-			DebugConsole.errprintln("MyXMLReader: parseXML not called");
+			Debug.errprintln("MyXMLReader: parseXML not called");
 			return null;
 		}
 		return config.getValues(name);
@@ -51,7 +51,7 @@ public class MyXMLReader {
 	
 	public boolean setNodeValue(String name,String value){
 		if(config==null){
-			DebugConsole.errprintln("MyXMLReader: parseXML not called");
+			Debug.errprintln("MyXMLReader: parseXML not called");
 			return false;
 		}		
 		return config.setValue(name,value);
@@ -124,7 +124,7 @@ public class MyXMLReader {
 				if(node==null){
 					Node parentNode  = getFirstElementNode(nodeList);
 					do{
-						DebugConsole.println("Creating element "+pathElements[j-1]);
+						Debug.println("Creating element "+pathElements[j-1]);
 						Element newNode = doc.createElement(pathElements[j-1]);
 						node=newNode;
 						parentNode.appendChild(node);
@@ -219,7 +219,7 @@ public class MyXMLReader {
 		try {
 			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException e1) {
-			  DebugConsole.throwMessage("Exception in Config.ParseXML:ParserConfigurationException: "+e1.getMessage());
+			  Debug.throwMessage("Exception in Config.ParseXML:ParserConfigurationException: "+e1.getMessage());
 		}
 		try {
 			if(mode==xmlParseMode.parseXMLFile){
@@ -230,9 +230,9 @@ public class MyXMLReader {
 				doc =db.parse(new InputSource(new java.io.StringReader(XMLData)));
 			}
 		} catch (SAXException e1) {
-			  DebugConsole.throwMessage("Exception in Config.ParseXML:SAXException: "+e1.getMessage());
+			  Debug.throwMessage("Exception in Config.ParseXML:SAXException: "+e1.getMessage());
 		} catch (IOException e1) {
-			  DebugConsole.throwMessage("Exception in Config.ParseXML:IOException: "+e1.getMessage());
+			  Debug.throwMessage("Exception in Config.ParseXML:IOException: "+e1.getMessage());
 		}
     doc.getDocumentElement().normalize();
 		listWalker(config , null,doc.getChildNodes(),listWalkerMode.getNodeValues,null,null);
@@ -253,18 +253,18 @@ public class MyXMLReader {
 	        }
 	        in.close();
 	    } catch (IOException e) {
-	    	DebugConsole.errprintln("IOException: " + e.getMessage());
+	    	Debug.errprintln("IOException: " + e.getMessage());
 	    	return null;
 	    }
 		// Search for the node
 	    int start= XMLFile.indexOf("<"+node+">");
 	    if(start==-1){
-	    	DebugConsole.errprintln("Error: The start node <"+node+"> is not found.");
+	    	Debug.errprintln("Error: The start node <"+node+"> is not found.");
 	    	return null;
 	    }
 	    int end= XMLFile.indexOf("</"+node+">");
 	    if(end==-1){
-	    	DebugConsole.errprintln("Error: The node end </"+node+"> is not found.");
+	    	Debug.errprintln("Error: The node end </"+node+"> is not found.");
 	    	return null;
 	    }
 	    return ("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"+XMLFile.substring(start,end+node.length()+3));

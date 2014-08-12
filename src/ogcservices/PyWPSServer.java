@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tools.CGIRunner;
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.Tools;
 
@@ -49,7 +49,7 @@ public class PyWPSServer extends HttpServlet {
       user = LoginManager.getUser(request,response);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
-      DebugConsole.println("WPS for user: "+user.id);
+      Debug.println("WPS for user: "+user.id);
     }catch(Exception e){    
       throw new Exception("Warning: Anonymous user: '"+e.getMessage()+"'");
     }
@@ -81,23 +81,23 @@ public class PyWPSServer extends HttpServlet {
     
     //Get the pywps location
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
-    DebugConsole.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
+    Debug.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
     
 
     
     
     
-    CGIRunner.runCGIProgram(commands,environmentVariables,response,outputStream,dataToPost);
+    CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,outputStream,dataToPost);
   }
   
   private void handleWPSRequests(HttpServletRequest request, HttpServletResponse response) {
-    DebugConsole.println("Handle WPS requests");
+    Debug.println("Handle WPS requests");
     OutputStream out1 = null;
     //response.setContentType("application/json");
     try {
       out1 = response.getOutputStream();
     } catch (IOException e) {
-      DebugConsole.errprint(e.getMessage());
+      Debug.errprint(e.getMessage());
       return;
     }
   
@@ -116,16 +116,16 @@ public class PyWPSServer extends HttpServlet {
       PyWPSServer.runPyWPS(request,response,out1,null,postData);
 
     } catch (Exception e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       response.setStatus(401);
       try {
         if(e.getMessage()!=null){
           out1.write(e.getMessage().getBytes());
-          DebugConsole.errprintln(e.getMessage());
+          Debug.errprintln(e.getMessage());
         }
       } catch (IOException e1) {
-        DebugConsole.errprintln("Unable to write to stream");
-        DebugConsole.printStackTrace(e);
+        Debug.errprintln("Unable to write to stream");
+        Debug.printStackTrace(e);
       }
     }    
   }
@@ -134,14 +134,14 @@ public class PyWPSServer extends HttpServlet {
    * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
    */
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    DebugConsole.println("WPS POST request received");
+    Debug.println("WPS POST request received");
     
     handleWPSRequests(request,response);
   }
   
   protected void doGet(HttpServletRequest request, HttpServletResponse response) {
     
-    DebugConsole.println("PWS QueryString: "+request.getQueryString());
+    Debug.println("PWS QueryString: "+request.getQueryString());
     //Check if this is a WPS status request, which means reading a local XML file which resides on disk.
     try{
         String output = null;
@@ -164,18 +164,18 @@ public class PyWPSServer extends HttpServlet {
           output = output.substring(1);
           portalOutputPath = Tools.makeCleanPath(portalOutputPath);
           String fileName = portalOutputPath+"/"+output;
-          DebugConsole.println("WPS GET status request: "+portalOutputPath+output);
+          Debug.println("WPS GET status request: "+portalOutputPath+output);
           OutputStream out1 = null;
           String data;
           try{
             Tools.checkValidCharsForFile(output);
             data = Tools.readFile(fileName);
           }catch(Exception e){
-            DebugConsole.errprintln(e.getMessage());
+            Debug.errprintln(e.getMessage());
             try {
               out1 = response.getOutputStream();
             } catch (IOException e1) {
-              DebugConsole.errprint(e1.getMessage());
+              Debug.errprint(e1.getMessage());
               return;
             }
             response.setContentType("text/html");
@@ -185,7 +185,7 @@ public class PyWPSServer extends HttpServlet {
          try {
             out1 = response.getOutputStream();
           } catch (IOException e) {
-            DebugConsole.errprint(e.getMessage());
+            Debug.errprint(e.getMessage());
             return;
           }
           response.setContentType("text/xml");
@@ -196,7 +196,7 @@ public class PyWPSServer extends HttpServlet {
     }
   
     //Otherwise, just call pyWPS
-    DebugConsole.println("WPS GET request received");
+    Debug.println("WPS GET request received");
     handleWPSRequests(request,response);
   }
 

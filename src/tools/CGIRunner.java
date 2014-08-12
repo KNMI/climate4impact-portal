@@ -13,13 +13,15 @@ public class CGIRunner {
    * Runs a CGI program as executable on the system. Emulates the behavior of scripts in a traditional cgi-bin directory of apache http server.
    * @param commands A string array with the executable and the arguments to this executable
    * @param environmentVariables The environment variables used for this run
+   * @param directory The location to start the program, can be null or "" if not needed
    * @param response Can be null, when given the content-type for the response will be set.
    * @param outputStream A standard byte output stream in which the data of stdout is captured. Can for example be response.getOutputStream().
    * @param postData The data to post.
    * @throws Exception
    */
-  public static void runCGIProgram(String[] commands,String[] environmentVariables,final HttpServletResponse response,OutputStream outputStream,String postData) throws Exception{
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {DebugConsole.errprint(new String(message));}}
+  public static void runCGIProgram(String[] commands,String[] environmentVariables,String directory,final HttpServletResponse response,OutputStream outputStream,String postData) throws Exception{
+    Debug.println("Working Directory: "+directory);
+    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}}
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
       boolean headersSent = false;
       OutputStream output = null;
@@ -68,7 +70,7 @@ public class CGIRunner {
                     response.setContentType(headerKVP[1].trim());
                   }
                 }else{
-                  DebugConsole.println("Setting header "+headerKVP[0].trim()+"="+headerKVP[1].trim());
+                  Debug.println("Setting header "+headerKVP[0].trim()+"="+headerKVP[1].trim());
                   response.setHeader(headerKVP[0].trim(),headerKVP[1].trim());
                 }
               }
@@ -100,39 +102,39 @@ public class CGIRunner {
       DebugConsole.println(commands[j]);
     }*/
     
-    ProcessRunner processRunner = new ProcessRunner (stdoutPrinter,stderrPrinter,environmentVariables);
+    ProcessRunner processRunner = new ProcessRunner (stdoutPrinter,stderrPrinter,environmentVariables,directory);
     
-  
+    
 
     long startTimeInMillis = Calendar.getInstance().getTimeInMillis();  
-    DebugConsole.println("Starting CGI.");
+    Debug.println("Starting CGI.");
     try{
       //postData
       processRunner.runProcess(commands,postData);
     }catch(Exception e){
-      DebugConsole.println("Exception in processRunner");
-      DebugConsole.errprintln(e.getMessage());
+      Debug.println("Exception in processRunner");
+      Debug.errprintln(e.getMessage());
       
       throw(e);
     }
     
     if(processRunner.exitValue()!=0){
-      DebugConsole.errprintln("Warning: exit code: "+processRunner.exitValue());
+      Debug.errprintln("Warning: exit code: "+processRunner.exitValue());
     }
     else{
-      DebugConsole.errprintln("Exit code 0 == OK");
+      Debug.errprintln("Exit code 0 == OK");
     }
     
     if(response!=null){
       if(processRunner.exitValue()!=0){
         response.setStatus(500);
         String msg="Internal server error: CGI returned code "+processRunner.exitValue();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         outputStream.write(msg.getBytes());
       }
     }
     
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    DebugConsole.println("Finished CGI with code "+processRunner.exitValue()+": "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+    Debug.println("Finished CGI with code "+processRunner.exitValue()+": "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
   }
 }

@@ -84,7 +84,7 @@ public class HTTPTools extends HttpServlet {
         
         String message = "Invalid token given: '"
             + Character.toString((char) str[c]) + "', code (" + str[c] + ").";
-        DebugConsole.errprintln("Invalid string given: " + message + " in string "+input);
+        Debug.errprintln("Invalid string given: " + message + " in string "+input);
         throw new InvalidHTTPKeyValueTokensException(message);
       }
     }
@@ -185,15 +185,15 @@ public class HTTPTools extends HttpServlet {
       String trustRootsFile, String trustRootsPassword)
       throws WebRequestBadStatusException, IOException {
     String connectToURL = makeCleanURL(url);
-    DebugConsole.println("  Making GET: " + connectToURL);
+    Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
-      DebugConsole.println("  Using private key: " + pemFile);
-      DebugConsole.println("  Using trustRootsFile: " + trustRootsFile);
-      DebugConsole.println("  Using trustRootsPassword: " + trustRootsPassword);
+      Debug.println("  Using private key: " + pemFile);
+      Debug.println("  Using trustRootsFile: " + trustRootsFile);
+      Debug.println("  Using trustRootsPassword: " + trustRootsPassword);
 
     }
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
-      DebugConsole.println("Offline mode");
+      Debug.println("Offline mode");
       return null;
     }
     long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
@@ -254,39 +254,39 @@ public class HTTPTools extends HttpServlet {
     } catch (UnknownHostException unknownHostException) {
       throw unknownHostException;
     } catch (IOException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403, "IOException: Forbidden");
     } catch (UnrecoverableKeyException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (KeyManagementException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (KeyStoreException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (NoSuchAlgorithmException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (CertificateException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (GSSException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (WebRequestBadStatusException e) {
-      DebugConsole.printStackTrace(e);
+      Debug.printStackTrace(e);
       throw e;
     } catch (Exception e) {
-      DebugConsole.printStackTrace(e);
-      DebugConsole.println("HTTP Exception");
+      Debug.printStackTrace(e);
+      Debug.println("HTTP Exception");
       throw new WebRequestBadStatusException(403);
     }
     if (redirectLocation != null) {
-      DebugConsole.println("redirectLocation =" + redirectLocation);
+      Debug.println("redirectLocation =" + redirectLocation);
     }
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    DebugConsole.println("Finished GET: " + connectToURL + " ("
+    Debug.println("Finished GET: " + connectToURL + " ("
         + (stopTimeInMillis - startTimeInMillis) + " ms)");
     // DebugConsole.println("Retrieved "+result.length()+" bytes");
     return result;

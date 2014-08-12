@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import tools.DebugConsole;
+import tools.Debug;
 
 
 
@@ -46,7 +46,7 @@ import tools.DebugConsole;
         Date currentDate =  Calendar.getInstance().getTime();;
         //1000*60*5 == 5 minutes.
         if(currentDate.getTime()-1000*60*60 > creationDate.getTime()){
-        	DebugConsole.println("Destroying and recreating emf");
+        	Debug.println("Destroying and recreating emf");
         	emf.close();
         	emf  = null;
         	return getEMF();

@@ -1,6 +1,6 @@
 package impactservice;
 
-import tools.DebugConsole;
+import tools.Debug;
 
 public class SessionManager {
   public static class SearchSession{
@@ -45,7 +45,7 @@ public class SessionManager {
           "  \"pagelimit\":\""+pagelimit+"\",\n" +
           "  \"where\":\""+where + "\"\n"+
           "}\n";
-      DebugConsole.println("SearchSession JSON:\n"+searchSessionJson);
+      Debug.println("SearchSession JSON:\n"+searchSessionJson);
       return searchSessionJson;
     }
    /* public void reset() {

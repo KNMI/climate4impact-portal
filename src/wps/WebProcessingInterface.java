@@ -20,7 +20,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.MyXMLParser;
 import tools.MyXMLParser.Options;
 import tools.MyXMLParser.XMLElement;
@@ -66,7 +66,7 @@ public class WebProcessingInterface {
 			MyXMLParser.XMLElement  getCapabilitiesTree = new MyXMLParser.XMLElement();
 			try{
 				String getcaprequest="service=WPS&request=GetCapabilities";
-				DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
+				Debug.println("getProcessorsDescriptors: "+getcaprequest);
 				
 			
 		   
@@ -128,7 +128,7 @@ public class WebProcessingInterface {
       
       return error;
     } catch (JSONException e) { 
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
     }
     return null;
 	}
@@ -157,7 +157,7 @@ public class WebProcessingInterface {
 	          }catch(Exception e){}
 	        }catch(Exception e){}
 	        message+="\n\n"+extraInfo;
-	        DebugConsole.errprintln("error: "+message);
+	        Debug.errprintln("error: "+message);
 	        return returnErrorMessage(message);
 	      }
 	    }catch(Exception e){}
@@ -173,11 +173,11 @@ public class WebProcessingInterface {
 	 */
 	
 	public static JSONObject describeProcess(HttpServletRequest request,String id) throws Exception{
-	  DebugConsole.println("DescribeProcess "+id);
+	  Debug.println("DescribeProcess "+id);
 	  String getcaprequest="service=WPS&version=1.0.0&request=describeprocess&identifier="+id;
 	  
 	  MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
-    DebugConsole.println("getProcessorsDescriptors: "+getcaprequest);
+    Debug.println("getProcessorsDescriptors: "+getcaprequest);
     
     
     if(isLocal() == false){
@@ -197,7 +197,7 @@ public class WebProcessingInterface {
     //Check if an Exception has been thrown:
     JSONObject exception = checkException(a,getcaprequest);
     if(exception!=null){
-      DebugConsole.println("Exception in DescribeProcess: "+exception.toString());
+      Debug.println("Exception in DescribeProcess: "+exception.toString());
       return exception;
     }
     //DebugConsole.println("toJSON");
@@ -282,7 +282,7 @@ public class WebProcessingInterface {
       return null;
     }
     //http://bhw222.knmi.nl:8080/cgi-bin/wps.cgi?version=1.0.0&service=WPS&request=execute&identifier=Rint&datainputs=[startIndex=1;stopIndex=100]
-    DebugConsole.println("executeprocess "+procId+" datainput="+dataInputs);
+    Debug.println("executeprocess "+procId+" datainput="+dataInputs);
     //String getcaprequest=WPSURL+"service=WPS&version=1.0.0&request=execute&identifier="+procId+"&datainputs=[startIndex=1;stopIndex=100]";
     
     String postData="";
@@ -305,7 +305,7 @@ public class WebProcessingInterface {
          +"      </wps:ResponseForm>\n";
 
       String trimmedInput=dataInputs.trim();
-      DebugConsole.println("DataInputs="+trimmedInput);
+      Debug.println("DataInputs="+trimmedInput);
       if(!trimmedInput.equals("[]")){
         postData   +=   "      <wps:DataInputs>\n";
         //postData+=addLiteralData("startIndex","1");
@@ -318,7 +318,10 @@ public class WebProcessingInterface {
         String [] dataInputArray=trimmedInput.substring(1,trimmedInput.length()-1).split(";");
         for(int j=0;j<dataInputArray.length;j++){
           //KVP key=value
-          DebugConsole.println(dataInputArray[j]);
+          
+          
+          dataInputArray[j] = dataInputArray[j].split("#")[0];
+          Debug.println(dataInputArray[j]);
           try{
           String[] kvp=dataInputArray[j].split("=");
           if(kvp.length<2){
@@ -328,7 +331,7 @@ public class WebProcessingInterface {
           }
           }catch(Exception e){
             e.printStackTrace();
-            DebugConsole.errprintln("error");
+            Debug.errprintln("error");
             return returnErrorMessage("Invalid values given for '"+dataInputArray[j]+"' \nCause: "+e.toString());  
           }
         }
@@ -353,11 +356,11 @@ public class WebProcessingInterface {
         
         PyWPSServer.runPyWPS(request,null,out,null,postData);
         //a.parse(new URL(WPSURL),postData);
-        DebugConsole.println(getWPSURL()+" for "+user.id);
+        Debug.println(getWPSURL()+" for "+user.id);
         
-        DebugConsole.println("Process has been started with the following command:.");
+        Debug.println("Process has been started with the following command:.");
         //DebugConsole.println(postData+"\nThe result is:\n"+a.toString());
-        DebugConsole.println("Process has been started.");
+        Debug.println("Process has been started.");
       
       
        
@@ -379,8 +382,8 @@ public class WebProcessingInterface {
       creationTime = a.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");
 
     
-      DebugConsole.println("WPS statusLocation = '"+statusLocation+"'");
-      DebugConsole.println("WPS creationTime = '"+creationTime+"'");
+      Debug.println("WPS statusLocation = '"+statusLocation+"'");
+      Debug.println("WPS creationTime = '"+creationTime+"'");
     
    
       data.put("wpsurl", statusLocation);
@@ -402,7 +405,7 @@ public class WebProcessingInterface {
       return data;
     
     } catch (Exception e) {
-      DebugConsole.errprintln("error");
+      Debug.errprintln("error");
       return returnErrorMessage(e.toString());  
     }
    
@@ -427,7 +430,7 @@ public class WebProcessingInterface {
    * @return  JSONObject with status information
    */
   public static JSONObject monitorProcess( String statusLocation,HttpServletRequest request) {
-    DebugConsole.println("monitorProcess for statusLocation "+statusLocation);
+    Debug.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
     statusLocation = statusLocation.replace("8091", "80");
@@ -460,7 +463,7 @@ public class WebProcessingInterface {
       
       //If process is succeeded break!
       try{
-        DebugConsole.println("Process succeeded!: "+status.get("wps:ProcessSucceeded").getValue());
+        Debug.println("Process succeeded!: "+status.get("wps:ProcessSucceeded").getValue());
         //JSONObject submittedData=getSubmittedJobInformation(statusLocation,request);
         //data.put("postData", submittedData);
         data.put("progress",100 );
@@ -485,7 +488,7 @@ public class WebProcessingInterface {
       }
       
     }catch(Exception e){
-      DebugConsole.errprintln("error");
+      Debug.errprintln("error");
       return returnErrorMessage(e.getMessage());  
     }
     return data;
@@ -525,7 +528,7 @@ public class WebProcessingInterface {
    * @return
    */
   public static byte[] getImageFromStatusLocation(String statusLocation,String identifier){
-    DebugConsole.println("Get image from statusLocation "+statusLocation+" and id "+identifier);
+    Debug.println("Get image from statusLocation "+statusLocation+" and id "+identifier);
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));
@@ -543,11 +546,11 @@ public class WebProcessingInterface {
           }catch(Exception e){}
         }
       }catch(Exception e){
-        DebugConsole.errprintln("error");
+        Debug.errprintln("error");
         return returnErrorMessage(e.getMessage()+"\n"+b.toString()).toString().getBytes();
       }
     }catch(Exception e){
-      DebugConsole.errprintln("error");
+      Debug.errprintln("error");
       return returnErrorMessage(e.getMessage()+"\n").toString().getBytes();
     }
     return null;
@@ -555,7 +558,7 @@ public class WebProcessingInterface {
   
   
   public static String generateReportFromStatusLocation(String statusLocation){
-    DebugConsole.println("Get HTML from statusLocation "+statusLocation);
+    Debug.println("Get HTML from statusLocation "+statusLocation);
     String html = "";
     html+="<link rel=\"stylesheet\" href=\"/impactportal/styles.css\" type=\"text/css\" />";
 
@@ -596,7 +599,7 @@ public class WebProcessingInterface {
           try{
             dataEl.get("wps:ComplexData").getValue();
             String mimeType = dataEl.get("wps:ComplexData").getAttrValue("mimeType");
-            DebugConsole.println("MimeType = "+mimeType);
+            Debug.println("MimeType = "+mimeType);
             if(mimeType.equalsIgnoreCase("image/png")){
             //getImageFromStatusLocation
               String imageUrl = Configuration.getImpactServiceLocation()+"service=processor&request=getimage&outputId="+identifier+"&statusLocation="+statusLocation+"&image=img.png";
@@ -612,12 +615,12 @@ public class WebProcessingInterface {
         }
         html+="</table>";
       }catch(Exception e){
-        DebugConsole.errprintln("error in generateReportFromStatusLocation: "+e.getMessage());
+        Debug.errprintln("error in generateReportFromStatusLocation: "+e.getMessage());
 
        // html+= "<h1>No results available</h1><br/>"+"See <a href=\""+statusLocation+"\">"+statusLocation+"</a> (XML).";
         try{
           String exceptionMessage= checkException(b.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessFailed"), null).getString("error");
-          DebugConsole.errprintln("Process failed: "+exceptionMessage);
+          Debug.errprintln("Process failed: "+exceptionMessage);
           html+="<h2>An error occured while executing the process:</h2>"+exceptionMessage;
         }catch(Exception e2){
           e2.printStackTrace();
@@ -625,7 +628,7 @@ public class WebProcessingInterface {
         return html;
       }
     }catch(Exception e){
-      DebugConsole.errprintln("error");
+      Debug.errprintln("error");
       return (e.getMessage()+"\n").toString();
     }
   

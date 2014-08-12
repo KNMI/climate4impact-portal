@@ -38,7 +38,7 @@ import ASyncRunner.ASyncRunner;
 import ASyncRunner.MyRunnableWaiter;
 
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.MyXMLParser;
 
@@ -65,12 +65,12 @@ public class ESGFSearch {
     identifier = identifier.replaceAll("/", "_");
     identifier = identifier.replaceAll("=", "_");
     identifier+=".json";
-    DebugConsole.println("getDiskCachedString:: Getting from diskcache: "+identifier);
+    Debug.println("getDiskCachedString:: Getting from diskcache: "+identifier);
     String diskCacheLocation = Configuration.getImpactWorkspace()+"/staticdata/";
     try {
       return tools.Tools.readFile(diskCacheLocation+"/"+identifier);
     } catch (IOException e) {
-      DebugConsole.println("getDiskCachedString:: Diskcache not available for "+diskCacheLocation+"/"+identifier);
+      Debug.println("getDiskCachedString:: Diskcache not available for "+diskCacheLocation+"/"+identifier);
     }
     return null;
   }
@@ -83,7 +83,7 @@ public class ESGFSearch {
     uniqueId = uniqueId.replaceAll("=", "_");
     uniqueId+=".json";
     
-    DebugConsole.println("Getting from diskcache: "+uniqueId);
+    Debug.println("Getting from diskcache: "+uniqueId);
     String diskCacheLocation = Configuration.getImpactWorkspace()+"/diskCache/";
     try {
       
@@ -97,11 +97,11 @@ public class ESGFSearch {
         //DebugConsole.println("Created:"+createdHowManySecondsAgo);
         if(createdHowManySecondsAgo>mustbeYoungerThanNSeconds)
         {
-          DebugConsole.println("Ignoring "+uniqueId+"Because too old.");
+          Debug.println("Ignoring "+uniqueId+"Because too old.");
           tools.Tools.rm(diskCacheLocation+"/"+uniqueId);
           return null;
         }else{
-          DebugConsole.println(fileCacheId.toString()+"("+createdHowManySecondsAgo+"<"+mustbeYoungerThanNSeconds+")");
+          Debug.println(fileCacheId.toString()+"("+createdHowManySecondsAgo+"<"+mustbeYoungerThanNSeconds+")");
         }
       }
       return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId);
@@ -122,7 +122,7 @@ public class ESGFSearch {
     identifier = identifier.replaceAll("/", "_");
     identifier = identifier.replaceAll("=", "_");
     identifier+=".json";
-    DebugConsole.println("Storing to diskcache: "+identifier);
+    Debug.println("Storing to diskcache: "+identifier);
        String diskCacheLocation = Configuration.getImpactWorkspace()+"/diskCache/";
        
        try {
@@ -198,10 +198,10 @@ public class ESGFSearch {
     String data = null;
 
  
-    DebugConsole.println("desribeservice "+identifier);
+    Debug.println("desribeservice "+identifier);
     data = getFileFromImpactStorage((String)identifier);
     if(data == null){
-      DebugConsole.errprintln("Ünable to get descriptions for search items:"+identifier);
+      Debug.errprintln("Ünable to get descriptions for search items:"+identifier);
     }
     return data;
    
@@ -221,7 +221,7 @@ public class ESGFSearch {
    */
   static public JSONObject doCachedESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType) throws Exception{
     String uniqueId="ESGSearch_"+query+"_"+pageNumber+"_"+pageLimit+"_"+includeFacets+"_"+includeLongNameFacets+"_"+includeQueryResults+"_"+datasetType;
-    DebugConsole.println("*** uniqueId "+uniqueId);
+    Debug.println("*** uniqueId "+uniqueId);
     
     
     String data = getDiskCachedString(uniqueId,600);//null;//getPersistentCachedString(uniqueId);
@@ -231,7 +231,7 @@ public class ESGFSearch {
       d = doESGFSearchQuery(query,pageNumber,pageLimit,includeFacets,includeLongNameFacets,includeQueryResults,datasetType);
       
       if(d==null){
-        DebugConsole.errprintln("Unable to search  for identifier "+uniqueId);
+        Debug.errprintln("Unable to search  for identifier "+uniqueId);
         return null;
       }
        data=d.toString();
@@ -243,7 +243,7 @@ public class ESGFSearch {
     try {
       d = (JSONObject) new JSONTokener(data).nextValue();
     } catch (JSONException e) {
-      DebugConsole.errprintln("Unable to tokenize string for identifier "+uniqueId);
+      Debug.errprintln("Unable to tokenize string for identifier "+uniqueId);
       return null;
     }
     
@@ -254,8 +254,8 @@ public class ESGFSearch {
 
 
   static private JSONObject doESGFSearchQuery(String query,int pageNumber,int pageLimit,boolean includeFacets,boolean includeLongNameFacets,boolean includeQueryResults,String datasetType) throws Exception{
-    DebugConsole.println("Starting Search");
-    DebugConsole.println("Query: "+query);
+    Debug.println("Starting Search");
+    Debug.println("Query: "+query);
     
     String[] queryParts=query.split("\\?");
 
@@ -263,7 +263,7 @@ public class ESGFSearch {
     if(queryParts.length==2)queryString=queryParts[1];else queryString = queryParts[0];
 
    
-    DebugConsole.println("queryString: "+queryString);
+    Debug.println("queryString: "+queryString);
     
     JSONObject result = new JSONObject();
   
@@ -287,18 +287,18 @@ public class ESGFSearch {
       String s=queryString+"&limit="+pageLimit+"&offset="+((pageNumber-1)*pageLimit)+"&";
       s+="type="+datasetType+"&";
       
-      DebugConsole.println("Mainquery:"+s);
+      Debug.println("Mainquery:"+s);
       t.add(new ASyncSearch(s));
     }
    
-    DebugConsole.println("Waiting");
+    Debug.println("Waiting");
     int returnCode = t.waitForCompletion();
     if(returnCode != 0){
-      DebugConsole.println("Error");
+      Debug.println("Error");
       throw new Exception(t.getErrorMessage());
     }
     
-    DebugConsole.println("Finished");
+    Debug.println("Finished");
     
     if(includeFacets){
       facets.put("project",((ASyncFacetFinder)t.get(0)).data);
@@ -329,7 +329,7 @@ public class ESGFSearch {
   
   private static JSONArray addFacet(String facetToDo, String queryString) throws MalformedURLException, Exception {
     String ESGFQueryString="";
-    DebugConsole.println("addFacet "+facetToDo+"["+queryString+"]");
+    Debug.println("addFacet "+facetToDo+"["+queryString+"]");
     
     List<String> project = HTTPTools.getKVPList(queryString, "project");
     List<String> variable = HTTPTools.getKVPList(queryString, "variable");
@@ -378,7 +378,7 @@ public class ESGFSearch {
       for(int j=0;j<domain.size();j++){ESGFQueryString+="domain="+domain.get(j)+"&";} 
     }
     
-    DebugConsole.println("addFacet "+ESGFQueryString);
+    Debug.println("addFacet "+ESGFQueryString);
     
     
     /*
@@ -405,9 +405,9 @@ public class ESGFSearch {
     String datasetType = HTTPTools.getKVPItem(queryString, "type");
     if(datasetType == null){
       datasetType="Dataset";
-      DebugConsole.println("Forcing type="+datasetType);
+      Debug.println("Forcing type="+datasetType);
     } else {
-      DebugConsole.println("Found type="+datasetType);
+      Debug.println("Found type="+datasetType);
     }
     
     
@@ -428,14 +428,14 @@ public class ESGFSearch {
 
     String data = queryDescribeService("discribefacet?descat="+descatFacet);
     if(data == null){
-      DebugConsole.errprintln("Unable to describe facets, is static diskCache configured correctly?");
+      Debug.errprintln("Unable to describe facets, is static diskCache configured correctly?");
     }
 
     JSONObject queryResultsObject = null;
     try{
       queryResultsObject =  (JSONObject) new JSONTokener(data).nextValue();
     } catch (Exception e2) {
-      DebugConsole.errprintln("Unable to describe facets: Exception: "+e2.getMessage());
+      Debug.errprintln("Unable to describe facets: Exception: "+e2.getMessage());
     }
     
     JSONArray catDesc = null;
@@ -515,7 +515,7 @@ public class ESGFSearch {
     public void fail(String message) {
       failed=true;
       errorMessage = message;
-      DebugConsole.println(message);
+      Debug.println(message);
     }
     
     public boolean hasFailed(){
@@ -526,7 +526,7 @@ public class ESGFSearch {
       try {
         succes(addFacet(facetToDo, queryString));
       }catch (Exception e) {
-        DebugConsole.errprintln(e.getMessage());
+        Debug.errprintln(e.getMessage());
         fail(e.getMessage());
       }
     }
@@ -562,7 +562,7 @@ public class ESGFSearch {
     public void fail(String message) {
       failed= true;
       errorMessage = message;
-      DebugConsole.errprintln(message);
+      Debug.errprintln(message);
     }
     
     public void execute(){
@@ -697,7 +697,7 @@ public class ESGFSearch {
             }
           
           }catch(Exception e){
-            DebugConsole.errprintln("Skipping file: "+e.getMessage());
+            Debug.errprintln("Skipping file: "+e.getMessage());
           }
           
           Vector<XMLElement> longtype=docs.get(j).getList("long");
@@ -734,7 +734,7 @@ public class ESGFSearch {
             }
            
           }catch(Exception e){
-            DebugConsole.errprintln("Skipping file: "+e.getMessage());
+            Debug.errprintln("Skipping file: "+e.getMessage());
           }
           topics.put(product);
           
@@ -761,7 +761,7 @@ public class ESGFSearch {
       JSONArray facets = addFacet(facet, queryStr);
       
       if(facets==null){
-        DebugConsole.errprintln("Unable to search for identifier "+uniqueId);
+        Debug.errprintln("Unable to search for identifier "+uniqueId);
         return null;
       }
       JSONObject result = new JSONObject();
@@ -776,7 +776,7 @@ public class ESGFSearch {
     try {
       d = (JSONObject) new JSONTokener(data).nextValue();
     } catch (JSONException e) {
-      DebugConsole.errprintln("Unable to tokenize string for identifier "+uniqueId);
+      Debug.errprintln("Unable to tokenize string for identifier "+uniqueId);
       return null;
     }
     return d;

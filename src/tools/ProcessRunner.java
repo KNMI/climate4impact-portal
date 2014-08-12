@@ -1,6 +1,7 @@
 package tools;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -30,7 +31,7 @@ public class ProcessRunner{
 
 		    }
 		    catch (Exception e) {
-		      DebugConsole.printStackTrace(e);
+		      Debug.printStackTrace(e);
 		      String msg=("Exception in ProcessRunner.StatusPrinterThread: " + e.getMessage());
 		    	printer.print(msg.getBytes(),msg.length());
 		    }
@@ -46,10 +47,12 @@ public class ProcessRunner{
 	public StatusPrinterInterface stdoutPrinter = null;
 	public StatusPrinterInterface stderrPrinter = null;
 	private String[] environmentVars = null;
-	public ProcessRunner(StatusPrinterInterface _stdoutPrinter,StatusPrinterInterface _stderrPrinter, String[] _environmentVars){
+	private String workingDirectory = null;
+	public ProcessRunner(StatusPrinterInterface _stdoutPrinter,StatusPrinterInterface _stderrPrinter, String[] _environmentVars, String _workingDirectory){
 		stdoutPrinter=_stdoutPrinter;
 		stderrPrinter=_stderrPrinter;
 		environmentVars=_environmentVars;
+		workingDirectory = _workingDirectory;
 	}
 
 	public int runProcess(String[] commands,String dataToPost) throws Exception{
@@ -65,7 +68,7 @@ public class ProcessRunner{
 	      for(int j=0;j<commands.length;j++){
 	        cmd+=commands[j]+" ";
 	      }
-	      DebugConsole.println("Commands: "+cmd);
+	      Debug.println("Commands: "+cmd);
 	      if(dataToPost!=null){
 	        if(dataToPost.length()>0){
   	        environmentVars = Tools.appendString(environmentVars, "CONTENT_LENGTH="+dataToPost.length());
@@ -78,8 +81,22 @@ public class ProcessRunner{
 	      
 	      /*for(int j=0;j<environmentVars.length;j++){
           DebugConsole.println(environmentVars[j]);
-        }*/
-	    	child = Runtime.getRuntime().exec(commands,environmentVars);
+        }
+	      */
+	      File workingDir = null;
+	      if(workingDirectory != null){
+	        workingDir = new File(workingDirectory);
+	        if(workingDir.isDirectory() == false || workingDir.exists() == false){
+	          workingDir = null;
+	        }
+	      }
+	      
+	      if(workingDir!=null){
+	        Debug.println("Using working directory "+workingDirectory);
+	      }
+	      
+        child = Runtime.getRuntime().exec(commands,environmentVars,workingDir);
+	      
 	      if(dataToPost!=null){
 	        if(dataToPost.length()>0){
             OutputStreamWriter wr = new OutputStreamWriter(child.getOutputStream());

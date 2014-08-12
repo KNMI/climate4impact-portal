@@ -7,7 +7,7 @@ import java.io.Writer;
 
 import javax.servlet.jsp.JspWriter;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.SendMail;
 
 public class MessagePrinters {
@@ -21,11 +21,11 @@ public class MessagePrinters {
       final PrintWriter printWriter = new PrintWriter(result);
       exception.printStackTrace(printWriter);
       String msg=exception.getMessage()+"\n\n"+result.toString();
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT:"+subject+"]", msg);
       
     } catch (Exception e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
     }
 
   }
@@ -36,11 +36,11 @@ public class MessagePrinters {
       final PrintWriter printWriter = new PrintWriter(result);
       exception.printStackTrace(printWriter);
       String msg=exception.getMessage()+"\n\n"+result.toString();
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT:"+subject+"]", msg);
       
     } catch (Exception e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
     }
 
   }
@@ -48,11 +48,11 @@ public class MessagePrinters {
   public static void emailFatalErrorMessage(String subject,String message) throws IOException{
     try {
       String[] to={Configuration.getEmailToSendFatalErrorMessages()};
-      DebugConsole.errprintln(message);
+      Debug.errprintln(message);
       SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT: FATAL ERROR]: "+subject, message);
       
     } catch (Exception e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
     }
 
   }

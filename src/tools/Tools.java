@@ -369,7 +369,7 @@ public class Tools {
         }
       }
       if(found == false){
-        DebugConsole.errprintln("Invalid string given: "+input);
+        Debug.errprintln("Invalid string given: "+input);
         throw new Exception("Invalid token given: '"+Character.toString((char)str[c])+"', code ("+str[c]+").");
       }
     }

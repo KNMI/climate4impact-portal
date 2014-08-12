@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tools.CGIRunner;
-import tools.DebugConsole;
+import tools.Debug;
 import tools.Tools;
 
 
@@ -35,17 +35,18 @@ public class AdagucServer {
       ImpactUser user = LoginManager.getUser(request,response);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
-      DebugConsole.println("WMS for user: "+user.id);
+      Debug.println("WMS for user: "+user.id);
     }catch(Exception e){    
-      DebugConsole.println("Warning: Anonymous user: '"+e.getMessage()+"'");
+      Debug.println("Warning: Anonymous user: '"+e.getMessage()+"'");
     }
+    
 
     environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
     environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
     
     String commands[] = Configuration.ADAGUCServerConfig.getADAGUCExecutable();
-    DebugConsole.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
-    CGIRunner.runCGIProgram(commands,environmentVariables,response,outputStream,null);
+    Debug.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
+    CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,outputStream,null);
   }
 
 }

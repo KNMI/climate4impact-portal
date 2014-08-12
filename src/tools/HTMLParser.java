@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 
@@ -61,17 +61,17 @@ public class HTMLParser {
 	}
 	
 	static String doGetRequest(String contentsURL) throws IOException {
-		DebugConsole.println("doGetRequest: '" + contentsURL + "'");
+		Debug.println("doGetRequest: '" + contentsURL + "'");
 		try {
 			InetAddress addr = InetAddress.getLocalHost();
 			String hostname = addr.getHostName();
 			contentsURL = contentsURL.replaceAll(hostname, "localhost");
-			DebugConsole.println("hostname: '" + hostname + "'");
+			Debug.println("hostname: '" + hostname + "'");
 			if (hostname.equals("bhlnmgis.knmi.nl")) {
 				String externalName = "://webgis.nmdc.eu";
 				contentsURL = contentsURL.replaceAll(externalName,
 						"://localhost");
-				DebugConsole.println("doGetRequest-replace: '" + contentsURL
+				Debug.println("doGetRequest-replace: '" + contentsURL
 						+ "'");
 			}
 
@@ -80,7 +80,7 @@ public class HTMLParser {
 		try {
 			return HTTPTools.makeHTTPGetRequest(contentsURL);
 		} catch (WebRequestBadStatusException e) {
-			DebugConsole.errprintln(e.getMessage());
+			Debug.errprintln(e.getMessage());
 			return "Statuscode: "+ e.getStatusCode();
 		}
 	}
@@ -145,7 +145,7 @@ public class HTMLParser {
 		try {
 			doc = htmlData.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			DebugConsole.errprintln("Unable to convert htmldata to byte array");
+			Debug.errprintln("Unable to convert htmldata to byte array");
 			return null;
 		}
 
@@ -174,7 +174,7 @@ public class HTMLParser {
 					try {
 						elementsContent = new String(doc, elementContentStart, elementContentStop - elementContentStart, "UTF-8");
 					} catch (UnsupportedEncodingException e) {
-						DebugConsole.errprintln("UnsupportedEncodingException");
+						Debug.errprintln("UnsupportedEncodingException");
 						elementsContent="";
 					}
 					//elementsContent = elementsContent.trim();
@@ -241,7 +241,7 @@ public class HTMLParser {
 
 					}
 				} catch (UnsupportedEncodingException e) {
-					DebugConsole.errprintln("UnsupportedEncodingException");
+					Debug.errprintln("UnsupportedEncodingException");
 				}
 				if (isElementEnd == true)
 					domDepth--;

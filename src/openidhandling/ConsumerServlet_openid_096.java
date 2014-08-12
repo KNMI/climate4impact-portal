@@ -41,7 +41,7 @@ import org.openid4java.message.sreg.SRegResponse;
 import org.openid4java.util.HttpClientFactory;
 import org.openid4java.util.ProxyProperties;
 
-import tools.DebugConsole;
+import tools.Debug;
 
 /**
  * @author Sutra Zhou
@@ -133,7 +133,7 @@ public class ConsumerServlet_openid_096 extends javax.servlet.http.HttpServlet {
                 } else {
                         req.setAttribute("openid_identifier", identifier.getIdentifier());						 //<-- IMPACT EDITS
                         req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());		 //<-- IMPACT EDITS
-                        DebugConsole.println("OPENID Authentication succes for"+identifier.getIdentifier());
+                        Debug.println("OPENID Authentication succes for"+identifier.getIdentifier());
                 		this.getServletContext().getRequestDispatcher("/login.jsp").forward(req, resp);
                         //this.getServletContext().getRequestDispatcher("/return.jsp").forward(req, resp);
                 }

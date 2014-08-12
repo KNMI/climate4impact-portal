@@ -42,7 +42,7 @@ import org.openid4java.message.sreg.SRegResponse;
 
 
 
-import tools.DebugConsole;
+import tools.Debug;
 
 /**
  * @author Sutra Zhou, Maarten Plieger
@@ -137,9 +137,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			if (identifier != null) {
 				
 				identifier=identifier.trim();
-				DebugConsole.println("User entered openid identifier ["+identifier+"]");
+				Debug.println("User entered openid identifier ["+identifier+"]");
  			 
-				DebugConsole.println("IN: User came from path "+referrer);
+				Debug.println("IN: User came from path "+referrer);
 				if(keepId==true){
 			     if(identifier.startsWith("http")){
              addOpenIdCookie(req,resp,identifier);
@@ -149,8 +149,8 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 				this.authRequest(identifier, req, resp);
 			} else {
-			  DebugConsole.println("No OpenID given: directing to login page");
-			  DebugConsole.println("INPUT ERROR: User came from path "+referrer);
+			  Debug.println("No OpenID given: directing to login page");
+			  Debug.println("INPUT ERROR: User came from path "+referrer);
 				this.getServletContext().getRequestDispatcher(referrer)
 						.forward(req, resp); 
 			}
@@ -158,7 +158,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	}
 
 	private void addOpenIdCookie(HttpServletRequest req, HttpServletResponse resp,String identifier) {
-	  DebugConsole.println("Setting COOKIE openid_identifier="+identifier);
+	  Debug.println("Setting COOKIE openid_identifier="+identifier);
     Cookie cookie = new Cookie("openid_identifier",identifier);
     cookie.setMaxAge(3600*24*7);
     resp.addCookie(cookie);
@@ -175,7 +175,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
           cookies [i].setMaxAge(0);
           cookies [i].setPath("/");
           resp.addCookie(cookies [i]);
-          DebugConsole.println("EXPIRING COOKIE openid_identifier at " + System.currentTimeMillis());
+          Debug.println("EXPIRING COOKIE openid_identifier at " + System.currentTimeMillis());
         }
       }
     }
@@ -184,23 +184,23 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
     cookie.setPath("/");
     resp.addCookie(cookie);
     
-    DebugConsole.println("EXPIRING COOKIE openid_identifier at " + System.currentTimeMillis());
+    Debug.println("EXPIRING COOKIE openid_identifier at " + System.currentTimeMillis());
     addOpenIdCookie(request,resp,"");
         
   }
 
   private void processReturn(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-    DebugConsole.println("Validating request...");
+    Debug.println("Validating request...");
 		Identifier identifier = this.verifyResponse(req);
 		log.debug("identifier: " + identifier);
 		if (identifier != null) {
-		  DebugConsole.println("Validation is OK");
+		  Debug.println("Validation is OK");
 			req.setAttribute("identifier", identifier.getIdentifier());
 			//req.setAttribute("email", identifier.getIdentifier());
 			req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());
 		}else{
-		  DebugConsole.println("Validation is INVALID");
+		  Debug.println("Validation is INVALID");
 		}
 	 
 		String referrer = getValidReferrer(req);
@@ -226,7 +226,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
     }
 	  
 	  if(referrer!=null){
-	    DebugConsole.println("Referrer was "+referrer);
+	    Debug.println("Referrer was "+referrer);
       if(referrer.startsWith("/") == false){
         String homeURL=null;
         if(referrer.startsWith("http")){
@@ -235,7 +235,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
         if(referrer.startsWith("https")){
           homeURL = Configuration.getHomeURLHTTPS();
         }
-        DebugConsole.println("HomeURL: "+homeURL);
+        Debug.println("HomeURL: "+homeURL);
      
         if(referrer.startsWith(homeURL)){
           returnURL = referrer.substring(homeURL.length());
@@ -244,7 +244,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
         returnURL = referrer;
       }
     }
-  	DebugConsole.println("processReturn: User came from: "+returnURL);
+  	Debug.println("processReturn: User came from: "+returnURL);
     return returnURL;
   }
 
@@ -260,9 +260,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			String returnToUrl = httpReq.getRequestURL().toString() + "?fromopenid=true&";
 			//DebugConsole.println("OriginURL="+httpReq.get);
 			//DebugConsole.println("OriginURL="+httpReq.getPathTranslated());
-			DebugConsole.println("ReturnURL= "+returnToUrl);
+			Debug.println("ReturnURL= "+returnToUrl);
 			String referrer = getValidReferrer(httpReq);;
-      DebugConsole.println("User came from path "+referrer);
+      Debug.println("User came from path "+referrer);
       if(referrer!=null){
         returnToUrl+="returnurl="+URLEncoder.encode(referrer, "UTF-8");
       }
@@ -350,13 +350,13 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 			// attach the extension to the authentication request
 			if (!sregReq.getAttributes().isEmpty()) {
-			  DebugConsole.println("SREG Attributes defined, adding extension");
+			  Debug.println("SREG Attributes defined, adding extension");
 				authReq.addExtension(sregReq);
 			
 			}
 			
 			if(!fetch.getAttributes().isEmpty()){
-			  DebugConsole.println("AX Attributes defined, adding extension");
+			  Debug.println("AX Attributes defined, adding extension");
         authReq.addExtension(fetch);
 			}
 
@@ -400,7 +400,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
         errorMsg+="<strong>The OpenID provider is probably not recognized by climate4impact.</strong><br/><br/>";
       }
 		      errorMsg+="The problem has the following details:<br/>"+e.getMessage();
-		  DebugConsole.errprintln(errorMsg);
+		  Debug.errprintln(errorMsg);
 		  //DebugConsole.printStackTrace(e);
 
       String identifier = httpReq.getParameter("openid_identifier");
@@ -443,14 +443,14 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			if (verified != null) {
 				AuthSuccess authSuccess = (AuthSuccess) verification
 						.getAuthResponse();
-				DebugConsole.println("Verifications succesfull");
+				Debug.println("Verifications succesfull");
 
 				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG11)) {
-				  DebugConsole.println("Has extension OPENID_NS_SREG1");
+				  Debug.println("Has extension OPENID_NS_SREG1");
 				}
 				
 				if (authSuccess.hasExtension(SRegMessage.OPENID_NS_SREG)) {
-				  DebugConsole.println("Has extension OPENID_NS_SREG");
+				  Debug.println("Has extension OPENID_NS_SREG");
 				  
 					MessageExtension ext = authSuccess
 							.getExtension(SRegMessage.OPENID_NS_SREG);
@@ -459,7 +459,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 						for (Iterator<String> iter = sregResp.getAttributeNames()
 								.iterator(); iter.hasNext();) {
 							String name = (String) iter.next();
-							DebugConsole.println("name="+name);
+							Debug.println("name="+name);
 							String value = sregResp.getParameterValue(name);
 							httpReq.setAttribute(name, value);
 						}
@@ -467,12 +467,12 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				}
 				
         if (!authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
-          DebugConsole.errprintln("No extensions received from provider");
+          Debug.errprintln("No extensions received from provider");
         }
         
         
 				if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX)) {
-				  DebugConsole.println("Has extension OPENID_NS_AX");
+				  Debug.println("Has extension OPENID_NS_AX");
 					FetchResponse fetchResp = (FetchResponse) authSuccess
 							.getExtension(AxMessage.OPENID_NS_AX);
 
@@ -484,7 +484,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				 */
 				 	
 			    String emailAddress = fetchResp.getAttributeValue("email");
-			    DebugConsole.println("User email is "+emailAddress);
+			    Debug.println("User email is "+emailAddress);
 			    
 			    if(emailAddress!=null){
 			      if(emailAddress.length()>0){
@@ -504,7 +504,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 						List<String> values = fetchResp.getAttributeValues(alias);
 						if (values.size() > 0) {
 							log.debug(alias + " : " + values.get(0));
-							DebugConsole.println("name="+alias+" value="+values.get(0));
+							Debug.println("name="+alias+" value="+values.get(0));
 							httpReq.setAttribute(alias, values.get(0));
 						}
 					}

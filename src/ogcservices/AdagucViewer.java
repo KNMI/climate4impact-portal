@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.MyXMLParser;
 import tools.MyXMLParser.Options;
 
@@ -46,13 +46,13 @@ public class AdagucViewer extends HttpServlet {
     try {
       out1 = response.getOutputStream();
     } catch (IOException e) {
-      DebugConsole.errprint(e.getMessage());
+      Debug.errprint(e.getMessage());
       return;
     }
     
     if(serviceStr==null){
       String msg="SERVICE param missing";
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       out1.write(msg.getBytes());
       return;
     }
@@ -76,7 +76,7 @@ public class AdagucViewer extends HttpServlet {
 	}
 	
 	private void MakeKML(HttpServletRequest request, OutputStream out1,     HttpServletResponse response) throws IOException {
-    DebugConsole.println("MakeKML "+request.getQueryString());
+    Debug.println("MakeKML "+request.getQueryString());
     /*
      * srs=EPSG%3A4326&
      * bbox=-180,-138.79746835443038,180,138.79746835443038&
@@ -111,7 +111,7 @@ public class AdagucViewer extends HttpServlet {
     String cleanDimString="";
     for(int j=0;j<dimList.length;j++){
       String[] dimTerms=dimList[j].split("=");
-      DebugConsole.println("dimTerms[0]="+dimTerms[0]);
+      Debug.println("dimTerms[0]="+dimTerms[0]);
       if(dimTerms[0].equalsIgnoreCase("time")||dimTerms[0].equalsIgnoreCase("elevation")){
         cleanDimString+="&amp;"+URLEncoder.encode(dimList[j],"UTF-8");
       }else{
@@ -119,7 +119,7 @@ public class AdagucViewer extends HttpServlet {
       }
     }
     //cleanDimString=URLEncoder.encode(cleanDimString,"UTF-8");
-    DebugConsole.println("cleanDimString="+cleanDimString);
+    Debug.println("cleanDimString="+cleanDimString);
     String kml="";
     kml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     kml += "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
@@ -141,7 +141,7 @@ public class AdagucViewer extends HttpServlet {
         String hostname =request.getRequestURL()+"/../..";
         layerService=hostname+layerService.replaceAll("&", "&amp;");
       }
-      DebugConsole.println("layerService=\n"+layerService);
+      Debug.println("layerService=\n"+layerService);
       
 
       if(enabled.equals("true")){
@@ -182,7 +182,7 @@ public class AdagucViewer extends HttpServlet {
 	 * @param response
 	 */
 	private void XML2JSON(HttpServletRequest request, OutputStream out1, HttpServletResponse response) {
-	  DebugConsole.println("XML2JSON "+request.getQueryString());
+	  Debug.println("XML2JSON "+request.getQueryString());
     
     String requestStr=request.getParameter("request");
     if(requestStr==null){
@@ -196,7 +196,7 @@ public class AdagucViewer extends HttpServlet {
     try {
       if(requestStr==null || callbackStr == null){
         String msg="REQUEST param or CALLBACK param missing";
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         out1.write(msg.getBytes());
         return;
       }
@@ -204,7 +204,7 @@ public class AdagucViewer extends HttpServlet {
       requestStr=URLDecoder.decode(requestStr,"UTF-8");
       MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
       
-      DebugConsole.println("Making XML to JSON request for "+requestStr);
+      Debug.println("Making XML to JSON request for "+requestStr);
 
       boolean isLocalADAGUC = false;
       
@@ -215,12 +215,12 @@ public class AdagucViewer extends HttpServlet {
 
       if(isLocalADAGUC){
         //Local XML2JSON request to our local adagucserver
-        DebugConsole.println("Running local CGI with "+requestStr);
+        Debug.println("Running local CGI with "+requestStr);
         //Remove /impactportal/ImpactService? from the requeststring
         int beginningOfUrl = requestStr.indexOf("?");
         if(beginningOfUrl!=-1){
           requestStr = requestStr.substring(beginningOfUrl+1);
-          DebugConsole.println("Truncated URL to "+requestStr);
+          Debug.println("Truncated URL to "+requestStr);
         }
         ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
         AdagucServer.runADAGUCWMS(request,null,requestStr,stringOutputStream);
@@ -231,7 +231,7 @@ public class AdagucViewer extends HttpServlet {
         }
       }else{
         //Remote XML2JSON request to external WMS service
-        DebugConsole.println("Converting XML to JSON for "+requestStr);
+        Debug.println("Converting XML to JSON for "+requestStr);
         rootElement.parse(new URL(requestStr));
       }
      

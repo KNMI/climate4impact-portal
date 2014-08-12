@@ -27,7 +27,7 @@ public class JSONMessageDecorator{
 		messages+=data+"\n";
 	}
 	public void printexception(String data){
-		DebugConsole.errprintln(data);
+		Debug.errprintln(data);
 		exceptions=data;    	
 		close();
 	}
@@ -48,7 +48,7 @@ public class JSONMessageDecorator{
       try {
         out = response.getWriter();
       } catch (IOException e) {
-        DebugConsole.errprint(e.getMessage());
+        Debug.errprint(e.getMessage());
         return;
       }
 		}

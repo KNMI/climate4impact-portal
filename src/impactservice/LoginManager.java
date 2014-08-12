@@ -15,7 +15,7 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 //import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.Oid;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.Tools;
 
 /**
@@ -59,14 +59,14 @@ public class LoginManager {
   public synchronized static void getCredential(ImpactUser user) throws Exception{
     
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
-      DebugConsole.println("offline mode");
+      Debug.println("offline mode");
       return;
     }
     MyProxy myProxy = new MyProxy(Configuration.LoginConfig.getMyProxyServerHost(),Configuration.LoginConfig.getMyProxyServerPort());
     //myProxy.setHost(Configuration.LoginConfig.getMyProxyServerHost());
     //myProxy.setPort(Configuration.LoginConfig.getMyProxyServerPort());
     
-    DebugConsole.println("Setting proxy host:port as '"+Configuration.LoginConfig.getMyProxyServerHost()+":"+Configuration.LoginConfig.getMyProxyServerPort()+"'");
+    Debug.println("Setting proxy host:port as '"+Configuration.LoginConfig.getMyProxyServerHost()+":"+Configuration.LoginConfig.getMyProxyServerPort()+"'");
     //GSSCredential retcred = myProxy.get(null,user.id, Configuration.LoginConfig.getMyProxyDefaultPassword(), 60*60*24);
     try {
       String userName = Configuration.LoginConfig.getMyProxyDefaultUserName();
@@ -74,18 +74,18 @@ public class LoginManager {
         userName = user.id;
       }
       
-      DebugConsole.println("Setting username to "+userName+":"+Configuration.LoginConfig.getMyProxyDefaultPassword());
+      Debug.println("Setting username to "+userName+":"+Configuration.LoginConfig.getMyProxyDefaultPassword());
       
-      ExtendedGSSCredential cred= (ExtendedGSSCredential) myProxy.get(userName, Configuration.LoginConfig.getMyProxyDefaultPassword(), 60*60*24);
+      ExtendedGSSCredential cred= (ExtendedGSSCredential) myProxy.get(userName, Configuration.LoginConfig.getMyProxyDefaultPassword(), 60*60*24*7);
      
       try {
-        DebugConsole.println(cred.getName().toString());
+        Debug.println(cred.getName().toString());
        // DebugConsole.println(""+cred.getRemainingLifetime());
         
         Oid [] mechs = cred.getMechs();
         if (mechs != null) {
                 for (int i = 0; i < mechs.length; i++)
-                        DebugConsole.println(mechs[i].toString());
+                        Debug.println(mechs[i].toString());
         }
         
         //Export credential to file
@@ -97,16 +97,16 @@ public class LoginManager {
         cred.dispose();
 
       } catch (Exception e) {
-        DebugConsole.printStackTrace(e);
+        Debug.printStackTrace(e);
         throw new Exception("LoginManager: Unable to write credential");
       }
     } catch (MyProxyException e) {
       String msg="Unable to get credential for "+user.id;
-      DebugConsole.errprintln(msg);
-      DebugConsole.printStackTrace(e);
+      Debug.errprintln(msg);
+      Debug.printStackTrace(e);
       throw new Exception("LoginManager: "+msg);
     }
-    DebugConsole.println("Credentials for user "+user.id+" retrieved");
+    Debug.println("Credentials for user "+user.id+" retrieved");
   }
   
  /**
@@ -149,7 +149,7 @@ public class LoginManager {
             X509Certificate cert = certs[0];
             
               String subjectDN = cert.getSubjectDN().toString();
-              DebugConsole.println("getSubjectDN: "+subjectDN);
+              Debug.println("getSubjectDN: "+subjectDN);
               String[] dnItems = subjectDN.split(", ");
               for(int j=0;j<dnItems.length;j++){
                 int CNIndex = dnItems[j].indexOf("CN");
@@ -161,7 +161,7 @@ public class LoginManager {
               
           }else{
             String message = "No user information available from either session or x509\n";
-            DebugConsole.errprintln(message);
+            Debug.errprintln(message);
             /*response.setStatus(403);
             response.getOutputStream().println(message);
             throw new Exception("You are not logged in...");*/
@@ -170,7 +170,7 @@ public class LoginManager {
           
           if(  CertOpenIdIdentifier == null){
             String message = "No valid ESGF certificate provided: no user found.";
-            DebugConsole.errprintln(message);
+            Debug.errprintln(message);
             /*response.setStatus(403);
             response.getOutputStream().println(message);
             throw new Exception(message);*/
@@ -208,7 +208,7 @@ public class LoginManager {
       }
     }
     //The user was not found, so create a new user
-    DebugConsole.println("Creating new user object for "+userId);
+    Debug.println("Creating new user object for "+userId);
     ImpactUser user = new ImpactUser();
     user.id=userId;
     users.add(user);
@@ -224,28 +224,28 @@ public class LoginManager {
    */
   public synchronized static void checkLogin(String openIdIdentifier,HttpServletRequest request) throws Exception{
 
-    DebugConsole.println("checkLogin "+openIdIdentifier);
+    Debug.println("checkLogin "+openIdIdentifier);
     if(openIdIdentifier==null){
-      DebugConsole.errprintln("No openIdIdentifier given");
+      Debug.errprintln("No openIdIdentifier given");
     }
     ImpactUser user = getUser(openIdIdentifier,request);
     
-    DebugConsole.println("Check login "+user.id);
+    Debug.println("Check login "+user.id);
     user.internalName = user.id.replace("http://", "");
     user.internalName = user.internalName.replace("https://", "");
     user.internalName = user.internalName.replaceAll("/", ".");
-    DebugConsole.println("internalName = "+user.internalName);
+    Debug.println("internalName = "+user.internalName);
     String workspace = Configuration.getImpactWorkspace();
-    DebugConsole.println("Base workspace = "+workspace);
+    Debug.println("Base workspace = "+workspace);
     user.setWorkspace(workspace+user.internalName+"/");
-    DebugConsole.println("User workspace = "+user.getWorkspace());
+    Debug.println("User workspace = "+user.getWorkspace());
     try {
-      DebugConsole.println("Making dir "+user.getWorkspace());
+      Debug.println("Making dir "+user.getWorkspace());
       Tools.mkdir(user.getWorkspace());
       Tools.mkdir(user.getWorkspace()+"certs");
       user.certificateFile = user.getWorkspace()+"certs/"+"creds.pem";
     } catch (IOException e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
       user.credentialError=true;
       throw new Exception("Unable to create credential for user, server misconfiguration:"+user.id+"\n"+e.getMessage());
     }
@@ -266,7 +266,7 @@ public class LoginManager {
         if(emailAddress.length()>0){
           user.setEmailAddress(emailAddress);
           foundEmail = true;
-          DebugConsole.println("Email: "+emailAddress);    
+          Debug.println("Email: "+emailAddress);    
         }
       }
       if(!foundEmail ){
@@ -304,7 +304,7 @@ public class LoginManager {
         //+"HTTP.SSL.SSLv3="+user.certificateFile+"\n"
         //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
         +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
-    DebugConsole.println("createNCResourceFile for user "+user.id+":\n"+fileContents);
+    Debug.println("createNCResourceFile for user "+user.id+":\n"+fileContents);
     Tools.writeFile(user.getWorkspace()+"/.httprc", fileContents) ;
     Tools.writeFile(user.getWorkspace()+"/.dodsrc", fileContents) ;
  }

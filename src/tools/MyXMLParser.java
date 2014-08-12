@@ -112,7 +112,7 @@ public class MyXMLParser {
 		 * @throws Exception
 		 */
 	  public void parseFile(String file) throws Exception {
-	    DebugConsole.println("Loading "+file);
+	    Debug.println("Loading "+file);
       try{
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -122,15 +122,15 @@ public class MyXMLParser {
         inputStream.close();
       } catch (SAXException e) {
         String msg="SAXException: "+e.getMessage();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new SAXException(msg);
     } catch (IOException e) {
         String msg="IOException: "+e.getMessage();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new IOException(msg);
     }catch(Exception e){
       String msg="Exception: "+e.getMessage();
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       throw new Exception(msg);
     }
       
@@ -153,15 +153,15 @@ public class MyXMLParser {
         inputStream.close();
       } catch (SAXException e) {
           String msg="SAXException: "+e.getMessage()+":\n\""+string+"\"";
-          DebugConsole.errprintln(msg);
+          Debug.errprintln(msg);
           throw new SAXException(msg);
       } catch (IOException e) {
           String msg="IOException: "+e.getMessage();
-          DebugConsole.errprintln(msg);
+          Debug.errprintln(msg);
           throw new IOException(msg);
       }catch(Exception e){
         String msg="Exception: "+e.getMessage();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new Exception(msg);
       }
       
@@ -180,7 +180,7 @@ public class MyXMLParser {
 				DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 				DocumentBuilder db = dbf.newDocumentBuilder();
 			  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
-		    DebugConsole.println("  Making XML GET: "+url.toString());
+		    Debug.println("  Making XML GET: "+url.toString());
 		    /*if(Configuration.GlobalConfig.isInOfflineMode()==true){
 		      if(url.getHost().equals("localhost")==false){
 		        DebugConsole.println("Offline mode");
@@ -196,10 +196,10 @@ public class MyXMLParser {
 				parse(document);
 				inputStream.close();
 				long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-		    DebugConsole.println("Finished XML GET: "+url.toString()+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+		    Debug.println("Finished XML GET: "+url.toString()+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
 		  } catch (SAXException e) {
         String msg="SAXException: "+e.getMessage()+" for URL "+url.toString();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new SAXException(msg);
     } catch (IOException e) {
         String msg="IOException: "+e.getMessage()+" for URL "+url.toString();;
@@ -207,12 +207,12 @@ public class MyXMLParser {
         if(statusCode>300){
           throw new WebRequestBadStatusException(statusCode);
         }
-        DebugConsole.errprintln("Status code: "+ connection.getResponseCode());
-        DebugConsole.errprintln(msg);
+        Debug.errprintln("Status code: "+ connection.getResponseCode());
+        Debug.errprintln(msg);
         throw new IOException(msg);
     }catch(Exception e){
       String msg="Exception: "+e.getMessage()+" for URL "+url.toString();;
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       throw new Exception(msg);
     }
 		}
@@ -242,18 +242,18 @@ public class MyXMLParser {
        
       } catch (SAXException e) {
         String msg="SAXException: "+e.getMessage();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new SAXException(msg);
     } catch (IOException e) {
         String msg="IOException: "+e.getMessage();
-        DebugConsole.errprintln(msg);
+        Debug.errprintln(msg);
         throw new IOException(msg);
     }catch(Exception e){
       String msg="Exception: "+e.getMessage();
-      DebugConsole.errprintln(msg);
+      Debug.errprintln(msg);
       throw new Exception(msg);
     }
-      DebugConsole.println("Ready");
+      Debug.println("Ready");
     }
 		
 		/** 
@@ -340,7 +340,7 @@ public class MyXMLParser {
      * @return the encoded JSON string
      */
     private String jsonEncode(String in){
-      in = in.replaceAll("\"", "\\\"");
+      in = in.replaceAll("\"", "\\\\\"");
       in = in.replaceAll("\n", "\\n");
       return in;
     }
@@ -506,7 +506,7 @@ public class MyXMLParser {
       try {
         jsonObject = (JSONObject) new JSONTokener(jsonString).nextValue();
       } catch (JSONException e) {
-        DebugConsole.errprintln("Unable to tokenize JSON string to JSONObject \n"+jsonString);
+        Debug.errprintln("Unable to tokenize JSON string to JSONObject \n"+jsonString);
         return null;
       }
       return jsonObject;

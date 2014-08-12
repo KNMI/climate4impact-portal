@@ -31,7 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONMessageDecorator;
@@ -64,7 +64,7 @@ public class ImpactService extends HttpServlet {
   		String requestStr=request.getParameter("request");
   		if(requestStr!=null){requestStr=URLDecoder.decode(requestStr,"UTF-8");}else{errorResponder.printexception("urlStr="+requestStr);return;}
   		
-  		DebugConsole.println("PROCESSOR REQUEST="+requestStr);
+  		Debug.println("PROCESSOR REQUEST="+requestStr);
   		
   		/**
   		 * Remove processor from status list
@@ -109,7 +109,7 @@ public class ImpactService extends HttpServlet {
   			try {
       			out1 = response.getWriter();
       		} catch (IOException e) {
-      			DebugConsole.errprint(e.getMessage());
+      			Debug.errprint(e.getMessage());
       			return;
       		}
   			Vector<WebProcessingInterface.ProcessorDescriptor> listOfProcesses = WebProcessingInterface.getAvailableProcesses(request);
@@ -168,7 +168,7 @@ public class ImpactService extends HttpServlet {
             response.setContentType("application/json");
             response.getWriter().print(WebProcessingInterface.executeProcess(procId,dataInputs,request,response));
           } catch (Exception e) {
-            DebugConsole.errprintln(e.getMessage());
+            Debug.errprintln(e.getMessage());
             try {
               JSONObject error = new JSONObject();
               error.put("error",e.getMessage());
@@ -326,7 +326,7 @@ public class ImpactService extends HttpServlet {
     
     
     private void handleCatalogBrowserRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
-  		DebugConsole.println("SERVICE CATALOGBROWSER: "+request.getQueryString());
+  		Debug.println("SERVICE CATALOGBROWSER: "+request.getQueryString());
       String format= request.getParameter("format");
       if(format==null)format="";
   	  try{
@@ -344,7 +344,7 @@ public class ImpactService extends HttpServlet {
         HTTPTools.validateInputTokens(variableFilter);
         HTTPTools.validateInputTokens(textFilter);
         
-  	    DebugConsole.println("Starting CATALOG: "+request.getQueryString());
+  	    Debug.println("Starting CATALOG: "+request.getQueryString());
   		  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
   		  JSONArray treeElements = null;
   		  try{
@@ -356,7 +356,7 @@ public class ImpactService extends HttpServlet {
   		  }
   		  
         long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-        DebugConsole.println("Finished CATALOG: "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms) "+request.getQueryString());
+        Debug.println("Finished CATALOG: "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms) "+request.getQueryString());
 
         if(treeElements == null){
           response.setContentType("text/html");
@@ -384,8 +384,8 @@ public class ImpactService extends HttpServlet {
             }
             
             
-            DebugConsole.println("variableFilter: '"+variableFilter+"'");
-            DebugConsole.println("textFilter: '"+textFilter+"'");
+            Debug.println("variableFilter: '"+variableFilter+"'");
+            Debug.println("textFilter: '"+textFilter+"'");
             html+="<div id=\"variableandtextfilter\"><form id=\"varFilter\">";
             if(availableVars.size()>0){
               html+="<b>Variables:</b>";
@@ -420,9 +420,9 @@ public class ImpactService extends HttpServlet {
           }
           html+=buildHTML(treeElements,"",0,openid)+"</table></div>";
           long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
-          DebugConsole.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
+          Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
   		    response.getWriter().print(html);
-  		    DebugConsole.println("Catalog request finished.");
+  		    Debug.println("Catalog request finished.");
   		  }else{
           response.setContentType("application/json");
   		    response.getWriter().print(treeElements.toString());
@@ -483,14 +483,14 @@ public class ImpactService extends HttpServlet {
       HttpSession session = request.getSession();
       DatasetViewerSession datasetViewerSession=(DatasetViewerSession) session.getAttribute("datasetviewersession");
       if(datasetViewerSession==null){ 
-        DebugConsole.println("Creating new datasetviewersession");
+        Debug.println("Creating new datasetviewersession");
         datasetViewerSession = new DatasetViewerSession();session.setAttribute("datasetviewersession",datasetViewerSession);
       }
-      DebugConsole.println("SERVICE GETVARIABLES: "+request.getQueryString());
+      Debug.println("SERVICE GETVARIABLES: "+request.getQueryString());
 
       String requestStr=request.getParameter("request");
       if(requestStr!=null){requestStr=URLDecoder.decode(requestStr,"UTF-8");}else{errorResponder.printexception("urlStr="+requestStr);return;}
-      PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
+      PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {Debug.errprint(e.getMessage());return;}
 
       //Check if we really have an URL here and not a localfile
       if(requestStr.indexOf("http")!=0&&requestStr.indexOf("dods")!=0){
@@ -537,7 +537,7 @@ public class ImpactService extends HttpServlet {
       try{
         //Strip the # token.
         requestStr = requestStr.split("#")[0];
-        DebugConsole.println("dodsRequest="+requestStr);
+        Debug.println("dodsRequest="+requestStr);
 
         String ncdumpMessage = "";
      
@@ -546,7 +546,7 @@ public class ImpactService extends HttpServlet {
           
           if(user == null)return;
         }catch(Exception e){
-          DebugConsole.println("WARNING: User not logged in");
+          Debug.println("WARNING: User not logged in");
         }
         
 
@@ -569,15 +569,15 @@ public class ImpactService extends HttpServlet {
             }catch(SSLPeerUnverifiedException e){
               
               msg="The peer is unverified (SSL unverified): "+e.getMessage();
-              DebugConsole.errprintln(msg);
+              Debug.errprintln(msg);
               throw new Exception(msg);
             }catch(UnknownHostException e){
               msg="The host is unknown: '"+e.getMessage()+"'\n";
-              DebugConsole.errprintln(msg);
+              Debug.errprintln(msg);
               throw new Exception(msg);
             }catch(ConnectTimeoutException e) {
               msg="The connection timed out: '"+e.getMessage()+"'\n";
-              DebugConsole.errprintln(msg);
+              Debug.errprintln(msg);
               throw new Exception(msg);
             }catch(WebRequestBadStatusException e){
               
@@ -625,7 +625,7 @@ public class ImpactService extends HttpServlet {
               msg+=body;*/
               //String result = e.getResult();
               //if(result!=null)msg+="\n"+result;
-              DebugConsole.errprintln(msg);
+              Debug.errprintln(msg);
               throw new Exception(msg);
             }/*catch(Exception e){
               msg="Exception: "+e.getMessage();
@@ -633,10 +633,10 @@ public class ImpactService extends HttpServlet {
             }*/
           }
         
-        DebugConsole.println("Trying to parse ncdump message");
+        Debug.println("Trying to parse ncdump message");
         MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
         rootElement.parseString(ncdumpMessage);
-        DebugConsole.println("Parsed");
+        Debug.println("Parsed");
         //DebugConsole.println(rootElement.toString());
 
         List<XMLElement>dimensions = rootElement.get("netcdf").getList("dimension");
@@ -802,7 +802,7 @@ public class ImpactService extends HttpServlet {
 
   private void handleSearchRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
 		response.setContentType("application/json");
-		DebugConsole.println("SERVICE SEARCH: "+request.getQueryString());
+		Debug.println("SERVICE SEARCH: "+request.getQueryString());
 		//Params: URLEncoded verquery, pagenumber, pagesize.
 		// Mode=distinct|search
 		// mode=distinct: category=any
@@ -812,7 +812,7 @@ public class ImpactService extends HttpServlet {
 	    HttpSession session = request.getSession();
 		  SearchSession searchSession=(SearchSession) session.getAttribute("searchsession");
       if(searchSession==null){ 
-        DebugConsole.println("Creating new searchsession");
+        Debug.println("Creating new searchsession");
         searchSession = new SearchSession();session.setAttribute("searchsession",searchSession);
       }
       
@@ -871,7 +871,7 @@ public class ImpactService extends HttpServlet {
           
         }
 
-				DebugConsole.println("inclFacets: "+includeFacets);
+				Debug.println("inclFacets: "+includeFacets);
 		
 				searchSession.variable=HTTPTools.getKVPItemDecoded(queryStr,"variable");
         searchSession.time_frequency=HTTPTools.getKVPItemDecoded(queryStr,"time_frequency");
@@ -908,9 +908,9 @@ public class ImpactService extends HttpServlet {
 //				DebugConsole.println("currentPage  : "+currentPage);
 				//DebugConsole.println("Start : "+start);
 				
-				DebugConsole.println("Query : "+query);
+				Debug.println("Query : "+query);
 //				DebugConsole.println("ResultLength: "+resultJSON.length());
-				PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
+				PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {Debug.errprint(e.getMessage());return;}
 				response.setContentType("application/json");
 				out1.print(resultJSON.toString());
 			}
@@ -919,18 +919,18 @@ public class ImpactService extends HttpServlet {
 			  String facet=HTTPTools.getHTTPParam(request,"facet");
 			  
 			  String queryStr="";try{ queryStr=HTTPTools.getHTTPParam(request,"query");}catch(Exception e){}
-			  DebugConsole.println("Facet to query = "+facet);
-			  DebugConsole.println("Facet queryStr = "+queryStr);
+			  Debug.println("Facet to query = "+facet);
+			  Debug.println("Facet queryStr = "+queryStr);
 
 			  JSONObject resultJSON = null;
         resultJSON = ESGFSearch.getFacetForQuery(facet,queryStr+"&type="+dataSetType);
- 	      PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());return;}
+ 	      PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e) {Debug.errprint(e.getMessage());return;}
         response.setContentType("application/json");
         out1.print(resultJSON.toString());
 			}
 		}catch(Exception e){
-      DebugConsole.printStackTrace(e);
-			DebugConsole.errprintln("Exception catched "+e.getMessage());
+      Debug.printStackTrace(e);
+			Debug.errprintln("Exception catched "+e.getMessage());
 
 			JSONObject error = new JSONObject();
 			try {
@@ -938,7 +938,7 @@ public class ImpactService extends HttpServlet {
 			} catch (JSONException e2) {
 				return;
 			}
-			PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e1) {DebugConsole.errprint(e1.getMessage());return;}
+			PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e1) {Debug.errprint(e1.getMessage());return;}
 			out1.print(error.toString());
 			return;
 		}
@@ -1023,7 +1023,7 @@ public class ImpactService extends HttpServlet {
           JSONObject datasetList = GenericCart.CartPrinters.showDataSetList(basketList,request);
           response.getWriter().println(datasetList.toString());
         }catch(Exception e){
-          DebugConsole.printStackTrace(e);
+          Debug.printStackTrace(e);
           response.getWriter().println(e.getMessage());
         }
         return;
@@ -1038,7 +1038,7 @@ public class ImpactService extends HttpServlet {
         try{
           response.setContentType("text/plain");
           String[] procId=request.getParameterValues("id[]");
-          DebugConsole.println("Delete file from basket: "+procId);
+          Debug.println("Delete file from basket: "+procId);
           //if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
           basketList = LoginManager.getUser(request,response).getShoppingCart();
           basketList.removeDataLocators(procId);
@@ -1061,7 +1061,7 @@ public class ImpactService extends HttpServlet {
     		  GenericCart shoppingCart = null;
     		  shoppingCart = LoginManager.getUser(request,response).getShoppingCart();
     		
-    		  DebugConsole.println("Adding data to basket"+request.getParameter("id"));
+    		  Debug.println("Adding data to basket"+request.getParameter("id"));
     		  
     		  int currentNumProducts=shoppingCart.getNumProducts(request);
     		  
@@ -1088,7 +1088,7 @@ public class ImpactService extends HttpServlet {
     			String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts(request)-currentNumProducts)+"\",";
     			result += "\"numproducts\":\""+(shoppingCart.getNumProducts(request))+"\"}";
     			
-    			DebugConsole.println(result);
+    			Debug.println(result);
           response.setContentType("application/json");
     			out1.print(result);
     		}
@@ -1099,7 +1099,7 @@ public class ImpactService extends HttpServlet {
   			} catch (JSONException e2) {
   				return;
   			}
-  			PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e1) {DebugConsole.errprint(e1.getMessage());return;}
+  			PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e1) {Debug.errprint(e1.getMessage());return;}
   			out1.print(error.toString());
   			return;
     	}
@@ -1125,14 +1125,14 @@ public class ImpactService extends HttpServlet {
 
 
   private void addFileToBasket(GenericCart shoppingCart,JSONObject el) throws JSONException {
-	  DebugConsole.println(el.toString());
+	  Debug.println(el.toString());
     String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
     Calendar cal = Calendar.getInstance();
     String currentISOTimeString = sdf.format(cal.getTime())+"Z";
     long addDateMilli=cal.getTimeInMillis();
     String addDate=currentISOTimeString;
-    DebugConsole.println("Adding dataset "+el.getString("id")+" with date "+addDate);
+    Debug.println("Adding dataset "+el.getString("id")+" with date "+addDate);
     JSONObject fileInfo = new JSONObject();
     try{
       String str=el.getString("OPENDAP");
@@ -1158,7 +1158,7 @@ public class ImpactService extends HttpServlet {
         fileInfo.put("filesize",str);
       }
     }catch(Exception e){}
-    DebugConsole.println("Data="+fileInfo.toString());
+    Debug.println("Data="+fileInfo.toString());
     
     shoppingCart.addDataLocator(el.getString("id"),fileInfo.toString(), addDate, addDateMilli,true);
       
@@ -1168,7 +1168,7 @@ public class ImpactService extends HttpServlet {
 
   static PrintWriter getPrintWriter(HttpServletResponse response) {
 		PrintWriter out1 = null;
-		try {out1 = response.getWriter();} catch (IOException e) {DebugConsole.errprint(e.getMessage());}
+		try {out1 = response.getWriter();} catch (IOException e) {Debug.errprint(e.getMessage());}
 		return out1;
 	}
 
@@ -1178,7 +1178,7 @@ public class ImpactService extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	  if(request.getQueryString()!=null){
-	    DebugConsole.println("Request received query string "+request.getQueryString());
+	    Debug.println("Request received query string "+request.getQueryString());
 	  }
 		JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
 		String serviceStr = null;
@@ -1235,7 +1235,7 @@ public class ImpactService extends HttpServlet {
 		 */
 		if(serviceStr.equals("ncdump")){
 			//handleNCDUMPRequest(request,response,errorResponder);
-		  DebugConsole.println("Deprecated command");
+		  Debug.println("Deprecated command");
 		}
 		
 		/*
@@ -1288,7 +1288,7 @@ public class ImpactService extends HttpServlet {
         if(mode.equalsIgnoreCase("advancedsearch")){
           SearchSession searchSession = (SearchSession) session.getAttribute("searchsession");  
           if(searchSession==null){
-            DebugConsole.println("Creating new searchsession");
+            Debug.println("Creating new searchsession");
             searchSession = new SearchSession();session.setAttribute("searchsession",searchSession);
           }
           out.print(searchSession.getAsJSON());
@@ -1296,10 +1296,10 @@ public class ImpactService extends HttpServlet {
         }
         out.print("{\"error\":\"Invalid mode\"}");
       } catch (IOException e) {
-        DebugConsole.errprint(e.getMessage());
+        Debug.errprint(e.getMessage());
         return;
       } catch (Exception e) {
-        DebugConsole.errprint(e.getMessage());
+        Debug.errprint(e.getMessage());
         return;
       }
     }
@@ -1308,13 +1308,13 @@ public class ImpactService extends HttpServlet {
 
 
   private void handleWMSRequests(HttpServletRequest request, HttpServletResponse response) {
-	  DebugConsole.println("Handle WMS requests");
+	  Debug.println("Handle WMS requests");
     OutputStream out1 = null;
     //response.setContentType("application/json");
     try {
       out1 = response.getOutputStream();
     } catch (IOException e) {
-      DebugConsole.errprint(e.getMessage());
+      Debug.errprint(e.getMessage());
       return;
     }
   
@@ -1326,8 +1326,8 @@ public class ImpactService extends HttpServlet {
       try {
         out1.write(e.getMessage().getBytes());
       } catch (IOException e1) {
-        DebugConsole.errprintln("Unable to write to stream");
-        DebugConsole.printStackTrace(e);
+        Debug.errprintln("Unable to write to stream");
+        Debug.printStackTrace(e);
       }
     }    
   }

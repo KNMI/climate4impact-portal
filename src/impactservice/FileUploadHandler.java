@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 
 /**
@@ -46,7 +46,7 @@ public class FileUploadHandler extends HttpServlet {
         return;
       }
       
-      DebugConsole.println("Start upload for user "+user.id);
+      Debug.println("Start upload for user "+user.id);
       
       long BASKET_UPLOAD_MAX_FILE_SIZE = 100000000;
       String [] allowedExtensions = {".nc",".shp",".sbx",".shx",".dbf",".sbn",".xml",".prj",".csv",".h5"};
@@ -63,7 +63,7 @@ public class FileUploadHandler extends HttpServlet {
         return;
       }
       
-      DebugConsole.println(UPLOAD_DIRECTORY);
+      Debug.println(UPLOAD_DIRECTORY);
       
       JSONObject jsonResponse = new JSONObject();
       JSONArray jsonFileList = new JSONArray();
@@ -113,7 +113,7 @@ public class FileUploadHandler extends HttpServlet {
                         
                         if(hasAValidExtension){
                           if(fileSize<BASKET_UPLOAD_MAX_FILE_SIZE){
-                            DebugConsole.println("Uploading file "+name+" "+fileSize);
+                            Debug.println("Uploading file "+name+" "+fileSize);
                             try{
                               File file = new File(UPLOAD_DIRECTORY + File.separator + name);
                               item.write( file);
@@ -129,7 +129,7 @@ public class FileUploadHandler extends HttpServlet {
                             if(supportedExtensions.length()>0)supportedExtensions+=", ";
                             supportedExtensions += allowedExtensions[j];
                           }
-                          DebugConsole.errprintln("User "+user.internalName+" tried to upload invalid extension '"+name+"'");
+                          Debug.errprintln("User "+user.internalName+" tried to upload invalid extension '"+name+"'");
                           jsonFile.put("error", "invalid extension, supported are: "+supportedExtensions);;
                         }
                         
@@ -149,7 +149,7 @@ public class FileUploadHandler extends HttpServlet {
               try {
                 jsonFile.put("name",  ex.getMessage());
                 jsonFile.put("error",  ex.getMessage());
-                DebugConsole.errprintln("User "+user.internalName+" tried to upload: exception: "+ex.getMessage());
+                Debug.errprintln("User "+user.internalName+" tried to upload: exception: "+ex.getMessage());
               } catch (JSONException e) {
               }
               request.setAttribute("message", ex.getMessage());

@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
@@ -33,7 +33,7 @@ public class GenericCart {
   private  String genericId = "";
   
   public  GenericCart(String id,ImpactUser user){
-    DebugConsole.println("Creating new GenericCart with id "+id+" for user "+user.id);
+    Debug.println("Creating new GenericCart with id "+id+" for user "+user.id);
     this.genericId=id;
     this.user=user;
     
@@ -72,13 +72,13 @@ public class GenericCart {
 	 * @param dataLocation e.g. http://etc.nc
 	 */
   	public synchronized void addDataLocator(String id, String dataLocation) {
-  	  DebugConsole.println("Adding "+id);
+  	  Debug.println("Adding "+id);
   	  dataLocation=dataLocation.replace("http://cmip-dn.badc.rl.ac.uk", "http://cmip-dn1.badc.rl.ac.uk");
   		DataLocator d = new DataLocator(id,dataLocation);
   		for(int j=0;j<dataLocatorList.size();j++){
   		  
   		  if(dataLocatorList.get(j).id.equals(id)){
-          DebugConsole.println("Already added "+id);
+          Debug.println("Already added "+id);
           return;
         }
   		}
@@ -93,7 +93,7 @@ public class GenericCart {
       for(int j=0;j<dataLocatorList.size();j++){
         
         if(dataLocatorList.get(j).id.equals(id)){
-          DebugConsole.println("Already added "+id);
+          Debug.println("Already added "+id);
           return;
         }
       }
@@ -107,23 +107,23 @@ public class GenericCart {
 	   }
 	 }
 	 public synchronized void removeDataLocator(String id) {
-	    DebugConsole.println("Removing "+id);
+	    Debug.println("Removing "+id);
 	    try {
         id = HTTPTools.validateInputTokens(id);
       } catch (Exception e1) {
-        DebugConsole.errprintln("Invalid tokens while removing "+id);
+        Debug.errprintln("Invalid tokens while removing "+id);
         return;
       }
 	    try {
-	      DebugConsole.println("Checking "+user.getDataDir()+"/"+id);
+	      Debug.println("Checking "+user.getDataDir()+"/"+id);
         File file = new File(user.getDataDir()+"/"+id);
         if(file.exists()){
           if(file.isFile()){
-            DebugConsole.println("Deleting file "+file.getAbsolutePath());
+            Debug.println("Deleting file "+file.getAbsolutePath());
             file.delete();
           }else{
             if(file.isDirectory()){
-              DebugConsole.println("Deleting directory "+file.getAbsolutePath());
+              Debug.println("Deleting directory "+file.getAbsolutePath());
               Tools.rmdir(file);
             }
           }
@@ -142,7 +142,7 @@ public class GenericCart {
 	  }
 
 	public int getNumProducts(HttpServletRequest request){
-	  DebugConsole.println("GetNumProducts" );
+	  Debug.println("GetNumProducts" );
 	  int numCustomFiles = 0;
 //	  ImpactUser impactUser;
 //    try {
@@ -163,13 +163,13 @@ public class GenericCart {
 	
 
   public void loadFromStore() throws Exception {
-    DebugConsole.println("Loading from store");
+    Debug.println("Loading from store");
     String file=user.getWorkspace()+"/"+genericId+".xml";
     XMLElement catalogElement = new XMLElement();
     try {
       catalogElement.parseFile(file);
     } catch (Exception e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
       return;
     }
    
@@ -188,7 +188,7 @@ public class GenericCart {
 
   }
   public synchronized void saveToStore(){
-    DebugConsole.println("Saving to store");
+    Debug.println("Saving to store");
     String file=user.getWorkspace()+"/"+genericId+".xml";
     String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
     data+="<GenericCart>\n";
@@ -198,14 +198,14 @@ public class GenericCart {
       try {
         data+="  <element id=\""+element.id+"\" data=\""+URLEncoder.encode(element.cartData,"UTF-8")+"\" adddate=\""+element.addDate+"\" adddatemillis=\""+element.addDateMilli+"\"/>\n";
       } catch (UnsupportedEncodingException e) {
-         DebugConsole.errprintln("Unable to add XML element "+element.id+": "+e.getMessage());
+         Debug.errprintln("Unable to add XML element "+element.id+": "+e.getMessage());
       }
     }
     data+="</GenericCart>\n";
     try {
       Tools.writeFile(file,data);
     } catch (IOException e) {
-      DebugConsole.errprintln(e.getMessage());
+      Debug.errprintln(e.getMessage());
     }
   }
 
@@ -219,7 +219,7 @@ public class GenericCart {
      * @throws Exception 
      */
     public static String showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
-      DebugConsole.println("Show joblist");
+      Debug.println("Show joblist");
       String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).id+"</strong><br/>";
       htmlResp += "<table class=\"basket\">";
       Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
@@ -271,7 +271,7 @@ public class GenericCart {
           }
           
         } catch (Exception e) {
-          DebugConsole.println(e.getMessage());
+          Debug.println(e.getMessage());
           htmlResp+="<td>crashed</td>";
           htmlResp+="<td>-</td>";
           
@@ -416,7 +416,7 @@ public class GenericCart {
   
   
   public static JSONObject showDataSetList(GenericCart genericCart,HttpServletRequest request) throws Exception{
-    DebugConsole.println("Show datasetlist");
+    Debug.println("Show datasetlist");
    JSONObject datasetList = new JSONObject();
    
    JSONArray datasets = new JSONArray();
@@ -459,7 +459,7 @@ public class GenericCart {
           try{catalogURL =elementProps.getString("catalogURL");}catch(Exception e){}
           try{fileSize =elementProps.getString("filesize");}catch(Exception e){}
         } catch (Exception e) {
-          DebugConsole.errprintln(e.getMessage()+" on \n"+element.cartData);
+          Debug.errprintln(e.getMessage()+" on \n"+element.cartData);
           catalogURL=element.cartData;
         }
         

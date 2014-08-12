@@ -25,7 +25,7 @@ public class SendMail{
      // Recipient's email ID needs to be mentioned.
      //TODO must be configurable
      subject = subject.replaceAll("\n", " ");
-     DebugConsole.println("Sending email from "+from+" with subject ["+subject+"]");
+     Debug.println("Sending email from "+from+" with subject ["+subject+"]");
      
      // Assuming you are sending email from localhost
      String host = "localhost";
@@ -65,7 +65,7 @@ public class SendMail{
         Transport.send(message);
         System.out.println("Sent message successfully....");
      }catch (MessagingException mex) {
-       DebugConsole.printStackTrace(mex);
+       Debug.printStackTrace(mex);
         //mex.printStackTrace();
        //throw new Exception("Unable to send mail with subject ["+subject+"] msg: "+mex.getMessage());
      }

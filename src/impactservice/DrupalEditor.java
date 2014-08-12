@@ -12,7 +12,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.HTMLParser;
 import tools.HTMLParser.HTMLElementCallback;
@@ -75,7 +75,7 @@ public class DrupalEditor {
 			if(hostname.equals("bhlnmgis.knmi.nl")){
 				String externalName="://webgis.nmdc.eu";
 				contentsURL=contentsURL.replaceAll(externalName, "://localhost");
-				DebugConsole.println("doGetRequest-replace: '"+contentsURL+"'");  
+				Debug.println("doGetRequest-replace: '"+contentsURL+"'");  
 			}
 		
 		} catch (UnknownHostException e) {
@@ -86,11 +86,11 @@ public class DrupalEditor {
   		if(urlObject!=null){
   		  long timeInMillis = Calendar.getInstance().getTimeInMillis();
   		  if(timeInMillis - urlObject.date < 60000){
-  		    DebugConsole.println("Returning message from cache");
+  		    Debug.println("Returning message from cache");
           return urlObject.message;
   		  }else{
   		    HttpragmentCache.remove(contentsURL);
-  		    DebugConsole.println("Too old");
+  		    Debug.println("Too old");
   		  }
   		}
 		}
@@ -166,7 +166,7 @@ public class DrupalEditor {
 			try {
 				requestedPage=URLEncoder.encode(requestedPage,"UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				DebugConsole.errprintln("URLEncode failed: "+e.getMessage());
+				Debug.errprintln("URLEncode failed: "+e.getMessage());
 			}
 			homeURL=homeURL+"?q="+requestedPage;
 			if(requestedPageNumber!=null){

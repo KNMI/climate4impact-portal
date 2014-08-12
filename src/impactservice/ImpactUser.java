@@ -2,7 +2,7 @@ package impactservice;
 
 import java.io.IOException;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.Tools;
 
 
@@ -27,12 +27,12 @@ public class ImpactUser {
   }
 
   synchronized public GenericCart getProcessingJobList(){
-    DebugConsole.println("getProcessingJobList");
+    Debug.println("getProcessingJobList");
     try{
       if(processingJobsList==null){
         processingJobsList = new GenericCart("processingJobsList",this);
       }
-      DebugConsole.println("Loading processing list from store");
+      Debug.println("Loading processing list from store");
       processingJobsList.loadFromStore();
     }catch(Throwable e){
       try {
@@ -44,7 +44,7 @@ public class ImpactUser {
     return processingJobsList;  
   }
   synchronized public GenericCart getShoppingCart() {
-    DebugConsole.println("getShoppingCart");
+    Debug.println("getShoppingCart");
     try{
       if(shoppingCart==null){
         shoppingCart = new GenericCart("shoppingCart",this);

@@ -3,7 +3,7 @@ package ASyncRunner;
 import java.util.Calendar;
 import java.util.Vector;
 
-import tools.DebugConsole;
+import tools.Debug;
 
 public class MyRunnableWaiter {
   private long startTimeInMillis;
@@ -97,7 +97,7 @@ public class MyRunnableWaiter {
 
   public int waitForCompletion(){
     int retCode = jobPoller.waitForCompletion();
-    DebugConsole.println("Took "+(Calendar.getInstance().getTimeInMillis()-startTimeInMillis)+" ms");
+    Debug.println("Took "+(Calendar.getInstance().getTimeInMillis()-startTimeInMillis)+" ms");
     return retCode;
   }
     

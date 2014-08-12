@@ -13,7 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.HTTPTools;
 import tools.JSONMessageDecorator;
 import tools.MyXMLParser;
@@ -59,7 +59,7 @@ public class THREDDSCatalogBrowser {
     } catch (Exception e1) {
    
       MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
-      DebugConsole.errprintln("Unable to load catalog: "+e1.getMessage());
+      Debug.errprintln("Unable to load catalog: "+e1.getMessage());
       throw e1;
     }
     
@@ -91,7 +91,7 @@ public class THREDDSCatalogBrowser {
     long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     addDatasets(rootCatalog,hostPath,supportedServices,a,catalogElement.get("catalog"),variableFilter,textFilter,null);
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    DebugConsole.println("Finished parsing THREDDS catalog to JSON in ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+    Debug.println("Finished parsing THREDDS catalog to JSON in ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
     return a;
     
   }
@@ -135,7 +135,7 @@ public class THREDDSCatalogBrowser {
         folder.put("variables2",putVariableInfo(xmlElement));
        
         if(succeeded==false){
-          DebugConsole.errprint("Did not succeed!");
+          Debug.errprint("Did not succeed!");
           return false;
         }
       }else{
@@ -241,13 +241,13 @@ public class THREDDSCatalogBrowser {
                 }
                 //if(variableList.length()==0)put=true;
                 if(variableList.length()==0){
-                  DebugConsole.println(leaf.getString("text")+" - "+c.length());
+                  Debug.println(leaf.getString("text")+" - "+c.length());
                  // if(a!=null)put=true;
                         
                 }
               }
             }catch(Exception e){
-              DebugConsole.errprintln(e.getMessage());
+              Debug.errprintln(e.getMessage());
               put = true;
             }
           }

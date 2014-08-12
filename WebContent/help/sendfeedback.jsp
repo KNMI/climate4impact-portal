@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"
-	import="impactservice.ImpactService,tools.DebugConsole,impactservice.LoginManager,impactservice.ImpactUser"
+	import="impactservice.ImpactService,tools.Debug,impactservice.LoginManager,impactservice.ImpactUser"
 	import="javax.servlet.http.*" import="javax.servlet.http.Cookie"
 	import="impactservice.DrupalEditor,org.apache.commons.lang3.StringEscapeUtils,tools.HTMLParser"
 	%><!DOCTYPE html>

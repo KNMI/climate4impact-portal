@@ -2,7 +2,7 @@ package impactservice;
 
 
 
-import tools.DebugConsole;
+import tools.Debug;
 import tools.MyXMLReader;
 
 public class Configuration {
@@ -47,12 +47,12 @@ public class Configuration {
       if(System.currentTimeMillis()<readConfigPolInterval+10000)return;
     }
     readConfigPolInterval=System.currentTimeMillis(); 
-    DebugConsole.println("Reading configfile "+getConfigFile());
+    Debug.println("Reading configfile "+getConfigFile());
     MyXMLReader configReader = new MyXMLReader();
     try {
       configReader.parseXMLFile(getConfigFile());
     } catch (Exception e) {
-      DebugConsole.println("Unable to read "+getConfigFile());
+      Debug.println("Unable to read "+getConfigFile());
       configReader = null;
       return;
     }
