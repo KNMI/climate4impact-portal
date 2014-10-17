@@ -423,7 +423,6 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			// (which comes in as a HTTP request from the OpenID provider)
 			ParameterList response = new ParameterList(httpReq
 					.getParameterMap());
-
 			// retrieve the previously stored discovery information
 			DiscoveryInformation discovered = (DiscoveryInformation) httpReq
 					.getSession().getAttribute("openid-disc");

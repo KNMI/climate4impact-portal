@@ -19,6 +19,16 @@
     <servlet-name>ImpactService</servlet-name>
     <url-pattern>/ImpactService</url-pattern>
   </servlet-mapping>
+   <servlet>
+    <description></description>
+    <display-name>DownscalingService</display-name>
+    <servlet-name>DownscalingService</servlet-name>
+    <servlet-class>impactservice.DownscalingService</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DownscalingService</servlet-name>
+    <url-pattern>/DownscalingService/*</url-pattern>
+  </servlet-mapping>
   <servlet>
     <description></description>
     <display-name>ConsumerServlet</display-name>
