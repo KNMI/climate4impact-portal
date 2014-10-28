@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServlet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tools.DebugConsole;
+import tools.Debug;
 
 
 /**
@@ -45,7 +45,7 @@ public class DownscalingAuth{
    * Fill necessary headers to request DP
    */
   protected static HttpURLConnection prepareQuery(String URI, String type) throws IOException{
-    DebugConsole.println("Subscribe user -- Building statement for URI: " + URI);
+    Debug.println("Subscribe user -- Building statement for URI: " + URI);
     URL url;
     HttpURLConnection urlConn;
     url = new URL(URI);
@@ -59,7 +59,7 @@ public class DownscalingAuth{
   }
   
   protected static HttpURLConnection prepareSimpleQuery(String URI, String type) throws IOException{
-    DebugConsole.println("Subscribe user -- Building statement for URI: " + URI);
+    Debug.println("Subscribe user -- Building statement for URI: " + URI);
     URL url;
     HttpURLConnection urlConn;
     url = new URL(URI);
