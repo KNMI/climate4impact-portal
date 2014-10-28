@@ -12,7 +12,7 @@
  
 		<div class="impactcontent">
   	    <div class="cmscontent">
-  		<%try{out.print(DrupalEditor.showDrupalContent("?q=node/6",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+  		<%try{out.print(DrupalEditor.showDrupalContent("?q=node/6",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
   		</div>
 		</div>
 	 

@@ -1,3 +1,4 @@
+<%@page import="tools.Debug"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.DrupalEditor,tools.HTTPTools,java.net.URLEncoder"%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 
@@ -15,6 +16,9 @@
         	String catalogURL= "";
         	try{
         		catalogURL = HTTPTools.getHTTPParam(request,"catalog").replaceAll(".html", ".xml").trim();
+        		if(catalogURL.length()==0){
+        			catalogURL = "undefined";
+        		}
         		out.println("catalogURL='"+catalogURL+"';");
         	}catch(Exception e){
         		out.println("errorMessage='"+URLEncoder.encode(e.getMessage(),"UTF-8")+"';");
@@ -22,10 +26,13 @@
         	String userURL = catalogURL.replace(".xml", ".html");
         	
         	String baseURL = userURL.split("#")[0];
-        	
-        	String baseName = userURL.substring(userURL.lastIndexOf("/")+1);
-        	baseName = baseName.substring(0,baseName.lastIndexOf("."));
-        	System.out.println("basename: "+baseName);
+        	String baseName = "";
+        	try{
+        	 	baseName = userURL.substring(userURL.lastIndexOf("/")+1);
+        		baseName = baseName.substring(0,baseName.lastIndexOf("."));
+        		System.out.println("basename: "+baseName);
+        	}catch(Exception e){
+        	}
         	
         	
         %>
@@ -187,7 +194,7 @@
 			<table>
 			<tr>
 			<td>Catalog: </td>
-			<td  style="max-width:860px;word-wrap: break-word;"> <a target="_blank" href="<%= request.getParameter("catalog").replace(".xml", ".html") %>"><%= request.getParameter("catalog").replace(".xml", ".html") %></a></td>
+			<td  style="max-width:860px;word-wrap: break-word;"> <a target="_blank" href="<%= catalogURL.replace(".xml", ".html") %>"><%= catalogURL.replace(".xml", ".html") %></a></td>
 			<td><div id="catalogasjson"></div></td></tr></table>
    		 
         	<!-- Dataset container -->

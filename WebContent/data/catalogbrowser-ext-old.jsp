@@ -94,7 +94,7 @@
 					<tr>
 						<td class="container"><div id="container" ></div></td>
 						<td class="split"></td>
-						<td class="contexthelp"><%try{out.print(DrupalEditor.showDrupalContent("?q=datasetviewercontext",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%></td>
+						<td class="contexthelp"><%try{out.print(DrupalEditor.showDrupalContent("?q=datasetviewercontext",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%></td>
 					</tr>
 				</table>
 			</div>

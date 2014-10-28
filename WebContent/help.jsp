@@ -9,7 +9,7 @@
 		<jsp:include page="header.jsp" />
 		<!-- Contents -->
 		<div class="impactcontent">
-      <%try{out.print(DrupalEditor.showDrupalContent("?q=node/9",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+      <%try{out.print(DrupalEditor.showDrupalContent("?q=node/9",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
 	    </div>
   <!-- /Contents -->
 	<jsp:include page="footer.jsp" />

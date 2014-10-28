@@ -11,7 +11,7 @@
 		
 		<div class="impactcontent">
 		 <div class="cmscontent"> 
-    <%try{out.print(DrupalEditor.showDrupalContent("?q=about",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>          			
+    <%try{out.print(DrupalEditor.showDrupalContent("?q=about",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>          			
   			</div> 
 		</div>
 		

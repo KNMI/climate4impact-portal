@@ -10,7 +10,10 @@ import java.util.Map;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -103,7 +106,7 @@ public class DrupalEditor {
 		
 	}
 
-	static public String showDrupalContent(String defaultPage,HttpServletRequest request) throws DrupalEditorException{
+	static public String showDrupalContent(String defaultPage,HttpServletRequest request,HttpServletResponse response) throws DrupalEditorException{
 	  boolean showEditButton = false;
 	  try {
       ImpactUser user = LoginManager.getUser(request,null);
@@ -112,14 +115,14 @@ public class DrupalEditor {
       }
     } catch (Exception e) {
     }
-	  return showDrupalContent(defaultPage,request, showEditButton );
+	  return showDrupalContent(defaultPage,request, response,showEditButton );
 	}
 	
-	static public String showDrupalContent(String defaultPage,HttpServletRequest request, boolean showEditButton) throws DrupalEditorException{
-	  return showDrupalContent(defaultPage,request,showEditButton,true);
+	static public String showDrupalContent(String defaultPage,HttpServletRequest request,HttpServletResponse response, boolean showEditButton) throws DrupalEditorException{
+	  return showDrupalContent(defaultPage,request,response,showEditButton,true);
 	}
 	  
-  static public String showDrupalContent(String defaultPage,HttpServletRequest request, boolean showEditButton, boolean showTitle) throws DrupalEditorException{
+  static public String showDrupalContent(String defaultPage,HttpServletRequest request,HttpServletResponse response, boolean showEditButton, boolean showTitle) throws DrupalEditorException{
 		String returnMessage="";
 		//String homeURL=drupalHost+drupalBaseURL+drupalDirectory;
 		String homeURL=Configuration.DrupalConfig.getDrupalHost()+Configuration.DrupalConfig.getDrupalBaseURL()+Configuration.DrupalConfig.getDrupalDirectory();
@@ -256,6 +259,17 @@ public class DrupalEditor {
 			returnMessage=returnMessage.replaceAll("<p>There is currently no content classified with this term.</p>", "");
 			
 		}catch(WebRequestBadStatusException e){
+		  if(e.getStatusCode() == 404){
+		   
+		      try {
+		        request.getRequestDispatcher("/impactportal/error_404.jsp").forward(request, response);
+            
+          } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
+		      return "";
+		  }
 			throw new DrupalEditorException("Could not obtain page "+homeURL+"<br/>\n"+e.getMessage()+"\n",e.getStatusCode());
 		}catch(Exception e){
 		

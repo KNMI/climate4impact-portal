@@ -26,7 +26,11 @@
 			pageName=pageName+"?"+queryString;
 		}
 			}
-			String searchCommand=request.getParameter("q");
+			String searchCommand=null;
+			try{
+				searchCommand=HTTPTools.getHTTPParam(request, "q");
+			}catch(Exception e){
+			}
 			//Detect if we found a searchstring
 			String searchString = "";
 			if(searchCommand!=null){
@@ -133,6 +137,12 @@
 			<% if(user!=null){
     	String accountTitle = "Account";
     	if(currentLoginPage.indexOf("jobs")!=-1){
+    		accountTitle += "&nbsp;<code class=\"codejobsicon\"></code>";
+    	}
+    	if(currentLoginPage.indexOf("processing")!=-1){
+    		accountTitle += "&nbsp;<code class=\"codejobsicon\"></code>";
+    	}
+    	if(currentLoginPage.indexOf("wpsuseproc")!=-1){
     		accountTitle += "&nbsp;<code class=\"codejobsicon\"></code>";
     	}
     	if(currentLoginPage.indexOf("basket")!=-1){

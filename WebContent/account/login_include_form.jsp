@@ -37,13 +37,13 @@
 	
 	//Not registered?				
 	out.print(
-			"<span style=\"padding:0px;margin:0px;float:left;\"><a target=\"_blank\" href=\"/impactportal/help/howto.jsp?q=create_esgf_account\"><i>Not registered?</i></a></span>"
+			"<span style=\"padding:0px;margin:0px;float:left;\"><a href=\"/impactportal/help/howto.jsp?q=create_esgf_account\"><i>Not registered?</i></a></span>"
 			+ "</form>"
 	);
 %>
 
 <br />
 <br />
-<br /> You can compose your OpenID based on user name and corresponding index node:<br />
+<br /> If you are already registered, you can compose your OpenID based on your user name and corresponding index node:<br />
 <div id="datanodebuttons"></div>
 * You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a>

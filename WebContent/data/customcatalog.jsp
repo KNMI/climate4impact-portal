@@ -25,7 +25,7 @@
 			<div id="container" style="width:100%;"></div>
 			
 			   <div class="cmscontent">
-      <%try{out.print(DrupalEditor.showDrupalContent("?q=customcatalog",request,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+      <%try{out.print(DrupalEditor.showDrupalContent("?q=customcatalog",request,response,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
      
       <div class="textstandardleft">
       <h2>Browse a catalog:</h2>

@@ -41,7 +41,7 @@
 			</div>
 
 			<h1>Sign in with your ESGF OpenID account</h1>
-			<div class="textstandardleft  ">
+			<div class="textstandardleft" style="width:540px;">
 
 				
 		<jsp:include page="login_include_form.jsp" />
@@ -58,14 +58,15 @@
 	<jsp:include page="loginmenu.jsp" />
 
 	<div class="impactcontent">
-		<div class="cmscontent">
+	
 
-
+			<div class="breadcrumb"><a href="login.jsp">Account</a> » Account </div>
+			<div class="cmscontent">
 			<h1>You are signed in</h1>
 			<div class="textstandardleft">
 				
-				Your openid is:<br/><strong><%=user.id%></strong><br /><br/>
-				You email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
+				Your OpenId is:<br/><strong><%=user.id%></strong><br /><br/>
+				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
 				
 				 <b>Actions:</b>
 				<ul>

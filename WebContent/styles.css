@@ -1264,7 +1264,8 @@ table.drupal {
 }
 
 div.textstandardleft {
-	width: 540px;
+	/*width: 540px;*/
+	width: 800px;
 	position: relative;
 	display: block;
 	padding-left: 15px;
@@ -1277,7 +1278,7 @@ div.textstandardleft {
 	font-weight: normal;
 	font-family: "Open Sans", "Helvetica Neue", sans-serif;
 
-	/*text-align: justify;*/
+	text-align: justify;
 	/*background: #FBFBFB;*/
 }
 
@@ -1668,7 +1669,7 @@ a:hover.lexicon-term {
 }
 
 .lexicon-list dd {
-	width: 540px;
+	width: 800px;
 	position: relative;
 	padding-left: 15px;
 	margin-left: 50px;
@@ -2181,7 +2182,7 @@ input[type=text],textarea {
 }
 
 input[type=text] {
-	height: 18px;
+	height: 24px;
 }
 
 div.fileinput {
@@ -2433,4 +2434,9 @@ a img {
 .
 .x-column-header-inner {
 	border:none !important;
+}
+
+.x-grid-cell-inner {
+	/*background-color: #FFF;*/
+
 }

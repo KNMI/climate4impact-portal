@@ -14,7 +14,7 @@
   	    <div class="cmscontent">
   		<%
   		try{
-  			out.print(DrupalEditor.showDrupalContent("?q=downscalingprocess",request));
+  			out.print(DrupalEditor.showDrupalContent("?q=downscalingprocess",request,response));
  		}catch(DrupalEditor.DrupalEditorException e){
  			out.print(e.getMessage());response.setStatus(e.getCode());
   		}

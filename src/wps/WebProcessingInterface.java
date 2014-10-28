@@ -255,14 +255,25 @@ public class WebProcessingInterface {
 	}
 	
 	public static String addLiteralData(String identifier,String value){
-	  String data="        <wps:Input>\n"
-        +  "          <ows:Identifier>"+identifier+"</ows:Identifier>\n";
+	  String data="";
+	  
 	  if(value!=null){
-        data+=  "          <wps:Data>\n"
-        +  "            <wps:LiteralData>"+value+"</wps:LiteralData>\n"
-        +  "          </wps:Data>\n";
+      String [] values = value.split(",");
+      for(int j=0;j<values.length;j++){
+    	  data+=  "        <wps:Input>\n";
+        data+=  "          <ows:Identifier>"+identifier+"</ows:Identifier>\n";
+        data+=  "          <wps:Data>\n";
+        data+=  "            <wps:LiteralData>"+values[j]+"</wps:LiteralData>\n";
+        data+=  "          </wps:Data>\n";
+        data+=  "        </wps:Input>\n";
+      }
+	  }else{
+	    data+=  "        <wps:Input>\n";
+      data+=  "          <ows:Identifier>"+identifier+"</ows:Identifier>\n";
+      data+=  "          <wps:Data>\n";
+      data+=  "          </wps:Data>\n";
+      data+=  "        </wps:Input>\n";
 	  }
-    data+="        </wps:Input>\n";
     return data;
 	}
 	
@@ -342,7 +353,7 @@ public class WebProcessingInterface {
       postData     +=  "    </wps:Execute>\n";
       
       MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
-      
+      Debug.println(postData);
      
       
       if(isLocal() == false){
@@ -356,9 +367,9 @@ public class WebProcessingInterface {
         
         PyWPSServer.runPyWPS(request,null,out,null,postData);
         //a.parse(new URL(WPSURL),postData);
-        Debug.println(getWPSURL()+" for "+user.id);
+        //Debug.println(getWPSURL()+" for "+user.id);
         
-        Debug.println("Process has been started with the following command:.");
+        //Debug.println("Process has been started with the following command:.");
         //DebugConsole.println(postData+"\nThe result is:\n"+a.toString());
         Debug.println("Process has been started.");
       
@@ -433,7 +444,7 @@ public class WebProcessingInterface {
     Debug.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
-    statusLocation = statusLocation.replace("8091", "80");
+    //statusLocation = statusLocation.replace("8091", "80");
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
       b.parse(new URL(statusLocation));

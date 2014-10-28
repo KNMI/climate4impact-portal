@@ -6,6 +6,7 @@ var BasketWidget = function() {
   var initialized = false;
   var tree = undefined;
   var store = undefined;
+  var openedWindows = [];
   var _init = function(){
     if(initialized == true)return;
     initialized = true;
@@ -85,6 +86,34 @@ var BasketWidget = function() {
       
       
     });
+    
+    var getSelectedFilesForUsage = function(){
+	      if (tree.getSelectionModel().hasSelection()) {
+	        var selectedNode = tree.getSelectionModel().getSelection();
+	  
+	            // alert(selectedNode[0].data.dapurl + ' was selected');
+	        if (_callbackFunction) {
+	          var doClose = _callbackFunction(selectedNode);
+	          if (doClose === true) {
+	            for(w in openedWindows){
+	          	  w = openedWindows[w];
+	          	  try{
+	          		  w.close();
+	          		  w.destroy();
+	          	  }catch(e){
+	          	  }
+	            }
+	            openedWindows = [];
+	          	
+	            basketWindow.close();
+	          }
+	        }else{
+	          Ext.MessageBox.alert('Error','Nothing to apply to.');
+	        }
+	      } else {
+	        Ext.MessageBox.alert('Error','No selected files.');
+	      }
+    };
   
     var getButtons = function(){
       var buttons =[{
@@ -190,21 +219,7 @@ var BasketWidget = function() {
         var useFileButton =  {
           text : 'Use file(s)',
           handler : function() {
-            if (tree.getSelectionModel().hasSelection()) {
-              var selectedNode = tree.getSelectionModel().getSelection();
-    
-              // alert(selectedNode[0].data.dapurl + ' was selected');
-              if (_callbackFunction) {
-                var doClose = _callbackFunction(selectedNode);
-                if (doClose === true) {
-                  basketWindow.close();
-                }
-              }else{
-                Ext.MessageBox.alert('Error','Nothing to apply to.');
-              }
-            } else {
-              Ext.MessageBox.alert('Error','No selected files.');
-            }
+        	  getSelectedFilesForUsage();
           }
           
         };
@@ -238,6 +253,7 @@ var BasketWidget = function() {
           items : fileViewer.getViewer()
         });
         w.show();
+        openedWindows.push(w);
         fileViewer.load(record.get('dapurl'));
       }else if(record.get('catalogurl')){
         window.open('/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(record.get('catalogurl')));
@@ -297,7 +313,11 @@ var BasketWidget = function() {
       listeners:{
         itemdblclick:{
           fn:function(e,node,e){
-            showFileInfo(node,false);
+        	if(_callbackFunction){
+        		getSelectedFilesForUsage();
+        	}else{
+        		showFileInfo(node,false);
+        	}
           }
         }
       }
@@ -305,8 +325,10 @@ var BasketWidget = function() {
   }
 
   t.show = function(callbackFunction) {
+	  
     _callbackFunction = callbackFunction;
     if (basketWindow == undefined) {
+    	
       _init();
       basketWindow = Ext.create('Ext.Window', {
         width : 900,
@@ -316,15 +338,14 @@ var BasketWidget = function() {
         closeAction : 'hide',
         maximizable : true,
         frame : false,
-       
         title : 'Basket',
         layout : 'fit',
-        items : tree
-        ,
+        items : tree,
         listeners : {
           afterrender : {
             fn : function() {
-              store.load();
+              window.setTimeout(function(){store.load();;}, 300);    
+              
 
             }
           }

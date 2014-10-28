@@ -12,7 +12,7 @@
 		<jsp:include page="helpmenu.jsp" />
 		<div class="impactcontent">
 		 <div class="cmscontent"> 
-    <%try{out.print(DrupalEditor.showDrupalContent("?q=howto",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>                                  			
+    <%try{out.print(DrupalEditor.showDrupalContent("?q=howto",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>                                  			
   			</div> 
 		</div>
 		

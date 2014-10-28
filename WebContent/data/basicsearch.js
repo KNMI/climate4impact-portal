@@ -252,7 +252,7 @@ var loadFacetList = function(facetType,collapse){
 							selectedVariables+=v;
 						}
 
-						query+=facet+"="+v+"&";
+						query+=facet+"="+URLEncode(v)+"&";
 					}
 				}
 			}
@@ -286,7 +286,7 @@ var loadFacetList = function(facetType,collapse){
 				if(!dataSize)dataSize="-";
 				html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
 				if(topics[j].catalogURL){
-					html+='<td><a target=\"_blank\" href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'#'+selectedVariables+'">browse</a></td>';
+					html+='<td><a  href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'#'+selectedVariables+'">browse</a></td>';
 				}else{
 					html+="<td>-</td>";
 				}

@@ -220,30 +220,30 @@ public class GenericCart {
      */
     public static String showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
       Debug.println("Show joblist");
-      String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).id+"</strong><br/>";
-      htmlResp += "<table class=\"basket\">";
+      String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).id+"</strong><br/>\n";
+      htmlResp += "<table class=\"basket\">\n";
       Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
       int j=1;
 
-      htmlResp+="<tr>";
+      htmlResp+="<tr>\n";
       
-      htmlResp+="<td style=\"width:150px;background-color:#DDD;\"><b>Started on:</b></td>";
-      htmlResp+="<td style=\"width:360px;background-color:#DDD;\"><b>WPS Identifier</b></td>";
-      htmlResp+="<td style=\"width:360px;background-color:#DDD;\"><b>Unique Id</b></td>";
-      htmlResp+="<td style=\"width:30px;background-color:#DDD;\"><b>Progress</b></td>";
+      htmlResp+="<td style=\"width:150px;background-color:#DDD;\"><b>Started on:</b></td>\n";
+      htmlResp+="<td style=\"width:360px;background-color:#DDD;\"><b>WPS Identifier</b></td>\n";
+      htmlResp+="<td style=\"width:360px;background-color:#DDD;\"><b>Status location</b></td>\n";
+      htmlResp+="<td style=\"width:30px;background-color:#DDD;\"><b>Progress</b></td>\n";
 
       
-        htmlResp+="<td style=\"background-color:#DDD;\"><b>View</b></td>";
+        htmlResp+="<td style=\"background-color:#DDD;\"><b>View</b></td>\n";
       
       
-      htmlResp+="<td style=\"background-color:#DDD;\"><b>X</b></td>";
-      htmlResp+="</tr>";
+      htmlResp+="<td style=\"background-color:#DDD;\"><b>X</b></td>\n";
+      htmlResp+="</tr>\n";
 
       while(itr.hasNext()) {
         DataLocator element = itr.next(); 
-        htmlResp+="<tr>";
+        htmlResp+="<tr>\n";
         
-        htmlResp+="<td>"+element.addDate+"</td>";
+        htmlResp+="<td>"+element.addDate+"</td>\n";
       
         
         try {
@@ -251,46 +251,46 @@ public class GenericCart {
           JSONObject elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
           String statusLocation = elementProps.getString("wpsurl");
           String id= elementProps.getString("id");
-          htmlResp+="<td>"+id+"</td>";
-          htmlResp+="<td>"+element.id+"</td>";
+          htmlResp+="<td>"+id+"</td>\n";
+          htmlResp+="<td><a href=\""+statusLocation+"\">"+element.id+"</a></td>\n";
           
           
           JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
           try{
             String progress= progressObject.getString("progress");
             if(progress.equals("100")){
-              htmlResp+="<td>ready</td>";
-              htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>";
+              htmlResp+="<td>ready</td>\n";
+              htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>\n";
             }else{
-              htmlResp+="<td>"+progress+" % </td>";
-              htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>";
+              htmlResp+="<td>"+progress+" % </td>\n";
+              htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>\n";
             }
           }catch(Exception e){
             htmlResp+="<td>failed</td>";
-            htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>";
+            htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>\n";
           }
           
         } catch (Exception e) {
           Debug.println(e.getMessage());
-          htmlResp+="<td>crashed</td>";
-          htmlResp+="<td>-</td>";
+          htmlResp+="<td>crashed</td>\n";
+          htmlResp+="<td>-</td>\n";
           
           
         }
         
      
-        htmlResp+="<td><a href=\"#\" onclick='removeId(\""+element.id+"\");return false;'>X</a></td>";
-        htmlResp+="</tr>";
+        htmlResp+="<td><a href=\"#\" onclick='removeId(\""+element.id+"\");return false;'>X</a></td>\n";
+        htmlResp+="</tr>\n";
         j++;
       } 
       
       if(j==0){
-        htmlResp+="<tr>";
-        htmlResp+="<td>No items added to the basket (empty basket)</td>";
-        htmlResp+="</tr>";
+        htmlResp+="<tr>\n";
+        htmlResp+="<td>No items added to the basket (empty basket)</td>\n";
+        htmlResp+="</tr>\n";
       }
       
-      htmlResp+="</table>";
+      htmlResp+="</table>\n";
       return htmlResp;
     }
     

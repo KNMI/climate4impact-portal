@@ -66,8 +66,13 @@ public class HTTPTools extends HttpServlet {
       'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
       'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '|', '&',
-      '.', ',', '~', ' ','/',':','?','_','#','=' };
-  
+      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')'};
+  /**
+   * Validates input for valid tokens, preventing XSS attacks. Throws Exception when invalid tokens are encountered.
+   * @param input The string as input
+   * @return returns the same string
+   * @throws Exception when invalid tokens are encountered
+   */
   public static String validateInputTokens(String input) throws Exception {
     if(input == null)return null;
     
@@ -275,7 +280,7 @@ public class HTTPTools extends HttpServlet {
       Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(403);
     } catch (WebRequestBadStatusException e) {
-      Debug.printStackTrace(e);
+      //Debug.printStackTrace(e);
       throw e;
     } catch (Exception e) {
       Debug.printStackTrace(e);

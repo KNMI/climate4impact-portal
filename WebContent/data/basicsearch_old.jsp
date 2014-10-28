@@ -245,7 +245,7 @@
 	
 	<!--  <div style="line-height:0px;height:0px;margin:32px 10px;float: right;clear:both;overflow:none; border: none;"></div>
 
-      <%try{out.print(DrupalEditor.showDrupalContent("?q=search_help",request,false,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
+      <%try{out.print(DrupalEditor.showDrupalContent("?q=search_help",request,response,false,false));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
       -->
   			<div class="impactcontent">
   			<div id="info"></div>

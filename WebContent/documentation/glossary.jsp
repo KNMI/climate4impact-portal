@@ -12,8 +12,14 @@
 		<div class="impactcontent">
 		 <div class="cmscontent"> 
 		  
-  		
-  		  <%try{out.print(DrupalEditor.showDrupalContent("?q=climate4impactglossary",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>        
+  			<h1>Glossary</h1>
+  			<div class="textstandardleft">
+  			
+  			<a href="/impactportal/documentation/glossary.jsp">Climate4Impact Glossary</a><br/>
+  			<a href="/impactportal/documentation/glossary.jsp?q=EUPORIAS-Glossary">EUPORIAS Glossary</a>
+  			
+  			</div>
+  		  <%try{out.print(DrupalEditor.showDrupalContent("?q=climate4impactglossary",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>        
   			</div> 
 		</div>
 		

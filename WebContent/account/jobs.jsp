@@ -111,6 +111,7 @@
 		<jsp:include page="loginmenu.jsp" />
  
 		<div class="impactcontent">
+		<div class="breadcrumb"><a href="login.jsp">Account</a> » Monitor jobs </div>
 		<h1>Submitted processing jobs</h1>
 		<%
 			ImpactUser user = null;
@@ -130,7 +131,7 @@
 			out.println("<div id='joblist'></div>");
 			
 			
-			out.println("<br/><div class=\"textstandardleft\"><span ><a style=\"vertical-align:middle;\" href=\"/impactportal/data/wpsoverview.jsp\"><img style=\"height:32px;vertical-align:middle\" src=\"http://climate4impact.eu/files/calculator_0.png\" alt=\"Processing\"/> Go to processing.</a></span></div><br/>");
+			
 			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
 		}
 		%>

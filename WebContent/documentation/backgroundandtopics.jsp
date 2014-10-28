@@ -12,7 +12,7 @@
 		<jsp:include page="docmenu.jsp" />
 		<div class="impactcontent">
 		 <div class="cmscontent"> 
-      <%try{out.print(DrupalEditor.showDrupalContent("?q=General_information_and_recommendations",request));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>  			
+      <%try{out.print(DrupalEditor.showDrupalContent("?q=General_information_and_recommendations",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>  			
   			</div> 
 		</div>
 		

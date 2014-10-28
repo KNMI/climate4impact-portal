@@ -136,5 +136,6 @@ public class CGIRunner {
     
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
     Debug.println("Finished CGI with code "+processRunner.exitValue()+": "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+    outputStream.flush();
   }
 }

@@ -91,7 +91,7 @@
 			<%
 				try {
 					out.print(DrupalEditor.showDrupalContent("?q=contactexpert",
-							request));
+							request,response));
 				} catch (DrupalEditor.DrupalEditorException e) {
 					out.print(e.getMessage());
 					response.setStatus(e.getCode());

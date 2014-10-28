@@ -1,7 +1,7 @@
 
   var OpenIDProviders = {
-      'SMHI-LIU-NSC':{
-        name:'SMHI-LIU-NSC',
+      'SMHI-NSC-LIU':{
+        name:'SMHI-NSC-LIU',
         openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
         createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
         accountinfo:'http://esg-dn1.nsc.liu.se/esgf-web-fe/accountsview',
