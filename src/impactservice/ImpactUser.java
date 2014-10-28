@@ -66,6 +66,14 @@ public class ImpactUser {
     Tools.mkdir(dataDir);
     return dataDir;
   }
+  
+  
+  public String getInternalName() {
+    return internalName;
+  }
+  public void setInternalName(String internalName) {
+    this.internalName = internalName;
+  }
   public String getEmailAddress() {
     return emailAddress;
   }

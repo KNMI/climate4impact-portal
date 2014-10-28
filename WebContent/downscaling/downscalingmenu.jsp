@@ -31,8 +31,9 @@
 
   <ul style="height:20px;">
 	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingdocs.jsp" >Documentation</a></li>
+	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/subscription.jsp" >Subscription</a></li>
+	<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscaling.jsp" >Create</a></li> 
 	 <!-- 
-  	  <li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscaling.jsp" >Create</a></li>
       <li <% if(highLightProcessing)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/processing.jsp" >Processing</a></li>
       -->
     

@@ -11,9 +11,9 @@ public class Configuration {
   
   private static String impactWorkspace=null;//"/home/visadm/impactspace/";
 
-  
   public static String getImpactWorkspace(){readConfig();return impactWorkspace+"/";}
   
+  public static String getDownscalingPortalWorkspace(){return getImpactWorkspace()+"downscalingportal/";};
   
   public static String getHomePath(){
     return System.getProperty("user.home")+"/impactportal/";
