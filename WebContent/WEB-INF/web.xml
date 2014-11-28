@@ -23,7 +23,7 @@
     <description></description>
     <display-name>DownscalingService</display-name>
     <servlet-name>DownscalingService</servlet-name>
-    <servlet-class>impactservice.DownscalingService</servlet-class>
+    <servlet-class>downscaling.DownscalingService</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>DownscalingService</servlet-name>

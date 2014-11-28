@@ -614,8 +614,8 @@ div.note {
 }
 
 div.warning {
-	padding: 10px 15px 10px 80px;
-	background: #fffbc6 url("alert_warning_32.png") 15px 15px no-repeat;
+	padding: 25px 25px 25px 80px;
+	background: #fffbc6 url("alert_warning_32.png") 25px center no-repeat;
 	min-height: 42px;
 }
 
@@ -2439,4 +2439,8 @@ a img {
 .x-grid-cell-inner {
 	/*background-color: #FFF;*/
 
+}
+
+.text-small{
+	font-size: 0.6em;
 }
