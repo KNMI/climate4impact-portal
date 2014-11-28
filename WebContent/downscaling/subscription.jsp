@@ -7,7 +7,7 @@
  <%
     try{
 		ImpactUser user = LoginManager.getUser(request);
-		if(DownscalingAuth.isUserSubscribed(user)){
+		if(impactservice.DownscalingAuth.isUserSubscribed(user)){
 			request.setAttribute("isSubscribed", "true");
 		}else{
 			out.print("<div class='warning'>");

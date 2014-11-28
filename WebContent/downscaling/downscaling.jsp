@@ -365,7 +365,7 @@
 		  			<tr>
 		  				<div id="variable-types"> 
 			  				<%
-			  					for(String type : DownscalingService.getVariableTypes()){
+			  					for(String type : impactservice.DownscalingService.getVariableTypes()){
 			  							out.print("<td><input type='radio' name='variable-type' data-variable-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
 			  					}
 			  				%>
