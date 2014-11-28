@@ -27,7 +27,7 @@ import tools.Debug;
 /**
  * Servlet implementation class ImpactService
  */
-public class DownscalingAuth{
+public class DownscalingAuthDeprecated{
   public static final String CONTENT_TYPE_JSON = "application/json";
   public static final String C4I_USER = "climate4impact";
   public static final String C4I_PASSWORD = "climate4impact";
@@ -38,7 +38,7 @@ public class DownscalingAuth{
   /**
    * @see HttpServlet#HttpServlet()
    */
-  public DownscalingAuth() {
+  public DownscalingAuthDeprecated() {
   }
 
   /*
@@ -166,7 +166,7 @@ public class DownscalingAuth{
   }
   
   protected static ImpactUser getUser(ImpactUser user, String username) throws ServletException, IOException{
-    HttpURLConnection urlConn = prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username, "GET");
+    HttpURLConnection urlConn = prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + "/users/" + username, "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
         return null;
     try {

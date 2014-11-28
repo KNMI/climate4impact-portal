@@ -26,7 +26,7 @@ import org.json.JSONObject;
 /**
  * Servlet implementation class ImpactService
  */
-public class DownscalingService extends HttpServlet {
+public class DownscalingServiceDeprecated extends HttpServlet {
   
   /**
    * 
@@ -36,14 +36,14 @@ public class DownscalingService extends HttpServlet {
   /**
    * @see HttpServlet#HttpServlet()
    */
-  public DownscalingService() {
+  public DownscalingServiceDeprecated() {
       super();
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {  
     String pathInfo = request.getPathInfo();
     if(pathInfo.matches("/users/.*/predictands")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?" + request.getQueryString(), "GET");
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + pathInfo + "?" + request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -57,7 +57,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zone/.*/predictors/.*/predictands/.*")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo, "GET");
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + pathInfo, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -71,7 +71,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zone/.*/predictands/.*/downscalingMethods")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo, "GET");
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + pathInfo, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -85,7 +85,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/variables")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?variableType=" + request.getParameter("variableType"), "GET");
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + pathInfo + "?variableType=" + request.getParameter("variableType"), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -99,7 +99,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/validation")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?idZone=" + 
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareSimpleQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + pathInfo + "?idZone=" + 
               request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("downscalingMethod"), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();
@@ -116,7 +116,7 @@ public class DownscalingService extends HttpServlet {
   }
     
   public static List<Predictand> getUserPredictands(String username)throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username + "/predictands", "GET");
+    HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + "/users/" + username + "/predictands", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -137,7 +137,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<String> getVariableTypes()throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/variables/types", "GET");
+    HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + "/variables/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -164,7 +164,7 @@ public class DownscalingService extends HttpServlet {
 	  String pathInfo = request.getPathInfo();
 //	  ImpactUser loggedInUser = LoginManager.getUser(request);
     if(pathInfo.equals("/subscribe")){//Configuration.getImpactWorkspace()
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users", "POST");
+      HttpURLConnection urlConn = DownscalingAuthDeprecated.prepareQuery(DownscalingAuthDeprecated.BASE_DP_REST_URL + "/users", "POST");
       JSONObject user = new JSONObject();
       try {
         user.put("username", request.getParameter("username"));
