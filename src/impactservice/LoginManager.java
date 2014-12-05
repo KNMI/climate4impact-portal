@@ -2,6 +2,7 @@ package impactservice;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
@@ -16,6 +17,8 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
 
 import tools.Debug;
+import tools.HTTPTools;
+import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
 /**
@@ -62,6 +65,26 @@ public class LoginManager {
       Debug.println("offline mode");
       return;
     }
+    
+
+    //Test met openID URL
+    
+    user.userMyProxyService = null;
+    //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
+    XMLElement xmlParser = new XMLElement();
+    xmlParser.parse(new URL(user.id));
+    Debug.println(xmlParser.toString());
+    Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
+    for(XMLElement service : services){
+      if(service.get("Type").getValue().indexOf("myproxy")!=-1){
+        Debug.println(service.get("URI").getValue());
+        user.userMyProxyService = service.get("URI").getValue();
+      }
+    }
+    
+
+    
+    
     MyProxy myProxy = new MyProxy(Configuration.LoginConfig.getMyProxyServerHost(),Configuration.LoginConfig.getMyProxyServerPort());
     //myProxy.setHost(Configuration.LoginConfig.getMyProxyServerHost());
     //myProxy.setPort(Configuration.LoginConfig.getMyProxyServerPort());

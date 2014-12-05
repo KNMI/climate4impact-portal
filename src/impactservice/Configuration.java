@@ -5,6 +5,7 @@ package impactservice;
 import tools.Debug;
 import tools.MyXMLReader;
 
+
 public class Configuration {
 
   static long readConfigPolInterval = 0;;

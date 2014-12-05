@@ -27,10 +27,12 @@
 		boolean highLightCatalogs = false;
 		boolean highLightBasket = false;
 		boolean highLightBasicSearch = false;
+		boolean highLightESGFSearch = false;
 		
 
 		if(pageName.indexOf("data/basicsearch.jsp")!=-1)highLightBasicSearch=true;
 		else if(pageName.indexOf("data/advancedsearch.jsp")!=-1)highLightBasicSearch=true;
+		else if(pageName.indexOf("data/esgfsearch.jsp")!=-1)highLightESGFSearch=true;
 		else if(pageName.indexOf("data/download.jsp")!=-1)highLightDownload=true;
 		else if(pageName.indexOf("data/transform.jsp")!=-1)highLightTransform=true;
 		else if(pageName.indexOf("data/wps")!=-1)highLightTransform=true;
@@ -47,6 +49,7 @@
   <ul style="height:20px;">
   <!-- 	<li <% if(highLightHome)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Overview</a></li>-->
   <li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>
+  <li <% if(highLightESGFSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/esgfsearch.jsp" >Faceted Search</a></li>
    <!--  <li <% if(highLightAdvancedSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/advancedsearch.jsp" >Advanced Search</a></li> -->
     <li <% if(highLightCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/catalogs.jsp" >Catalogs</a></li>
     <li <% if(highLightCustomCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/customcatalog.jsp" >Explore your own catalogs or files</a></li>

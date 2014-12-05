@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Vector;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -46,6 +47,7 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+
 
 /**
  * Servlet implementation class DoHTTPRequest
@@ -514,6 +516,32 @@ public class HTTPTools extends HttpServlet {
     if (items.size() == 0)
       return null;
     return items.get(0);
+  }
+
+  public static String makeHTTPGetRequest(URL url) throws WebRequestBadStatusException, IOException {
+    return makeHTTPGetRequest(url.toString());
+    
+  }
+
+  public static KVPKey parseQueryString(String url) {
+    KVPKey kvpKey = new KVPKey();
+    String urlParts[] = url.split("\\?");
+    String queryString = urlParts[urlParts.length - 1];
+    String[] kvpparts = queryString.split("&");
+    for (int j = 0; j < kvpparts.length; j++) {
+      String kvp[] = kvpparts[j].split("=");
+      if (kvp.length == 2) {
+        String valueChecked;
+        try {
+          valueChecked = validateInputTokens(kvp[1]);
+          kvpKey.addKVP(kvp[0],valueChecked);
+        } catch (Exception e) {
+          kvpKey.addKVP(kvp[0],e.getMessage());
+        }
+        
+      }
+    }
+    return kvpKey;
   }
 
 }

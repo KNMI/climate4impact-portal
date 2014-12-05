@@ -1,0 +1,228 @@
+.page{
+  border:0px solid black;
+  width:900px;
+  padding:3px;
+}
+
+.searchSelectFacet{
+  margin:5px 0px 5px 0px;
+}
+
+.selectedElementList{
+  margin:0px;
+  padding:0px;
+}
+
+.roundborder{
+  -moz-border-radius-topleft: 3px;
+  -moz-border-radius-topright:3px;
+  -moz-border-radius-bottomleft:3px;
+  -moz-border-radius-bottomright:3px;
+  -webkit-border-top-left-radius:3px;
+  -webkit-border-top-right-radius:3px;
+  -webkit-border-bottom-left-radius:3px;
+  -webkit-border-bottom-right-radius:3px;
+  border-top-left-radius:3px;
+  border-top-right-radius:3px;
+  border-bottom-left-radius:3px;
+  border-bottom-right-radius:3px;
+}
+
+.facets{
+  padding:1px 6px 1px 6px;
+  margin:2px;
+  border:1px solid black;
+  cursor: pointer; cursor: hand;
+  line-height:25px;
+  background-color: #444;
+  color:white;
+  display:inline-block;
+}
+
+.facets:hover  {
+  background-color: #8F8;
+  color:black;
+}
+
+.facetSelected{
+  background-color: #D8E8FC;
+  border:1px solid #7DA2CE;
+  color:black;
+}
+
+.facetSelected:hover{
+  background-color:#FFFF80;
+ border:1px solid #6D82aE;
+}
+
+.facetDisabled{
+  background-color:#888;
+  border:1px solid #888;
+}
+
+.elementSelector{
+  padding:0px 16px 0px 16px;
+  margin:0px;
+  overflow:hidden;
+  cursor: pointer; cursor: hand;
+  line-height:25px;
+  background-color: #FFF;
+  color:black;
+  display:block;
+  border-top:1px solid #DDD;
+  border-left:1px solid #DDD;
+  border-right:1px solid #DDD;
+  border-bottom:1px solid #FFF;
+}
+
+.elementSelectorEven{
+   background-color: #FFF;
+}
+
+.elementSelectorOdd{
+  background-color:#FFF ;
+}
+
+.elementSelector:hover  {
+  background-color: #D0FFD0;
+  color:black;
+/*   border:1px solid #999;*/
+
+}
+.elementSelected{
+  background-color: #D8E8FC;
+}
+
+.elementSelected:hover{
+  background-color:#FFFF80;
+}
+
+.elementSelectorContainer{
+   overflow:auto;
+   max-height:200px;
+   margin:2px;
+   border:1px solid #668;
+}
+
+.button_facetselectorclose{
+  float:right;
+}
+
+.button_elementselectorok{
+float:right;
+}
+
+.button_filterresults{
+  float:right;
+}
+
+.button_removefilter{
+  height:20px;
+  width:20px;
+  line-height:15px;
+  padding:0px;
+  margin:0px;
+}
+
+.div_filterresults{
+  display:block;
+  line-height:25px;
+}
+
+
+.overlay{
+  position:fixed;
+  display:inline;
+ background: rgba(255,255,255,.7);
+  z-index:10000;
+}
+
+/*All components should be put in here */
+.searchCompContainer{
+  background: #eeefef;
+  border: 1px solid #dddede;
+  border-radius: 1px;
+  padding: 6px;
+}
+
+.searchComp{
+  border-radius:4px;
+  margin:4px 2px 8px 2px;
+}
+
+.searchCompHeader{
+  font-weight: bold;
+   background: rgba(255,255,255,.33);
+  border-bottom-style:solid;
+  border-color:#91847C;
+  border-bottom-width:1px;
+   padding:2px 6px 2px 6px;
+}
+
+.searchCompBody{
+  padding:6px 6px 6px 6px;
+  height:100%;
+}
+
+.searchCompFooter{
+}
+
+
+/* Field 1 on top showing all selected elements */
+.selectedElements{
+  background-color:#D9FFD4;
+  /*padding:10px;
+  margin-bottom:2px;*/
+  border:1px solid #91847C;
+}
+
+/*Field 2 Middle component */
+.facetOverview{
+  background-color:#DCD9FF;
+  border:1px solid #91847C;
+}
+
+/*Field 3 Bottom component displaying search results*/
+.searchResults{
+  background-color:#FFDAC3;
+  border:1px solid #91847C; 
+}
+
+.resultList{
+  overflow:auto;
+  max-height:200px;
+  border:1px solid #668;
+  background-color:#FFF; 
+}
+
+.resultItem{
+ padding:0px 16px 0px 16px;
+ margin:0px;
+ overflow:hidden;
+ cursor: pointer; cursor: hand;
+ line-height:25px;
+ background-color: #FFF;
+ color:black;
+ display:block;
+ border-top:1px solid #DDD;
+ border-left:1px solid #DDD;
+ border-right:1px solid #DDD;
+ border-bottom:1px solid #FFF;
+}
+
+.resultItemChecking{
+   background-color: #999;
+}
+
+.resultItemOk{
+   background-color: #FFF;
+}
+
+.resultItemWrong{
+   background-color: #F44;
+}
+
+.resultItem:hover  {
+  background-color: #D0FFD0;
+  color:black;
+}
