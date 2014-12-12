@@ -46,10 +46,10 @@ body,.x-body {
 	/*  overflow-y: scroll;*/
 }
 
-*{
+/* *{
 	-moz-box-sizing:initial;
 }
-
+ */
 code{
 	background-color: initial;
     color: white;
@@ -1758,11 +1758,24 @@ ul.pager {
 
 /*Dialog*/
 .ui-dialog .ui-dialog-titlebar {
-	height: 22px;
-	padding: 0px;
-	margin: 0px;
+ font-weight: bold;
+  background:#428bca;
+  font-size:18px;
+  color:white;
+   /*background: rgba(0,0,0,.30);*/
+  border-bottom-style:solid;
+  border-color:#91847C;
+  border-bottom-width:1px;
+   padding:2px 6px 2px 6px;
+   line-height:24px;
+   border-radius:0px;
+   
+   /*height:22px;*/
 }
 
+.ui-widget{
+	font-family: "Open Sans", "Helvetica Neue", sans-serif;	
+}
 /*Slider*/
 .ui-slider .ui-slider-handle {
 	width: 8px;
@@ -1773,6 +1786,19 @@ ul.pager {
 .ui-slider-horizontal {
 	height: 10px;
 }
+/* 
+.ui-corner-br{
+	border-bottom-right-radius:0px;
+}
+.ui-corner-bl{
+	border-bottom-left-radius:0px;
+}
+.ui-corner-tr{
+	border-top-right-radius:0px;
+}
+.ui-corner-tl{
+	border-top-left-radius:0px;
+} */
 
 .ui-iconbutton {
 	background: transparent;
@@ -2232,7 +2258,7 @@ input[type=button],input[type=submit] {
 	font-size:14px;
 	font-weight:normal;
 	font-style:normal;
-	height:23px;
+	/*height:23px;*/
 	line-height:23x;
 	width:100px;
 	text-decoration:none;

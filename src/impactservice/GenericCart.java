@@ -475,7 +475,8 @@ public class GenericCart {
             if(httpURL.indexOf("fileServer")>0){
               dapURL=httpURL.replace("fileServer", "dodsC");
             }
-          }else{
+          }*/
+          /*else{
             if(dapURL!=null&&httpURL==null){
               if(dapURL.indexOf("dodsC")>0){
                 if(dapURL.indexOf("aggregation")==-1){

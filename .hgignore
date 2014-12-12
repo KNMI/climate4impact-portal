@@ -7,3 +7,4 @@ syntax: glob
 *.a
 *.jar
 *.class
+*.tar.gz

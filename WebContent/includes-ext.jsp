@@ -1,5 +1,5 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>IS-ENES &mdash; Climate4Impact portal</title>
+    <title>Climate for impact</title>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" >
     <link rel="icon" type="image/png" href="/impactportal/favicon.ico"/>
     <link rel="stylesheet" href="/impactportal/js/jquery-ui-1.10.3/themes/base/jquery-ui.css" />

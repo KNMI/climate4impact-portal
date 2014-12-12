@@ -283,9 +283,9 @@ public class ImpactService extends HttpServlet {
           
           /*
            * Only show opendap when it is really advertised by the server.
-           * if(openDAPURL == null && httpURL !=null){
+           */ if(openDAPURL == null && httpURL !=null){
             openDAPURL = httpURL.replace("fileServer", "dodsC")+"#";
-          }*/
+          }
           
           if(openDAPURL!=null){
             try {

@@ -58,6 +58,7 @@ public class ESGFSearchServlet extends HttpServlet {
       }
       
       if(service.equalsIgnoreCase("search")){
+        //Thread.sleep(100);
         if(mode.equalsIgnoreCase("getfacets")){
           JSONResponse jsonresponse = esgfSearch.getFacets(facets,query);
           jsonresponse.setJSONP(jsonp);

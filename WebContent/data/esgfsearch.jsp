@@ -5,9 +5,10 @@
    
     <jsp:include page="../includes-ui.jsp" />
     
-    <script type="text/javascript" src="esgfsearch.js"></script>
+    <script type="text/javascript" src="esgfsearch/esgfsearch.js"></script>
+     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
 
-	 <link rel="stylesheet" href="esgfsearch.css" />
+	 <link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
 	  
 
       <script type="text/javascript">
@@ -15,9 +16,11 @@
     
       var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>';
       $( document ).ready(function() {
-
-    	  addFilter();
-    	});
+        var el = $("#searchcontainer");
+        renderSearchInterface({element:el,service:"/impactportal/esgfsearch?",query:""});
+        
+   
+      });
     </script>
   </head>
 <body>
@@ -29,32 +32,10 @@
 
 <h1>Faceted search</h1>
 
-<div class="searchCompContainer">
+<div id="searchcontainer"></div>
 
 
-
-<div id="facetOverview" class="searchComp facetOverview">
-  <div class="searchCompHeader">Filters</div>
-  <div class="searchCompBody"></div>
-  <div class="searchCompFooter"></div>
-</div>
-
-<div id="selectedElements" class="searchComp selectedElements">
-  <div class="searchCompHeader">Selected filters</div>
-  <div class="searchCompBody"></div>
-  <div class="searchCompFooter"></div>
-</div>
-
-<div id="searchResults" class="searchComp searchResults">
-  <div class="searchCompHeader">Results</div>
-  <div class="searchCompBody"></div>
-  <div class="searchCompFooter"></div>
-</div>
-
-</div>
-
-</div>
-   
+</div>   
 	 	
   <!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

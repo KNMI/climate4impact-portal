@@ -34,7 +34,10 @@ public class Search {
 
   public JSONResponse getFacets(String facets, String query) {
     try{
-      return getFacetsImp(facets,query);
+      lockOnQuery(facets+query);
+      JSONResponse r = getFacetsImp(facets,query);
+      releaseQuery(facets+query);
+      return r;
     }catch(Exception e){
       JSONResponse r = new JSONResponse();
       r.setException(e.getClass().getName(), e);
@@ -46,7 +49,7 @@ public class Search {
   }
   
   public JSONResponse getFacetsImp(String facets,String query) throws JSONException {
-    int searchLimit = 25;
+    int searchLimit = 10;
     JSONResponse r = new JSONResponse();
     
     String esgfQuery = "facets=*&limit="+searchLimit+"&";
@@ -160,7 +163,9 @@ public class Search {
     
     responseObj.put("limit",searchLimit);
     
-    SortedSet<String> sortedResponse = new TreeSet<String>();
+   
+    
+    JSONArray searchResults = new JSONArray(); 
     
     try {
       Vector<XMLElement> result1=el.get("response").getList("result");
@@ -171,12 +176,25 @@ public class Search {
           if(a.getAttrValue("name").equals("response")){
             responseObj.put("numfound",Integer.parseInt(a.getAttrValue("numFound")));
             Vector<XMLElement> doclist=a.getList("doc");
+            
             for(XMLElement doc : doclist){
+              JSONObject searchResult = new JSONObject();
+              searchResults.put(searchResult);
               Vector<XMLElement> arrlist = doc.getList("arr");
+              Vector<XMLElement> strlist = doc.getList("str");
               for(XMLElement arr : arrlist){
-                if(arr.getAttrValue("name").equals("url")){
-                  sortedResponse.add(arr.get("str").getValue().split("#")[0]);
-                  //Debug.println(arr.get("str").getValue().split("#")[0]);
+                String attrName = arr.getAttrValue("name");
+                if(attrName.equals("url")){
+                  String urlToCheck = arr.get("str").getValue().split("#")[0];
+                  urlToCheck = urlToCheck.split("\\|")[0];
+                  searchResult.put("url",urlToCheck);
+                }
+              }
+              for(XMLElement str : strlist){
+                String attrName = str.getAttrValue("name");
+                if(attrName.equals("id")){
+                  searchResult.put("id",str.getValue().split("\\|")[0]);
+                  //
                 }
               }
               
@@ -194,12 +212,6 @@ public class Search {
     }
     
     
-    JSONArray resultList = new JSONArray();
-    
-    
-    for(String response : sortedResponse){
-      resultList.put(response);
-    }
         
     
     
@@ -207,7 +219,7 @@ public class Search {
     
     
     try {
-      responseObj.put("results",resultList );
+      responseObj.put("results",searchResults );
     } catch (JSONException e) {
       r.setException("JSONException unable to put response", e);
       return r;
@@ -227,9 +239,44 @@ public class Search {
     return r;
   }
 
+  static Vector<String> busyURLs = new Vector<String>();
+  
+  private void lockOnQuery(String query){
+    synchronized(busyURLs){
+      try {
+        while(busyURLs.contains(query)){
+          busyURLs.wait();
+        }
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      busyURLs.add(query); 
+    }
+  }
+  
+  private void releaseQuery(String query){
+    synchronized(busyURLs){
+      busyURLs.remove(query);
+      busyURLs.notifyAll();
+    }
+  }
+  
   public JSONResponse checkURL(String query) {
+    
+    Debug.println("Checking: "+query);
+    lockOnQuery(query);
+
+    JSONResponse r = _checkURL(query);
+    
+    releaseQuery(query);
+    Debug.println("Finished: "+query);
+    
+    return r;
+  }
+  public JSONResponse _checkURL(String query) {
     JSONResponse result = new JSONResponse();
-    //Debug.println(query);
+    
     
     
     String response = DiskCache.get(cacheLocation, "dataset_"+query, 1000);
