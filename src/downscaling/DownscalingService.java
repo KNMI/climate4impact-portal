@@ -73,7 +73,11 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zones/.*/predictands/.*/downscalingMethods")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo, "GET");
+      String parameters = "";
+      String dMethodType = request.getParameter("dMethodType");
+      if(dMethodType != null && !dMethodType.equals(""))
+          parameters = "?dMethodType=" + dMethodType;
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + parameters, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -129,6 +133,34 @@ public class DownscalingService extends HttpServlet {
       out.flush();
       response.setContentType("application/pdf");
       response.setHeader("Content-Disposition", "attachment; filename=output.pdf");
+    }else if(pathInfo.matches("/datasets")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?zone="+request.getParameter("zone")+"&username="+request.getParameter("username"), "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");
+      // Get the printwriter object from response to write the required json object to the output stream      
+      PrintWriter out = response.getWriter();
+      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
+      out.print(sb);
+      out.flush();
+    }else if(pathInfo.matches("/datasets/.*/scenarios")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?zone="+request.getParameter("zone") + "&sYear="+request.getParameter("sYear") + "&eYear="+request.getParameter("eYear"), "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");
+      // Get the printwriter object from response to write the required json object to the output stream      
+      PrintWriter out = response.getWriter();
+      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
+      out.print(sb);
+      out.flush();
     }
   }
     
@@ -172,6 +204,46 @@ public class DownscalingService extends HttpServlet {
     }
     return variableTypes;
   }
+  
+  public static List<String> getDatasetTypes()throws ServletException, IOException, JSONException{
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/datasets/types", "GET");
+    if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+      return null;
+    StringBuffer response = new StringBuffer();
+    BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
+    }
+    in.close();
+    JSONObject myObject = new JSONObject(response.toString());
+    JSONArray jsonVariableTypes = myObject.getJSONArray("values");
+    List<String> variableTypes = new ArrayList<String>();
+    for(int i=0; i< jsonVariableTypes.length(); i++){
+      variableTypes.add(jsonVariableTypes.getString(i));
+    }
+    return variableTypes;
+  }
+  
+  public static List<String> getDownscalingMethodTypes()throws ServletException, IOException, JSONException{
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscalingMethods/types", "GET");
+    if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+      return null;
+    StringBuffer response = new StringBuffer();
+    BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
+    }
+    in.close();
+    JSONObject myObject = new JSONObject(response.toString());
+    JSONArray jsonVariableTypes = myObject.getJSONArray("values");
+    List<String> variableTypes = new ArrayList<String>();
+    for(int i=0; i< jsonVariableTypes.length(); i++){
+      variableTypes.add(jsonVariableTypes.getString(i));
+    }
+    return variableTypes;
+  }
 
 
   /**
@@ -182,6 +254,7 @@ public class DownscalingService extends HttpServlet {
 //	  ImpactUser loggedInUser = LoginManager.getUser(request);
     if(pathInfo.equals("/subscribe")){//Configuration.getImpactWorkspace()
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users", "POST");
+      urlConn.setRequestProperty("Content-Type", "application/json");
       JSONObject user = new JSONObject();
       try {
         user.put("username", request.getParameter("username"));
@@ -201,6 +274,17 @@ public class DownscalingService extends HttpServlet {
       }else{
           System.out.println(urlConn.getResponseMessage());  
       }  
+    }else if(pathInfo.equals("/downscale")){
+      String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName")+"&scenarioName="+request.getParameter("scenarioName")+"&cells="+request.getParameter("cells").replace(" ", "%20");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + params, "POST");
+      response.getWriter().print(urlConn.getResponseMessage());
+      response.setStatus(urlConn.getResponseCode());
+//      if(urlConn.getResponseCode() ==HttpURLConnection.HTTP_CREATED){
+//          Debug.print("201 - User subscribed");  
+//          response.sendRedirect("../downscaling/downscaling.jsp");
+//      }else{
+//          System.out.println(urlConn.getResponseMessage());  
+//      }  
     }
 	}
 }
