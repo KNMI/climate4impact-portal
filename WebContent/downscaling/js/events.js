@@ -15,27 +15,39 @@ $(document).on('click', '.link', function(event, ui){
 $(document).ready(function() {
   $("#date-range-start, #date-range-end").keyup(function (e) {
     if (e.keyCode == 13) {
-      var textFieldStart = $("#date-range-start").val();
-      var textFieldEnd = $("#date-range-end").val();
-      if( textFieldStart => $("#slider-range").slider("option", "min") && textFieldStart <= $("#slider-range").slider("option", "max")){
-        $("#slider-range").slider("values",[textFieldStart,textFieldEnd]);
-      }else{
-        alert("Out of bounds value");
-      }
+      reloadSlider();
     }
   });
 });
+
+$(document).on('change','#date-range-start, #date-range-end', function(event, ui){
+  reloadSlider();
+});
+
+function reloadSlider(){
+  var textFieldStart = $("#date-range-start").val();
+  var textFieldEnd = $("#date-range-end").val();
+  if( textFieldStart => $("#slider-range").slider("option", "min") && textFieldStart <= $("#slider-range").slider("option", "max")){
+    $("#slider-range").slider("values",[textFieldStart,textFieldEnd]);
+  }else{
+    alert("Out of bounds value");
+  }
+}
 
 
 $(document).on('click', 'button', function(event, ui){
   var id = $(this).attr('id');
   if(id == "button-load-scenarios"){
+    insertHashProperty("sYear", $('#date-range-start').val(), sortedKeys);
+    insertHashProperty("eYear", $('#date-range-end').val(), sortedKeys);
     loadScenarios();
-  }else if(id=="submit"){
-    if(getValueFromHash("scenario") != null)
+  }else if(id=="button-downscale"){
+    if(getValueFromHash("scenarioName") != null)
       downscalingSubmit();
     else
-      alert("You have fill the whole form to Downscale");
+      alert("You have to fill in the whole form to Downscale");
+  }else if(id=="button-saveconfig"){
+    showSaveConfigDialog("Do you want to save this configuration?");
   }
 });
 
@@ -63,7 +75,7 @@ $(document).on('change', 'input:radio', function(event, ui){
       removeHashProperty("variableName");
       removeHashProperty("zone");
       removeHashProperty("predictandName");
-      removeHashProperty("downscalingMethod");
+      removeHashProperty("dMethodName");
       loadVariables();
     }
   }else if($(this).attr('name') == 'variable'){
@@ -72,7 +84,7 @@ $(document).on('change', 'input:radio', function(event, ui){
       insertHashProperty('variableName', variable, sortedKeys);
       removeHashProperty("zone");
       removeHashProperty("predictandName");
-      removeHashProperty("downscalingMethod");
+      removeHashProperty("dMethodName");
       loadPredictands();
     }
   }else if($(this).attr('name') == 'predictand'){
@@ -94,7 +106,7 @@ $(document).on('change', 'input:radio', function(event, ui){
     var predictand = encodeURIComponent($(this).attr('data-predictand'));
     var downscalingMethod = encodeURIComponent($(this).attr('data-downscaling-method'));
     if($(this).is(':checked')){
-      insertHashProperty('downscalingMethod', downscalingMethod, sortedKeys);
+      insertHashProperty('dMethodName', downscalingMethod, sortedKeys);
       $('#validation').html("<a href='../DownscalingService/validation?idZone="+idZone+"&predictandName="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
       $('#downscalingmethod-header').collapsible('open');
       loadDatasets();
@@ -108,13 +120,13 @@ $(document).on('change', 'input:radio', function(event, ui){
   }else if($(this).attr('name') == 'dataset'){
     var dataset = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('dataset', dataset, sortedKeys);
+      insertHashProperty('datasetName', dataset, sortedKeys);
       loadScenarios();
     }
   }else if($(this).attr('name') == 'scenario'){
     var scenario = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('scenario', scenario, sortedKeys);
+      insertHashProperty('scenarioName', scenario, sortedKeys);
     }
   }
 });

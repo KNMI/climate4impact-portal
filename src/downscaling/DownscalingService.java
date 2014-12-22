@@ -1,6 +1,12 @@
 package downscaling;
 
+import impactservice.Configuration;
+import impactservice.LoginManager;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,8 +14,14 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import model.Predictand;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -161,9 +174,36 @@ public class DownscalingService extends HttpServlet {
       // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
+    }else if(pathInfo.equals("/downscalings")){
+     
+    }else{
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
     }
   }
     
+  public static Map<String, String> getUserConfigurations(String username){
+    try {
+      Scanner scanner = null;
+      Map<String, String> hashMap = new HashMap<String, String>();
+      try {
+        String userQueriesFilePath = Configuration.getImpactWorkspace().substring(0, Configuration.getImpactWorkspace().length()-1) + username + "/downscaling/queries";
+        scanner = new Scanner(new File(userQueriesFilePath));
+
+        while(scanner.hasNextLine()){
+          String line = scanner.nextLine();
+          String[] parts = line.split(",");
+          hashMap.put(parts[0], parts[1]);
+        }
+      } catch (FileNotFoundException e) {
+      }finally{
+        scanner.close();
+      }
+      return hashMap;
+    } catch (Exception e) {
+    }
+    return null;
+  }
+  
   public static List<Predictand> getUserPredictands(String username)throws ServletException, IOException, JSONException{
     HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username + "/predictands", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
@@ -274,18 +314,63 @@ public class DownscalingService extends HttpServlet {
       }else{
           System.out.println(urlConn.getResponseMessage());  
       }  
-    }else if(pathInfo.equals("/downscale")){
-      String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName")+"&scenarioName="+request.getParameter("scenarioName")+"&cells="+request.getParameter("cells").replace(" ", "%20");
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + params, "POST");
+      
+    }else if(pathInfo.equals("/downscalings/downscale")){
+      String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+
+          request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName").replace(" ", "%20")+"&scenarioName="+request.getParameter("scenarioName")+
+          "&cells="+request.getParameter("cells").replace(" ", "%20");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscale" + params, "POST");
       response.getWriter().print(urlConn.getResponseMessage());
       response.setStatus(urlConn.getResponseCode());
-//      if(urlConn.getResponseCode() ==HttpURLConnection.HTTP_CREATED){
-//          Debug.print("201 - User subscribed");  
-//          response.sendRedirect("../downscaling/downscaling.jsp");
-//      }else{
-//          System.out.println(urlConn.getResponseMessage());  
-//      }  
+      
+    }else if(pathInfo.equals("/downscalings")){
+      
+      Map<String, String[]> parameterMap = request.getParameterMap();
+      String username = parameterMap.get("username")[0];
+      String configName = parameterMap.get("configName")[0]; 
+      String userWorkspacePath = Configuration.getImpactWorkspace().substring(0, Configuration.getImpactWorkspace().length()-1) + username + "/downscaling";
+      if(!hasConfig(username, configName)){
+        File downscalingDirectory = new File(userWorkspacePath);
+        if(!downscalingDirectory.exists())
+          downscalingDirectory.mkdir();
+        userWorkspacePath += "/queries";
+        String query =  configName + ",";
+        for(String key : parameterMap.keySet()){
+          if(!key.equals("username") && !key.equals("configName"))
+            query += key+"="+parameterMap.get(key)[0] + "&";
+        }
+        query = query.substring(0, query.length()-1);
+        FileWriter file = null;
+        PrintWriter pw = null;
+        try
+        {
+          file = new FileWriter(userWorkspacePath, true);
+          pw = new PrintWriter(file);
+          pw.println(query);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+           try {
+             if (null != file)
+                file.close();
+             } catch (Exception e2) {
+                e2.printStackTrace();
+             }
+        }
+      }else{
+        response.getWriter().print("{'errors':['Existing name'],'success':false}");
+        response.setStatus(403);
+      }
+    }else{
+      response.setStatus(HttpStatus.SC_BAD_REQUEST);
     }
+	}
+	
+	private boolean hasConfig(String username, String configName){
+	  Map<String, String> userConfigsMap = getUserConfigurations(username);
+	  if(userConfigsMap != null)
+	    return userConfigsMap.containsKey(configName);
+	  return false;
 	}
 }
 

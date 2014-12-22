@@ -41,9 +41,8 @@
       			request.setAttribute("loggedInUser", null);
       		}
       	%>
-<%-- 		var loggedInUser = '<%=request.getAttribute("loggedInUser")%>'; --%>
-		var loggedInUser = 'antonio';
-      	var sortedKeys = ['variableType','variableName','zone','predictandName','dMethodType','downscalingMethod','datasetType','dataset','scenario'];
+		var loggedInUser = '<%=request.getAttribute("loggedInUser")%>';
+      	var sortedKeys = ['variableType','variableName','zone','predictandName','dMethodType','dMethodName','datasetType','datasetName', 'sYear', 'eYear', 'scenarioName'];
       	  
 
      		
@@ -68,7 +67,7 @@
 		    min : 1851,
 		    max: 2101,
 		    step: 1,
-		    values: [2001, 2011],
+		    values: [2001, 2010],
 		    slide: function( event, ui ) {
 	        	$("#date-range-start" ).val(ui.values[0]);
 	        	$("#date-range-end").val(ui.values[1]);
@@ -82,16 +81,16 @@
 			var idZone = getValueFromHash("zone");
 			var variableName = getValueFromHash("variableName");
 			var predictandName = getValueFromHash("predictandName");
-			var dMethodName = getValueFromHash("downscalingMethod");
+			var dMethodName = getValueFromHash("dMethodName");
 			var datasetType = getValueFromHash("datasetType");
-			var datasetName = getValueFromHash("dataset");
-			var scenarioName = getValueFromHash("scenario");
+			var datasetName = getValueFromHash("datasetName");
+			var scenarioName = getValueFromHash("scenarioName");
 		    var sYear = $('#date-range-start').val();
 		    var eYear = $('#date-range-end').val();
 		  	var cells = sYear+" "+eYear+" "+ datasetName+" 0";
 		  	var params ="?username="+loggedInUser+"&idZone="+idZone+"&predictandName="+predictandName+"&dMethodName="+dMethodName+"&scenarioName="+scenarioName+"&cells="+cells;
-		  	var url="../DownscalingService/downscale" + params;
-		  	showOKDialog("<p>Are you sure you want to launch this configuration?<\p>" + "<p>Variable: "+variableName +"<\p>" + 
+		  	var url="../DownscalingService/downscalings/downscale" + params;
+		  	showOKDialog("<p>Are you sure you want to Downscale this Downscaling configuration?<\p>" + "<p>Variable: "+variableName +"<\p>" + 
 		  	    "<p>Predictand: "+predictandName+"<\p>"+"<p>Downscaling method: "+dMethodName+"<\p>" + "<p>Dataset: "+ datasetName+"<\p>"+
 		  	    "<p>Scenario: " + scenarioName + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
 		}
@@ -103,6 +102,46 @@
 		    	contentType: 'application/x-www-form-urlencoded',
 		    	success: function (response) {
 		      		alert("Downscaling successfully launched");
+		      		$("body").removeClass("loading");
+		    	},error: function () {
+		        	alert("error");
+		    	}
+			}); 
+		}
+		
+		function saveConfig(configName){
+		  	var idZone = getValueFromHash("zone");
+		  	var variableType = getValueFromHash("variableType");
+			var variableName = getValueFromHash("variableName");
+			var predictandName = getValueFromHash("predictandName");
+			var dMethodType = getValueFromHash("dMethodType");
+			var dMethodName = getValueFromHash("dMethodName");
+			var datasetType = getValueFromHash("datasetType");
+			var datasetName = getValueFromHash("datasetName");
+			var scenarioName = getValueFromHash("scenarioName");
+		    var sYear = $('#date-range-start').val();
+		    var eYear = $('#date-range-end').val();
+			$.ajax({
+		    	url: '../DownscalingService/downscalings',
+		    	type: 'POST',
+		    	data: {
+		    	  'configName' : configName,
+		    	  'username' : loggedInUser,
+		    	  'variableType':variableType,
+		    	  'variableName':variableName,
+		    	  'zone' : idZone, 
+		    	  'predictandName' : predictandName,
+		    	  'dMethodType' : dMethodType,
+		    	  'dMethodName' : dMethodName,
+		    	  'datasetType' : datasetType,
+		    	  'datasetName' : datasetName,
+		    	  'scenarioName' : scenarioName,
+		    	  'sYear': sYear,
+		    	  'eYear': eYear,
+		    	},
+		    	contentType: 'application/x-www-form-urlencoded',
+		    	success: function (response) {
+		      		alert("<p>Configuration successfully saved.<\p> Please, reload this page to select it.");
 		      		$("body").removeClass("loading");
 		    	},error: function () {
 		        	alert("error");
@@ -138,7 +177,15 @@
 			<h1>Load saved downscalings</h1>
 				<select id="select-saved-downscalings" value="empty">
 				    <option value="empty"> Select a saved config</option>
-					<option value="variableType=TEMPERATURE&variableName=Tmax&zone=305&predictandName=NorthAtlantic1_TX&dMethodType=ALL&downscalingMethod=mean10&datasetType=CLIMATE&dataset=BCM2&scenario=A2"> North Atlantic</option>
+				    <% 
+				    	String username = LoginManager.getUser(request).getInternalName();
+				    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
+				    	if(configsMap != null){
+				     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
+					     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
+					     	}
+				    	}
+				    %>
 				</select>
 			
 			<h1>Configure your Downscaling</h1>
@@ -303,7 +350,8 @@
 						<div id="scenarios"></div>
 					</div>
 				</div>
-				<button id="submit" type="button">Downscale</button> 	
+				<button id="button-saveconfig" type="button">Save config</button> 	
+				<button id="button-downscale" type="button">Downscale</button> 	
    		</c:if>	
 		 	
 	  <!-- /Contents -->

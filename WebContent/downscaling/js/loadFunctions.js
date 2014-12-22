@@ -42,6 +42,22 @@ function showDialog(title){
   });
 }
 
+function showSaveConfigDialog(message){
+  showMessageDialog(message);
+  $('#dialog-content').append("<p><label for='config-name'>Config name</label><input type='text' id='input-configname'name='config-name'><\p>");
+  $("#dialog").dialog({
+      buttons: { 
+      Save: function() {
+        saveConfig($('#input-configname').val());
+        $( this ).dialog( "close" );
+      },
+      Cancel: function() {
+        $( this ).dialog( "close" );
+      }
+    }
+    });
+}
+
 function showOKDialog(message, url){
   showMessageDialog(message);
   $("#dialog").dialog({
@@ -136,7 +152,7 @@ function loadPredictandDetails(zone,predictor,predictand){
 function loadDownscalingMethods(){
   var zone = getValueFromHash("zone");
   var predictandName = getValueFromHash("predictandName");
-  var defaultDownscalingMethod = getValueFromHash("downscalingMethod");
+  var defaultDownscalingMethod = getValueFromHash("dMethodName");
   var dMethodType = getValueFromHash("dMethodType");
   var parameters = "";
   $('#downscaling-methods').html('');
@@ -144,7 +160,7 @@ function loadDownscalingMethods(){
     dMethodType = "ALL";
     insertHashProperty("dMethodType",dMethodType, sortedKeys);
   }
-  $('input:radio[name="downscaling-method-type"][value="'+dMethodType+'"]').prop('checked', true);
+  $("input:radio[name='downscaling-method-type'][value='"+dMethodType+"']").prop('checked', true);
   if(dMethodType != "ALL") 
     parameters = "?dMethodType=" + dMethodType;
   if(zone != null && predictandName != null){
@@ -152,7 +168,7 @@ function loadDownscalingMethods(){
         $.each(data.values, function(index, value){
           $('#downscaling-methods').append("<td><input class='input-downscaling-method' data-zone='"+zone+"' data-predictand='"+ predictandName+"' data-downscaling-method='"+value.name+"' type='radio' name='downscalingMethod' value='"+value.name+"'/>"+value.name+"</td>");
           if(defaultDownscalingMethod != null && defaultDownscalingMethod == value.name){
-              $("input[name=downscalingMethod][value="+value.name+"]").prop('checked',true);
+              $("input[name='downscalingMethod'][value='"+value.name+"']").prop('checked',true);
               $('#validation').html("<a href='../DownscalingService/validation?idZone="+zone+"&predictandName="+predictandName+"&downscalingMethod="+defaultDownscalingMethod+"' download='report'>Download validation report</a>");
           }
         });
@@ -166,7 +182,7 @@ function loadDownscalingMethods(){
 function loadDatasets(){
     var zone = getValueFromHash("zone");
     var datasetType = getValueFromHash("datasetType");
-    var defaultDatasetValue = getValueFromHash("dataset");
+    var defaultDatasetValue = getValueFromHash("datasetName");
     $('#datasets').html('');
     if(datasetType == null){
       datasetType = "CLIMATE";
@@ -178,7 +194,7 @@ function loadDatasets(){
         $.each(data.values, function(index, value){
           $('#datasets').append("<td><input class='input-dataset' data-name='"+value.name+"' type='radio' name='dataset' value='"+value.name+"'/><abbr><span>"+value.name+"</span></abbr></td>");
           if(defaultDatasetValue == value.name)
-            $("input[name=dataset][value="+value.name+"]").prop('checked',true);
+            $("input[name=dataset][value='"+value.name+"']").prop('checked',true);
         });
     });
     $('#dataset-header').collapsible('open');
@@ -187,17 +203,25 @@ function loadDatasets(){
 
 function loadScenarios(){
     var zone = getValueFromHash("zone");
-    var dataset = getValueFromHash("dataset");
-    var defaultScenarioValue = getValueFromHash("scenario");
-    var sYear = $('#date-range-start').val();
-    var eYear = $('#date-range-end').val();
+    var datasetName = getValueFromHash("datasetName");
+    var defaultScenarioValue = getValueFromHash("scenarioName");
+    var sYear = getValueFromHash("sYear");
+    var eYear = getValueFromHash("eYear");
+    if(sYear != null){
+      $('#date-range-start').val(sYear);
+      $('#date-range-start').change();
+    }
+    if(eYear != null){
+      $('#date-range-end').val(eYear);
+      $('#date-range-end').change();
+    }
     $('#scenarios').html('');
-    if(zone != null && dataset != null){
-    $.get( "../DownscalingService"+"/datasets/"+dataset+"/scenarios?zone=" + zone +"&sYear=" + sYear + "&eYear=" + eYear, function( data ) {
+    if(zone != null && datasetName != null){
+    $.get( "../DownscalingService"+"/datasets/"+datasetName+"/scenarios?zone=" + zone +"&sYear=" + $('#date-range-start').val() + "&eYear=" + $('#date-range-end').val(), function( data ) {
         $.each(data.values, function(index, value){
           $('#scenarios').append("<td><input class='input-scenario' data-name='"+value.name+"' type='radio' name='scenario' value='"+value.name+"'/><abbr title='"+'From ' + value.metadata.split(';')[1].split('=')[1]+' to '+value.metadata.split(';')[2].split('=')[1]+"'><span >"+ value.name +"</span></abbr></td>");
           if(defaultScenarioValue == value.name)
-            $("input[name=scenario][value="+value.name+"]").prop('checked',true);
+            $("input[name=scenario][value='"+value.name+"']").prop('checked',true);
         });
     });
     $('#scenario-header').collapsible('open');
