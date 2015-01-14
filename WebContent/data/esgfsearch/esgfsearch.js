@@ -11,6 +11,10 @@ var renderSearchInterface = function(options){
   return new SearchInterface(options);
 };
 
+var setVarFilter = function(){
+	alert('wrong');
+};
+
 var SearchInterface = function(options){
   //var impactESGFSearchEndPoint = "http://bhw485.knmi.nl:8280/impactportal/esgfsearch?";
   var impactESGFSearchEndPoint = "esgfsearch?";
@@ -138,6 +142,28 @@ var SearchInterface = function(options){
    if(options.service){
      impactESGFSearchEndPoint = options.service;
    }
+   
+   $(".headerhelpbutton").button({
+	 
+     icons: {
+    	 primary: "ui-icon-help"
+     },
+   }).click(function(){
+	  var el = jQuery('<div title="Search help" class="headerhelpdiv"></div>', {}).dialog({
+	        width:800,
+	        height:400,
+	        modal:true
+      });
+	  el.html('<div class="ajaxloader"></div>');
+	  var helpReturned = function(data){
+		  el.html(data);	  
+	  }
+	  $.ajax({
+	      url: "esgfsearch/esgfsearchhelp.html"	    
+	  }).done(function(d) {
+		  helpReturned(d)
+	  })
+   });
     
     addFilter();
   };
@@ -240,7 +266,71 @@ var SearchInterface = function(options){
       });
       
       var renderCatalogBrowser = function(options){
-        options.element.html("Bla for"+options.url);
+    	  var variableFilter = undefined;
+  		  var textFilter = undefined;
+     	  var applyCatalogFilters = function(el){
+        		variableFilter = '';
+        		el.find("form.varFilter :input[type=checkbox]").each(function(){
+        			 var input = $(this);
+        			 if(input.is(":checked")){
+        				 if(variableFilter.length>0)variableFilter+="|";
+        				 variableFilter+=input.attr('id');
+        			 }
+        			
+        		});
+        		if(variableFilter.length==0)variableFilter = undefined;
+        		
+        		textFilter = '';
+        		textFilter = el.find(".textfilter").val();
+        		if(textFilter.length<1)textFilter = undefined;
+        		
+        		loadCatalog(options,variableFilter,textFilter);
+        	};
+      	  
+    	var preventSubmit = function(event) {
+  	        if(event.keyCode == 13) {
+  	            event.preventDefault();
+  	            setVarFilter();
+  	            return false;
+  	        }
+  	    };
+    	  
+    	  var loadCatalog = function(options,variableFilter,textFilter){
+    		  options.element.empty().html('<div class="ajaxloader"></div>');
+    		  
+    		  var httpCallback = function(data){
+    			
+        		  options.element.empty().html(data);
+        		  
+        		  options.element.find(".varFilter").keypress(preventSubmit);
+        		  options.element.find(".varFilter").keydown(preventSubmit);
+        		  options.element.find(".varFilter").keyup(preventSubmit);
+        		  
+        		  options.element.find(".varFilter").find('input[type="button"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});
+        		  options.element.find('a').attr('target','_blank');
+        	  };
+    		  
+    		  var url = "/impactportal/ImpactService?service=catalogbrowser&format=text/html&node="+encodeURIComponent(options.url);
+    		  var filters = "";
+    		  if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}
+ 	  	  	  if(variableFilter!=undefined){filters+="&variables="+encodeURIComponent(variableFilter);}
+ 	  	  	  url+=filters;
+ 	  	  	  console.log(url);
+    		  $.ajax({
+		        url:  url
+		        //crossDomain:true,
+		        //dataType:"jsonp"
+		      }).done(function(d) {
+		        httpCallback(d)
+		      }).fail(function() {
+		    	  httpCallback("Failed");
+		      }).always(function(){
+		      });
+    	  }
+    	  loadCatalog(options);
+    	  
+   
+       
       }
       
       renderCatalogBrowser({element:el,url:catalogObject.url});
@@ -321,7 +411,7 @@ var SearchInterface = function(options){
     var autocomplete = "Search: <input class=\"searchautocomplete\" =\"text\"></input>";
   
     var appliedElements = "<div>&nbsp;<span class=\"selectedElementList\"></span></div>";
-    var applyButton = "<button class=\"button_elementselectorok\">Add filter</button>";
+    var applyButton = "<button class=\"button_elementselectorok\">Search</button>";
     facetselectordiv.html("<div class=\"elementSelectorContainer roundborder\">"+html+"</div>"+"<div style=\"padding:5px;margin-bottom:5px;\">"+appliedElements+"<hr/>"+autocomplete+applyButton+"</div>");
     
     rootElement.find(".button_elementselectorok").attr('onclick','').click(function(t){

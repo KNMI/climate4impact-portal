@@ -7,7 +7,7 @@
     
     <script type="text/javascript" src="esgfsearch/esgfsearch.js"></script>
      <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
-
+  <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
 	 <link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
 	  
 
@@ -30,7 +30,7 @@
 <div class="impactcontent">
 	
 
-<h1>Faceted search</h1>
+<table class="headertable" ><tr><td><h1>Faceted search</h1></td><td class="headerhelptd"><button class="headerhelpbutton">Help</button></td></tr></table>
 
 <div id="searchcontainer"></div>
 

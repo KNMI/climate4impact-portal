@@ -28,6 +28,7 @@
 			dataset = URLDecoder.decode(dataset,"UTF-8");
 			dataset=dataset.replace("thredds/fileServer","thredds/dodsC");
 			dapURL = dataset.split("\\|")[0];
+			dapURL = dapURL.split("\\#")[0];
 			int inda = dapURL.indexOf(".nc.html");
 			if(inda>0){
 			  dapURL = dapURL.substring(0,inda+3);

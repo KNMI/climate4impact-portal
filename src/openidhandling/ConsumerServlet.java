@@ -293,60 +293,66 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			  DebugConsole.println("param "+param);
 		  }*/
 			
+	    /* Clear the attribute in advance :) */
+      httpReq.getSession().setAttribute("emailaddress", null);
+      
 			//fetch.addAttribute("urn:esg:email:address",true);
 			//fetch.addAttribute("esg:email:address",true);
 			//fetch.addAttribute("EmailAddress", "http://www.w3.org/2001/XMLSchema", true);
-			fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
+			//fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
+			/* According to BADC openid this should be http://openid.net/schema/contact/internet/email instead of http://schema.openid.net/contact/email" */
+			fetch.addAttribute("email", "http://openid.net/schema/contact/internet/email", true);
+			
 
 			//sregReq.addAttribute("urn:esg:email:address",true);
 			//sregReq.addAttribute("esg:email:address",true);
 			//sregReq.addAttribute("Email", "http://schema.openid.net/contact/email", true);
 			
-			if ("1".equals(httpReq.getParameter("nickname"))) {
+/*			if ("1".equals(httpReq.getParameter("nickname"))) {
 				// fetch.addAttribute("nickname",
 				// "http://schema.openid.net/contact/nickname", false);
 				sregReq.addAttribute("nickname", false);
 			}
-			if ("1".equals(httpReq.getParameter("email"))) {
-				fetch.addAttribute("email",
-						"http://schema.openid.net/contact/email", false);
+*/			if ("1".equals(httpReq.getParameter("email"))) {
+				//fetch.addAttribute("email","http://schema.openid.net/contact/email", false);
+				fetch.addAttribute("email","http://openid.net/schema/contact/internet/email", false);
 				sregReq.addAttribute("email", false);
 			}
-			if ("1".equals(httpReq.getParameter("fullname"))) {
-				fetch.addAttribute("fullname",
-						"http://schema.openid.net/contact/fullname", false);
-				sregReq.addAttribute("fullname", false);
-			}
-			if ("1".equals(httpReq.getParameter("dob"))) {
-				fetch.addAttribute("dob",
-						"http://schema.openid.net/contact/dob", true);
-				sregReq.addAttribute("dob", false);
-			}
-			if ("1".equals(httpReq.getParameter("gender"))) {
-				fetch.addAttribute("gender",
-						"http://schema.openid.net/contact/gender", false);
-				sregReq.addAttribute("gender", false);
-			}
-			if ("1".equals(httpReq.getParameter("postcode"))) {
-				fetch.addAttribute("postcode",
-						"http://schema.openid.net/contact/postcode", false);
-				sregReq.addAttribute("postcode", false);
-			}
-			if ("1".equals(httpReq.getParameter("country"))) {
-				fetch.addAttribute("country",
-						"http://schema.openid.net/contact/country", false);
-				sregReq.addAttribute("country", false);
-			}
-			if ("1".equals(httpReq.getParameter("language"))) {
-				fetch.addAttribute("language",
-						"http://schema.openid.net/contact/language", false);
-				sregReq.addAttribute("language", false);
-			}
-			if ("1".equals(httpReq.getParameter("timezone"))) {
-				fetch.addAttribute("timezone",
-						"http://schema.openid.net/contact/timezone", false);
-				sregReq.addAttribute("timezone", false);
-			}
+//			if ("1".equals(httpReq.getParameter("fullname"))) {
+//				fetch.addAttribute("fullname",
+//						"http://schema.openid.net/contact/fullname", false);
+//				sregReq.addAttribute("fullname", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("dob"))) {
+//				fetch.addAttribute("dob",
+//						"http://schema.openid.net/contact/dob", true);
+//				sregReq.addAttribute("dob", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("gender"))) {
+//				fetch.addAttribute("gender",
+//						"http://schema.openid.net/contact/gender", false);
+//				sregReq.addAttribute("gender", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("postcode"))) {
+//				fetch.addAttribute("postcode",
+//						"http://schema.openid.net/contact/postcode", false);
+//				sregReq.addAttribute("postcode", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("country"))) {
+//				fetch.addAttribute("country",
+//						"http://schema.openid.net/contact/country", false);
+//				sregReq.addAttribute("country", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("language"))) {
+//				fetch.addAttribute("language",
+//						"http://schema.openid.net/contact/language", false);
+//				sregReq.addAttribute("language", false);
+//			}
+//			if ("1".equals(httpReq.getParameter("timezone"))) {
+//				fetch.addAttribute("timezone",
+//						"http://schema.openid.net/contact/timezone", false);
+//				sregReq.addAttribute("timezone", false);
+//			}
 
 			// attach the extension to the authentication request
 			if (!sregReq.getAttributes().isEmpty()) {
@@ -485,6 +491,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			    String emailAddress = fetchResp.getAttributeValue("email");
 			    Debug.println("User email is "+emailAddress);
 			    
+			
 			    if(emailAddress!=null){
 			      if(emailAddress.length()>0){
 			        httpReq.getSession().setAttribute("emailaddress", emailAddress);

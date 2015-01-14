@@ -21,8 +21,8 @@
       'CEDA':        {
     	  name:'BADC/CEDA'   ,
     	  openidprefix:'https://ceda.ac.uk/openid/',
-    	  createaccount:'https://ceda.ac.uk/',        
-    	  accountinfo:'https://ceda.ac.uk/',
+    	  createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
+    	  accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
     	  logocls:'logo_UK'},
       'DKRZ':        {
     	  name:'DKRZ'        ,

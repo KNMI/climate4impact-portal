@@ -386,7 +386,7 @@ public class ImpactService extends HttpServlet {
             
             Debug.println("variableFilter: '"+variableFilter+"'");
             Debug.println("textFilter: '"+textFilter+"'");
-            html+="<div id=\"variableandtextfilter\"><form id=\"varFilter\">";
+            html+="<div id=\"variableandtextfilter\"><form id=\"varFilter\" class=\"varFilter\">";
             if(availableVars.size()>0){
               html+="<b>Variables:</b>";
               for(int j=0;j<availableVars.size();j++){
@@ -400,7 +400,7 @@ public class ImpactService extends HttpServlet {
               }
               html+="<hr/>";
             }
-            html+="<b>Text filter:</b> <input type=\"textarea\" id=\"textfilter\" value=\""+textFilter+"\" />";
+            html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
             html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
             
             html+="</form></div>";
@@ -776,7 +776,17 @@ public class ImpactService extends HttpServlet {
 
       */
       }catch(Exception e){
-        String msg="Unable to get file <a target=\"_blank\" href=\""+requestStr+"\">"+requestStr+"</a>.\n\n"+e.getMessage();
+        
+        String requestStrWithOpenId = requestStr;
+        if(user.id!=null){
+          if(requestStrWithOpenId.indexOf("?")==-1){
+            requestStrWithOpenId +="?";
+          }else{
+            requestStrWithOpenId +="&";
+          }
+          requestStrWithOpenId+="openid="+URLEncoder.encode(user.id,"utf-8");
+        }
+        String msg="Unable to get file <a target=\"_blank\" href=\""+requestStrWithOpenId+"\">"+requestStr+"</a>.\n\n"+e.getMessage();
         
         String userId = "No user.";
         if(user!=null){
