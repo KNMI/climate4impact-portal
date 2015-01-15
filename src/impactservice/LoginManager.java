@@ -17,7 +17,6 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
 
 import tools.Debug;
-import tools.HTTPTools;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
@@ -73,7 +72,7 @@ public class LoginManager {
     //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
     XMLElement xmlParser = new XMLElement();
     xmlParser.parse(new URL(user.id));
-    Debug.println(xmlParser.toString());
+    //Debug.println(xmlParser.toString());
     Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
     for(XMLElement service : services){
       if(service.get("Type").getValue().indexOf("myproxy")!=-1){

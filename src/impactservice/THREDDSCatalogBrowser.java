@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import esgfsearch.Search;
 import tools.Debug;
 import tools.HTTPTools;
 import tools.JSONMessageDecorator;
@@ -36,6 +37,7 @@ public class THREDDSCatalogBrowser {
   }
 
   public static JSONArray browseThreddsCatalog(HttpServletRequest request,   HttpServletResponse response, JSONMessageDecorator errorResponder1,String variableFilter,String textFilter) throws MalformedURLException, Exception {
+    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     String nodeStr=request.getParameter("node");
     
     if(nodeStr!=null){nodeStr=URLDecoder.decode(nodeStr,"UTF-8");}else{
@@ -45,23 +47,41 @@ public class THREDDSCatalogBrowser {
       throw new Exception("Invalid URL given");
     }
     
-  
+    long timeStampBefore = Calendar.getInstance().getTimeInMillis();
+    long timeStampAfter;
+    
     nodeStr= HTTPTools.makeCleanURL(nodeStr);
     String rootCatalog =  new URL(nodeStr).toString();    
     String path = new URL(rootCatalog).getFile();
     String hostPath = rootCatalog.substring(0,rootCatalog.length()-path.length());
-    //DebugConsole.println("Catalog: "+rootCatalog);
-    //DebugConsole.println("hostPath: "+hostPath);
+    
+    timeStampAfter = Calendar.getInstance().getTimeInMillis();
+    Debug.println("TIME: URL and HOST check: ("+(timeStampAfter-timeStampBefore)+" ms)");
+    timeStampBefore = timeStampAfter;
     
     MyXMLParser.XMLElement catalogElement = new MyXMLParser.XMLElement();
     try {
-      catalogElement.parse(new URL(rootCatalog));
+      Debug.println("Getting "+rootCatalog);
+
+      //Try to get from local storage:
+      Search esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      String result = esgfSearch.getCatalog(rootCatalog);
+      
+      timeStampAfter = Calendar.getInstance().getTimeInMillis();
+      Debug.println("TIME: Catalog Get: ("+(timeStampAfter-timeStampBefore)+" ms)");
+      timeStampBefore = timeStampAfter;
+      
+      catalogElement.parseString(result);
     } catch (Exception e1) {
    
       MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
       Debug.errprintln("Unable to load catalog: "+e1.getMessage());
       throw e1;
     }
+    
+    timeStampAfter = Calendar.getInstance().getTimeInMillis();
+    Debug.println("TIME: XML String parsing: ("+(timeStampAfter-timeStampBefore)+" ms)");
+    timeStampBefore = timeStampAfter;
     
     Vector<Service> supportedServices = getSupportedServices(catalogElement.get("catalog"));
     
@@ -72,6 +92,12 @@ public class THREDDSCatalogBrowser {
         DebugConsole.println("--"+supportedServices.get(j).accesTypes.get(i).serviceType+" with base "+supportedServices.get(j).accesTypes.get(i).base);
       }
     }*/
+    
+    timeStampAfter = Calendar.getInstance().getTimeInMillis();
+    Debug.println("TIME: Supported Services: ("+(timeStampAfter-timeStampBefore)+" ms)");
+    timeStampBefore = timeStampAfter;
+    
+    
     
     JSONArray a = new JSONArray();
     
@@ -88,10 +114,15 @@ public class THREDDSCatalogBrowser {
     c.put(d);
     b.put("children",c);
     a.put(b);*/
-    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
+    
     addDatasets(rootCatalog,hostPath,supportedServices,a,catalogElement.get("catalog"),variableFilter,textFilter,null);
+    
+    timeStampAfter = Calendar.getInstance().getTimeInMillis();
+    Debug.println("TIME: JSON Generated: ("+(timeStampAfter-timeStampBefore)+" ms)");
+    timeStampBefore = timeStampAfter;
+    
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
-    Debug.println("Finished parsing THREDDS catalog to JSON in ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
+    Debug.println("TIME:  Finished parsing THREDDS catalog to JSON in ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
     return a;
     
   }

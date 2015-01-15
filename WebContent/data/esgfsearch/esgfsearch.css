@@ -167,7 +167,7 @@ float:right;
 .searchCompBody{
   padding:6px 6px 6px 6px;
   height:100%;
-  background:#eeefef;
+  background:#e0ebeb;
 }
 
 .searchCompFooter{
@@ -196,7 +196,7 @@ float:right;
 
 .resultList{
   overflow:auto;
-  max-height:200px;
+  max-height:260px;
   border:1px solid #668;
   background-color:#FFF; 
 }
@@ -206,7 +206,7 @@ float:right;
  margin:0px;
  overflow:hidden;
  cursor: pointer; cursor: hand;
- line-height:25px;
+ line-height:20px;
  background-color: #FFF;
  color:black;
  display:block;

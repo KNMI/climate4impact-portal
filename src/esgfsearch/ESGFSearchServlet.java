@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tools.HTTPTools;
-
+import tools.JSONResponse;
 /**
  * Servlet implementation class ESGFSearchServlet
  */

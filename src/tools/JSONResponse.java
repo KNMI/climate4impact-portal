@@ -1,8 +1,4 @@
-package esgfsearch;
-
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URLEncoder;
+package tools;
 
 import tools.Debug;
 

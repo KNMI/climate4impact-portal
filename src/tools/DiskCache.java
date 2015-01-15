@@ -41,7 +41,7 @@ public class DiskCache  {
         //DebugConsole.println("Created:"+createdHowManySecondsAgo);
         if(createdHowManySecondsAgo>mustbeYoungerThanNSeconds)
         {
-          //Debug.println("Ignoring "+uniqueId+"Because too old.");
+          Debug.println("Ignoring "+uniqueId+"Because too old.");
           tools.Tools.rm(diskCacheLocation+"/"+uniqueId);
           return null;
         }
@@ -68,7 +68,7 @@ public class DiskCache  {
     identifier = identifier.replaceAll("=", "_");
   
     //Debug.println("Storing to diskcache: "+identifier);
-       
+    try{
        try {
         tools.Tools.mksubdirs(diskCacheLocation);
         tools.Tools.writeFile(diskCacheLocation+"/"+identifier, data);
@@ -76,6 +76,10 @@ public class DiskCache  {
 
         e.printStackTrace();
       }
+    }catch(Exception e){
+      Debug.errprintln("Unable to write to cachelocation "+diskCacheLocation+" with identifier "+identifier);
+      
+    }
   }
   
 

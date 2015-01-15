@@ -1,6 +1,5 @@
 package esgfsearch;
 
-import java.awt.List;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -9,7 +8,6 @@ import java.net.URLEncoder;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.json.JSONArray;
@@ -19,10 +17,12 @@ import org.json.JSONObject;
 import tools.Debug;
 import tools.DiskCache;
 import tools.HTTPTools;
+import tools.LockOnQuery;
 import tools.HTTPTools.WebRequestBadStatusException;
 import tools.KVPKey;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
+import tools.JSONResponse;
 
 public class Search {
   String searchEndPoint = null;
@@ -34,9 +34,9 @@ public class Search {
 
   public JSONResponse getFacets(String facets, String query) {
     try{
-      lockOnQuery(facets+query);
+      LockOnQuery.lock(facets+query);
       JSONResponse r = getFacetsImp(facets,query);
-      releaseQuery(facets+query);
+      LockOnQuery.release(facets+query);
       return r;
     }catch(Exception e){
       JSONResponse r = new JSONResponse();
@@ -239,57 +239,35 @@ public class Search {
     return r;
   }
 
-  static Vector<String> busyURLs = new Vector<String>();
-  
-  private void lockOnQuery(String query){
-    synchronized(busyURLs){
-      try {
-        while(busyURLs.contains(query)){
-          busyURLs.wait();
-        }
-      } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      busyURLs.add(query); 
-    }
-  }
-  
-  private void releaseQuery(String query){
-    synchronized(busyURLs){
-      busyURLs.remove(query);
-      busyURLs.notifyAll();
-    }
-  }
-  
+ 
   public JSONResponse checkURL(String query) {
     
     Debug.println("Checking: "+query);
-    lockOnQuery(query);
+    LockOnQuery.lock(query);
 
     JSONResponse r = _checkURL(query);
     
-    releaseQuery(query);
+    LockOnQuery.release(query);
     Debug.println("Finished: "+query);
     
     return r;
   }
-  public JSONResponse _checkURL(String query) {
-    JSONResponse result = new JSONResponse();
-    
-    
-    
-    String response = DiskCache.get(cacheLocation, "dataset_"+query, 1000);
+  
+  public String getCatalog(String catalogURL) throws Exception{
+  
+    String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, 10*60);
     if(response!=null){
-      result.setMessage(response);
-      return result;
+      Debug.println("CATALOG FROM CACHE "+catalogURL);
+      return response;
     }
     boolean ISOK = false;
     String errorMessage = "";
     try {
-      HTTPTools.makeHTTPGetRequest(query);
+      Debug.println("CATALOG GET "+catalogURL);
+      response = HTTPTools.makeHTTPGetRequest(catalogURL);
       ISOK = true;
     } catch (WebRequestBadStatusException e) {
+      Debug.println("CATALOG GET WebRequestBadStatusException");
       if(e.getStatusCode()==404){
         errorMessage = "Not found (404)";
       }else if(e.getStatusCode()==403){
@@ -298,24 +276,35 @@ public class Search {
         errorMessage = "Code ("+e.getStatusCode()+")";
       }
     } catch (IOException e) {
+      Debug.println("CATALOG GET IOException");
       errorMessage = e.getMessage();
       
     }
-    
+    if(ISOK == false){
+      throw new Exception("Unable to GET catalog "+catalogURL+" : "+errorMessage);
+    }
+    Debug.println("CATALOG GET SET");
+    DiskCache.set_2(cacheLocation, "dataset_"+catalogURL, response);
+    Debug.println("CATALOG GET SET DONE");
+    return response;
+  }
+  
+  public JSONResponse _checkURL(String query) {
     JSONObject jsonresult = new JSONObject();
-    
-    try {
-    if(ISOK == true){
-        jsonresult.put("ok", "ok");
-      }else{
+    try{
+      getCatalog(query);
+      jsonresult.put("ok", "ok");
+    }catch(Exception e){
+      Debug.println(e.getMessage());
+      try {
         jsonresult.put("ok", "false");
-        jsonresult.put("message", errorMessage);
+        jsonresult.put("message", e.getMessage());
+      } catch (JSONException e1) {
       }
-    } catch (JSONException e) {
     }
     String message = jsonresult.toString();
+    JSONResponse result = new JSONResponse();
     result.setMessage(message);
-    DiskCache.set_2(cacheLocation, "dataset_"+query, message);
     return result;
   }
 

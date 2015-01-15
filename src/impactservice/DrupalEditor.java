@@ -1,25 +1,23 @@
 package impactservice;
 
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tools.Debug;
-import tools.HTTPTools;
 import tools.HTMLParser;
 import tools.HTMLParser.HTMLElementCallback;
 import tools.HTMLParser.HTMLParserNode;
+import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 
 
