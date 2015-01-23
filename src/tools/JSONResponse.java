@@ -1,5 +1,8 @@
 package tools;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import tools.Debug;
 
 public class JSONResponse {
@@ -9,7 +12,7 @@ public class JSONResponse {
   boolean hasError = false; 
   public String getMessage(){
     if(jsonp!=null){
-      if(jsonp.length()>1){
+      if(jsonp.length()>0){
         return jsonp+"("+message+");";
       }
     }
@@ -35,7 +38,13 @@ public class JSONResponse {
     this.hasError = true;
   }
   public void setErrorMessage(String string){
-    this.message = "{\"error\":\""+string+"\"}";
+    JSONObject error = new JSONObject();
+    try {
+      error.put("error", string);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    this.message = error.toString();
     this.hasError = true;
   }
 }

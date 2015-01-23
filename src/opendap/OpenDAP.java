@@ -363,22 +363,24 @@ public class OpenDAP {
 //            Debug.println(i+"="+a.getByte(i));
 //          }
 //          
-          if(Debugger.DebugOpenDAP)Debug.println("Normal read");
+          if(Debugger.DebugOpenDAP)Debug.println("Normal read "+varName+" start:"+dimInfo[j].start[0] +" count:"+ dimInfo[j].count[0]);
           ByteBuffer byteBuffer = variable.read(dimInfo[j].start, dimInfo[j].count).getDataAsByteBuffer();
           
-          b = byteBuffer.array();
+         
           
           
           
           int elsize = 1;
-         
+          if(type == CDMTypes.Byte)elsize=1;
           if(type == CDMTypes.UInt16)elsize=2;
           if(type == CDMTypes.UInt32)elsize=4;
           if(type == CDMTypes.Int16)elsize=2;
           if(type == CDMTypes.Int32)elsize=4;
           if(type == CDMTypes.Float32)elsize=4;
           if(type == CDMTypes.Float64)elsize=8;
-          
+          if(Debugger.DebugOpenDAP){
+            Debug.println("ElSize = "+elsize);
+          }
           //if(b.length!=varSize){
             //DebugConsole.errprintln(""+b.length/elsize+" and "+varSize);
           //}
@@ -387,11 +389,13 @@ public class OpenDAP {
           byte[] c = new byte[elsize];
           
           //DataOutputStream dos2 = new DataOutputStream(bos);
-          
+          b = byteBuffer.array();
+
           for(int g=0;g<b.length;g=g+elsize){
             for(int i=0;i<elsize;i++){
+             // c[i]=b[((elsize-1)-i)+g];
               c[i]=b[i+g];
-             // DebugConsole.println(""+c[i]);
+             //Debug.println(""+c[i]);
             }
             //dos2.writeFloat(0);
             bos.write(c);
@@ -418,7 +422,15 @@ public class OpenDAP {
         DataOutputStream dos = new DataOutputStream(bos);
         CDMTypes type = ncTypeToCDMType(variable.getDataType().toString());
         if(type != CDMTypes.String){
-          if(type == CDMTypes.Byte )dos.writeDouble(variable.readScalarByte());
+          if(type == CDMTypes.Byte ){
+            //Debug.println("Writing scalar byte");
+            bos.write(variable.readScalarByte());
+            bos.write(variable.readScalarByte());
+            bos.write(variable.readScalarByte());
+            bos.write(variable.readScalarByte());
+            
+            //dos.writeDouble(variable.readScalarByte());
+          }
           if(type == CDMTypes.Int16||type == CDMTypes.UInt16)dos.writeDouble(variable.readScalarShort());
           if(type == CDMTypes.Int32||type == CDMTypes.UInt32)dos.writeDouble(variable.readScalarInt());
           if(type == CDMTypes.Float32)dos.writeDouble(variable.readScalarFloat());

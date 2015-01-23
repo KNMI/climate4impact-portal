@@ -458,8 +458,11 @@ var SearchInterface = function(options){
       }
     });
   
-    rootElement.find(".elementSelector").attr('onclick','').click(function(t){
+    rootElement.find(".elementSelector").attr('onclick','').click(function(evt){
       selectElement($(this));
+      if (evt.ctrlKey == false){
+    	selectedElementsForFacet();
+      }
     });
       
    };

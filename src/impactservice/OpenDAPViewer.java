@@ -87,20 +87,28 @@ public class OpenDAPViewer {
                 certificateLocation = user.certificateFile;
               }
             }
-            ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
-          }catch(SSLPeerUnverifiedException e){
+            try{
+              ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
+            }catch(Exception e){
+              Debug.errprintln(e.getMessage());
+              throw e;
+            }
+          }catch( javax.net.ssl.SSLPeerUnverifiedException e){
             
             msg="The peer is unverified (SSL unverified): "+e.getMessage();
             Debug.errprintln(msg);
-            throw new Exception(msg);
+            jsonResponse.setErrorMessage(msg);
+            return jsonResponse;
           }catch(UnknownHostException e){
             msg="The host is unknown: '"+e.getMessage()+"'\n";
             Debug.errprintln(msg);
-            throw new Exception(msg);
+            jsonResponse.setErrorMessage(msg);
+            return jsonResponse;
           }catch(ConnectTimeoutException e) {
             msg="The connection timed out: '"+e.getMessage()+"'\n";
             Debug.errprintln(msg);
-            throw new Exception(msg);
+            jsonResponse.setErrorMessage(msg);
+            return jsonResponse;
           }catch(WebRequestBadStatusException e){
             
             if(e.getStatusCode()==400){
@@ -148,7 +156,9 @@ public class OpenDAPViewer {
             //String result = e.getResult();
             //if(result!=null)msg+="\n"+result;
             Debug.errprintln(msg);
-            throw new Exception(msg);
+            msg=msg.replaceAll("\n", "<br/>");
+            jsonResponse.setErrorMessage(msg);
+            return jsonResponse;
           }/*catch(Exception e){
             msg="Exception: "+e.getMessage();
             throw new Exception(msg);
