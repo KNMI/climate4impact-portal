@@ -61,7 +61,7 @@ public class THREDDSCatalogBrowser {
     
     MyXMLParser.XMLElement catalogElement = new MyXMLParser.XMLElement();
     try {
-      Debug.println("Getting "+rootCatalog);
+      //Debug.println("Getting "+rootCatalog);
 
       //Try to get from local storage:
       Search esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");

@@ -431,11 +431,29 @@ public class OpenDAP {
             
             //dos.writeDouble(variable.readScalarByte());
           }
-          if(type == CDMTypes.Int16||type == CDMTypes.UInt16)dos.writeDouble(variable.readScalarShort());
-          if(type == CDMTypes.Int32||type == CDMTypes.UInt32)dos.writeDouble(variable.readScalarInt());
-          if(type == CDMTypes.Float32)dos.writeDouble(variable.readScalarFloat());
-          if(type == CDMTypes.Float64)dos.writeDouble(variable.readScalarDouble());
-         
+          if(type == CDMTypes.Int16||type == CDMTypes.UInt16){
+            dos.writeDouble(variable.readScalarShort());
+          }
+          if(type == CDMTypes.Int32||type == CDMTypes.UInt32){
+            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar int32");
+            //dos.writeDouble(variable.readScalarInt());
+            dos.writeInt(variable.readScalarInt());
+//            bos.write(0xFF);
+//            bos.write(0xFF);
+//            bos.write(0x80);
+//            bos.write(0x01);
+          }
+          if(type == CDMTypes.Float32){
+            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar float32");
+            dos.writeFloat(variable.readScalarFloat());
+            
+          }
+          if(type == CDMTypes.Float64){
+            
+            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar double");
+            dos.writeDouble(variable.readScalarDouble());
+          }
+          
           //bos.write(0xFF);
           //bos.write(0xFF);
           //bos.write(0x80);
@@ -457,7 +475,10 @@ public class OpenDAP {
 
   private static String getAttribute(Attribute attr){
     DataType type = attr.getDataType();
-    String attrStr = ("        "+CDMTypeToString(ncTypeToCDMType(type.toString()))+" "+attr.getFullNameEscaped())+" ";
+    String attrName = attr.getFullNameEscaped();
+    attrName = attrName.replaceAll("\\[","_");
+    attrName = attrName.replaceAll("\\]","_");
+    String attrStr = ("        "+CDMTypeToString(ncTypeToCDMType(type.toString()))+" "+attrName)+" ";
     //+" \""+attr.getStringValue()+"\";\n");
     boolean foundType = false;
     if(type == DataType.STRING){
@@ -476,6 +497,10 @@ public class OpenDAP {
       s = s.replaceAll("<", "");
       s = s.replaceAll(">", "");*/
       s = s.replaceAll("\"", "\\\\\"");
+      
+//      s = s.replaceAll("\\[", "A");
+//      s = s.replaceAll("\\]", "A");
+//      s="";
       //s = s.replaceAll(">", "");
       //if(attr.getName().startsWith("p"))s="";
       //DebugConsole.println(s);
