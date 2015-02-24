@@ -1,4 +1,7 @@
-package impactservice;
+package downscaling;
+
+import impactservice.Configuration;
+import impactservice.ImpactUser;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -18,6 +21,8 @@ import java.util.Scanner;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,10 +36,12 @@ public class DownscalingAuth{
   public static final String CONTENT_TYPE_JSON = "application/json";
   public static final String C4I_USER = "climate4impact";
   public static final String C4I_PASSWORD = "climate4impact";
-  public static final String BASE_DP__URL = "http://10.0.2.2:8080/dp/";
-  public static final String BASE_DP_REST_URL = "http://10.0.2.2:8080/dp/rest";
+  public static final String BASE_DP__URL = "http://meteo.unican.es/dp/";
+//  public static final String BASE_DP__URL = "http://10.0.2.2:8080/dp/";
+  public static final String BASE_DP_REST_URL = BASE_DP__URL + "rest";
   public static final String DATE_FORMAT = "dd-MM-yyyy HH:mm:ss z";
   public static final String C4I_CREDENTIAL_PATH = Configuration.getDownscalingPortalWorkspace()+"downscaling.cred";
+  public static enum responseStatus {OK, CREATED, BAD_REQUEST, NOT_FOUND};
   /**
    * @see HttpServlet#HttpServlet()
    */
@@ -167,6 +174,8 @@ public class DownscalingAuth{
   
   protected static ImpactUser getUser(ImpactUser user, String username) throws ServletException, IOException{
     HttpURLConnection urlConn = prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username, "GET");
+    if(urlConn.getResponseCode() == HttpStatus.SC_SERVICE_UNAVAILABLE)
+      throw new ServletException("[CODE " + HttpStatus.SC_SERVICE_UNAVAILABLE + "] Downscaling Portal Service temporarily unavailable");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
         return null;
     try {
@@ -177,18 +186,16 @@ public class DownscalingAuth{
         response.append(inputLine);
       }
       in.close();
-      JSONObject myObject = new JSONObject(response.toString());
-      String internalName = myObject.getJSONObject("value").getString("username");
-      //if(!myObject.getJSONObject("responseCode").toString().equals("OK"))
-        
-      if(internalName.equals(user.getInternalName()))
-        return user;
-      //myObject.getJSONObject("responseCode");
-      
-      //LoginManager.get TODO
-      //myObject.getJSONObject("value").getString("openID");
+      JSONObject jsonResponse = new JSONObject(response.toString());
+      String internalName;
+      if(jsonResponse.getString("responseStatus").equals(responseStatus.OK.toString()) && jsonResponse.optJSONObject("value") != null){
+        internalName = jsonResponse.getJSONObject("value").getString("username");
+        if(internalName.equals(user.getInternalName())){
+          Debug.println("User found in DP: " + internalName);
+          return user;
+        }
+      } 
     } catch (JSONException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;

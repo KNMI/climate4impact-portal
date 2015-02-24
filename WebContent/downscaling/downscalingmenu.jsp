@@ -1,8 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="impactservice.* "%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="impactservice.* "%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="impacttopmenu datamenu">
 
-<%
+<!-- TAB HIGHLIGHTING -->
+	<%
 
 		String Home="/impactportal/";
 		//String header=ImpactPages.createHeader(request.getServletPath());
@@ -19,27 +20,20 @@
 				
 		String pageName=request.getServletPath();
 		boolean highLightDownscaling = false;
-		boolean highLightProcessing = false;
+		boolean highLightSubscription = false;
 		boolean highLightDocumentation = false;
 
 		if(pageName.indexOf("downscaling/downscaling.jsp")!=-1)highLightDownscaling=true;
-		else if(pageName.indexOf("downscaling/processing.jsp")!=-1)highLightProcessing=true;
 		else if(pageName.indexOf("downscaling/downscalingdocs.jsp")!=-1)highLightDocumentation=true;
 
 		//out.print(header); //returns file name and path
-		%>
+	%>
 
   <ul style="height:20px;">
 	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingdocs.jsp" >Documentation</a></li>
-	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/subscription.jsp" >Subscription</a></li>
-	<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscaling.jsp" >Create</a></li> 
-	 <!-- 
-      <li <% if(highLightProcessing)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/processing.jsp" >Processing</a></li>
-      -->
-    
-
-   
+	<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscaling.jsp" >Create <span class="text-small"> beta</span></a> </li>
   </ul>  
  </div>
  
+
  

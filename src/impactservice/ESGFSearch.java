@@ -50,7 +50,7 @@ import tools.MyXMLParser.XMLElement;
  *
  */
 public class ESGFSearch {
-  String[] facets = {"project","variable","time_frequency","institute","experiment","model","realm","domain"};
+//  String[] facets = {"project","variable","time_frequency","institute","experiment","model","realm","domain"};
 
   
   /**

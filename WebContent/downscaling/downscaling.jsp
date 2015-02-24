@@ -1,7 +1,9 @@
 <%@page import="impactservice.SessionManager"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="impactservice.*"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" import="impactservice.*"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" import="downscaling.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" import="java.util.*"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" import="model.Predictand"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -9,15 +11,16 @@
     <jsp:include page="../includes-ui.jsp" />
     
     <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
-    <script type="text/javascript" src="/impactportal/adagucviewer/webmapjs/WMJSTools.js"></script>
     <script type="text/javascript" src="js/functions.js"></script>
+    <script type="text/javascript" src="js/loadFunctions.js"></script>
+    <script type="text/javascript" src="js/events.js"></script>
 	<script src="js/libraries/leaflet-0.7.3/leaflet.js"></script>
+	<script src="js/libraries/spin/spin.min.js"></script>
 	<link rel="stylesheet" href="js/libraries/leaflet-0.7.3/leaflet.css" />
+	<link rel="stylesheet" href="css/custom-style.css" />
 	
 	<style>
-		.refreshinfo{ display:inline;float:left;overflow:hidden;width:740px;height:20px;}
-		.link { cursor: pointer; }
-		#predictand_info { float: left; padding: 30px;}
+		
 	</style>
 	
 	<script type="text/javascript">
@@ -30,341 +33,329 @@
       		}
       	%>
       	var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>service=search&';
-
-      	var sortedKeys = ['variableType','variableName','zone','predictandName','downscalingMethod'];
       	
-		function showDialog(title){
-	      	$('#dialog').dialog({
-	      		dialogClass: 'custom-dialog', 
-	      	 	height: 600,
-	          	width: 850,
-	          	modal: true,
-	      		resizable: true,
-	      		title: title,
-	      		open: function(event, ui){
-	      		  $('#map').css('height','500px');
-	      		},
-	      		close: function( event, ui ) {
-	      			$('#dialog').remove();
-	      			$('body').append('<div id="dialog"><div id="dialog-content"></div></div>');
-	      			$('body').append('<div id="predictand-details"><div id="predictand-info"></div><div id="map"></div></div>');
-	      			$('#map').css('height','');
-	      		}
-	      	});
-      	}
-      
-		function loadMap(startLat, startLon, endLat, endLon){
-		      	var a = [startLat, startLon];
-		      	var b = [startLat, endLon];
-		      	var c = [endLat, endLon];
-		      	var d = [endLat, startLon];
-		      	var center = [(b[0]+c[0])/2, (a[1]+b[1])/2]
-		      	var map = L.map('map').setView(center, 2);
-	      		L.tileLayer('https://{s}.tiles.mapbox.com/v3/mannuk.jj9612k9/{z}/{x}/{y}.png', {
-	        	attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://meteo.unican.es">UC</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>'
-	    	}).addTo(map);
-		      	var polygon = L.polygon([a,b,c,d]).addTo(map);
-		}
-		
-		function loadVariables(variableType,defaultVariable){
-			$('#variables').html('').triggerHandler('contentChanged');
-			if(variableType != ''){
-				$.get( "../DownscalingService/variables?variableType="+variableType, function( data ) {
-					$.each(data.values, function(index, value){
-						$('#variables').append("<td><input class='input-variable' + data-variable="+value.code+" type='radio' name='variable'/><abbr title='"+value.description+"\nUnits: "+value.units+"'><span class='link'>"+value.code+"</span></abbr></td>");
-		  			if(defaultVariable == value.code)
-		  			  $('#variables').find("[data-variable='" + value.code + "']").prop('checked',true);
-					});
-				});
-			}
-		}
+      	<%
+      		try{
+      			request.setAttribute("loggedInUser", LoginManager.getUser(request).getInternalName());
+      		}catch(Exception e){
+      			request.setAttribute("loggedInUser", null);
+      		}
+      	%>
+		var loggedInUser = '<%=request.getAttribute("loggedInUser")%>';
+      	var sortedKeys = ['variableType','variableName','zone','predictandName','dMethodType','dMethodName','datasetType','datasetName', 'sYear', 'eYear', 'scenarioName'];
+      	  
 
-			
-		function loadPredictands(variableName, defaultPredictand){
-			var URL = '../DownscalingService/users/antonio/predictands';
-			$('#predictands').html('').triggerHandler('contentChanged');
-			if(variableName != ''){
-				URL += '?variableName=' + variableName;
-				$.get( URL, function( data ) {
-					$('#predictands').append('List of matched predictands');
-					$.each(data.values, function(index, value){
-			  			$('#predictands').append("<td><input class='input-predictand' data-predictand='"+value.predictandName+"' data-id-zone='"+value.idZone+"' data-predictor='"+ value.predictorName+"' type='radio' name='predictand'/><abbr title='Click to see more info'><span class='link'>"+value.predictandName+"</span></abbr></td>");
-			  			if(defaultPredictand == value.predictandName)
-			  			  $('#predictands').find("[data-predictand='" + value.predictandName + "']").prop('checked',true);
-					});
-				});
-		  	}
-		}
-		
-		function loadPredictandDetails(zone,predictor,predictand){
-			$.get( "../DownscalingService/users/antonio/zone/"+zone+"/predictors/"+predictor+"/predictands/" + predictand, function( data ) {
-		        $('#predictand-info').html('Name: ' + data.value.predictandName +'</br> Variable: ' + data.value.variable + ' </br> Variable type: ' + data.value.variableType + '</br> Dataset: ' + data.value.dataset);
-		        loadMap(data.value.startLat, data.value.startLon, data.value.endLat, data.value.endLon);
-		      });
-		}
-		
-		function loadDownscalingMethods(zone,predictand, defaultDownscalingMethod){
-			$('#downscaling-methods').html('').triggerHandler('contentChanged');
-			if(zone != '' && predictand != ''){
-				$.get( "../DownscalingService/users/antonio/zone/"+zone+"/predictands/" + predictand + "/downscalingMethods", function( data ) {
-			  		$.each(data.values, function(index, value){
-			    		$('#downscaling-methods').append("<td><input class='input-downscaling-method' data-zone='"+zone+"' data-predictand='"+ predictand+"' data-downscaling-method='"+value+"' type='radio' name='downscalingMethod'/><abbr title='Click to see more info'><span class='link'>"+value+"</span></abbr></td>");
-				  		if(defaultDownscalingMethod == value)
-	  			  			$('#downscaling-methods').find("[data-downscaling-method='" + value + "']").prop('checked',true);
-					});
-		      	});
-			}
-		}
-		
-		function loadContent(){
-			var map = getMapFromHash();
-			var variableType = getValue(map, "variableType");
-			var variableName = getValue(map, "variableName");
-			var zone = getValue(map, "zone");
-			var predictandName = getValue(map, "predictandName");
-			var downscalingMethod = getValue(map, "downscalingMethod");
-			$(".input-variable-type[data-variable-type='"+variableType+"']").attr('checked',true)
-			loadVariables(getValue(map, "variableType"),variableName);
-			loadPredictands(variableName,predictandName);
-			loadDownscalingMethods(zone, predictandName, downscalingMethod);
-			replaceHash(map);
-		}
-	
-		
+     		
 		$(document).ready(function() {
 			//collapsible management
 			$('.collapsible').collapsible({});
 			$("input:checkbox").prop('checked', false);
-			
-			$('#variables').bind('contentChanged', function(event, data) {
-				loadPredictands("","");
-				removeHashProperty("variableName");
-	    	});
-			
-			$('#predictands').bind('contentChanged', function(event, data) {
-			  	loadDownscalingMethods("","","")
-			  	removeHashProperty("zone");
-			  	removeHashProperty("predictandName");
-			  	removeHashProperty("downscalingMethod");
-    		});
-			
-			$('#downscaling-methods').bind('contentChanged', function(event, data) {
-
-    		});
-			
-			$(window).on("hashchange", function(e){
-			    var oldHash = e.originalEvent.oldURL;
-			    var newHash = e.originalEvent.newURL;
-			});
- 			//loadcontent();
 		});
-		
-		$(document).on('click', '.link', function(event, ui){
-			showDialog('Predictand');
-			$('#predictand-details').appendTo('#dialog-content');
-			var firedInput = $(event.target).parent().prev('input');
-			var idZone = $(firedInput).attr('data-id-zone');
-			var predictor = $(firedInput).attr('data-predictor');
-			var predictand = $(firedInput).attr('data-predictand');
-			loadPredictandDetails(idZone,predictor,predictand);
-		});
-		
 				
-		//CHANGE EVENTS
-		$(document).on('change', 'input:radio', function(event, ui){
-			if($(this).attr('name') == 'variable-type'){
-				//delete elements from here
-				$('#variable').html('');
-				if($(this).is(':checked')){
-					loadVariables($(this).val());
-					insertHashProperty('variableType', $(this).val(), sortedKeys);
-				}else{
-					removeHashProperty('variableType');
-				}
-			}else if($(this).attr('name') == 'variable'){
-				var variable = $(this).attr('data-variable');
-				if($(this).is(':checked')){
-					loadPredictands(variable);
-					insertHashProperty('variableName', variable, sortedKeys);
-				}
-			}else if($(this).attr('name') == 'predictand'){
-				var idZone = $(this).attr('data-id-zone');
-				var predictor = $(this).attr('data-predictor');
-				var predictand = $(this).attr('data-predictand');
-				$('#downscaling-methods').html('');
-				if($(this).is(':checked')){
-					loadDownscalingMethods(idZone,predictand,"");
-					insertHashProperty('zone', idZone, sortedKeys);
-					insertHashProperty('predictandName', predictand, sortedKeys);
-				}
- 			}else if($(this).attr('name') == 'downscalingMethod'){
-				var idZone = $(this).attr('data-zone');
-				var predictand = $(this).attr('data-predictand');
-				var downscalingMethod = $(this).attr('data-downscaling-method');
-				if($(this).is(':checked')){
-					insertHashProperty('downscalingMethod', $(this).attr('data-downscaling-method'), sortedKeys);
- 					$('#validation').html("<a href='../DownscalingService/validation?idZone="+idZone+"&predictandName="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
-				}
-			}
-			
+		$(document).ajaxStart(function () {
+			$("body").addClass("loading");
+			console.debug("loading class added");
 		});
-
+		$(document).ajaxStop(function () {
+			$("body").removeClass("loading");
+			console.debug("loading class removed");
+		});
+		
 		$(function() {
 		  $("#slider-range").slider({
 		    range : true,
-		    min : 1850,
-		    max: 2100,
-		    values: [1970, 2050],
-		    
+		    min : 1851,
+		    max: 2101,
+		    step: 1,
+		    values: [2001, 2010],
+		    slide: function( event, ui ) {
+	        	$("#date-range-start" ).val(ui.values[0]);
+	        	$("#date-range-end").val(ui.values[1]);
+		    }
 		  });
+		  $("#date-range-start" ).val($( "#slider-range" ).slider( "values", 0));
+		  $("#date-range-end" ).val($( "#slider-range" ).slider( "values", 1));    
 		});
+		
+		function downscalingSubmit(){
+			var idZone = getValueFromHash("zone");
+			var variableName = getValueFromHash("variableName");
+			var predictandName = getValueFromHash("predictandName");
+			var dMethodName = getValueFromHash("dMethodName");
+			var datasetType = getValueFromHash("datasetType");
+			var datasetName = getValueFromHash("datasetName");
+			var scenarioName = getValueFromHash("scenarioName");
+		    var sYear = $('#date-range-start').val();
+		    var eYear = $('#date-range-end').val();
+		  	var cells = sYear+" "+eYear+" "+ datasetName+" 0";
+		  	var params ="?username="+loggedInUser+"&idZone="+idZone+"&predictandName="+predictandName+"&dMethodName="+dMethodName+"&scenarioName="+scenarioName+"&cells="+cells;
+		  	var url="../DownscalingService/downscalings/downscale" + params;
+		  	showOKDialog("<p>Are you sure you want to Downscale this Downscaling configuration?<\p>" + "<p>Variable: "+variableName +"<\p>" + 
+		  	    "<p>Predictand: "+predictandName+"<\p>"+"<p>Downscaling method: "+dMethodName+"<\p>" + "<p>Dataset: "+ datasetName+"<\p>"+
+		  	    "<p>Scenario: " + scenarioName + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
+		}
+		
+		function postData(url){
+			$.ajax({
+		    	url: url,
+		    	type: 'POST',
+		    	contentType: 'application/x-www-form-urlencoded',
+		    	success: function (response) {
+		      		alert("Downscaling successfully launched");
+		      		$("body").removeClass("loading");
+		    	},error: function () {
+		        	alert("error");
+		    	}
+			}); 
+		}
+		
+		function saveConfig(configName){
+		  	var idZone = getValueFromHash("zone");
+		  	var variableType = getValueFromHash("variableType");
+			var variableName = getValueFromHash("variableName");
+			var predictandName = getValueFromHash("predictandName");
+			var dMethodType = getValueFromHash("dMethodType");
+			var dMethodName = getValueFromHash("dMethodName");
+			var datasetType = getValueFromHash("datasetType");
+			var datasetName = getValueFromHash("datasetName");
+			var scenarioName = getValueFromHash("scenarioName");
+		    var sYear = $('#date-range-start').val();
+		    var eYear = $('#date-range-end').val();
+			$.ajax({
+		    	url: '../DownscalingService/downscalings',
+		    	type: 'POST',
+		    	data: {
+		    	  'configName' : configName,
+		    	  'username' : loggedInUser,
+		    	  'variableType':variableType,
+		    	  'variableName':variableName,
+		    	  'zone' : idZone, 
+		    	  'predictandName' : predictandName,
+		    	  'dMethodType' : dMethodType,
+		    	  'dMethodName' : dMethodName,
+		    	  'datasetType' : datasetType,
+		    	  'datasetName' : datasetName,
+		    	  'scenarioName' : scenarioName,
+		    	  'sYear': sYear,
+		    	  'eYear': eYear,
+		    	},
+		    	contentType: 'application/x-www-form-urlencoded',
+		    	success: function (response) {
+		      		alert("<p>Configuration successfully saved.<\p> Please, reload this page to select it.");
+		      		$("body").removeClass("loading");
+		    	},error: function () {
+		        	alert("error");
+		    	}
+			}); 
+		}
+		
+		
 		    
     </script>
   </head>
 <body>
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="downscalingmenu.jsp" />
+	<jsp:include page="subscription.jsp" />
 
-    <div id="dialog">
-   		<div id="dialog-content">
-   		</div>
-    </div>
-    
-    <div id="predictand-details">
-    	<div id="predictand-info"></div>
-    	<div id="map"></div>
-    </div>
-    
-    <div id="test">
-    </div>
-  			
-	<div class="impactcontent">
-		<div id="info"></div>
-		<h1>Load saved downscalings</h1>
-			<select>
-				<option value="1"> NorthAtlantic downscaling</option>
-				<option value="2"> Namibia downscaling</option>
-			</select>
+    <c:if test="${isSubscribed}">
+	    <div id="dialog">
+	   		<div id="dialog-content">
+	   		</div>
+	    </div>
+	    
+	    <div id="predictand-details">
+	    	<div id="predictand-info"></div>
+	    	<div id="map"></div>
+	    </div>
+	    
+	    <div id="test">
+	    </div>
 		
-		<h1>Configure your Downscaling</h1>
+		<div class="impactcontent">
+			<div id="info"></div>
+			<h1>Load saved downscalings</h1>
+				<select id="select-saved-downscalings" value="empty">
+				    <option value="empty"> Select a saved config</option>
+				    <% 
+				    	String username = LoginManager.getUser(request).getInternalName();
+				    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
+				    	if(configsMap != null){
+				     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
+					     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
+					     	}
+				    	}
+				    %>
+				</select>
 			
-			<!-- Variable -->
-	      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
-	        <table width="100%" >
-	        <tr>
-	        	<td class="collapsibletitle" >
-	        		Variable
-	        	</td>
-	        <td  style="padding:0px;">
-			<form>
-	  			<table class="collapsibletable" width="100%">
-	  			<tr>
-	  				<div id="variable-types"> 
-		  				<%
-		  					for(String type : DownscalingService.getVariableTypes()){
-		  							out.print("<td><input type='radio' name='variable-type' data-variable-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
-		  					}
-		  				%>
-		  			</div>
-	  			</tr>
-	  			
-	  			</table>
-	 			</form>
-	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table>
-	       </div>
-	       
-	       <div class="collapsiblecontainer"><div class="collapsiblecontent">
-			<table class="tablenoborder">
-				<tr>
-					<td><div id="refreshvariable"></div></td>
-	       	</tr></table>
-	      	<div id="variables"></div>
-	      	</div></div>
-	      	
-	      	<!-- Predictand -->
-	      	<div class="facetoverview collapsible" id="predictand-type-header" style="height:35px;"> 
-	        <table width="100%" >
-	        <tr>
-	        	<td class="collapsibletitle" >
-	        		Predictand
-	        	</td>
-	        <td  style="padding:0px;">
-			<form>
-	  			<table class="collapsibletable" width="100%">
-	  			<tr>
-					Select a variable to load matched predictands
-	  			</tr>
-	  			
-	  			</table>
-	 			</form>
-	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table>
-	       </div>
-	       
-	       <div class="collapsiblecontainer"><div class="collapsiblecontent">
-			<table class="tablenoborder">
-				<tr>
-					<td><div id="refresh-predictand"></div></td>
-	       	</tr></table>
-	      	<div id="predictands"></div>
-	      	</div></div>
-	      					
-	       
-			<!-- Downscaling methods -->
-	      	<div class="facetoverview collapsible" id="downscalingmethod-header" style="height:55px;"> 
-	        <table width="100%" ><tr>
-	        <td class="collapsibletitle" >
-	        	Downscaling methods
-	        </td><td  style="padding:0px;">
-			<form>
-	  			<table class="collapsibletable" width="100%">
-	  			<tr>
-	  				<div id="downscaling-methods"> Select one predictand to load downscaling methods</div>
-					<!-- Insert downscaling methods dynamically from predictand's choice -->
-	  			</tr>
-	  			
-	  			</table>
-	 			</form>
-	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table>
-	       </div>
-	       
-	       <div class="collapsiblecontainer"><div class="collapsiblecontent">
-	       <table class="tablenoborder"><tr><td><div id="refreshvariable"></div></td><td ><div id="refresh-downscaling-method-info"  class="refreshinfo"><div id="validation"></div></div></td></tr></table>
-	      	
-	      	</div></div>
-	       
+			<h1>Configure your Downscaling</h1>
+				
+				<!-- Variable -->
+		      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
+		        	<table width="100%" >
+				        <tr>
+				        	<td class="collapsibletitle" >
+				        		Variable
+				        	</td>
+				        	<td  style="padding:0px;">
+								<table class="collapsibletable" width="100%">
+				  					<tr>
+				  						<div id="variable-types"> 
+					  						<%
+					  							for(String type : DownscalingService.getVariableTypes()){
+					  									out.print("<td><input type='radio' name='variable-type' data-variable-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
+					  							}
+					  						%>
+					  					</div>
+									</tr>
+		  						</table>
+							</td>
+							<td style="padding:2px;">
+								<span class="collapse-close"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+		      			<div id="variables"></div>
+		      		</div>
+	      		</div>
+  
+		      	<!-- Predictand -->
+				<div class="facetoverview collapsible" id="predictand-type-header" style="height:35px;"> 
+		        	<table width="100%" >
+			        	<tr>
+			        		<td class="collapsibletitle" >
+			        			Predictand
+			        		</td>
+				        	<td  style="padding:0px;">
+				  				<table class="collapsibletable" width="100%">
+				  				</table>
+				        	</td>
+				        	<td style="padding:2px;">
+				        		<span class="collapse-close"/>
+				        	</td>
+			        	</tr>
+			        </table>
+				</div>
+		       
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+		      			<div id="predictands"></div>
+		      		</div>
+				</div>
+   						       
+				<!-- Downscaling methods -->
+		      	<div class="facetoverview collapsible" id="downscalingmethod-header" style="height:55px;"> 
+		        	<table width="100%" >
+		        		<tr>
+		        			<td class="collapsibletitle" >
+		        			Downscaling methods
+		        			</td>
+							<td  style="padding:0px;">
+		  						<table class="collapsibletable" width="100%">
+				  					<tr>
+					  					<div id="downscaling-method-types"> 
+						  					<%
+						  						out.print("<input type='radio' name='downscaling-method-type' data-downscaling-method-type ='ALL' value = 'ALL' class='input-downscaling-method-type'>ALL</input>");
+						  						for(String type : DownscalingService.getDownscalingMethodTypes()){
+													out.print("<input type='radio' name='downscaling-method-type' data-downscaling-method-type='" + type + "' value = '" + type + "' class='input-downscaling-method-type'>"+type+"</input>");		
+					  							}
+						  					%>
+						  				</div>
+				  					</tr>
+		  						</table>
+		        			</td>
+		        			<td style="padding:2px;">
+		        				<span class="collapse-close"/>
+	        				</td>
+        				</tr>
+       				</table>
+				</div>
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+		       			<div id="downscaling-methods"></div>
+					</div>
+				</div>
 
-<!-- 			<!-- Period of interest -->
-<!-- 	      	<div class="facetoverview collapsible" id="period-header" style="height:35px;">  -->
-<!-- 	        <table width="100%" > -->
-<!-- 	        <tr> -->
-<!-- 	        	<td class="collapsibletitle" > -->
-<!-- 	        		Period of interest -->
-<!-- 	        	</td> -->
-<!-- 	        <td  style="padding:0px;"> -->
-<!-- 			<form> -->
-<!-- 	  			<table class="collapsibletable" width="100%"> -->
-<!-- 	  			<tr> -->
-					
-<!-- 	  			</tr> -->
-	  			
-<!-- 	  			</table> -->
-<!-- 	 			</form> -->
-<!-- 	        </td><td style="padding:2px;"><span class="collapse-close"></span></td></tr></table> -->
-<!-- 	       </div> -->
-	       
-<!-- 	       <div class="collapsiblecontainer"><div class="collapsiblecontent"> -->
-<!-- 			<table class="tablenoborder"> -->
-<!-- 				<tr> -->
-<!-- 					<td><div id="refreshvariable"></div></td> -->
-<!-- 	       	</tr></table> -->
-<!-- 	      	<div id="period-selection"></div> -->
-<!-- 	      		<div id="slider-range"></div> -->
-<!-- 	      	</div></div> -->
-	      	
-	</div>
-	   
+				<!-- Dataset -->
+		      	<div class="facetoverview collapsible" id="dataset-header" style="height:35px;"> 
+					<table width="100%" >
+						<tr>
+			        		<td class="collapsibletitle" >
+			        			Dataset
+			        		</td>
+			        		<td  style="padding:0px;">
+								<table class="collapsibletable" width="100%">
+				  					<tr>
+										<div id="dataset-types"> 
+					  						<%
+					  							for(String type : DownscalingService.getDatasetTypes()){
+					  								if(type.equals("CLIMATE"))
+					  									out.print("<td><input type='radio' name='dataset-type' data-dataset-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
+					  							}
+					  						%>
+					  					</div>
+				  					</tr>  			
+			  					</table>
+			        		</td>
+			        		<td style="padding:2px;">
+			        			<span class="collapse-close"/>
+			        		</td>
+						</tr>
+					</table>
+				</div>
+		       
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+						<div id="datasets"></div>
+		      		</div>
+				</div>
+	
+				<!-- Scenarios -->
+		      	<div class="facetoverview collapsible" id="scenario-header" style="height:35px;"> 
+		        	<table width="100%" >
+			        	<tr>
+			        		<td class="collapsibletitle" >
+			        			Scenario
+			        		</td>
+			        		<td  style="padding:0px;">
+					  			<table class="collapsibletable" width="100%">
+				  					<tr>
+										<div id="period-selection">
+											<div>
+												<label for="date-range-start">Start year</label>
+												<input type="text" id="date-range-start" class="input-year"/>
+											</div>
+				      						<div id="slider-range"></div>
+				      						<div>
+				      							<label>End year</label>
+				      							<input type="text" id="date-range-end" class="input-year"></input>
+				      						</div>
+				      						<button id="button-load-scenarios" type="button">Reload</button>
+										</div>
+									</tr>
+					  			</table>
+							</td>
+							<td style="padding:2px;">
+								<span class="collapse-close"></span>
+							</td>
+						</tr>
+					</table>
+				</div>
+		       
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+						<div id="scenarios"></div>
+					</div>
+				</div>
+				<button id="button-saveconfig" type="button">Save config</button> 	
+				<button id="button-downscale" type="button">Downscale</button> 	
+   		</c:if>	
 		 	
 	  <!-- /Contents -->
 		<jsp:include page="../footer.jsp" />
+		<div class="modal"><!-- Place at bottom of page --></div>
   </body>
 </html>

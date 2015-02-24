@@ -5,6 +5,7 @@ package impactservice;
 import tools.Debug;
 import tools.MyXMLReader;
 
+
 public class Configuration {
 
   static long readConfigPolInterval = 0;;
@@ -33,6 +34,16 @@ public class Configuration {
 
   
   private static String getConfigFile(){
+    try{
+      String configLocation = System.getenv("IMPACTPORTAL_CONFIG");
+      if(configLocation!=null){
+        if(configLocation.length()>0){
+          return configLocation;
+        }
+      }
+    }catch(Exception e){
+    }
+    
     return getHomePath()+"config.xml";
   }
   

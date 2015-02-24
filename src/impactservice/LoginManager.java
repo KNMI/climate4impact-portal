@@ -81,6 +81,10 @@ public class LoginManager {
       }
     }
     
+    
+
+    
+    
     MyProxy myProxy = new MyProxy(Configuration.LoginConfig.getMyProxyServerHost(),Configuration.LoginConfig.getMyProxyServerPort());
     //myProxy.setHost(Configuration.LoginConfig.getMyProxyServerHost());
     //myProxy.setPort(Configuration.LoginConfig.getMyProxyServerPort());

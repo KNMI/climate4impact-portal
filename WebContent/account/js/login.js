@@ -21,8 +21,8 @@
       'CEDA':        {
     	  name:'BADC/CEDA'   ,
     	  openidprefix:'https://ceda.ac.uk/openid/',
-    	  createaccount:'https://ceda.ac.uk/',        
-    	  accountinfo:'https://ceda.ac.uk/',
+    	  createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
+    	  accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
     	  logocls:'logo_UK'},
       'DKRZ':        {
     	  name:'DKRZ'        ,
@@ -292,7 +292,7 @@ var generateLoginDialog = function(doReload){
       if(doReload == true){
         src+="?doreload=true";
       }
-      var title = "Login with your ESGF openid identifier";
+      var title = "Sign in with your ESGF OpenID account";
       var width = 900;
       var height = 500;
       iframe.attr({

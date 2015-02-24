@@ -115,7 +115,7 @@ var FileViewer = function() {
 	            var downloadURL = request.replace('dodsC', 'fileServer');
 	            if(openid){
 	              if(openid!=""){
-	                downloadURL+="?openid="+downloadURL;
+	                downloadURL+="?openid="+openid;
 	              }
 	            }
 
@@ -182,10 +182,14 @@ var FileViewer = function() {
   });
   this.load = function(_filelocation) {
     fileLocation = _filelocation;
+    filelocationwithopenid = fileLocation;
+    if(openid){
+      filelocationwithopenid+="?openid="+openid;
+    }
     fileStore.fireEvent('load');
     var proxy = fileStore.getProxy();
     proxy.url = fileheaderservice + URLEncode(fileLocation);
-    fileViewerPanel.getComponent('variableheader').update('File location: <a target="_blank" href="'+_filelocation+'">'+_filelocation+'</a>');
+    fileViewerPanel.getComponent('variableheader').update('File location: <a target="_blank" href="'+filelocationwithopenid+'">'+_filelocation+'</a>');
     fileStore.load();
   };
 

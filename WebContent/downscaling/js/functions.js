@@ -86,6 +86,16 @@ function removeHashProperty(key){
   return replaceHash(map);
 }
 
+function removeHashesFrom(key, sortedKeys){
+  var deleteKey = false;
+  for(var i in sortedKeys){
+    if(sortedKeys[i] == key)
+      deleteKey = true;
+    if(deleteKey)
+      removeHashProperty(key);
+  }
+}
+
 function getValueFromHash(key){
   var map = getMapFromHash();
   return getValue(map,key);

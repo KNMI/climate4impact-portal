@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class ProxyHTTPRequest
  */
-public class ProxyHTTPRequest extends HttpServlet {
+public class ProxyHTTPRequest_Deprecated2 extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ProxyHTTPRequest() {
+    public ProxyHTTPRequest_Deprecated2() {
         super();
         // TODO Auto-generated constructor stub
     }
