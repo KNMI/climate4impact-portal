@@ -100,6 +100,8 @@ public class GetDownloadScriptHandler extends HttpServlet {
       Date notAfter=getCertEndDate(user.getWorkspace()+"certs/"+"downloadcreds.pem");
       Format fmt=new SimpleDateFormat("yyyyMMddHHmm");
 
+      String today=fmt.format(new Date());
+
       urls=urls.replaceAll("\r", "");
 
       checkCredentials(user.getWorkspace()+"certs/"+"downloadcreds.pem");
@@ -113,7 +115,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
       String wgetScript=generateWgetScript(Configuration.DownloadScriptConfig.getDownloadScriptTemplate(), fillins);
       ServletOutputStream os=response.getOutputStream();
       response.setContentType("application/octet-stream");
-      response.setHeader("Content-Disposition", "attachment; filename=\"Mydownload.sh\"");
+      response.setHeader("Content-Disposition", "attachment; filename=\"IMPACTDL_"+today+".sh\"");
       os.print(wgetScript);
     }
   }
