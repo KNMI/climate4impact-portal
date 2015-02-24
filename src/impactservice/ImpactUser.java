@@ -19,12 +19,18 @@ public class ImpactUser {
   private GenericCart shoppingCart = null;
   private GenericCart processingJobsList = null;
   private String emailAddress;
+  public String userMyProxyService = null;
+  public String getUserMyProxyService() {
+    return userMyProxyService;
+  }
   public String getWorkspace(){
     return usersDir;
   }
   public void setWorkspace(String _usersDir){
     usersDir = _usersDir;
   }
+  
+
 
   synchronized public GenericCart getProcessingJobList(){
     Debug.println("getProcessingJobList");

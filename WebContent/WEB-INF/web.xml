@@ -19,7 +19,7 @@
     <servlet-name>ImpactService</servlet-name>
     <url-pattern>/ImpactService</url-pattern>
   </servlet-mapping>
-   <servlet>
+  <servlet>
     <description></description>
     <display-name>DownscalingService</display-name>
     <servlet-name>DownscalingService</servlet-name>
@@ -97,8 +97,7 @@
     <param-name>extjslocation</param-name>
     <param-value>/impactportal/js/extjs-4.2.1.883/</param-value>
   </context-param>
-
-   <servlet>
+  <servlet>
     <description></description>
     <display-name>FileUploadHandler</display-name>
     <servlet-name>FileUploadHandler</servlet-name>
@@ -113,22 +112,28 @@
     <display-name>DapServlet</display-name>
     <servlet-name>DapServlet</servlet-name>
     <servlet-class>opendap.DapServlet</servlet-class>
-    
   </servlet>
   <servlet-mapping>
-  
     <servlet-name>DapServlet</servlet-name>
     <url-pattern>/DAP/*</url-pattern>
   </servlet-mapping>
- <security-constraint>
+  <security-constraint>
     <web-resource-collection>
-        <web-resource-name>impactportal</web-resource-name>
-        <url-pattern>/*</url-pattern>
+      <web-resource-name>impactportal</web-resource-name>
+      <url-pattern>/*</url-pattern>
     </web-resource-collection>
     <user-data-constraint>
-        <transport-guarantee>NONE</transport-guarantee>
+      <transport-guarantee>NONE</transport-guarantee>
     </user-data-constraint>
-
-</security-constraint>
- 
+  </security-constraint>
+  <servlet>
+    <description></description>
+    <display-name>GetDownloadScriptHandler</display-name>
+    <servlet-name>GetDownloadScriptHandler</servlet-name>
+    <servlet-class>impactservice.GetDownloadScriptHandler</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetDownloadScriptHandler</servlet-name>
+    <url-pattern>/GetDownloadScriptHandler</url-pattern>
+  </servlet-mapping>
 </web-app>

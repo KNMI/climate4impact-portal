@@ -66,13 +66,14 @@ public class Configuration {
     ExpertContact.doConfig(configReader);
     ADAGUCServerConfig.doConfig(configReader);
     PyWPSServerConfig.doConfig(configReader);
+    DownloadScriptConfig.doConfig(configReader);
     
     configReader = null; 
   }
   
   
   public static String getEmailToSendFatalErrorMessages(){
-    return "plieger@knmi.nl";
+    return "vreedede@knmi.nl";
   }
   
   public static class GlobalConfig{
@@ -147,6 +148,7 @@ public class Configuration {
     private static String trustStoreFile = null;
     private static String trustStorePassword= null;
     private static String myProxyDefaultPassword = "<defaultpassword>";
+    private static String trustRootsLocation = null;
     
     // myProxyDefaultUserName should be null, because in that case the openid identifier from the current user is used.
     // It can be set to override a custom username, e.g. in case of testing on a workstation.
@@ -158,6 +160,7 @@ public class Configuration {
       trustStorePassword=configReader.getNodeValue("impactportal.loginconfig.truststorepassword");
       myProxyDefaultUserName = configReader.getNodeValue("impactportal.loginconfig.myproxyserverusernameoverride");
       myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
+      trustRootsLocation = configReader.getNodeValue("impactportal.loginconfig.trustrootslocation");
     }
     
     public static String getMyProxyServerHost(){readConfig();return myProxyServerHost;}
@@ -168,8 +171,7 @@ public class Configuration {
     public static String getMyProxyDefaultUserName(){readConfig();return myProxyDefaultUserName;}
 
     public static String getTrustRootsLocation() {
-      // TODO Auto-generated method stub
-      return "/usr/people/plieger/.globus/certificates/";
+      return trustRootsLocation;
     }
 
     
@@ -233,6 +235,18 @@ public class Configuration {
     public static String[] getPyWPSEnvironment() {
       readConfig();
       return environmentVariables;
+    }
+  }
+  public static class DownloadScriptConfig{
+    private static String downloadScriptTemplate="";
+    
+    public static void doConfig(MyXMLReader configReader){
+      downloadScriptTemplate=configReader.getNodeValue("impactportal.downloadscriptconfig.downloadscripttemplate");
+    }
+    
+    public static String getDownloadScriptTemplate() {
+      readConfig();
+      return downloadScriptTemplate;
     }
   }
 }

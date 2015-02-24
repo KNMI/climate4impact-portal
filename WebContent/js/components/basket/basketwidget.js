@@ -133,30 +133,88 @@ var BasketWidget = function() {
           }
         }
       },{
-        text : 'Download file',
+          text : 'Download file(s)',
+          iconCls : 'icon-download',
+          handler : function() {
+            var downloadWin;
+            if (tree.getSelectionModel().hasSelection()) {
+              var selectedNodes = tree.getSelectionModel().getSelection();
+              
+//              if(selectedNode.length>1){
+//                Ext.MessageBox.alert('Error','Please select a single file with HTTP enabled to download.');
+//                return;
+//              }
+              console.log('INFO Downloading: '+selectedNodes.length+" files");
+              var i;
+              for (i=0; i<selectedNodes.length; i++){
+                var selectedNode = selectedNodes[i];
+                var httpURL = selectedNode.data.httpurl;
+                if(!httpURL){
+              	  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
+              	  continue; //return;
+                }
+                if(openid){
+              	  if(openid!=""){
+              		  httpURL+="?openid="+openid;
+              	  }
+                }
+                console.log('INFO Downloading: '+httpURL);
+                console.log(selectedNode);
+                setTimeout(function(url) { //closure for httpURL
+              	return function() {
+              	  var frame = $('<iframe style="display: none;" class="multi-download-frame"></iframe>');
+                    frame.attr('src', url);
+                    $('.iframeshere').after(frame);
+                    setTimeout(function() { frame.remove();}, 1000 );
+              	};}(httpURL),200);
+              }
+              
+            } else {
+              Ext.MessageBox.alert('Error','No selected files.');
+            }
+          }
+      },{
+        text : 'Script download',
         iconCls : 'icon-download',
         handler : function() {
           if (tree.getSelectionModel().hasSelection()) {
-            var selectedNode = tree.getSelectionModel().getSelection();
+            var selectedNodes = tree.getSelectionModel().getSelection();
             
-            if(selectedNode.length>1){
-              Ext.MessageBox.alert('Error','Please select a single file with HTTP enabled to download.');
-              return;
-            }
-            selectedNode = selectedNode[0];
-            var httpURL = selectedNode.data.httpurl;
-            if(openid){
-              if(openid!=""){
-                httpURL+="?openid="+openid;
+            console.log('INFO Script Download: '+selectedNodes.length+" files");
+            var urlList=[];
+            var i;
+            for (i=0; i<selectedNodes.length; i++){
+              var selectedNode = selectedNodes[i];
+              var httpURL = selectedNode.data.httpurl;
+              if(!httpURL){
+            	  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
+            	  continue; //return;
               }
+              urlList.push(httpURL);
+              console.log(selectedNode);
             }
-            if(!httpURL){
-              Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
-              return;
+            var mySecureHostname="https:"+"//"+window.location.hostname;
+            var scriptForm = $('<form/>', {
+            	action: serverurlhttps+"/account/downloadscript.jsp",
+            	target: "_blank",
+            	method: "post"
+            });
+            scriptForm.append($("<input/>", {
+            	type: "hidden",
+            	name: "urls",
+            	value: urlList.join("\r\n")
+            }));
+            if ((openid) && (openid != "")) {
+              scriptForm.append($("<input/>", {
+              	  type: "hidden",
+              	  name: "openid",
+            	  value: openid
+              }));
             }
-            if (downloadWin)
-              downloadWin.close();
-            downloadWin = window.open(httpURL, 'jav','width=900,height=600,resizable=yes');
+            console.log(scriptForm);
+            $("body").append(scriptForm);
+            scriptForm.submit();
+            
           } else {
             Ext.MessageBox.alert('Error','No selected files.');
           }
@@ -296,7 +354,7 @@ var BasketWidget = function() {
             text : 'Date',
             width : 100,
             dataIndex : 'date',
-            hidden:true
+            hidden:false
           }/*,{
             text : 'Info',
             width : 40,
