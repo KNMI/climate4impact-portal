@@ -26,11 +26,11 @@
 		%>
 				<p>You are not logged in, please go to the <a href="/impactportal/account/login.jsp">login page</a> and log in</p>
 			<%
-		}else{
-			out.println("Basket for: <strong>"+user.id+"</strong>");
-			out.println("<div id='basketlist'></div>");
-		}
-		%>
+				}else{
+					out.println("Basket for: <strong>"+user.getUserName()+"</strong>");
+					out.println("<div id='basketlist'></div>");
+						}
+			%>
 		</div>
 	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

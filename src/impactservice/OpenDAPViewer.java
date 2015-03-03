@@ -7,7 +7,6 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +41,7 @@ public class OpenDAPViewer {
     /* Check if we really have an URL here and not a localfile */
     String prefixCheck = requestStr.toLowerCase();
     if(prefixCheck.startsWith("http")==false&&prefixCheck.startsWith("dods")==false){
-      jsonResponse.setErrorMessage("Invalid OpenDAP URL given, no HTTP or DODS prefix");
+      jsonResponse.setErrorMessage("Invalid OpenDAP URL given, no HTTP or DODS prefix",500);
       return jsonResponse;
     }
     HttpSession session = request.getSession();
@@ -64,9 +63,9 @@ public class OpenDAPViewer {
       try{
         user=LoginManager.getUser(request,response);
         
-        if(user == null){
-          jsonResponse.setErrorMessage("Unable to get user from LoginManager");
-        }
+//        if(user == null){
+//          jsonResponse.setErrorMessage("Unable to get user from LoginManager",500);
+//        }
       }catch(Exception e){
         Debug.println("INFO: User not logged in");
       }
@@ -77,93 +76,14 @@ public class OpenDAPViewer {
       ncdumpMessage=NetCDFC.executeNCDumpCommand(user,requestStr);
       
       
-      
-        if(ncdumpMessage==""){
-          String msg="";
-          try{
-            String certificateLocation = null;
-            if(user!=null){
-              if(user.certificateFile != null){
-                certificateLocation = user.certificateFile;
-              }
-            }
-            try{
-              ncdumpMessage = HTTPTools.makeHTTPGetRequest(requestStr+".ddx",certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
-            }catch(Exception e){
-              Debug.errprintln(e.getMessage());
-              throw e;
-            }
-          }catch( javax.net.ssl.SSLPeerUnverifiedException e){
-            
-            msg="The peer is unverified (SSL unverified): "+e.getMessage();
-            Debug.errprintln(msg);
-            jsonResponse.setErrorMessage(msg);
-            return jsonResponse;
-          }catch(UnknownHostException e){
-            msg="The host is unknown: '"+e.getMessage()+"'\n";
-            Debug.errprintln(msg);
-            jsonResponse.setErrorMessage(msg);
-            return jsonResponse;
-          }catch(ConnectTimeoutException e) {
-            msg="The connection timed out: '"+e.getMessage()+"'\n";
-            Debug.errprintln(msg);
-            jsonResponse.setErrorMessage(msg);
-            return jsonResponse;
-          }catch(WebRequestBadStatusException e){
-            
-            if(e.getStatusCode()==400){
-              msg+="HTTP status code "+e.getStatusCode()+": Bad request\n";
-              if(user == null){
-                msg+="\nNote: you are not logged in.\n";
-              }
-            }else if(e.getStatusCode()==401){
-              msg+="Unauthorized (401)\n";
-              if(user == null){
-                msg+="\nNote: you are not logged in.\n";
-              }
-            }else if(e.getStatusCode()==403){
-              msg+="Forbidden (403)\n";
-              if(user != null){
-                msg+="\nYou are not authorized to view this resource, you are logged in as "+user.id+"\n";
-              }
-            }else if(e.getStatusCode()==404){
-              msg+="File not found (404)\n";
-              if(user != null){
-                msg+="\nYou are logged in as "+user.id+"\n";
-              }
-            }else{
-              msg="WebRequestBadStatusException: "+e.getStatusCode()+"\n";
-            }
-            
-            
-            /*else{
-              msg+="\nYou are logged in as "+user.id+"\n";
-            }*/
-            /*String html = e.getResult();
-            
-            DebugConsole.println("Got:"+html+"]");
-            
-            DebugConsole.println("1");
-            HTMLParser htmlParser = new HTMLParser();
-            DebugConsole.println("2");
-            HTMLParserNode element = htmlParser.parseHTMLDocument(html);
-            DebugConsole.println("3");
-            HTMLParserNode body=htmlParser.getBody(element);
-            DebugConsole.println("4");
-            DebugConsole.println(body.printTree());
-            DebugConsole.println("5");
-            msg+=body;*/
-            //String result = e.getResult();
-            //if(result!=null)msg+="\n"+result;
-            Debug.errprintln(msg);
-            msg=msg.replaceAll("\n", "<br/>");
-            jsonResponse.setErrorMessage(msg);
-            return jsonResponse;
-          }/*catch(Exception e){
-            msg="Exception: "+e.getMessage();
-            throw new Exception(msg);
-          }*/
+    
+      if(ncdumpMessage==""){
+        try{
+          jsonResponse = LoginManager.identifyWhyGetRequestFailed(requestStr+".ddx",request,response);
+        }catch(WebRequestBadStatusException e2){
         }
+        return jsonResponse;
+      }
       
       Debug.println("Trying to parse ncdump message");
       MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
@@ -311,14 +231,14 @@ public class OpenDAPViewer {
       
       String requestStrWithOpenId = requestStr;
       if(user!=null){
-        if(user.id!=null){
+        if(user.getOpenId()!=null){
           if(requestStrWithOpenId.indexOf("?")==-1){
             requestStrWithOpenId +="?";
           }else{
             requestStrWithOpenId +="&";
           }
           try {
-            requestStrWithOpenId+="openid="+URLEncoder.encode(user.id,"utf-8");
+            requestStrWithOpenId+="openid="+URLEncoder.encode(user.getOpenId(),"utf-8");
           } catch (UnsupportedEncodingException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -329,7 +249,7 @@ public class OpenDAPViewer {
       
       String userId = "No user.";
       if(user!=null){
-        userId = user.id;
+        userId = user.getOpenId();
       }
       try {
         MessagePrinters.emailFatalErrorMessage("File access: "+e.getMessage(),msg+"\nUser: '"+userId+"'");
@@ -347,7 +267,7 @@ public class OpenDAPViewer {
         error.put("error",msg);
         errorVar.put(error);
       } catch (JSONException e1) {}
-      jsonResponse.setErrorMessage(errorVar.toString()+"\n\n\n");
+      jsonResponse.setErrorMessage(errorVar.toString()+"\n\n\n",500);
 
     }
 

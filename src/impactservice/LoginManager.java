@@ -2,7 +2,11 @@ package impactservice;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.Vector;
 
@@ -10,6 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import oauth2handling.OAuth2Handler;
+
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -17,6 +24,9 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
 
 import tools.Debug;
+import tools.HTTPTools;
+import tools.JSONResponse;
+import tools.HTTPTools.WebRequestBadStatusException;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
@@ -53,6 +63,26 @@ import tools.Tools;
 public class LoginManager {
   static Vector<ImpactUser> users = new Vector<ImpactUser>();
   
+  public static void getUserProxyService(ImpactUser user) throws MalformedURLException, WebRequestBadStatusException, Exception{
+ //Test met openID URL
+    
+    user.userMyProxyService = null;
+    //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
+    XMLElement xmlParser = new XMLElement();
+    if(user.getId().startsWith("http")==true){
+      xmlParser.parse(new URL(user.getId()));
+      //Debug.println(xmlParser.toString());
+      Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
+      for(XMLElement service : services){
+        if(service.get("Type").getValue().indexOf("myproxy")!=-1){
+          Debug.println(service.get("URI").getValue());
+          user.userMyProxyService = service.get("URI").getValue();
+        }
+      }
+    }
+    
+  }
+  
   /**
    * Retrieves a SLC (short lived credential) from the SLCS and stores it in the users home directory 
    * @param user User object with identifier and home directory set
@@ -66,21 +96,7 @@ public class LoginManager {
     }
     
 
-    //Test met openID URL
-    
-    user.userMyProxyService = null;
-    //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
-    XMLElement xmlParser = new XMLElement();
-    xmlParser.parse(new URL(user.id));
-    //Debug.println(xmlParser.toString());
-    Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
-    for(XMLElement service : services){
-      if(service.get("Type").getValue().indexOf("myproxy")!=-1){
-        Debug.println(service.get("URI").getValue());
-        user.userMyProxyService = service.get("URI").getValue();
-      }
-    }
-    
+   
 
     
     
@@ -93,8 +109,13 @@ public class LoginManager {
     try {
       String userName = Configuration.LoginConfig.getMyProxyDefaultUserName();
       if(userName == null){
-        userName = user.id;
+        userName = user.getOpenId();
       }
+      if(userName == null){
+        Debug.errprintln("No openid set for "+user.getId());
+        return;
+      }
+      
       
       Debug.println("Setting username to "+userName+":"+Configuration.LoginConfig.getMyProxyDefaultPassword());
       
@@ -123,12 +144,12 @@ public class LoginManager {
         throw new Exception("LoginManager: Unable to write credential");
       }
     } catch (MyProxyException e) {
-      String msg="Unable to get credential for "+user.id;
+      String msg="Unable to get credential for "+user.getOpenId();
       Debug.errprintln(msg);
       Debug.printStackTrace(e);
       throw new Exception("LoginManager: "+msg);
     }
-    Debug.println("Credentials for user "+user.id+" retrieved");
+    Debug.println("Credentials for user "+user.getId()+" retrieved");
   }
   
  /**
@@ -140,9 +161,21 @@ public class LoginManager {
   public static ImpactUser getUser(HttpServletRequest request, HttpServletResponse response) throws Exception {
   
     HttpSession session = request.getSession();
-    String id=(String) session.getAttribute("openid_identifier");
+    String id=(String) session.getAttribute("user_identifier");
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       id=Configuration.GlobalConfig.getDefaultUser();
+    }
+    
+
+    try{
+      String userId = OAuth2Handler.verifyAndReturnUserIdentifier(request);
+      
+      if(userId != null){
+        id = userId;
+        Debug.println("User ID from OAuth2 "+userId);
+      }
+    }catch(Exception e){
+      
     }
     
     if(id == null && response != null){
@@ -182,31 +215,66 @@ public class LoginManager {
               //DebugConsole.println("CertOpenIdIdentifier=["+CertOpenIdIdentifier+"]");
               
           }else{
-            String message = "No user information available from either session or x509\n";
+          
+
+            String message = "No user information available from either session, oauth2 or x509\n";
             Debug.errprintln(message);
-            /*response.setStatus(403);
-            response.getOutputStream().println(message);
+            //response.setStatus(403);
+            /*response.getOutputStream().println(message);
             throw new Exception("You are not logged in...");*/
           }
           
           
-          if(  CertOpenIdIdentifier == null){
-            String message = "No valid ESGF certificate provided: no user found.";
-            Debug.errprintln(message);
-            /*response.setStatus(403);
-            response.getOutputStream().println(message);
-            throw new Exception(message);*/
-          }else{
+          if(  CertOpenIdIdentifier != null){
             id = CertOpenIdIdentifier;
           }
         }
      // }
    // }
       
+    //Debug.println("id == "+id);
+    if(id == null){
+      throw new Exception("You are not logged in...");
+      //return null;
+//      response.setStatus(401);
+//      
+//      String queryString = "";
+//      if(request.getQueryString()!=null){
+//        queryString = "?"+request.getQueryString();
+//      }
+//      String redirURL = request.getRequestURL().toString()+queryString;
+//      Debug.println("401:"+redirURL);
+//      String redirURLEncoded = URLEncoder.encode(redirURL,"utf-8");
+//      
+//      response.sendRedirect("/impactportal/account/login.jsp?redirect="+redirURLEncoded);
+    }
     //DebugConsole.println("Getting user from session with id "+id);
     if(id == null)throw new Exception("You are not logged in...");
     ImpactUser user = getUser(id,request);
     return user;
+  }
+  
+  public static String getLoginPage(){
+    return "/impactportal/account/login.jsp";
+  }
+  
+  public static void redirectToLoginPage(HttpServletRequest request,HttpServletResponse response) throws IOException{
+    String queryString = "";
+    if(request.getQueryString()!=null){
+      queryString = "?"+request.getQueryString();
+    }
+    String redirURL = request.getRequestURL().toString()+queryString;
+    Debug.println("401:"+redirURL);
+    String redirURLEncoded = getLoginPage();
+    try {
+      redirURLEncoded = URLEncoder.encode(redirURL,"utf-8");
+    } catch (UnsupportedEncodingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      response.sendRedirect(getLoginPage());
+    }
+    
+    response.sendRedirect(getLoginPage()+"?redirect="+redirURLEncoded);
   }
   
   public static ImpactUser getUser(HttpServletRequest request) throws Exception {
@@ -219,11 +287,11 @@ public class LoginManager {
    * @return The user object
    */
   public synchronized static ImpactUser getUser(String userId,HttpServletRequest request){
-    //DebugConsole.println("Looking up user "+userId);
+    //Debug.println("Looking up user "+userId);
     //Lookup the user in the vector list
     if(userId==null)return null;
     for(int j=0;j<users.size();j++){
-      if(users.get(j).id.equals(userId)){
+      if(users.get(j).getId().equals(userId)){
         ImpactUser user = users.get(j);
         //DebugConsole.println("Found existing user "+userId);
         return user;
@@ -231,8 +299,9 @@ public class LoginManager {
     }
     //The user was not found, so create a new user
     Debug.println("Creating new user object for "+userId);
-    ImpactUser user = new ImpactUser();
-    user.id=userId;
+    ImpactUser user = new ImpactUser(userId);
+    
+    user.setOpenId( (String) request.getSession().getAttribute("openid_identifier"));
     users.add(user);
     try {checkLogin(userId,request);} catch (Exception e) { }
     
@@ -252,8 +321,8 @@ public class LoginManager {
     }
     ImpactUser user = getUser(openIdIdentifier,request);
     
-    Debug.println("Check login "+user.id);
-    user.internalName = user.id.replace("http://", "");
+    Debug.println("Check login "+user.getId());
+    user.internalName = user.getId().replace("http://", "");
     user.internalName = user.internalName.replace("https://", "");
     user.internalName = user.internalName.replaceAll("/", ".");
     Debug.println("internalName = "+user.internalName);
@@ -269,16 +338,9 @@ public class LoginManager {
     } catch (IOException e) {
       Debug.errprintln(e.getMessage());
       user.credentialError=true;
-      throw new Exception("Unable to create credential for user, server misconfiguration:"+user.id+"\n"+e.getMessage());
+      throw new Exception("Unable to create credential for user, server misconfiguration:"+user.getId()+"\n"+e.getMessage());
     }
-    try{
-      getCredential(user);
-    }catch(Exception e){
-      user.credentialError=true;
-      throw new Exception("Unable to get credential for user "+user.id+"\n"+e.getMessage());
-    }
-    
-    createNCResourceFile(user);
+   
     
     //Get email
     try{
@@ -292,11 +354,23 @@ public class LoginManager {
         }
       }
       if(!foundEmail ){
-        MessagePrinters.emailFatalErrorMessage("User email is not found", "User email is not found for "+user.id);
+        MessagePrinters.emailFatalErrorMessage("User email is not found", "User email is not found for "+user.getId());
       }
     }catch(Exception e){
       e.printStackTrace();
     }
+    
+  
+    
+    try{
+      getCredential(user);
+    }catch(Exception e){
+      user.credentialError=true;
+      e.printStackTrace();
+      throw new Exception("Unable to get credential for user "+user.getId()+"\n"+e.getMessage());
+    }
+    
+    createNCResourceFile(user);
     
     //createFontConfigFile(user);
     user.configured = true;
@@ -326,9 +400,103 @@ public class LoginManager {
         //+"HTTP.SSL.SSLv3="+user.certificateFile+"\n"
         //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
         +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
-    Debug.println("createNCResourceFile for user "+user.id+":\n"+fileContents);
+    Debug.println("createNCResourceFile for user "+user.getId()+":\n"+fileContents);
     Tools.writeFile(user.getWorkspace()+"/.httprc", fileContents) ;
     Tools.writeFile(user.getWorkspace()+"/.dodsrc", fileContents) ;
  }
+  /**
+   * This function can be used when e.g. ncdump or ADAGUC is unable to access a resource. This function make a call with the standard java libraries to identify the real problem. 
+   * A JSONResponse object is returned with detailed error information. This object can be sent back to the browser directly.
+   * @param requestStr
+   * @param request
+   * @param response
+   * @return
+   * @throws WebRequestBadStatusException
+   * @throws IOException
+   */
+  public static JSONResponse identifyWhyGetRequestFailed(String requestStr,HttpServletRequest request,HttpServletResponse response) throws  WebRequestBadStatusException, IOException  {
+    JSONResponse jsonResponse = new JSONResponse();
+    ImpactUser user = null;
+    try {
+      user = getUser(request);
+    } catch (Exception e1) {
+    }
+    String msg="";
+    String redirectURL = null;
+    String currentURL = null;
+    try{
+      String certificateLocation = null;
+      if(user!=null){
+        if(user.certificateFile != null){
+          certificateLocation = user.certificateFile;
+        }
+      }
+  
+      try {
+        HTTPTools.makeHTTPGetRequest(requestStr,certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
+      } catch (IOException e) {
+         throw e;
+      }
+ 
+    }catch( javax.net.ssl.SSLPeerUnverifiedException e){
+      
+      msg="The peer is unverified (SSL unverified): "+e.getMessage();
+      Debug.errprintln(msg);
+      jsonResponse.setErrorMessage(msg,500);
+      return jsonResponse;
+    }catch(UnknownHostException e){
+      msg="The host is unknown: '"+e.getMessage()+"'\n";
+      Debug.errprintln(msg);
+      jsonResponse.setErrorMessage(msg,500);
+      return jsonResponse;
+    }catch(ConnectTimeoutException e) {
+      msg="The connection timed out: '"+e.getMessage()+"'\n";
+      Debug.errprintln(msg);
+      jsonResponse.setErrorMessage(msg,500);
+      return jsonResponse;
+    }catch(WebRequestBadStatusException e){
+      
+      if(e.getStatusCode()==400){
+        msg+="HTTP status code "+e.getStatusCode()+": Bad request\n";
+        if(user == null){
+          msg+="\nNote: you are not logged in.\n";
+        }
+      }else if(e.getStatusCode()==401){
+        msg+="Unauthorized (401)\n";
+        if(user == null){
+          msg+="\nNote: you are not logged in.\n";
+          String queryString = "";
+          if(request.getQueryString()!=null){
+            queryString = "?"+request.getQueryString();
+          }
+          currentURL = request.getRequestURL().toString()+queryString;
+          Debug.println("401:"+currentURL);
+          String redirURLEncoded = URLEncoder.encode(currentURL,"utf-8");
+        
+          redirectURL = LoginManager.getLoginPage()+"?redirect="+redirURLEncoded;
+          //Debug.println("msg: throwing WebRequestBadStatusException");
+          //throw e;
+        }
+      }else if(e.getStatusCode()==403){
+        msg+="Forbidden (403)\n";
+        if(user != null){
+          msg+="\nYou are not authorized to view this resource, you are logged in as "+user.getOpenId()+"\n";
+        }
+      }else if(e.getStatusCode()==404){
+        msg+="File not found (404)\n";
+        if(user != null){
+          msg+="\nYou are logged in as "+user.getOpenId()+"\n";
+        }
+      }else{
+        msg="WebRequestBadStatusException: "+e.getStatusCode()+"\n";
+      }
+      
+      Debug.errprintln(msg);
+      msg=msg.replaceAll("\n", "<br/>");
+      jsonResponse.setErrorMessage(msg,e.getStatusCode(),redirectURL,currentURL,null);
+    }
+    return jsonResponse;
+    
+  }
  
 }

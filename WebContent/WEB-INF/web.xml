@@ -116,4 +116,14 @@
     <servlet-name>DiskCache</servlet-name>
     <url-pattern>/DiskCache</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OAuth2Servlet</display-name>
+    <servlet-name>OAuth2Servlet</servlet-name>
+    <servlet-class>oauth2handling.OAuth2Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OAuth2Servlet</servlet-name>
+    <url-pattern>/oauth</url-pattern>
+  </servlet-mapping>
 </web-app>

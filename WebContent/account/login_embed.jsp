@@ -54,7 +54,7 @@ body,.x-body {
 	<div style="text-align: center">
 		<h1>You are signed in.</h1>
 		You have successfully signed in with the following OpenID:<br /> <br />
-		<strong><%=user.id%></strong><br /> <br />
+		<strong><%=user.getOpenId()%></strong><br /> <br />
 		<h1>This window will now close.</h1>
 	</div>
 

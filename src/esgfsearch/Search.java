@@ -103,7 +103,7 @@ public class Search {
     try {
       el.parseString(XML);
     } catch (Exception e1) {
-      r.setErrorMessage("Unable to parse XML");
+      r.setErrorMessage("Unable to parse XML",500);
       return r;
       // TODO Auto-generated catch block
       //e1.printStackTrace();
@@ -147,7 +147,7 @@ public class Search {
             }
           }
         }catch(Exception e){
-          r.setErrorMessage("No name attribute");
+          r.setErrorMessage("No name attribute",500);
           return r;
         }
       }
@@ -201,7 +201,7 @@ public class Search {
             }
           }
         }catch(Exception e){
-          r.setErrorMessage("No name attribute");
+          r.setErrorMessage("No name attribute",500);
           return r;
         }
       }

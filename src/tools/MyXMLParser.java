@@ -18,7 +18,6 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-
 import tools.HTTPTools.WebRequestBadStatusException;
 
 import org.json.JSONException;
@@ -510,6 +509,36 @@ public class MyXMLParser {
         return null;
       }
       return jsonObject;
+    }
+    public String getNodeValue(String string) {
+      
+      String [] values = getNodeValues(string);
+      if(values==null)return null;
+      return values[0];
+    }
+    public String[] getNodeValues(String string) {
+      //Debug.println("Get value for ["+string+"]");
+      String[] elements = string.split("\\.");
+      int j=0;
+      XMLElement a = this;
+      try{
+        while(j<elements.length-1){
+          //Debug.println("Getting "+elements[j] );
+          a = a.get(elements[j]);
+          j++;
+        };
+        //Debug.println("Getting "+elements[j] );
+        Vector<XMLElement> b = a.getList(elements[j]);
+        if(b.size()>0){
+          String[] results = new String[b.size()];
+          for(int i=0;i<b.size();i++){
+            results[i] = b.get(i).getValue();
+          }
+          return results;
+        }
+      } catch (Exception e) {
+      }
+      return null;
     }
   
 	};

@@ -22,7 +22,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
+import java.util.SortedSet;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -188,8 +188,22 @@ public class HTTPTools extends HttpServlet {
     return makeHTTPGetRequest(url, null, null, null);
   }
 
+  
+  public static String makeHTTPGetRequest(String url,KVPKey key)throws WebRequestBadStatusException, IOException{
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,key);
+  }
+  
   public static String makeHTTPGetRequest(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword)
+      String trustRootsFile, String trustRootsPassword,KVPKey key)throws WebRequestBadStatusException, IOException{
+    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,key);
+  }
+  
+  public static String makeHTTPGetRequest(String url, String pemFile,
+      String trustRootsFile, String trustRootsPassword)throws WebRequestBadStatusException, IOException{
+    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null);
+  }
+  private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
+      String trustRootsFile, String trustRootsPassword,KVPKey key)
       throws WebRequestBadStatusException, IOException {
     String connectToURL = makeCleanURL(url);
     Debug.println("  Making GET: " + connectToURL);
@@ -224,6 +238,15 @@ public class HTTPTools extends HttpServlet {
 
       HttpResponse response = null;
 
+      if(key!=null){
+        SortedSet<String> a = key.getKeys();
+        for(String b : a){
+          System.out.println("Adding header "+b+"="+key.getValue(b).firstElement());
+          httpget.addHeader(b,key.getValue(b).firstElement());
+        }
+        
+      }
+      
       response = httpclient.execute(httpget);
 
       HttpEntity entity = response.getEntity();
@@ -295,7 +318,7 @@ public class HTTPTools extends HttpServlet {
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
     Debug.println("Finished GET: " + connectToURL + " ("
         + (stopTimeInMillis - startTimeInMillis) + " ms)");
-    // DebugConsole.println("Retrieved "+result.length()+" bytes");
+    //Debug.println("Retrieved "+result.length()+" bytes");
     return result;
   }
 

@@ -5,12 +5,16 @@ import impactservice.LoginManager;
 import impactservice.ImpactUser;
 
 import java.io.OutputStream;
+import java.net.URLDecoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import tools.CGIRunner;
 import tools.Debug;
+import tools.HTTPTools;
+import tools.HTTPTools.WebRequestBadStatusException;
+import tools.JSONResponse;
 import tools.Tools;
 
 
@@ -28,16 +32,27 @@ public class AdagucServer {
    */
   public static void runADAGUCWMS(HttpServletRequest request,HttpServletResponse response,String queryString,OutputStream outputStream) throws Exception{
     String[] environmentVariables = Configuration.ADAGUCServerConfig.getADAGUCEnvironment();
-
+    
     //Try to get homedir, ignore if failed
     String userHomeDir="";
     try{
       ImpactUser user = LoginManager.getUser(request,response);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
-      Debug.println("WMS for user: "+user.id);
+      Debug.println("WMS for user: "+user.getId());
     }catch(Exception e){    
       Debug.println("Warning: Anonymous user: '"+e.getMessage()+"'");
+   
+        String source = HTTPTools.getKVPItemDecoded(URLDecoder.decode(queryString,"UTF-8"), "source");
+        if(source != null){
+          Debug.println("Checking reason for "+source);
+          JSONResponse reason = LoginManager.identifyWhyGetRequestFailed(source, request,response);
+          if(reason.getStatusCode()==401){
+            Debug.println("Redirecting to login page");
+            LoginManager.redirectToLoginPage(request,response);
+            return;
+          }
+        }
     }
     
 

@@ -2,11 +2,15 @@ package impactservice;
 
 
 
+import java.util.Vector;
+
 import tools.Debug;
-import tools.MyXMLReader;
+import tools.MyXMLParser;
+import tools.MyXMLParser.XMLElement;
 
 
 public class Configuration {
+
 
   static long readConfigPolInterval = 0;;
   
@@ -59,9 +63,9 @@ public class Configuration {
     }
     readConfigPolInterval=System.currentTimeMillis(); 
     Debug.println("Reading configfile "+getConfigFile());
-    MyXMLReader configReader = new MyXMLReader();
+    XMLElement configReader = new XMLElement();
     try {
-      configReader.parseXMLFile(getConfigFile());
+      configReader.parseFile(getConfigFile());
     } catch (Exception e) {
       Debug.println("Unable to read "+getConfigFile());
       configReader = null;
@@ -77,7 +81,7 @@ public class Configuration {
     ExpertContact.doConfig(configReader);
     ADAGUCServerConfig.doConfig(configReader);
     PyWPSServerConfig.doConfig(configReader);
-    
+    Oauth2Config.doConfig(configReader);
     configReader = null; 
   }
   
@@ -94,7 +98,7 @@ public class Configuration {
     public static String defaultUserInOfflineMode;
     
     //public static String getServerHomeURL(){readConfig();return serverURLHTTP;}
-    public static void doConfig(MyXMLReader configReader) {
+    public static void doConfig(XMLElement configReader) {
       serverURLHTTP = configReader.getNodeValue("impactportal.serverurl");
       serverURLHTTPS = configReader.getNodeValue("impactportal.serverurlhttps");
       offlineMode = configReader.getNodeValue("impactportal.offlinemode");
@@ -125,7 +129,7 @@ public class Configuration {
     private static String drupalBaseURL="<drupalbaseurl>";
     private static String drupalDirectory="<drupaldirectory>";
     private static String portalFilesLocation="http://climate4impact.eu/files/";
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       drupalHost=configReader.getNodeValue("impactportal.drupalconfig.drupalhost");
       drupalBaseURL=configReader.getNodeValue("impactportal.drupalconfig.drupalbaseurl");
       drupalDirectory=configReader.getNodeValue("impactportal.drupalconfig.drupaldirectory");
@@ -134,16 +138,79 @@ public class Configuration {
     public static String getDrupalHost(){readConfig();return drupalHost;}
     public static String getDrupalBaseURL(){readConfig();return drupalBaseURL;}
     public static String getDrupalDirectory(){readConfig();return drupalDirectory;}
-    public static String getPortalFilesLocation() {
-      return portalFilesLocation;
-      
+    public static String getPortalFilesLocation() {readConfig();return portalFilesLocation;}
+  }
+  
+  public static class Oauth2Config{
+    
+    public static class Oauth2Settings{
+      public String OAuthAuthLoc = null;
+      public String OAuthTokenLoc = null;
+      public String OAuthClientId = null;
+      public String OAuthClientSecret = null;
+      public String OAuthClientScope = null;
+      public String id = null;
+      public String getConfig() {
+        String config = "OAuthAuthLoc: "+OAuthAuthLoc+"\n";
+        config += "OAuthTokenLoc: "+OAuthTokenLoc+"\n";
+        config += "OAuthClientId: "+OAuthClientId+"\n";
+        config += "OAuthClientScope: "+OAuthClientScope+"\n";
+        return config;
+      }
+    }
+    
+    static Vector<Oauth2Settings> oauth2Providers = new Vector<Oauth2Settings>();
+    
+    static Oauth2Settings getOauthSetting(String id){
+      for(int j=0;j<oauth2Providers.size();j++){
+//        Debug.println("Iterating "+oauth2Providers.get(j).id);
+        if(oauth2Providers.get(j).id.equals(id))return oauth2Providers.get(j);
+      }
+      return null;
+    }
+    
+    public static void doConfig(XMLElement  configReader){
+      Vector<XMLElement> providers = null;
+      try {
+        providers = configReader.get("impactportal").get("oauth2").getList("provider");
+      } catch (Exception e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      if(providers == null){
+        Debug.errprintln("No Oauth2 providers configured");
+        return;
+      }
+      for(int j=0;j<providers.size();j++){
+        XMLElement provider = providers.get(j);
+       
+        try {
+          Oauth2Settings oauthSetting = new Oauth2Settings();
+          oauthSetting.id = provider.getAttrValue("name");
+          oauthSetting.OAuthAuthLoc = provider.get("authloc").getValue();
+          oauthSetting.OAuthTokenLoc = provider.get("tokenloc").getValue();
+          oauthSetting.OAuthClientId = provider.get("clientid").getValue();
+          oauthSetting.OAuthClientSecret = provider.get("clientsecret").getValue();
+          oauthSetting.OAuthClientScope = provider.get("scope").getValue();
+          oauth2Providers.add(oauthSetting);
+          Debug.println("Found Oauth2 provider "+oauthSetting.id);
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    }
+    
+    public static Oauth2Settings getOAuthSettings(String id) {
+      readConfig();
+      return getOauthSetting(id);
     }
   }
   
   public static class VercSearchConfig{
     private static String __deprecated_vercSearchURL="<deprecated>";
     private static String esgfSearchURL="<esgfSearchURL>";
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       __deprecated_vercSearchURL=configReader.getNodeValue("impactportal.searchconfig.vercsearchurl");
       esgfSearchURL=configReader.getNodeValue("impactportal.searchconfig.esgfsearchurl");
     }
@@ -162,7 +229,7 @@ public class Configuration {
     // myProxyDefaultUserName should be null, because in that case the openid identifier from the current user is used.
     // It can be set to override a custom username, e.g. in case of testing on a workstation.
     private static String myProxyDefaultUserName = null;
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       myProxyServerHost=configReader.getNodeValue("impactportal.loginconfig.myproxyserverhost");
       myProxyServerPort=Integer.parseInt(configReader.getNodeValue("impactportal.loginconfig.myproxyserverport"));
       trustStoreFile=configReader.getNodeValue("impactportal.loginconfig.truststorefile");
@@ -190,7 +257,7 @@ public class Configuration {
   public static class ExpertContact{
     static String[] addresses={};
     
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       addresses = configReader.getNodeValue("impactportal.expertcontact.mailaddresses").split(",");
     }
     
@@ -206,7 +273,7 @@ public class Configuration {
     private static String[] environmentVariables = {
         };
     
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       ADAGUCExecutable=configReader.getNodeValue("impactportal.adagucserverconfig.adagucexecutable");
       environmentVariables = configReader.getNodeValues("impactportal.adagucserverconfig.exportenvironment");
     }
@@ -229,7 +296,7 @@ public class Configuration {
     
     private static String[] environmentVariables = { };
     
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement  configReader){
       PyWPSExecutable=configReader.getNodeValue("impactportal.pywpsconfig.pywpsexecutable");
       
       environmentVariables = configReader.getNodeValues("impactportal.pywpsconfig.exportenvironment");

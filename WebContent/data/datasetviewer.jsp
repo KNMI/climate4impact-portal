@@ -2,48 +2,47 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
 	  <%
-		//Automatically redirect to the catalogbrowser if accidently a catalog was given
-		try{
-			String a=HTTPTools.getHTTPParam(request, "dataset");
-			if(a==null)a=HTTPTools.getHTTPParam(request,"catalog") ;
-			if(a!=null){
-				if(a.length()>0){
-					String catalogURL = URLDecoder.decode(a,"UTF-8");
-					if(catalogURL.indexOf(".xml")>catalogURL.length()-7||catalogURL.indexOf("catalog.html")!=-1){
-					    String redirectURL = "/impactportal/data/catalogbrowser.jsp?catalog="+a;
-					    response.sendRedirect(redirectURL);
-					}
-				}
-			}
-		}catch(Exception e){
-			MessagePrinters.emailFatalErrorException("XSS encountered at datasetviewer.jsp", e);
-		}
-		
-		String dataset = null;
-  		try{
-  			dataset = HTTPTools.getHTTPParam(request, "dataset");
-  		}catch(Exception e){}
-		String dapURL = "undefined";
-		if(dataset!=null){
-			dataset = URLDecoder.decode(dataset,"UTF-8");
-			dataset=dataset.replace("thredds/fileServer","thredds/dodsC");
-			dapURL = dataset.split("\\|")[0];
-			dapURL = dapURL.split("\\#")[0];
-			int inda = dapURL.indexOf(".nc.html");
-			if(inda>0){
-			  dapURL = dapURL.substring(0,inda+3);
-			}
-		}
-		
-		ImpactUser user = null;
-		String openid="";
-		try{
-			user = LoginManager.getUser(request);
-			openid = user.id;
-		}catch(Exception e){
-		
-		}
-		
+	  	//Automatically redirect to the catalogbrowser if accidently a catalog was given
+	  	  		try{
+	  	  	String a=HTTPTools.getHTTPParam(request, "dataset");
+	  	  	if(a==null)a=HTTPTools.getHTTPParam(request,"catalog") ;
+	  	  	if(a!=null){
+	  	  		if(a.length()>0){
+	  	  			String catalogURL = URLDecoder.decode(a,"UTF-8");
+	  	  			if(catalogURL.indexOf(".xml")>catalogURL.length()-7||catalogURL.indexOf("catalog.html")!=-1){
+	  	  			    String redirectURL = "/impactportal/data/catalogbrowser.jsp?catalog="+a;
+	  	  			    response.sendRedirect(redirectURL);
+	  	  			}
+	  	  		}
+	  	  	}
+	  	  		}catch(Exception e){
+	  	  	MessagePrinters.emailFatalErrorException("XSS encountered at datasetviewer.jsp", e);
+	  	  		}
+	  	  		
+	  	  		String dataset = null;
+	  	    		try{
+	  	    			dataset = HTTPTools.getHTTPParam(request, "dataset");
+	  	    		}catch(Exception e){}
+	  	  		String dapURL = "undefined";
+	  	  		if(dataset!=null){
+	  	  	dataset = URLDecoder.decode(dataset,"UTF-8");
+	  	  	dataset=dataset.replace("thredds/fileServer","thredds/dodsC");
+	  	  	dapURL = dataset.split("\\|")[0];
+	  	  	dapURL = dapURL.split("\\#")[0];
+	  	  	int inda = dapURL.indexOf(".nc.html");
+	  	  	if(inda>0){
+	  	  	  dapURL = dapURL.substring(0,inda+3);
+	  	  	}
+	  	  		}
+	  	  		
+	  	  		ImpactUser user = null;
+	  	  		String openid="";
+	  	  		try{
+	  	  	user = LoginManager.getUser(request);
+	  	  	openid = user.getOpenId();
+	  	  		}catch(Exception e){
+	  	  		
+	  	  		}
 	  %>
   
     <jsp:include page="../includes-ext.jsp" />

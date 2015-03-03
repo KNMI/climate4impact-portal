@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"
-	import="impactservice.ImpactService,tools.Debug,impactservice.LoginManager,impactservice.ImpactUser,impactservice.MessagePrinters"
+	import="impactservice.ImpactService,tools.Debug,impactservice.LoginManager,impactservice.ImpactUser,impactservice.MessagePrinters,java.net.URLDecoder"
 	import="javax.servlet.http.*" import="javax.servlet.http.Cookie"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,8 +51,20 @@
 	</div>
 
 	<%
+	
+				String redirectURL = request.getParameter("redirect");
+				if(redirectURL!=null){
+					redirectURL = URLDecoder.decode(redirectURL,"utf-8");
+					request.getSession().setAttribute("redirect", redirectURL);
+				}
 			} else {
-
+				String redirectURL = (String)request.getSession().getAttribute("redirect");
+				if(redirectURL!=null){
+					redirectURL = URLDecoder.decode(redirectURL,"utf-8");
+					response.sendRedirect(redirectURL);
+					request.getSession().removeAttribute("redirect");
+					return;
+				}
 				//Print menu structure
 		%>
 	<jsp:include page="loginmenu.jsp" />
@@ -63,9 +75,13 @@
 			<div class="breadcrumb"><a href="login.jsp">Account</a> » Account </div>
 			<div class="cmscontent">
 			<h1>You are signed in</h1>
+			<%
+			%>
+			
+			
 			<div class="textstandardleft">
 				
-				Your OpenId is:<br/><strong><%=user.id%></strong><br /><br/>
+				Your ESGF OpenId Identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
 				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
 				
 				 <b>Actions:</b>
@@ -79,9 +95,9 @@
 	
 
 	<%
-					//Print warning when retrieving SLCS has failed.
+			//Print warning when retrieving SLCS has failed.
 						try {
-							impactservice.LoginManager.checkLogin(user.id,request);
+							impactservice.LoginManager.checkLogin(user.getId(),request);
 						} catch (Exception e) {
 							impactservice.MessagePrinters.printWarningMessage(out, e);
 						}
@@ -90,17 +106,18 @@
 		</div>
 	</div>
 	<%
-
-					}
-				%>
-
+		}
+	%>
 
 
-	<% if(user!=null){ %>
+
+	<%
+		if(user!=null){
+	%>
 	<script type="">
 				var accountInfo = '';
 					try{
-						accountInfo = getOpenIDProviderFromOpenId('<%=user.id%>').accountinfo;
+						accountInfo = getOpenIDProviderFromOpenId('<%=user.getOpenId()%>').accountinfo;
 					}catch(e){}
 					$('#accountinfo').html('<a href="'+accountInfo+'">'+accountInfo+'</a>');
 				</script>

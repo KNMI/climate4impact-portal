@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 
 
 
-public class MyXMLReader {
+public class MyXMLReaderDeprecated {
 	private String XMLFileName = null;
 	private Config config = null;
   private Document doc = null;

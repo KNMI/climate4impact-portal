@@ -33,7 +33,7 @@ public class GenericCart {
   private  String genericId = "";
   
   public  GenericCart(String id,ImpactUser user){
-    Debug.println("Creating new GenericCart with id "+id+" for user "+user.id);
+    Debug.println("Creating new GenericCart with id "+id+" for user "+user.getId());
     this.genericId=id;
     this.user=user;
     
@@ -220,7 +220,7 @@ public class GenericCart {
      */
     public static String showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
       Debug.println("Show joblist");
-      String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).id+"</strong><br/>\n";
+      String htmlResp = "Jobs for: <strong>"+LoginManager.getUser(request,null).getUserName()+"</strong><br/>\n";
       htmlResp += "<table class=\"basket\">\n";
       Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
       int j=1;
@@ -421,7 +421,7 @@ public class GenericCart {
    
    JSONArray datasets = new JSONArray();
    datasetList.put("children", datasets);
-   datasetList.put("text", genericCart.user.id);
+   datasetList.put("text", genericCart.user.getOpenId());
    datasetList.put("leaf", false);
    datasetList.put("viewer", "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?");
    datasetList.put("browser", "/"+Configuration.getHomeURLPrefix()+"/data/catalogbrowser.jsp?");

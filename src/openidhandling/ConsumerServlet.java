@@ -199,6 +199,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			req.setAttribute("identifier", identifier.getIdentifier());
 			//req.setAttribute("email", identifier.getIdentifier());
 			req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());
+			req.getSession().setAttribute("user_identifier",identifier.getIdentifier());
 		}else{
 		  Debug.println("Validation is INVALID");
 		}

@@ -408,7 +408,7 @@ public class ImpactService extends HttpServlet {
           
           String openid = null;
           try{
-            openid= LoginManager.getUser(request).id;
+            openid= LoginManager.getUser(request).getOpenId();
           }catch(Exception e){            
           }
           html+=buildHTML(treeElements,"",0,openid)+"</table></div>";

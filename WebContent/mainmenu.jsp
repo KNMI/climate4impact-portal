@@ -79,8 +79,8 @@
 			        //currentDataPage=pageName;
 		//}
 		if(highLightLogin){
-			        session.setAttribute( "currentloginpage", pageName);
-			        currentLoginPage=pageName;
+			        //session.setAttribute( "currentloginpage", pageName);
+			        //currentLoginPage=pageName;
 		}
 		  	}
 			//if(currentDataPage==null||currentDataPage.equals("null"))currentDataPage="/data/index.jsp";

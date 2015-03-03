@@ -1,7 +1,6 @@
 package downscaling;
 
 import impactservice.Configuration;
-import impactservice.LoginManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,10 +13,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

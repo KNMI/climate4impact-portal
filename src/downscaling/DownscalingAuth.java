@@ -22,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.HttpResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 

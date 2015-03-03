@@ -361,7 +361,7 @@ div.cmscontent p {
 }
 
 div.bodycontent {
-	z-index: 1000;
+	z-index: 100;
 	width: 960px;
 	margin-top: 4px;
 	padding-bottom: 10px;
@@ -1497,7 +1497,7 @@ table.usecases {
 	width: 200px;
 	height: 150px;
 	border: none;
-	z-index: 2000;
+	z-index: 200;
 	display: block;
 	padding: 0px;
 	margin: 0px;
@@ -2498,4 +2498,15 @@ a img {
 	  background-image: url("images/ajax-loader.gif");
 	  width:32px;
 	  height:32px;
+}
+
+
+
+.oauth2loginbox{
+	 line-height: 40px;
+}
+.oauth2loginbox img{
+	vertical-align: middle;
+	width:40px;
+	height:40px;
 }

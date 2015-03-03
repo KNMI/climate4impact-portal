@@ -15,9 +15,9 @@ try{
     <p>
     &#160;
     <%
-    if(user!=null){
-    	out.print("You are logged in as "+user.id);
-    }
+    	if(user!=null){
+            	out.print("You are logged in as "+user.getUserName());
+            }
     %>
     </p>
   </div> 

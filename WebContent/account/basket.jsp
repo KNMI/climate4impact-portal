@@ -94,7 +94,7 @@
 			
 			%>
 			<script type="text/javascript">
-				openid = '<%=user.id%>';
+				openid = '<%=user.getOpenId()%>';
 			</script>
 			<div id="basketwidget"></div>
 			<%
