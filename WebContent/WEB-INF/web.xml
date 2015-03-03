@@ -23,7 +23,7 @@
     <description></description>
     <display-name>DownscalingService</display-name>
     <servlet-name>DownscalingService</servlet-name>
-    <servlet-class>downscaling.DownscalingService</servlet-class>
+    <servlet-class>impactservice.DownscalingService</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>DownscalingService</servlet-name>
@@ -38,6 +38,36 @@
   <servlet-mapping>
     <servlet-name>ConsumerServlet</servlet-name>
     <url-pattern>/consumer</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetHTTPUrl</display-name>
+    <servlet-name>GetHTTPUrl</servlet-name>
+    <servlet-class>tools.DoHTTPRequest</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetHTTPUrl</servlet-name>
+    <url-pattern>/get</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ProxyHTTPRequest</display-name>
+    <servlet-name>ProxyHTTPRequest</servlet-name>
+    <servlet-class>tools.ProxyHTTPRequest</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ProxyHTTPRequest</servlet-name>
+    <url-pattern>/proxy</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>OpenIdReturn</display-name>
+    <servlet-name>OpenIdReturn</servlet-name>
+    <servlet-class>openidhandling.OpenIdReturn</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OpenIdReturn</servlet-name>
+    <url-pattern>/OpenIdReturn</url-pattern>
   </servlet-mapping>
   <error-page>
     <error-code>404</error-code>
@@ -98,23 +128,13 @@
   </security-constraint>
   <servlet>
     <description></description>
-    <display-name>ESGFSearchServlet</display-name>
-    <servlet-name>ESGFSearchServlet</servlet-name>
-    <servlet-class>esgfsearch.ESGFSearchServlet</servlet-class>
+    <display-name>GetDownloadScriptHandler</display-name>
+    <servlet-name>GetDownloadScriptHandler</servlet-name>
+    <servlet-class>impactservice.GetDownloadScriptHandler</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ESGFSearchServlet</servlet-name>
-    <url-pattern>/esgfsearch</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>DiskCache</display-name>
-    <servlet-name>DiskCache</servlet-name>
-    <servlet-class>esgfsearch.DiskCache</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DiskCache</servlet-name>
-    <url-pattern>/DiskCache</url-pattern>
+    <servlet-name>GetDownloadScriptHandler</servlet-name>
+    <url-pattern>/GetDownloadScriptHandler</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>

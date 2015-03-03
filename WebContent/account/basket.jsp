@@ -21,6 +21,8 @@
     var impactService=impactBase+'ImpactService?';
     var task;
     var openid = "";
+    var serverurl = "";
+    var serverurlhttps = "";
     var removeId = function(id){
     	
     	var passFn = function(e){
@@ -95,8 +97,11 @@
 			%>
 			<script type="text/javascript">
 				openid = '<%=user.getOpenId()%>';
+				serverurl = '<%=Configuration.getHomeURLHTTP()%>';
+				serverurlhttps = '<%=Configuration.getHomeURLHTTPS()%>';
 			</script>
 			<div id="basketwidget"></div>
+			<div class="iframeshere"></div>
 			<%
 
 		}

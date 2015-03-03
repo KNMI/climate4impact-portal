@@ -2300,9 +2300,10 @@ input[type=button],input[type=submit]:active {
 	top:1px;
 }
 
-input[type=text],textarea {
+input[type=text],input[type="password"],textarea {
 	border-radius: 3px;
 }
+
 
 .alnright {
 	text-align: right;

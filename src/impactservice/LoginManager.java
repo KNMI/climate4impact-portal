@@ -96,7 +96,21 @@ public class LoginManager {
     }
     
 
-   
+    //Retrieve myproxy service info from openID URL
+    
+    user.userMyProxyService = null;
+    //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
+    XMLElement xmlParser = new XMLElement();
+    xmlParser.parse(new URL(user.id));
+    Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
+    for(XMLElement service : services){
+      if(service.get("Type").getValue().indexOf("myproxy")!=-1){
+        Debug.println("myproxyservice: "+service.get("URI").getValue());
+        user.userMyProxyService = service.get("URI").getValue();
+      }
+    }
+    
+    
 
     
     
