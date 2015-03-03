@@ -44,7 +44,7 @@
             <tr>
               <td class="collapsibletitle">User name (OpenID):</td>
               <td><input id="openid" type="text" size="50"
-                name="openid" value="<%=user.id%>"></input><br /></td>
+                name="openid" value="<%=user.getOpenId()%>"></input><br /></td>
             </tr>
           </tbody>
         </table>

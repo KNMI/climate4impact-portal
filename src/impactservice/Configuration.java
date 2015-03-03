@@ -5,7 +5,6 @@ package impactservice;
 import java.util.Vector;
 
 import tools.Debug;
-import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
 
 
@@ -318,7 +317,7 @@ public class Configuration {
   public static class DownloadScriptConfig{
     private static String downloadScriptTemplate="";
     
-    public static void doConfig(MyXMLReader configReader){
+    public static void doConfig(XMLElement configReader){
       downloadScriptTemplate=configReader.getNodeValue("impactportal.downloadscriptconfig.downloadscripttemplate");
     }
     

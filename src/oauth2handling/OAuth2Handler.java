@@ -166,6 +166,7 @@ public class OAuth2Handler {
    * @throws NoSuchAlgorithmException
    * @throws InvalidKeySpecException
    */
+  @SuppressWarnings("unused")
   private static boolean verify_JWT_IdToken(String id_token) throws JSONException, WebRequestBadStatusException, IOException, SignatureException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
     //  http://self-issued.info/docs/draft-jones-json-web-token-01.html#DefiningRSA
     //  The JWT Signing Input is always the concatenation of a JWT Header Segment, a period ('.') character, and the JWT Payload Segment

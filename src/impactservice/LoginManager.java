@@ -99,14 +99,16 @@ public class LoginManager {
     //Retrieve myproxy service info from openID URL
     
     user.userMyProxyService = null;
-    //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
-    XMLElement xmlParser = new XMLElement();
-    xmlParser.parse(new URL(user.id));
-    Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
-    for(XMLElement service : services){
-      if(service.get("Type").getValue().indexOf("myproxy")!=-1){
-        Debug.println("myproxyservice: "+service.get("URI").getValue());
-        user.userMyProxyService = service.get("URI").getValue();
+    if(user.getOpenId() != null){
+      //String data2 = HTTPTools.makeHTTPGetRequest(user.id);
+      XMLElement xmlParser = new XMLElement();
+      xmlParser.parse(new URL(user.getOpenId()));
+      Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
+      for(XMLElement service : services){
+        if(service.get("Type").getValue().indexOf("myproxy")!=-1){
+          Debug.println("myproxyservice: "+service.get("URI").getValue());
+          user.userMyProxyService = service.get("URI").getValue();
+        }
       }
     }
     
@@ -249,21 +251,7 @@ public class LoginManager {
     //Debug.println("id == "+id);
     if(id == null){
       throw new Exception("You are not logged in...");
-      //return null;
-//      response.setStatus(401);
-//      
-//      String queryString = "";
-//      if(request.getQueryString()!=null){
-//        queryString = "?"+request.getQueryString();
-//      }
-//      String redirURL = request.getRequestURL().toString()+queryString;
-//      Debug.println("401:"+redirURL);
-//      String redirURLEncoded = URLEncoder.encode(redirURL,"utf-8");
-//      
-//      response.sendRedirect("/impactportal/account/login.jsp?redirect="+redirURLEncoded);
     }
-    //DebugConsole.println("Getting user from session with id "+id);
-    if(id == null)throw new Exception("You are not logged in...");
     ImpactUser user = getUser(id,request);
     return user;
   }

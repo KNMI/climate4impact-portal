@@ -1,23 +1,18 @@
 package impactservice;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,7 +24,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
@@ -80,7 +74,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
     }catch(Exception e){
       user = null;
     }
-    System.err.println("user:"+user.id);
+    System.err.println("user:"+user.getOpenId());
     String urls=request.getParameter("urls");
     String openid=request.getParameter("openid");
     String password=request.getParameter("password");
@@ -93,7 +87,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
       } catch (GetCredentialsException e) {
         response.setContentType("text/html");
         ServletOutputStream os=response.getOutputStream();
-        os.print("Error retrieving download credentials for user "+user.id+" because:"+e.getMessage());
+        os.print("Error retrieving download credentials for user "+user.getOpenId()+" because:"+e.getMessage());
         os.close();
         return;
       }
@@ -138,47 +132,47 @@ public class GetDownloadScriptHandler extends HttpServlet {
     return crt;
   }
 
-  private static PrivateKey loadPrivateKey(String fileName) 
-      throws IOException, GeneralSecurityException {
-    PrivateKey key = null;
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
-      StringBuilder builder = new StringBuilder();
-      boolean inKey = false;
-      for (String line = br.readLine(); line != null; line = br.readLine()) {
-        if (!inKey) {
-          if (line.startsWith("-----BEGIN ") && 
-              line.endsWith(" PRIVATE KEY-----")) {
-            inKey = true;
-          }
-          continue;
-        }
-        else {
-          if (line.startsWith("-----END ") && 
-              line.endsWith(" PRIVATE KEY-----")) {
-            inKey = false;
-            break;
-          }
-          builder.append(line);
-        }
-      }
-      //
-      byte[] encoded = DatatypeConverter.parseBase64Binary(builder.toString());
-      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-      KeyFactory kf = KeyFactory.getInstance("RSA");
-      key = kf.generatePrivate(keySpec);
-    } finally {
-      //      System.err.println("Error with cert "+fileName);
-      closeSilent(br);
-    }
-    return key;
-  }
+//  private static PrivateKey loadPrivateKey(String fileName) 
+//      throws IOException, GeneralSecurityException {
+//    PrivateKey key = null;
+//    BufferedReader br = null;
+//    try {
+//      br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+//      StringBuilder builder = new StringBuilder();
+//      boolean inKey = false;
+//      for (String line = br.readLine(); line != null; line = br.readLine()) {
+//        if (!inKey) {
+//          if (line.startsWith("-----BEGIN ") && 
+//              line.endsWith(" PRIVATE KEY-----")) {
+//            inKey = true;
+//          }
+//          continue;
+//        }
+//        else {
+//          if (line.startsWith("-----END ") && 
+//              line.endsWith(" PRIVATE KEY-----")) {
+//            inKey = false;
+//            break;
+//          }
+//          builder.append(line);
+//        }
+//      }
+//      //
+//      byte[] encoded = DatatypeConverter.parseBase64Binary(builder.toString());
+//      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+//      KeyFactory kf = KeyFactory.getInstance("RSA");
+//      key = kf.generatePrivate(keySpec);
+//    } finally {
+//      //      System.err.println("Error with cert "+fileName);
+//      closeSilent(br);
+//    }
+//    return key;
+//  }
 
-  private static void closeSilent(final BufferedReader br) {
-    if (br == null) return;
-    try { br.close(); } catch (Exception ign) {}
-  }
+//  private static void closeSilent(final BufferedReader br) {
+//    if (br == null) return;
+//    try { br.close(); } catch (Exception ign) {}
+//  }
 
   private static void closeSilent(final InputStream is) {
     if (is == null) return;
@@ -197,10 +191,10 @@ public class GetDownloadScriptHandler extends HttpServlet {
     return pubkey.getNotAfter();
   }
 
-  private String getCredentialsFromSession(ImpactUser user, String openid, String password) throws IOException {
-    byte[] credentials_encoded=Files.readAllBytes(Paths.get(user.getWorkspace()+"certs/"+"creds.pem"));
-    return new String(credentials_encoded);
-  }
+//  private String getCredentialsFromSession(ImpactUser user, String openid, String password) throws IOException {
+//    byte[] credentials_encoded=Files.readAllBytes(Paths.get(user.getWorkspace()+"certs/"+"creds.pem"));
+//    return new String(credentials_encoded);
+//  }
 
   private String getCredentials(ImpactUser user, String openid, String password) throws GetCredentialsException  {
     URI myproxyURL;
@@ -208,12 +202,21 @@ public class GetDownloadScriptHandler extends HttpServlet {
     String msg=null;
     try {
       myproxyURL = new URI(user.userMyProxyService);
-//      MyProxy myProxy = new MyProxy(myproxyURL.getHost(), myproxyURL.getPort());
-      MyProxy myProxy = new MyProxy("bvlpenes.knmi.nl", myproxyURL.getPort());
-      cred = (ExtendedGSSCredential) myProxy.get(openid, password, 60*60*24*7);
+      MyProxy myProxy = new MyProxy(myproxyURL.getHost(), myproxyURL.getPort());
+      boolean useInternal =  false;
+      if(useInternal == true){
+//      MyProxy myProxy = new MyProxy("bvlpenes.knmi.nl", myproxyURL.getPort());
+        cred = (ExtendedGSSCredential) myProxy.get(openid, password, 60*60*24*7);
+      }else{
+        String username = openid.substring(openid.lastIndexOf("/")+1);
+        Debug.println("Using Proxy URL ["+myproxyURL.getHost()+"] with port ["+myproxyURL.getPort()+"] for username ["+username+"]");
+        cred = (ExtendedGSSCredential) myProxy.get(username, password, 60*60*24*7);
+      }
+      
     } catch (MyProxyException e) {
       msg="MyProxy get failed with host "+user.userMyProxyService;
       Debug.println(msg);
+      Debug.printStackTrace(e);
       throw new GetCredentialsException(msg);
     } catch (URISyntaxException e) {
       msg="URI parse error: "+user.userMyProxyService;

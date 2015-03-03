@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+SKIPCERTCHECK="--no-check-certificate"
+EXTRAWGETARGS=""
+DOWNLOADDIRECTORY="."
+#
+TEMPCERT=/tmp/cert$$
+cat >$TEMPCERT <<EOCERT
+|CREDENTIALS|
+EOCERT
+#
+#
+OPENID="|OPENID|"
+#
+#
+read -r -d '' FILELIST <<'EOFILES'
+|URLS|
+EOFILES
+
+for f in $FILELIST; do
+  outfile="${DOWNLOADDIRECTORY}/`basename $f`"
+#  echo wget $SKIPCERTCHECK --certificate $TEMPCERT --private-key $TEMPCERT -O $outfile "$f?openid=$OPENID"
+  echo "Getting $outfile from $f"
+  wget $SKIPCERTCHECK --certificate $TEMPCERT --private-key $TEMPCERT -O $outfile "$f?openid=$OPENID"
+  if [ $? -gt 0 ]; then
+    echo "Download of $f failed"
+  fi
+done
+#
+date
+#
+echo "VALID_UNTIL: |VALID_UNTIL|"
+
+rm -f $TEMPCERT

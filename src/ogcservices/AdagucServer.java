@@ -1,8 +1,8 @@
 package ogcservices;
 
 import impactservice.Configuration;
-import impactservice.LoginManager;
 import impactservice.ImpactUser;
+import impactservice.LoginManager;
 
 import java.io.OutputStream;
 import java.net.URLDecoder;
@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import tools.CGIRunner;
 import tools.Debug;
 import tools.HTTPTools;
-import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONResponse;
 import tools.Tools;
 

@@ -1,10 +1,7 @@
 package tools;
 
-import org.apache.commons.lang3.reflect.TypeUtilsTest.This;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import tools.Debug;
 
 public class JSONResponse {
   private String message = "";
