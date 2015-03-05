@@ -260,22 +260,25 @@ public class THREDDSCatalogBrowser {
               if(variableFilter.length()>0){
                 put=false;
                 JSONArray variableList=variables;
-              
-                for(int v=0;v<variableList.length();v++){
-                  try{
-                    if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
-                      put=true;
-                      break;
+                if(variableList.length() == 0){
+                  put = true;
+                }else{
+                  for(int v=0;v<variableList.length();v++){
+                    try{
+                      if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
+                        put=true;
+                        break;
+                      }
+                    }catch(Exception e){
                     }
-                  }catch(Exception e){
                   }
                 }
                 //if(variableList.length()==0)put=true;
-                if(variableList.length()==0){
-                  Debug.println(leaf.getString("text")+" - "+c.length());
-                 // if(a!=null)put=true;
-                        
-                }
+//                if(variableList.length()==0){
+//                  Debug.println(leaf.getString("text")+" - "+c.length());
+//                 // if(a!=null)put=true;
+//                        
+//                }
               }
             }catch(Exception e){
               Debug.errprintln(e.getMessage());

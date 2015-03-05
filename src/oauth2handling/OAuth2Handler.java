@@ -386,7 +386,7 @@ public static String verifyAndReturnUserIdentifier(HttpServletRequest request) t
     if(userSubject == null)return null;
 
     String user_identifier = aud+"/"+userSubject;
-    String user_openid = null;//"https://esg-dn1.nsc.liu.se/esgf-idp/openid/maartenplieger";
+    String user_openid = null;
     request.getSession().setAttribute("openid_identifier",user_openid);
     request.getSession().setAttribute("user_identifier",user_identifier);
     
