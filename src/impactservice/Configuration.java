@@ -85,10 +85,22 @@ public class Configuration {
     configReader = null; 
   }
   
-  
-  public static String getEmailToSendFatalErrorMessages(){
-    return "plieger@knmi.nl";
+  public static class Admin{
+    static String[] addresses={};
+    
+    public static void doConfig(XMLElement  configReader){
+      addresses = configReader.getNodeValue("impactportal.admin.mailaddresses").split(",");
+    }
+    
+    public static String[] getEmailAddresses(){
+       readConfig();return  addresses;
+    }
   }
+  
+//  public static String getEmailToSendFatalErrorMessages(){
+//     configReader.getNodeValue("impactportal.expertcontact.mailaddresses").split(",");
+//    return "plieger@knmi.nl";
+//  }
   
   public static class GlobalConfig{
     private static String serverURLHTTP="";

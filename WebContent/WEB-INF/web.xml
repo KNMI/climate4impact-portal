@@ -146,4 +146,14 @@
     <servlet-name>OAuth2Servlet</servlet-name>
     <url-pattern>/oauth</url-pattern>
   </servlet-mapping>
+   <servlet>
+    <description></description>
+    <display-name>ESGFSearchServlet</display-name>
+    <servlet-name>ESGFSearchServlet</servlet-name>
+    <servlet-class>esgfsearch.ESGFSearchServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ESGFSearchServlet</servlet-name>
+    <url-pattern>/esgfsearch</url-pattern>
+  </servlet-mapping>
 </web-app>

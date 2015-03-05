@@ -16,13 +16,13 @@ public class MessagePrinters {
   }
   public static void emailFatalErrorException(String subject,Exception exception) throws IOException{
     try {
-      String[] to={Configuration.getEmailToSendFatalErrorMessages()};
+      String[] to=Configuration.Admin.getEmailAddresses();
       final Writer result = new StringWriter();
       final PrintWriter printWriter = new PrintWriter(result);
       exception.printStackTrace(printWriter);
       String msg=exception.getMessage()+"\n\n"+result.toString();
       Debug.errprintln(msg);
-      SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT:"+subject+"]", msg);
+      SendMail.sendMail(to,"c4i@climate4impact.eu","[CLIMATE4IMPACT:"+subject+"]", msg);
       
     } catch (Exception e) {
       Debug.errprintln(e.getMessage());
@@ -31,13 +31,13 @@ public class MessagePrinters {
   }
   public static void emailFatalErrorException(String subject,Throwable exception) throws IOException{
     try {
-      String[] to={Configuration.getEmailToSendFatalErrorMessages()};
+      String[] to=Configuration.Admin.getEmailAddresses();
       final Writer result = new StringWriter();
       final PrintWriter printWriter = new PrintWriter(result);
       exception.printStackTrace(printWriter);
       String msg=exception.getMessage()+"\n\n"+result.toString();
       Debug.errprintln(msg);
-      SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT:"+subject+"]", msg);
+      SendMail.sendMail(to,"c4i@climate4impact.eu","[CLIMATE4IMPACT:"+subject+"]", msg);
       
     } catch (Exception e) {
       Debug.errprintln(e.getMessage());
@@ -47,9 +47,9 @@ public class MessagePrinters {
   
   public static void emailFatalErrorMessage(String subject,String message) throws IOException{
     try {
-      String[] to={Configuration.getEmailToSendFatalErrorMessages()};
+      String[] to=Configuration.Admin.getEmailAddresses();
       Debug.errprintln(message);
-      SendMail.sendMail(to,Configuration.getEmailToSendFatalErrorMessages(),"[CLIMATE4IMPACT: FATAL ERROR]: "+subject, message);
+      SendMail.sendMail(to,"c4i@climate4impact.eu","[CLIMATE4IMPACT: FATAL ERROR]: "+subject, message);
       
     } catch (Exception e) {
       Debug.errprintln(e.getMessage());

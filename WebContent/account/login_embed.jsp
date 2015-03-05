@@ -65,11 +65,11 @@ body,.x-body {
 
 	<%
 		//Print warning when retrieving SLCS has failed.
-			/*try {
-				impactservice.LoginManager.checkLogin(user.id);
+			try {
+				impactservice.LoginManager.checkLogin(user.getId(),request);
 			} catch (Exception e) {
 				impactservice.MessagePrinters.printWarningMessage(out, e);
-			}*/
+			}
 		}
 	%>
 
