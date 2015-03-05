@@ -500,5 +500,13 @@ public class LoginManager {
     return jsonResponse;
     
   }
+  
+  
+  static public void logout(HttpServletRequest request){
+    request.getSession().setAttribute("access_token",null);
+    request.getSession().setAttribute("openid_identifier",null);
+    request.getSession().setAttribute("user_identifier",null);
+    request.getSession().setAttribute("email",null);
+  }
  
 }

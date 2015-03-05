@@ -29,7 +29,7 @@ public class OAuth2Servlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	  Debug.println(request.getQueryString());
+	  //Debug.println(request.getQueryString());
 	  if(request.getQueryString()==null){
 	    try {
         OAuth2Handler.getCode(request,response);

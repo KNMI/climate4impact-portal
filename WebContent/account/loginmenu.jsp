@@ -31,6 +31,7 @@
 		boolean highlightBasket = false,highlightAccount = false;
 		if(pageName.indexOf("basket.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("upload.jsp")!=-1)highlightBasket = true;
+		if(pageName.indexOf("downloadscript.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("fileuploadresult")!=-1)highlightBasket = true;
 		
 		if(pageName.indexOf("login.jsp")!=-1)highlightAccount = true;

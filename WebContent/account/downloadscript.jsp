@@ -35,45 +35,43 @@
 %>
   <jsp:include page="loginmenu.jsp" />
   <div class="impactcontent">
-    <h1>Get script to download file (set)</h1>
-    <div class="textstandardleft">
+    <h1>Create a script to download a set of files from your basket</h1>
+    <div class="textstandardleft" style="width:540px;">
       <form method="post"
         action="/impactportal/GetDownloadScriptHandler">
         <table style="width: 100%">
           <tbody>
             <tr>
-              <td class="collapsibletitle">User name (OpenID):</td>
+              <td><b>User name (OpenID):</b></td>
               <td><input id="openid" type="text" size="50"
                 name="openid" value="<%=user.getOpenId()%>"></input><br /></td>
             </tr>
-          </tbody>
-        </table>
-        <br />
-        <table style="width: 100%">
-          <tbody>
+       
             <tr>
-              <td class="collapsibletitle">Password:</td>
+              <td><b>Password:</b></td>
               <td><input id="password" type="password"
                 name="password" size="50"></input></td>
             </tr>
           </tbody>
         </table>
-        <br /> <input type="hidden" name="urls"
+        
+        <span style="float:right;margin-top:2px;">
+         <input type="hidden" name="urls"
           value="<%=request.getParameter("urls")%>" /> <input
-          type="submit" value="Get script"></input>
+          type="submit" class="ui-button ui-widget ui-state-default ui-corner-all"  value="Get script"></input>
+		</span>
+        
+        
       </form>
       <br />
-    </div>
-    <div>
+   
       <br /> <b>Actions:</b>
       <ul>
         <li><a href="basket.jsp">Go to your basket</a></li>
         <li><a href="../help/contactexpert.jsp">Having
             problems?</a></li>
       </ul>
-    </div>
-
-    <br />
+  
     <div id="showdownloadset">
       <b>The following files will be downloaded:</b><br />
       <div id="downloadfiles" class="files">
@@ -86,6 +84,7 @@
             }
           %>
         </ul>
+      </div>
       </div>
     </div>
   </div>

@@ -52,6 +52,8 @@ public class OAuth2Handler {
   //wget "https://www.googleapis.com/plus/v1/people/me/openIdConnect?" --header="Authorization: Bearer ya29.IwF2DNugbZI1KFo0EUyRMe2o_tfpgAoytDZkT4F0d98azSuGV3N9sTt4JN9zUnLXg3SQykxCz5BOzQ" -O info.txt --no-check-certificate
   //wget "http://bhw485.knmi.nl:8280/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root" --header="Authorization: Bearer ya29.IwF2DNugbZI1KFo0EUyRMe2o_tfpgAoytDZkT4F0d98azSuGV3N9sTt4JN9zUnLXg3SQykxCz5BOzQ" --header="Discovery: https://accounts.google.com/.well-known/openid-configuration" -O info.txt --no-check-certificate
   
+  //http://self-issued.info/docs/draft-ietf-oauth-v2-bearer.html#authz-header
+  
   // http://self-issued.info/docs/draft-jones-json-web-token-01.html#DefiningRSA
   // https://www.googleapis.com/oauth2/v2/certs
   // https://console.developers.google.com/project
@@ -68,8 +70,10 @@ public class OAuth2Handler {
   static void getCode(HttpServletRequest httpRequest,HttpServletResponse response) throws OAuthSystemException, IOException{
     Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config.getOAuthSettings("google");
     if(settings == null){
-      Debug.println("No Oauth settings set");
+      Debug.errprintln("No Oauth settings set");
     }
+    
+    Debug.println(settings.toString());
     
     OAuthClientRequest oauth2ClientRequest = OAuthClientRequest
         .authorizationLocation(settings.OAuthAuthLoc)
@@ -137,6 +141,7 @@ public class OAuth2Handler {
 
             String accessToken = oauth2Response.getAccessToken();
             Debug.println("ACCESS TOKEN:"+accessToken);
+            request.getSession().setAttribute("access_token",accessToken);
             Debug.println("EXPIRESIN:"+oauth2Response.getExpiresIn());
     
           }

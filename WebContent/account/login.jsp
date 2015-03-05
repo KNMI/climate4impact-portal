@@ -84,10 +84,11 @@
 				Your ESGF OpenId Identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
 				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
 				
+	
 				 <b>Actions:</b>
 				<ul>
 					<li>View account details: <span id="accountinfo">-</span></li>
-					<li>If you are not a member of the CMIP5 group: <a
+					<li>To register for groups: <a
 						href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo:
 							Create an ESGF account.</a><br /></li>
 					<li><a href="/impactportal/account/logout.jsp">Sign out</a><br /></li>

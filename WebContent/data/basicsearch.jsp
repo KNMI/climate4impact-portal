@@ -124,6 +124,7 @@
 						  			<tr>
 							  			<td><input type="checkbox" name="project_CMIP5"/><abbr title="Climate Model Intercomparison Project 5">CMIP5</abbr></td>
 							  			<td><input type="checkbox" name="project_CORDEX"/><abbr title="Coordinated Regional Climate Downscaling Experiment">CORDEX</abbr></td>
+							  			<td><input type="checkbox" name="project_specs"/><abbr title="Seasonal-to-decadal climate Prediction for the improvement of European Climate Services">SPECS</abbr></td>
 						  			</tr>
 					  			</table>
 				  			</form>

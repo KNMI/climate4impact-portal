@@ -1,7 +1,4 @@
-<%
-session.setAttribute("openid_identifier",null);
-session.setAttribute("user_identifier",null);
-session.setAttribute("email",null);
-
-response.sendRedirect("login.jsp");
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8" import="impactservice.LoginManager"%><%
+	LoginManager.logout(request);
+	response.sendRedirect("login.jsp");
 %>

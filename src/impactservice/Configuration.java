@@ -78,9 +78,12 @@ public class Configuration {
     VercSearchConfig.doConfig(configReader);
     LoginConfig.doConfig(configReader);
     ExpertContact.doConfig(configReader);
+    Admin.doConfig(configReader);
     ADAGUCServerConfig.doConfig(configReader);
     PyWPSServerConfig.doConfig(configReader);
     DownloadScriptConfig.doConfig(configReader);
+    Oauth2Config.doConfig(configReader);
+    
     
     configReader = null; 
   }

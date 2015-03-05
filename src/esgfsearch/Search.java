@@ -49,7 +49,7 @@ public class Search {
   }
   
   public JSONResponse getFacetsImp(String facets,String query) throws JSONException {
-    int searchLimit = 10;
+    int searchLimit = 30;
     JSONResponse r = new JSONResponse();
     
     String esgfQuery = "facets=*&limit="+searchLimit+"&";
