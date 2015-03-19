@@ -11,14 +11,10 @@
     
     <div class="impactcontent">
      <div class="textstandardleft">
-      <h1>A problem occurred!</h1>
+      <h1>A error occurred..</h1>
 
-      <%
-      out.print(session.getAttribute("message")); 
-      session.removeAttribute("message");
-      %>
-      <br/><br/>
-      The system administrator has been notified.<br/>
+      ${message}
+      
       <hr/>
       <b>Actions:</b>
       <ul>

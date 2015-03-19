@@ -64,6 +64,9 @@ public class GetDownloadScriptHandler extends HttpServlet {
     // TODO Auto-generated constructor stub
   }
 
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doPost(request,response);
+  }
   /**
    * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
    */
@@ -78,17 +81,19 @@ public class GetDownloadScriptHandler extends HttpServlet {
     String urls=request.getParameter("urls");
     String openid=request.getParameter("openid");
     String password=request.getParameter("password");
-    System.err.println(urls+";"+openid+";"+"*********");
+    //System.err.println(urls+";"+openid+";"+"*********");
     if ((urls!=null)&&(password!=null)&&(openid!=null)) {
       //Use openid and password to get credentials for download
       String credentials;
       try {
         credentials = getCredentials(user, openid, password);
       } catch (GetCredentialsException e) {
-        response.setContentType("text/html");
-        ServletOutputStream os=response.getOutputStream();
-        os.print("Error retrieving download credentials for user "+user.getOpenId()+" because:"+e.getMessage());
-        os.close();
+        String message = "Error retrieving credentials for user "+user.getOpenId()+"\n\n Cause: "+e.getMessage();
+        request.setAttribute("message", message.replaceAll("\\n", "<br/>"));
+        
+        Debug.errprintln(message);
+        
+        request.getRequestDispatcher("error.jsp").forward(request, response);
         return;
       }
       Date notAfter=getCertEndDate(user.getWorkspace()+"certs/"+"downloadcreds.pem");
@@ -223,7 +228,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
       Debug.println(msg);
       throw new GetCredentialsException(msg);
     } catch (IllegalArgumentException e) {
-      msg="Error found: "+e.getMessage();
+      msg=e.getMessage();
       Debug.println(msg);
       throw new GetCredentialsException(msg);
     }
