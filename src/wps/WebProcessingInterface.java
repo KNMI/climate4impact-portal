@@ -19,6 +19,7 @@ import ogcservices.PyWPSServer;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xml.sax.SAXException;
 
 import tools.Debug;
 import tools.MyXMLParser;
@@ -412,7 +413,7 @@ public class WebProcessingInterface {
       data.put("uniqueid", uniqueID);
       //Track this job
       trackJobForUser(user,uniqueID,data.toString());
-   
+      //monitorProcess(statusLocation,request);
       return data;
     
     } catch (Exception e) {
@@ -441,14 +442,35 @@ public class WebProcessingInterface {
    * @return  JSONObject with status information
    */
   public static JSONObject monitorProcess( String statusLocation,HttpServletRequest request) {
+  
     Debug.println("monitorProcess for statusLocation "+statusLocation);
     JSONObject data = new JSONObject();
     JSONObject exception = null;
     //statusLocation = statusLocation.replace("8091", "80");
     try {
       MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-      b.parse(new URL(statusLocation));
-      //Check if an Exception has been thrown:
+      
+      /*
+       * It seems that the statuslocation XML file is sometimes not completely written by PyWPS, or not immediately available after the process has been executed.
+       * Solution: Retry to read the XML file a couple of times until we have a good result.       * 
+       */
+      int maximumTries = 10;
+      boolean success = false;
+      do{
+        maximumTries--;
+        try{
+          b.parse(new URL(statusLocation));
+          success = true;
+        }catch(SAXException s){
+          Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
+          Thread.sleep(200);
+          if(maximumTries == 0){
+            throw s;
+          }
+        }
+      }while(maximumTries>0 && success == false);
+      
+      //Check if an WPS Exception has been thrown:
       XMLElement status = null;
       try{
         exception = checkException(b,"Location: "+statusLocation);;
