@@ -139,8 +139,8 @@ $(function() {
     tips.removeClass("ui-state-highlight");
     tips.text("");
     var bValid = true;
-    bValid = bValid && checkLength(name, "username", 3, 30,showtips);
-    bValid = bValid && checkRegexp(name, /^[a-z]([0-9a-z_.])+$/i,  "*Username may consist of a-z, 0-9, underscores, begin with a letter.",showtips);
+    bValid = bValid && checkLength(name, "username", 1, 50,showtips);
+    bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/i,  "*Username may consist of a-z, 0-9, underscores.",showtips);
    
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
     var username = name.val();
