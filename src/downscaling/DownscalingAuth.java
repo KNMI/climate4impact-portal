@@ -35,9 +35,9 @@ public class DownscalingAuth{
   public static final String CONTENT_TYPE_JSON = "application/json";
   public static final String C4I_USER = "climate4impact";
   public static final String C4I_PASSWORD = "climate4impact";
-  public static final String BASE_DP__URL = "http://meteo.unican.es/dp/";
-//  public static final String BASE_DP__URL = "http://10.0.2.2:8080/dp/";
-  public static final String BASE_DP_REST_URL = BASE_DP__URL + "rest";
+  public static final String BASE_DP_URL = "http://meteo.unican.es/dp/";
+//  public static final String BASE_DP_URL = "http://10.0.2.2:8080/dp/";
+  public static final String BASE_DP_REST_URL = BASE_DP_URL + "rest";
   public static final String DATE_FORMAT = "dd-MM-yyyy HH:mm:ss z";
   public static final String C4I_CREDENTIAL_PATH = Configuration.getDownscalingPortalWorkspace()+"downscaling.cred";
   public static enum responseStatus {OK, CREATED, BAD_REQUEST, NOT_FOUND};
@@ -57,7 +57,7 @@ public class DownscalingAuth{
     url = new URL(URI);
     urlConn = (HttpURLConnection)url.openConnection();
     urlConn.setRequestMethod(type);
-    urlConn.setRequestProperty("Content-Type", "application/json; charset=utf8");
+    urlConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf8");
     urlConn.setRequestProperty("Accept", "application/json");
     urlConn.setRequestProperty("token", getToken());
     urlConn.setDoOutput(true);

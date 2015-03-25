@@ -47,7 +47,6 @@
 
      		
 		$(document).ready(function() {
-			//collapsible management
 			$('.collapsible').collapsible({});
 			$("input:checkbox").prop('checked', false);
 		});
