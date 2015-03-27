@@ -24,9 +24,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Job;
 import model.Predictand;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,10 +63,8 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");   
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zones/.*/predictors/.*/predictands/.*")){
@@ -75,10 +75,8 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
-      PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
+      response.setContentType("application/json");     
+      PrintWriter out = response.getWriter(); 
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zones/.*/predictands/.*/downscalingMethods")){
@@ -93,10 +91,8 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");     
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/zones/.*/predictands/.*/stations")){
@@ -107,10 +103,8 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");      
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
     
@@ -122,15 +116,14 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");  
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/validation")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?idZone=" + 
-              request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("downscalingMethod").replace(" ", "%20"), "GET");
+      String params = "?idZone=" + 
+          request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("downscalingMethod");
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + URIUtil.encodeQuery(params), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();
       byte[] buffer = new byte[4096];
@@ -150,10 +143,8 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");    
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/datasets/.*/scenarios")){
@@ -164,10 +155,20 @@ public class DownscalingService extends HttpServlet {
       while ((inputLine = in.readLine()) != null) 
         sb.append(inputLine);
       in.close();
-      response.setContentType("application/json");
-      // Get the printwriter object from response to write the required json object to the output stream      
+      response.setContentType("application/json");   
       PrintWriter out = response.getWriter();
-      // Assuming your json object is **jsonObject**, perform the following, it will return your json object  
+      out.print(sb);
+      out.flush();
+    }else if(pathInfo.equals("/jobs")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "/users/" + request.getParameter("username") + "/jobs", "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");     
+      PrintWriter out = response.getWriter();
       out.print(sb);
       out.flush();
     }else if(pathInfo.equals("/downscalings")){
@@ -198,6 +199,27 @@ public class DownscalingService extends HttpServlet {
     } catch (Exception e) {
     }
     return null;
+  }
+  
+  public static List<Job> getUserJobs(String username) throws JSONException, IOException{
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username + "/jobs", "GET");
+    if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+      return null;
+    StringBuffer response = new StringBuffer();
+    BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
+    }
+    in.close();
+    JSONObject myObject = new JSONObject(response.toString());
+    JSONArray jsonPredictands = myObject.getJSONArray("values");
+    List<Job> jobs = new ArrayList<Job>();
+    for(int i=0; i< jsonPredictands.length(); i++){
+      Job p = new Job.JobBuilder(jsonPredictands.getJSONObject(i)).build();
+      jobs.add(p);
+    }
+    return jobs;
   }
   
   public static List<Predictand> getUserPredictands(String username)throws ServletException, IOException, JSONException{
@@ -313,9 +335,9 @@ public class DownscalingService extends HttpServlet {
       
     }else if(pathInfo.equals("/downscalings/downscale")){
       String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+
-          request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName").replace(" ", "%20")+"&scenarioName="+request.getParameter("scenarioName")+
-          "&cells="+request.getParameter("cells").replace(" ", "%20");
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscale" + params, "POST");
+          request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName")+"&scenarioName="+request.getParameter("scenarioName")+
+          "&cells="+request.getParameter("cells");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscale" + URIUtil.encodeQuery(params), "POST");
       response.getWriter().print(urlConn.getResponseMessage());
       response.setStatus(urlConn.getResponseCode());
       
