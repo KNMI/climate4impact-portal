@@ -425,8 +425,13 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 	var values = [];
 	if(input.LiteralData.DefaultValue){
 		if(input.LiteralData.DefaultValue.value){
-			values = input.LiteralData.DefaultValue.value.split(',');
+			if(input.attr.maxOccurs <= 1){
+				values = [input.LiteralData.DefaultValue.value.split(',')];
+			}else{
+				values = input.LiteralData.DefaultValue.value.split(',');
+			}
 		}
+		
 	}else{
 		values = ["None"];
 	}

@@ -24,68 +24,78 @@ public class CGIRunner {
     class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}}
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
       boolean headersSent = false;
+      boolean foundLF = false;
       OutputStream output = null;
-      String header="";
+      StringBuffer header = new StringBuffer();
       public StdoutPrinter(OutputStream outputStream) {
         output=outputStream;
       }
   
      // boolean a = false;
       public void print(byte[] message,int bytesRead) {
-        //DebugConsole.print(new String(message));
-    /*    if(a==false){
-          a=true;
-          for(int j=0;j<bytesRead;j++){
-            DebugConsole.println(j+":="+message[j]+" = "+new String(message).substring(j,j+1));
-          }
-        }*/
+        try {
+          _print(message,bytesRead);
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+      
+      public void _print(byte[] message,int bytesRead) throws IOException {
         //Try to extract HTML headers and Content-Type 
+      
         if(headersSent==false){
           int endHeaderIndex=0;
           for(int j=0;j<bytesRead;j++){
-            if(j>0){
-              if((message[j-1]==13&&message[j]==10)||(message[j]==10&&message[j+1]==10)){
-                headersSent=true;
-                endHeaderIndex=j;
+            
+            if(message[j] == 10){
+              if(foundLF == false){
+                foundLF = true;
+                continue;
+              }
+            }else if (foundLF == true && message[j] != 13){
+              foundLF=false;
+              continue;
+            }
+            
+            if(foundLF == true){
+              if(message[j] == 10){
+                headersSent = true;
+                endHeaderIndex = j;
+                while((message[endHeaderIndex] == 10 || message[endHeaderIndex] == 13 ) && endHeaderIndex<bytesRead){
+                  endHeaderIndex++;
+                }
+                output.write(message, endHeaderIndex,bytesRead-(endHeaderIndex));
+                header.append(new String(message),0,endHeaderIndex);
                 break;
               }
             }
-            header+=(char)message[j];
           }
-          if(headersSent){
-           
-           
-            //DebugConsole.println("Found header:\n'"+header+"'");
-            String[] headerItem=header.split("\n");
+          if( headersSent == true){
+            String[] headerItem=header.toString().split("\n");
             for(int h=0;h<headerItem.length;h++){
               String[] headerKVP=headerItem[h].split(":");
               if(headerKVP.length==2){
-//                DebugConsole.println(headerKVP[0].trim()+"="+headerKVP[1].trim());
+                //Debug.println(headerKVP[0].trim()+"="+headerKVP[1].trim());
                 if(headerKVP[0].trim().equalsIgnoreCase("Content-Type")){
                   if(response!=null){
                     headerKVP[1]=headerKVP[1].replaceAll("\\n", "");
                     headerKVP[1]=headerKVP[1].replaceAll("\\r", "");
                     headerKVP[1]=headerKVP[1].replaceAll(" ", "");
-                    //DebugConsole.println("Setting Content-Type to '"+headerKVP[1].trim()+"'");
+                    //Debug.println("Setting Content-Type to ["+headerKVP[1].trim()+"]");
                     response.setContentType(headerKVP[1].trim());
                   }
                 }else{
-                  Debug.println("Setting header "+headerKVP[0].trim()+"="+headerKVP[1].trim());
+                  //Debug.println("Setting header ["+headerKVP[0].trim()+"]=["+headerKVP[1].trim()+"]");
                   response.setHeader(headerKVP[0].trim(),headerKVP[1].trim());
                 }
               }
             }
-            try {
-              //System.out.write(message, endHeaderIndex+2,bytesRead-(endHeaderIndex+2));
-              output.write(message, endHeaderIndex+2,bytesRead-(endHeaderIndex+2));
-            } catch (IOException e) {
-            }
+          }else{
+            header.append(message);
           }
         }else{
-          //Content Type found, now just forward the data
-          try {
-            output.write(message,0,bytesRead);
-          } catch (IOException e) {}
+          output.write(message,0,bytesRead);
         }
       }
     }

@@ -155,6 +155,7 @@ public class WebProcessingInterface {
 	          message+="\n";
 	          try{
 	            message+=pyWPSXMLStructure.getFirst().getFirst().get("ows:ExceptionText").getValue();
+	            message=message.replaceAll("\\\\","");
 	          }catch(Exception e){}
 	        }catch(Exception e){}
 	        message+="\n\n"+extraInfo;
@@ -454,7 +455,7 @@ public class WebProcessingInterface {
        * It seems that the statuslocation XML file is sometimes not completely written by PyWPS, or not immediately available after the process has been executed.
        * Solution: Retry to read the XML file a couple of times until we have a good result.       * 
        */
-      int maximumTries = 10;
+      int maximumTries = 4;
       boolean success = false;
       do{
         maximumTries--;
