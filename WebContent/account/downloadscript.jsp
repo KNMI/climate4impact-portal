@@ -45,12 +45,14 @@
               <td><b>User name (OpenID):</b></td>
               <td><input id="openid" type="text" size="50"
                 name="openid" value="<%=user.getOpenId()%>"></input><br /></td>
+                <td></td>
             </tr>
        
             <tr>
               <td><b>Password:</b></td>
               <td><input id="password" type="password"
                 name="password" size="50"></input></td>
+                <td><span>?</span></td>
             </tr>
           </tbody>
         </table>
@@ -64,7 +66,13 @@
         
       </form>
       <br />
-   
+      <b>Remark:</b>
+      <ul>
+        <li>
+        This screen needs your password to generate a security certificate for access to ESGF data on your behalf.<br/>
+        This certificate will be included in the downloaded script and will enable you to download the selected data to your Linux or OS X system.
+        </li>
+      </ul>
       <br /> <b>Actions:</b>
       <ul>
         <li><a href="basket.jsp">Go to your basket</a></li>
@@ -73,7 +81,7 @@
       </ul>
   
     <div id="showdownloadset">
-      <b>The following files will be downloaded:</b><br />
+      <b>The download script (for Linux/OSX) will be able to download the following files:</b><br />
       <div id="downloadfiles" class="files">
         <ul>
           <% String files=request.getParameter("urls");

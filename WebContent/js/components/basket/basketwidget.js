@@ -133,37 +133,31 @@ var BasketWidget = function() {
           }
         }
       },{
-          text : 'Download file(s)',
+          text : 'Download file',
           iconCls : 'icon-download',
           handler : function() {
             var downloadWin;
             if (tree.getSelectionModel().hasSelection()) {
               var selectedNodes = tree.getSelectionModel().getSelection();
-              var securePage=location.protocol=="https:";
-              var i;
-              for (i=0; i<selectedNodes.length; i++){
-                var selectedNode = selectedNodes[i];
+              if ((selectedNodes.length>1)||(selectedNodes.length==0)) { 
+              	  Ext.MessageBox.alert('Error','Please select exactly one file with HTTP enabled to download.');
+              } else {
+                var securePage=location.protocol=="https:";
+                var selectedNode = selectedNodes[0];
                 var httpURL = selectedNode.data.httpurl;
                 if(!httpURL){
-              	  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
-              	  continue; //return;
+                  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
+                } else {
+                  if(openid){
+                    if(openid!=""){
+                      httpURL+="?openid="+openid;
+                    }
+                  }
+               	  if (downloadWin) {
+                	downloadwin.close();
+                  }
+              	  downloadWin=window.open(httpURL, 'dwnl', 'width=900,height=600,resizable=yes');
                 }
-                if (securePage && httpURL.substring(0, 5)=="http:"){
-                  Ext.MessageBox.alert('Error','URL '+httpURL+" is a non-secure URL. Login to the unsecured version of this portal to download "+URL+" or use `Script download' button");
-                  continue; //return;
-                }	
-                if(openid){
-              	  if(openid!=""){
-              		  httpURL+="?openid="+openid;
-              	  }
-                }
-                setTimeout(function(url) { //closure for httpURL
-              	return function() {
-              	  var frame = $('<iframe style="display: none;" class="multi-download-frame"></iframe>');
-                    frame.attr('src', url);
-                    $('.iframeshere').after(frame);
-                    setTimeout(function() { frame.remove();}, 1000 );
-              	};}(httpURL),200);
               }
             } else {
               Ext.MessageBox.alert('Error','No selected files.');
