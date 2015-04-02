@@ -71,6 +71,12 @@ public class ESGFSearchServlet extends HttpServlet {
           response.setContentType(jsonresponse.getMimeType());
           response.getOutputStream().print(jsonresponse.getMessage());
         }
+        if(mode.equalsIgnoreCase("addtobasket")){
+          JSONResponse jsonresponse = esgfSearch.addtobasket(query);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
       }
       
     } catch (Exception e) {

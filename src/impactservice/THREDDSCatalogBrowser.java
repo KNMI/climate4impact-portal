@@ -36,8 +36,8 @@ public class THREDDSCatalogBrowser {
     }
   }
 
-  public static JSONArray browseThreddsCatalog(HttpServletRequest request,   HttpServletResponse response, JSONMessageDecorator errorResponder1,String variableFilter,String textFilter) throws MalformedURLException, Exception {
-    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
+  public static JSONArray browseThreddsCatalog(HttpServletRequest request,  String variableFilter,String textFilter) throws MalformedURLException, Exception {
+   
     String nodeStr=request.getParameter("node");
     
     if(nodeStr!=null){nodeStr=URLDecoder.decode(nodeStr,"UTF-8");}else{
@@ -46,12 +46,16 @@ public class THREDDSCatalogBrowser {
     if(nodeStr.indexOf("http")!=0){
       throw new Exception("Invalid URL given");
     }
-    
+    return browseThreddsCatalog(nodeStr,variableFilter,textFilter);
+
+  }
+  
+  public static JSONArray browseThreddsCatalog(String catalogURL, String variableFilter,String textFilter) throws MalformedURLException, Exception {
+    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     long timeStampBefore = Calendar.getInstance().getTimeInMillis();
     long timeStampAfter;
-    
-    nodeStr= HTTPTools.makeCleanURL(nodeStr);
-    String rootCatalog =  new URL(nodeStr).toString();    
+    String _catalogURL= HTTPTools.makeCleanURL(catalogURL);
+    String rootCatalog =  new URL(_catalogURL).toString();    
     String path = new URL(rootCatalog).getFile();
     String hostPath = rootCatalog.substring(0,rootCatalog.length()-path.length());
     
@@ -65,7 +69,7 @@ public class THREDDSCatalogBrowser {
 
       //Try to get from local storage:
       Search esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
-      String result = esgfSearch.getCatalog(rootCatalog);
+      String result = esgfSearch.getCatalog(catalogURL);
       
       timeStampAfter = Calendar.getInstance().getTimeInMillis();
       Debug.println("TIME: Catalog Get: ("+(timeStampAfter-timeStampBefore)+" ms)");

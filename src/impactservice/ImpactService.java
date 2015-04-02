@@ -341,7 +341,7 @@ public class ImpactService extends HttpServlet {
   		  long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
   		  JSONArray treeElements = null;
   		  try{
-  		    treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request, response,errorResponder,variableFilter,textFilter); 
+  		    treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request, variableFilter,textFilter); 
   		  }catch(Exception e){
   		    response.setContentType("text/html");
   		    response.getWriter().print("Unable to read catalog: "+e.getMessage());

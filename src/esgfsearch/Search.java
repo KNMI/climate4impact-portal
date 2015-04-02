@@ -1,5 +1,7 @@
 package esgfsearch;
 
+import impactservice.THREDDSCatalogBrowser;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -13,6 +15,7 @@ import java.util.Vector;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import tools.Debug;
 import tools.DiskCache;
@@ -33,9 +36,10 @@ public class Search {
   }
 
   public JSONResponse getFacets(String facets, String query) {
+    int searchLimit = 5;
     try{
       LockOnQuery.lock(facets+query);
-      JSONResponse r = getFacetsImp(facets,query);
+      JSONResponse r = _getFacetsImp(facets,query,searchLimit);
       LockOnQuery.release(facets+query);
       return r;
     }catch(Exception e){
@@ -48,14 +52,14 @@ public class Search {
     
   }
   
-  public JSONResponse getFacetsImp(String facets,String query) throws JSONException {
-    int searchLimit = 30;
+  private JSONResponse _getFacetsImp(String facets,String query, int searchLimit) throws JSONException {
+  
     JSONResponse r = new JSONResponse();
     
-    String esgfQuery = "facets=*&limit="+searchLimit+"&";
+    String esgfQuery = "facets=*&limit="+searchLimit+"&sort=true&";
     
     if(facets!=null){
-      esgfQuery = "facets="+facets+"&";
+      esgfQuery = "facets="+facets+"&limit="+searchLimit+"&sort=true&";
     }
     
     if(query!=null){
@@ -289,7 +293,7 @@ public class Search {
     return response;
   }
   
-  public JSONResponse _checkURL(String query) {
+  private JSONResponse _checkURL(String query) {
     JSONObject jsonresult = new JSONObject();
     try{
       getCatalog(query);
@@ -304,6 +308,101 @@ public class Search {
     }
     String message = jsonresult.toString();
     JSONResponse result = new JSONResponse();
+    result.setMessage(message);
+    return result;
+  }
+
+  public JSONResponse addtobasket(String query) {
+    JSONResponse result = new JSONResponse();
+    JSONObject jsonresult = new JSONObject();
+    try{
+      //DOSTUFF
+      int searchLimit = 1000;
+      LockOnQuery.lock(query);
+      JSONResponse r = _getFacetsImp(null,query,searchLimit);
+      LockOnQuery.release(query);
+
+      JSONObject searchResults =  (JSONObject) new JSONTokener(r.getMessage()).nextValue();
+      long numFound = searchResults.getJSONObject("response").getLong("numfound");
+      
+      if(numFound>searchLimit){
+        result.setErrorMessage("Too many results, maximum of "+searchLimit+" allowed.", 200);
+      }else{
+        jsonresult.put("numfound", searchResults.getJSONObject("response").getLong("numfound"));
+        jsonresult.put("ok", "ok");
+      }
+      
+      JSONArray results = searchResults.getJSONObject("response").getJSONArray("results");
+      int numFiles = 0;
+      for(int j=0;j<results.length();j++){
+        try{
+          String url = results.getJSONObject(j).getString("url");
+         
+     
+          JSONArray files = THREDDSCatalogBrowser.browseThreddsCatalog(url, null,null); 
+          class B{
+            JSONArray result = null;
+            JSONArray makeFlat(JSONArray catalog) throws JSONException{
+              result = new JSONArray();
+              _rec(catalog);
+              return result;
+            }
+            void _rec(JSONArray catalog) throws JSONException{
+              for(int i=0;i<catalog.length();i++){
+                JSONObject a=catalog.getJSONObject(i);
+                JSONObject b = new  JSONObject();
+                
+                try{
+                  b.put("HTTPServer", a.getString("HTTPServer"));
+                  result.put(b);
+                }catch (JSONException e) {}
+                try{
+                  _rec(a.getJSONArray("children"));
+                } catch (JSONException e) {
+                }
+              }
+            }
+          }
+          B b = new B();
+          JSONArray flat = b.makeFlat(files);
+          Debug.println(j+"): "+url+ " has entries "+flat.length());
+          for(int i=0;i<flat.length();i++){
+            
+            String openDAPURL=null;
+            String httpURL=null;
+            String hrefURL=null;
+            String catalogURL=null;
+            String nodeText = null;
+            String fileSize = "";
+            JSONObject a=flat.getJSONObject(i);
+            //Debug.println(a.getString("text"));
+//            nodeText = a.getString("text");
+//            try{openDAPURL = a.getString("OPENDAP");}catch (JSONException e) {}
+            try{httpURL = a.getString("HTTPServer");}catch (JSONException e) {}
+//            try{catalogURL = a.getString("catalogURL");}catch (JSONException e) {}
+//            try{hrefURL = a.getString("href");}catch (JSONException e) {}
+//            try{fileSize = a.getString("dataSize");}catch (JSONException e) {}
+//            
+            if(httpURL!=null){
+              Debug.println(httpURL);
+              numFiles++;
+            }
+
+          }
+        }catch(Exception e){
+          Debug.errprintln(j+"): "+results.getJSONObject(j).getString("id"));
+          Debug.printStackTrace(e);
+        }
+      }
+      
+      Debug.println("Numfiles is "+numFiles);
+      
+     
+    }catch(Exception e){
+       result.setException("Unable to query", e);
+    }
+    String message = jsonresult.toString();
+    
     result.setMessage(message);
     return result;
   }
