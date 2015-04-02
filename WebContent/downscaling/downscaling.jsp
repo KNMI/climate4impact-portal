@@ -41,7 +41,7 @@
       			request.setAttribute("loggedInUser", null);
       		}
       	%>
-		var loggedInUser = '<%=request.getAttribute("loggedInUser")%>';
+		var loggedInUser = '<%=LoginManager.getUser(request).getInternalName()%>';
       	var sortedKeys = ['variableType','variableName','zone','predictandName','dMethodType','dMethodName','datasetType','datasetName', 'sYear', 'eYear', 'scenarioName'];
       	  
 
