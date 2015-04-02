@@ -1,7 +1,5 @@
 package impactservice;
 
-
-
 import java.util.Vector;
 
 import tools.Debug;
@@ -83,6 +81,7 @@ public class Configuration {
     PyWPSServerConfig.doConfig(configReader);
     DownloadScriptConfig.doConfig(configReader);
     Oauth2Config.doConfig(configReader);
+    DownscalingConfig.doConfig(configReader);
     
     
     configReader = null; 
@@ -340,5 +339,55 @@ public class Configuration {
       readConfig();
       return downloadScriptTemplate;
     }
+  }
+  
+  public static class DownscalingConfig{
+    private static String username;
+    private static String password;
+    private static String tokenPath;
+    private static String tokenFileName;
+    private static String dateFormat;
+    private static String dpBaseUrl;
+    private static String dpBaseRestUrl;
+    
+    public static void doConfig(XMLElement  configReader){
+      username = configReader.getNodeValue("impactportal.downscaling.credential.username");
+      password = configReader.getNodeValue("impactportal.downscaling.credential.password");
+      tokenPath = configReader.getNodeValue("impactportal.downscaling.token.path");
+      tokenFileName = configReader.getNodeValue("impactportal.downscaling.token.filename");
+      dateFormat = configReader.getNodeValue("impactportal.downscaling.token.dateformat");
+      dpBaseUrl = configReader.getNodeValue("impactportal.downscaling.dpbaseurl");
+      dpBaseRestUrl = configReader.getNodeValue("impactportal.downscaling.dprestbaseurl");
+    }
+    
+    public static String getUsername(){
+       readConfig();
+       return username;
+    }
+    public static String getPassword(){
+      readConfig();
+      return password;
+   }
+    public static String getTokenPath(){
+      readConfig();
+      return tokenPath;
+   }
+    
+    public static String getTokenFileName(){
+      readConfig();
+      return tokenFileName;
+   }
+    public static String getDateFormat(){
+      readConfig();
+      return dateFormat;
+   }
+    public static String getDpBase(){
+      readConfig();
+      return dpBaseUrl;
+   }
+    public static String getDpBaseRestUrl(){
+      readConfig();
+      return dpBaseRestUrl;
+   }
   }
 }
