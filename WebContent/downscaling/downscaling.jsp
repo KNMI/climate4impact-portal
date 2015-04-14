@@ -9,7 +9,7 @@
   <head>
    
     <jsp:include page="../includes-ui.jsp" />
-    
+    <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
     <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
     <script type="text/javascript" src="js/functions.js"></script>
     <script type="text/javascript" src="js/loadFunctions.js"></script>
@@ -17,7 +17,7 @@
 	<script src="js/libraries/leaflet-0.7.3/leaflet.js"></script>
 	<script src="js/libraries/spin/spin.min.js"></script>
 	<link rel="stylesheet" href="js/libraries/leaflet-0.7.3/leaflet.css" />
-	<link rel="stylesheet" href="css/custom-style.css" />
+	<link rel="stylesheet" href="css/style-downscaling.css" />
 	
 	<style>
 		
@@ -148,7 +148,18 @@
 			}); 
 		}
 		
-		
+		$(function() {
+		  	$("#button-load-scenarios").button({
+    	  		icons: { primary: "ui-icon-arrowrefresh-1-e"}
+   			});
+	    	$("#button-saveconfig").button({
+	    	  icons: { primary: "ui-icon-folder-open"}
+	    	});
+	    	$("#button-downscale").button({
+	    	  icons: { primary: "ui-icon-circle-check"}
+	    	});
+
+	  });
 		    
     </script>
   </head>
@@ -275,6 +286,7 @@
 				<div class="collapsiblecontainer">
 					<div class="collapsiblecontent">
 		       			<div id="downscaling-methods"></div>
+		       			<div id="validation"></div>
 					</div>
 				</div>
 
@@ -332,7 +344,7 @@
 				      							<label>End year</label>
 				      							<input type="text" id="date-range-end" class="input-year"></input>
 				      						</div>
-				      						<button id="button-load-scenarios" type="button">Reload</button>
+				      						<button id="button-load-scenarios" type="button"></button>
 										</div>
 									</tr>
 					  			</table>
@@ -349,8 +361,11 @@
 						<div id="scenarios"></div>
 					</div>
 				</div>
-				<button id="button-saveconfig" type="button">Save config</button> 	
-				<button id="button-downscale" type="button">Downscale</button> 	
+				<div id="bottom-buttons">
+					<button id="button-saveconfig" type="button">Save</button>
+					<button id="button-downscale" type="button">Downscale</button>
+				</div>
+			</div>
    		</c:if>	
 		 	
 	  <!-- /Contents -->

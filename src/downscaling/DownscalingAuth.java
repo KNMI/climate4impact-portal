@@ -58,7 +58,7 @@ public class DownscalingAuth{
   }
   
   protected static HttpURLConnection prepareSimpleQuery(String URI, String type) throws IOException{
-    Debug.println("Subscribe user -- Building statement for URI: " + URI);
+    Debug.println("Building statement for URI: " + URI);
     URL url;
     HttpURLConnection urlConn;
     url = new URL(URI);

@@ -122,7 +122,7 @@ public class DownscalingService extends HttpServlet {
       out.flush();
     }else if(pathInfo.matches("/validation")){
       String params = "?idZone=" + 
-          request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("downscalingMethod");
+          request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("dMethodName");
       HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + URIUtil.encodeQuery(params), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();

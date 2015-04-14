@@ -169,13 +169,22 @@ function loadDownscalingMethods(){
           $('#downscaling-methods').append("<td><input class='input-downscaling-method' data-zone='"+zone+"' data-predictand='"+ predictandName+"' data-downscaling-method='"+value.name+"' type='radio' name='downscalingMethod' value='"+value.name+"'/>"+value.name+"</td>");
           if(defaultDownscalingMethod != null && defaultDownscalingMethod == value.name){
               $("input[name='downscalingMethod'][value='"+value.name+"']").prop('checked',true);
-              $('#validation').html("<a href='../DownscalingService/validation?idZone="+zone+"&predictandName="+predictandName+"&downscalingMethod="+defaultDownscalingMethod+"' download='report'>Download validation report</a>");
+              loadValidationReport();
           }
         });
         $('#downscalingmethod-header').collapsible('open');
     });
   }else{
     $('#downscalingmethod-header').collapsible('close');
+  }
+}
+
+function loadValidationReport(){
+  var zone = getValueFromHash("zone");
+  var predictandName = getValueFromHash("predictandName");
+  var dMethodName = getValueFromHash("dMethodName");
+  if(zone != null && predictandName != null && dMethodName != null){
+    $('#validation').html("<a href='../DownscalingService/validation?idZone="+zone+"&predictandName="+predictandName+"&dMethodName="+dMethodName+"' download='report'>Download validation report</a>");
   }
 }
 
