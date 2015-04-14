@@ -267,18 +267,19 @@ var getReloadAfterLogin = function(){
 }
 
 var generateLoginDialog = function(doReload){
+  
 //  console.log(generateLoginDialog);
   var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" scrolling="0" style="overflow:auto;padding:0px;margin:0px;" ></iframe>');
   //var footer = $('<div class="logindialogfooter" ><a onclick="window.open(\'/impactportal/account/login_embed.jsp?doreload=true\',\'targetWindow\',\'toolbar=no,location=no,status=no,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=800,height=500\')" >Do you encounter an untrusted connection? Click here.</a></div>');
   var footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
   
-  
+ 
     var loginDialog = $("<div id=\"loginDialog\" class=\"loginDialog\" ></div>").append(iframe).append(footer).appendTo("body").dialog({
         autoOpen: false,
         modal: true,
         resizable: false,
         width: "900px",
-       
+        dialogClass: 'topDialog',
         close: function () {
             iframe.attr("src", "");
         },
@@ -287,10 +288,18 @@ var generateLoginDialog = function(doReload){
           duration: 200
          }
     });
+  
    
       var src = "/impactportal/account/login_embed.jsp";
-      if(doReload == true){
+      if(doReload === true){
         src+="?doreload=true";
+      }else{
+        loginDialog.bind('dialogclose', function(event) {
+          if(doReload){
+            doReload();
+          }
+        });
+        
       }
       var title = "Sign in with your ESGF OpenID account";
       var width = 900;
@@ -303,6 +312,7 @@ var generateLoginDialog = function(doReload){
       if(loginDialog.dialog){
         loginDialog.dialog("option", "title", title).dialog("open");
       }
+     
 
 }
 

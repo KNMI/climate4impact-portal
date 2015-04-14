@@ -281,15 +281,16 @@ public class ImpactService extends HttpServlet {
           }
           
           if(openDAPURL!=null){
-            try {
-              dapLink="<a href=\"/impactportal/data/datasetviewer.jsp?dataset="+URLEncoder.encode(openDAPURL,"UTF-8")+"\">view</a>";
-            } catch (UnsupportedEncodingException e1) {}
+           
+              //dapLink="<a href=\"/impactportal/data/datasetviewer.jsp?dataset="+URLEncoder.encode(openDAPURL,"UTF-8")+"\">view</a>";
+              dapLink="<button onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</button>";
+            
           }
           if(httpURL!=null){
             if(openid!=null){
-              httpLink="<a target=\"_blank\" href=\""+httpURL+"?openid="+openid+"\">get</a>";
+              httpLink="<button target=\"_blank\" href=\""+httpURL+"?openid="+openid+"\">download</button>";
             }else{
-              httpLink="<a href=\""+httpURL+"\">get</a>";
+              httpLink="<button href=\""+httpURL+"\">download</button>";
             }
           }
           //html+="</td><td>"+dapLink+"</td><td>"+httpLink;

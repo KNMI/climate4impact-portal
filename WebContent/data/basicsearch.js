@@ -276,21 +276,25 @@ var loadFacetList = function(facetType,collapse){
 
 
 			var html="<table class=\"modellist\">";
-			html+="<tr ><td class=\"modellistheader\">No.</td><td class=\"modellistheader\">Name</td><td class=\"modellistheader\" >Size</td><td class=\"modellistheader\">catalog</td><td class=\"modellistheader\">OPENDAP</td><td class=\"modellistheader\">HTTP</td><td class=\"modellistheader\"><span class=\"shoppingbasketicon\"></span></td></tr>"
-				var topics =  json.topics;
+			html+="<tr ><td class=\"modellistheader\">No.</td><td class=\"modellistheader\">Name</td><td class=\"modellistheader\" >Size</td><td class=\"modellistheader\">Browse</td>";
+			//"<td class=\"modellistheader\">OPENDAP</td><td class=\"modellistheader\">HTTP</td>" +
+			html+=	"<td class=\"modellistheader\">Add to Basket</td></tr>";
+			var topics =  json.topics;
 			for(var j=0;j<topics.length;j++){
 				var rowType="even";
 				if(j%2==1)rowType="odd";
 				var fileid = topics[j].instance_id;
 				var dataSize = topics[j].dataSize;
 				if(!dataSize)dataSize="-";
-				html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
+				//html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td><input type="checkbox" checked="checked" name="file_'+fileid+'">'+fileid+'</input></td><td>'+dataSize+'</td>';
+				html+='<tr class="'+rowType+'"><td >'+(j+1)+'</td><td>'+fileid+'</td><td>'+dataSize+'</td>';
 				if(topics[j].catalogURL){
-					html+='<td><a  href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'#'+selectedVariables+'">browse</a></td>';
+					//html+='<td><a  href="/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(topics[j].catalogURL)+'#'+selectedVariables+'">browse</a></td>';
+					html+='<td><button onclick="renderCatalogBrowser({url:\''+topics[j].catalogURL+'#'+selectedVariables+'\'})">browse</button></td>';
 				}else{
 					html+="<td>-</td>";
 				}
-				if(topics[j].OPENDAP){
+				/*if(topics[j].OPENDAP){
 					html+='<td><a href="/impactportal/data/datasetviewer.jsp?dataset='+URLEncode(topics[j].OPENDAP)+'">view</a></td>';
 				}else{
 					html+="<td>-</td>";
@@ -299,7 +303,7 @@ var loadFacetList = function(facetType,collapse){
 					html+='<td><a target="_blank" href="'+topics[j].HTTPServer+'">get</a></td>';
 				}else{
 					html+="<td>-</td>";
-				}
+				}*/
 				if(topics[j].OPENDAP||topics[j].HTTPServer){
 					html+="<td><span class=\"shoppingbasketicon\" onclick=\"postIdentifierToBasket({id:'"+topics[j].instance_id+"',HTTPServer:'"+topics[j].HTTPServer+"',OPENDAP:'"+topics[j].OPENDAP+"',catalogURL:'null'});\"></span></td>";
 				}else{
