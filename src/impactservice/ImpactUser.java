@@ -3,6 +3,7 @@ package impactservice;
 import java.io.IOException;
 
 import tools.Debug;
+import tools.HTTPTools;
 import tools.Tools;
 
 
@@ -82,7 +83,7 @@ public class ImpactUser {
   public String getInternalName() {
     return internalName;
   }
-  public void setInternalName(String internalName) {
+  public void _setInternalName(String internalName) {
     this.internalName = internalName;
   }
   public String getId(){
@@ -105,6 +106,11 @@ public class ImpactUser {
       return openid;
     }
     return getEmailAddress();
+  }
+  public String getDataURL() {
+    String url = HTTPTools.makeCleanURL(Configuration.getHomeURLHTTPS()+"/DAP/"+internalName);
+    url = url.replace("?","/");
+    return url;
   }
 
  

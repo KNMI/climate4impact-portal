@@ -290,7 +290,7 @@ var BasketWidget = function() {
         return;
       }
       if(record.get('dapurl')){
-        var fileViewer = new FileViewer();
+        var fileViewer = new ExtFileViewer();
         var w = Ext.create('Ext.Window', {
           width : 900,
           height : 500,
@@ -306,7 +306,19 @@ var BasketWidget = function() {
         openedWindows.push(w);
         fileViewer.load(record.get('dapurl'));
       }else if(record.get('catalogurl')){
-        window.open('/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(record.get('catalogurl')));
+        var el = jQuery('<div></div>', {
+            title: record.get("id"),
+          }).dialog({
+            width:900,
+            height:500
+          });
+          el.html('<div class="ajaxloader"></div>');
+        //var callback = function(data){
+          
+          renderCatalogBrowser({element:el,url:record.get('catalogurl')});
+          //alert("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
+        //}
+        //window.open('/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(record.get('catalogurl')));
       }
     };
     

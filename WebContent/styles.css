@@ -2387,6 +2387,11 @@ a img {
 	margin:0px;
 }
 
+.topDialog{
+	z-index:300000 !important;
+}
+
+
 
 .footerlogos p{
 
@@ -2511,3 +2516,4 @@ a img {
 	width:40px;
 	height:40px;
 }
+

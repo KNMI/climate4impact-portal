@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import esgfsearch.Search;
 import tools.Debug;
@@ -36,8 +37,8 @@ public class THREDDSCatalogBrowser {
     }
   }
 
-  public static JSONArray browseThreddsCatalog(HttpServletRequest request,   HttpServletResponse response, JSONMessageDecorator errorResponder1,String variableFilter,String textFilter) throws MalformedURLException, Exception {
-    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
+  public static JSONArray browseThreddsCatalog(HttpServletRequest request,  String variableFilter,String textFilter) throws MalformedURLException, Exception {
+    Debug.println("variableFilter="+variableFilter);
     String nodeStr=request.getParameter("node");
     
     if(nodeStr!=null){nodeStr=URLDecoder.decode(nodeStr,"UTF-8");}else{
@@ -46,12 +47,16 @@ public class THREDDSCatalogBrowser {
     if(nodeStr.indexOf("http")!=0){
       throw new Exception("Invalid URL given");
     }
-    
+    return browseThreddsCatalog(request,nodeStr,variableFilter,textFilter);
+
+  }
+  
+  public static JSONArray browseThreddsCatalog(HttpServletRequest request,String catalogURL, String variableFilter,String textFilter) throws MalformedURLException, Exception {
+    long startTimeInMillis = Calendar.getInstance().getTimeInMillis();
     long timeStampBefore = Calendar.getInstance().getTimeInMillis();
     long timeStampAfter;
-    
-    nodeStr= HTTPTools.makeCleanURL(nodeStr);
-    String rootCatalog =  new URL(nodeStr).toString();    
+    String _catalogURL= HTTPTools.makeCleanURL(catalogURL);
+    String rootCatalog =  new URL(_catalogURL).toString();    
     String path = new URL(rootCatalog).getFile();
     String hostPath = rootCatalog.substring(0,rootCatalog.length()-path.length());
     
@@ -65,7 +70,17 @@ public class THREDDSCatalogBrowser {
 
       //Try to get from local storage:
       Search esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
-      String result = esgfSearch.getCatalog(rootCatalog);
+      String result = esgfSearch.getCatalog(catalogURL,request);
+      
+      //Debug.println("catalogURL"+catalogURL);
+      if(catalogURL.endsWith(".catalog")){
+        //Debug.println("OK");
+        //Debug.println(result);
+        JSONObject o =  ((JSONObject) new JSONTokener(result).nextValue());
+        JSONArray a = new JSONArray();
+        a.put(o);
+        return a;
+      }
       
       timeStampAfter = Calendar.getInstance().getTimeInMillis();
       Debug.println("TIME: Catalog Get: ("+(timeStampAfter-timeStampBefore)+" ms)");
@@ -75,7 +90,7 @@ public class THREDDSCatalogBrowser {
     } catch (Exception e1) {
    
       MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
-      Debug.errprintln("Unable to load catalog: "+e1.getMessage());
+      Debug.errprintln("Unable to load catalog: invalid XML");//+e1.getMessage());
       throw e1;
     }
     
@@ -163,7 +178,7 @@ public class THREDDSCatalogBrowser {
         folder.put("expanded", true);
         folder.put("cls", "folder");
         folder.put("variables",putVariableInfo(dataset));
-        folder.put("variables2",putVariableInfo(xmlElement));
+        //folder.put("variables2",putVariableInfo(xmlElement));
        
         if(succeeded==false){
           Debug.errprint("Did not succeed!");
@@ -232,16 +247,19 @@ public class THREDDSCatalogBrowser {
           leaf.put("text", nodeName);// - ("+supportedServicesString+")");
           
           String dataSize = "-";
+          long fileSize = 0;
           try{
             String units = dataset.get("dataSize").getAttrValue("units");;
-            if(units.equals("Tbytes"))units="T";
-            if(units.equals("Gbytes"))units="G";
-            if(units.equals("Mbytes"))units="M";
-            if(units.equals("Kbytes"))units="K";
-            dataSize = dataset.get("dataSize").getValue()+""+units;
+            String dataSizeValue = dataset.get("dataSize").getValue();
+            if(units.equals("Tbytes")){units="T";try{fileSize = (long) Double.parseDouble(dataSizeValue)*1024*1024*1024*1024;}catch(Exception e){}}
+            else if(units.equals("Gbytes")){units="G";try{fileSize = (long) Double.parseDouble(dataSizeValue)*1024*1024*1024;}catch(Exception e){}}
+            else if(units.equals("Mbytes")){units="M";try{fileSize = (long) Double.parseDouble(dataSizeValue)*1024*1024;}catch(Exception e){}}
+            else if(units.equals("Kbytes")){units="K";try{fileSize = (long) Double.parseDouble(dataSizeValue)*1024;}catch(Exception e){}}
+            else try{fileSize = (long) Double.parseDouble(dataSizeValue);}catch(Exception e){}
+            dataSize = dataSizeValue+""+units;
           }catch(Exception e){}
           leaf.put("dataSize", dataSize);
-          
+          leaf.put("fileSize", ""+fileSize);
          // if(parent!=null){
            // putVariableInfo(b,parent);
           //}else{

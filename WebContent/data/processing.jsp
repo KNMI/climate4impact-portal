@@ -8,12 +8,25 @@
   <body>
 		<jsp:include page="../header.jsp" />
 		<!-- Contents -->
-		<jsp:include page="docmenu.jsp" />
+		<jsp:include page="datamenu.jsp" />
+ 
 		<div class="impactcontent">
-		<div class="cmscontent">
-       <%try{out.print(DrupalEditor.showDrupalContent("?q=node/3",request,response));}catch(DrupalEditor.DrupalEditorException e){out.print(e.getMessage());response.setStatus(e.getCode());}%>
-		  </div>
-	    </div>
+  	    <div class="cmscontent">
+  		<%
+  		try{
+  			out.print(DrupalEditor.showDrupalContent("?q=transformations",request,response));
+ 		}catch(DrupalEditor.DrupalEditorException e){
+ 			out.print(e.getMessage());response.setStatus(e.getCode());
+ 			
+ 			out.println("<hr/><a href=\"wpsoverview.jsp\">Show the list of transformations</a>");
+ 			
+  		
+  		}
+  		
+  		%>
+  		</div>
+		</div>
+	 
   <!-- /Contents -->
 	<jsp:include page="../footer.jsp" />
   </body>

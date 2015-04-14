@@ -151,7 +151,7 @@ public class MyXMLParser {
         parse(document);
         inputStream.close();
       } catch (SAXException e) {
-          String msg="SAXException: "+e.getMessage()+":\n\""+string+"\"";
+          String msg="SAXException: "+e.getMessage()+":\n\"";//+string+"\"";
           Debug.errprintln(msg);
           throw new SAXException(msg);
       } catch (IOException e) {

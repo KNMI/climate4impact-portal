@@ -201,7 +201,7 @@ public class ESGFSearch {
     Debug.println("desribeservice "+identifier);
     data = getFileFromImpactStorage((String)identifier);
     if(data == null){
-      Debug.errprintln("Ünable to get descriptions for search items:"+identifier);
+      Debug.errprintln("Ünable to get descriptions for search items:"+identifier+"\n");
     }
     return data;
    
@@ -427,20 +427,22 @@ public class ESGFSearch {
     if(descatFacet.equals("time_frequency"))descatFacet="frequency";
 
     String data = queryDescribeService("discribefacet?descat="+descatFacet);
+    JSONArray catDesc = null;
     if(data == null){
       Debug.errprintln("Unable to describe facets, is static diskCache configured correctly?");
-    }
-
-    JSONObject queryResultsObject = null;
-    try{
-      queryResultsObject =  (JSONObject) new JSONTokener(data).nextValue();
-    } catch (Exception e2) {
-      Debug.errprintln("Unable to describe facets: Exception: "+e2.getMessage());
-    }
-    
-    JSONArray catDesc = null;
-    if(queryResultsObject!=null){
-      catDesc = (JSONArray) queryResultsObject.get(descatFacet);
+    }else{
+  
+      JSONObject queryResultsObject = null;
+      try{
+        queryResultsObject =  (JSONObject) new JSONTokener(data).nextValue();
+      } catch (Exception e2) {
+        Debug.errprintln("Unable to describe facets: Exception: "+e2.getMessage());
+      }
+      
+      
+      if(queryResultsObject!=null){
+        catDesc = (JSONArray) queryResultsObject.get(descatFacet);
+      }
     }
    
     /*for(int n=0;n<catDesc.length();n++){
