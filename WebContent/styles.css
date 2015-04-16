@@ -2511,3 +2511,37 @@ a img {
 	width:40px;
 	height:40px;
 }
+
+/*
+.x-grid-tree-node-expanded .x-tree-icon-parent {
+    background: url('http://icons.iconarchive.com/icons/sekkyumu/developpers/16/Play-Green-Button-icon.png') no-repeat center center !important;
+}
+.x-grid-row  .x-tree-icon-leaf {
+    background-image:url('http://icons.iconarchive.com/icons/graphicrating/koloria/16/Button-Play-Pause-icon.png');
+}
+*/
+.x-tree-icon { width: 24px;}
+.typeOF {
+    background-image:url('images/typeOF.png');
+	    background-repeat:no-repeat;	
+}
+.typeF {
+    background-image:url('images/typeF.png');
+	    background-repeat:no-repeat;	
+}
+.typeO {
+    background-image:url('images/typeO.png');
+	    background-repeat:no-repeat;	
+}
+.typeCAT {
+	    background-image:url('images/typeCAT.png');
+	    background-repeat:no-repeat;	
+}
+.typeFolder {
+	    background-image:url('images/iconFolder.png') !important;
+	    background-repeat:no-repeat;	
+}
+.x-grid-tree-node-expanded .typeFolder{
+	    background-image:url('images/iconFolderopen.png') !important;
+	    background-repeat:no-repeat;	
+}
