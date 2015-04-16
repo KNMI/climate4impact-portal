@@ -64,7 +64,7 @@
     Ext.onReady(function(){
     	Ext.override(Ext.data.proxy.Ajax,{ timeout:240000});
     	setSearchServiceURL('<%="/"+impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?'); 
-    	var fileViewer = new FileViewer();
+    	var fileViewer = new ExtFileViewer();
 		var container = Ext.create('Ext.container.Container', {
 	      layout:'fit',
 		  renderTo:'container',

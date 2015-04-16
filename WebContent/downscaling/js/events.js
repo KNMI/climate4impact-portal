@@ -109,6 +109,7 @@ $(document).on('change', 'input:radio', function(event, ui){
       insertHashProperty('dMethodName', downscalingMethod, sortedKeys);
       $('#validation').html("<a href='../DownscalingService/validation?idZone="+idZone+"&predictandName="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
       $('#downscalingmethod-header').collapsible('open');
+      loadValidationReport();
       loadDatasets();
     }
   }else if($(this).attr('name') == 'dataset-type'){

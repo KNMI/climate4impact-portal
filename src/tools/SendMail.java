@@ -65,7 +65,7 @@ public class SendMail{
         Transport.send(message);
         System.out.println("Sent message successfully....");
      }catch (MessagingException mex) {
-       Debug.printStackTrace(mex);
+       //Debug.printStackTrace(mex);
         //mex.printStackTrace();
        //throw new Exception("Unable to send mail with subject ["+subject+"] msg: "+mex.getMessage());
      }

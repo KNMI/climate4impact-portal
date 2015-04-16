@@ -2387,6 +2387,11 @@ a img {
 	margin:0px;
 }
 
+.topDialog{
+	z-index:300000 !important;
+}
+
+
 
 .footerlogos p{
 

@@ -6,8 +6,8 @@
 		String Home="/impactportal/";
 		//String header=ImpactPages.createHeader(request.getServletPath());
 		
-		String[] menuElements={"documentation/guidanceandusecases.jsp","documentation/backgroundandtopics.jsp","documentation/glossary.jsp","documentation/mapandplot.jsp","documentation/processing.jsp","documentation/publications.jsp"};
-		String[] menuNames   ={"Guidance &amp; use cases","Background &amp; topics","Glossary","Map &amp; Plot","Processing","Publications"};
+		String[] menuElements={"documentation/guidanceandusecases.jsp","documentation/backgroundandtopics.jsp","documentation/glossary.jsp","documentation/publications.jsp"};
+		String[] menuNames   ={"Guidance &amp; use cases","Background &amp; topics","Glossary","Publications"};
 				
 		String pageName=request.getServletPath();
 		

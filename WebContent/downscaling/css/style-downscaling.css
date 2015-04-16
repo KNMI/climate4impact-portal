@@ -1,0 +1,80 @@
+.refreshinfo
+{ 
+	display:inline;
+	float:left;
+	overflow:hidden;
+	width:740px;
+	height:20px;
+}
+
+.link 
+{ 
+	cursor: pointer; 
+}
+
+#predictand_info 
+{ 
+	float: left; 
+	padding: 30px;
+}
+		
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('../../images/ajax-loader.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading {
+    overflow: hidden;   
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal {
+    display: block;
+}
+		
+#slider-range {
+	width: 60%;
+	margin-top: 5px
+}
+.input-year{
+	width: 30px;
+	height: 15px !important;
+}
+#period-selection{
+	margin-top: 2px;
+}
+#period-selection div{
+	float: left;
+	margin-right: 10px;
+}
+
+#bottom-buttons{
+	margin: 5px 5px 5px 0;
+}
+
+/*
+JQUERY UI MODIFICATIONS
+*/
+.ui-slider .ui-slider-range {
+    background-position: initial !important;
+}
+
+/* #button-load-scenarios span{ */
+/* 	padding:2 !important; */
+/* } */
+
+#button-load-scenarios .ui-button-text {
+    padding: 10px 13px;
+}

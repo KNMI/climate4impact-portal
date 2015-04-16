@@ -33,13 +33,6 @@ import tools.Debug;
  */
 public class DownscalingAuth{
   public static final String CONTENT_TYPE_JSON = "application/json";
-  public static final String C4I_USER = "climate4impact";
-  public static final String C4I_PASSWORD = "climate4impact";
-  public static final String BASE_DP_URL = "http://meteo.unican.es/dp/";
-//  public static final String BASE_DP_URL = "http://10.0.2.2:8080/dp/";
-  public static final String BASE_DP_REST_URL = BASE_DP_URL + "rest";
-  public static final String DATE_FORMAT = "dd-MM-yyyy HH:mm:ss z";
-  public static final String C4I_CREDENTIAL_PATH = Configuration.getDownscalingPortalWorkspace()+"downscaling.cred";
   public static enum responseStatus {OK, CREATED, BAD_REQUEST, NOT_FOUND};
   /**
    * @see HttpServlet#HttpServlet()
@@ -65,7 +58,7 @@ public class DownscalingAuth{
   }
   
   protected static HttpURLConnection prepareSimpleQuery(String URI, String type) throws IOException{
-    Debug.println("Subscribe user -- Building statement for URI: " + URI);
+    Debug.println("Building statement for URI: " + URI);
     URL url;
     HttpURLConnection urlConn;
     url = new URL(URI);
@@ -86,13 +79,16 @@ public class DownscalingAuth{
     String token = "";
     Scanner scanner = null;
     try {
-      scanner = new Scanner(new File(C4I_CREDENTIAL_PATH));
+      File file = new File(Configuration.DownscalingConfig.getTokenPath()+"/"+Configuration.DownscalingConfig.getTokenFileName());
+      if(!file.exists())
+        authenticate();
+      scanner = new Scanner(file);
       while(scanner.hasNextLine() && !isValid){
         String line = scanner.nextLine();
         String[] parts = line.split("=");
         String key = parts[0];
         if(key.equals("expiration")){
-          SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+          SimpleDateFormat formatter = new SimpleDateFormat(Configuration.DownscalingConfig.getDateFormat());
           try {
             expiration = formatter.parse(parts[1]);
             Date now = new Date();
@@ -125,10 +121,10 @@ public class DownscalingAuth{
     HttpURLConnection urlConn;
     String token = null;
     try{
-      url = new URL(BASE_DP_REST_URL + "/authenticate");
+      url = new URL(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/authenticate");
       urlConn = (HttpURLConnection)url.openConnection();
       urlConn.setRequestMethod("GET");
-      String urlParameters = "username="+C4I_USER+"&password="+C4I_PASSWORD;
+      String urlParameters = "username="+Configuration.DownscalingConfig.getUsername()+"&password="+Configuration.DownscalingConfig.getPassword();
       urlConn.setDoOutput(true);
       DataOutputStream wr = new DataOutputStream(urlConn.getOutputStream());
       wr.writeBytes(urlParameters);
@@ -149,7 +145,14 @@ public class DownscalingAuth{
     PrintWriter pw = null;
     try
     {
-      file = new FileWriter(C4I_CREDENTIAL_PATH);
+      File directory = new File(Configuration.DownscalingConfig.getTokenPath());
+      if(!directory.exists())
+        directory.mkdirs();
+      String tokenFilePath = Configuration.DownscalingConfig.getTokenPath() + "/" + Configuration.DownscalingConfig.getTokenFileName();
+      File tokenFile = new File(tokenFilePath);
+      if(!tokenFile.exists())
+        tokenFile.createNewFile();
+      file = new FileWriter(tokenFilePath);
       pw = new PrintWriter(file);
       pw.println(content);
     } catch (Exception e) {
@@ -172,7 +175,7 @@ public class DownscalingAuth{
   }
   
   protected static ImpactUser getUser(ImpactUser user, String username) throws ServletException, IOException{
-    HttpURLConnection urlConn = prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username, "GET");
+    HttpURLConnection urlConn = prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users/" + username, "GET");
     if(urlConn.getResponseCode() == HttpStatus.SC_SERVICE_UNAVAILABLE)
       throw new ServletException("[CODE " + HttpStatus.SC_SERVICE_UNAVAILABLE + "] Downscaling Portal Service temporarily unavailable");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)

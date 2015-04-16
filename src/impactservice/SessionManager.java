@@ -45,7 +45,7 @@ public class SessionManager {
           "  \"pagelimit\":\""+pagelimit+"\",\n" +
           "  \"where\":\""+where + "\"\n"+
           "}\n";
-      Debug.println("SearchSession JSON:\n"+searchSessionJson);
+      //Debug.println("SearchSession JSON:\n"+searchSessionJson);
       return searchSessionJson;
     }
    /* public void reset() {

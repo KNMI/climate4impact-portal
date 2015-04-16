@@ -56,7 +56,7 @@ public class DownscalingService extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {  
     String pathInfo = request.getPathInfo();
     if(pathInfo.matches("/users/.*/predictands")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?" + request.getQueryString(), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" + request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -68,7 +68,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/users/.*/zones/.*/predictors/.*/predictands/.*")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo, "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -84,7 +84,7 @@ public class DownscalingService extends HttpServlet {
       String dMethodType = request.getParameter("dMethodType");
       if(dMethodType != null && !dMethodType.equals(""))
           parameters = "?dMethodType=" + dMethodType;
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + parameters, "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + parameters, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -96,7 +96,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/zones/.*/predictands/.*/stations")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo, "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo, "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -109,7 +109,7 @@ public class DownscalingService extends HttpServlet {
       out.flush();
     
     }else if(pathInfo.matches("/variables")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?variableType=" + request.getParameter("variableType"), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?variableType=" + request.getParameter("variableType"), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -122,8 +122,8 @@ public class DownscalingService extends HttpServlet {
       out.flush();
     }else if(pathInfo.matches("/validation")){
       String params = "?idZone=" + 
-          request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("downscalingMethod");
-      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + URIUtil.encodeQuery(params), "GET");
+          request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("dMethodName");
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + URIUtil.encodeQuery(params), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();
       byte[] buffer = new byte[4096];
@@ -136,7 +136,7 @@ public class DownscalingService extends HttpServlet {
       response.setContentType("application/pdf");
       response.setHeader("Content-Disposition", "attachment; filename=output.pdf");
     }else if(pathInfo.matches("/datasets")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?zone="+request.getParameter("zone")+"&username="+request.getParameter("username"), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?zone="+request.getParameter("zone")+"&username="+request.getParameter("username"), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -148,7 +148,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.matches("/datasets/.*/scenarios")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "?zone="+request.getParameter("zone") + "&sYear="+request.getParameter("sYear") + "&eYear="+request.getParameter("eYear"), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?zone="+request.getParameter("zone") + "&sYear="+request.getParameter("sYear") + "&eYear="+request.getParameter("eYear"), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -160,7 +160,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.equals("/jobs")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + pathInfo + "/users/" + request.getParameter("username") + "/jobs", "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "/users/" + request.getParameter("username") + "/jobs", "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -202,7 +202,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<Job> getUserJobs(String username) throws JSONException, IOException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username + "/jobs", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users/" + username + "/jobs", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -223,7 +223,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<Predictand> getUserPredictands(String username)throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users/" + username + "/predictands", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users/" + username + "/predictands", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -244,7 +244,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<String> getVariableTypes()throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/variables/types", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/variables/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -264,7 +264,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<String> getDatasetTypes()throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/datasets/types", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/datasets/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -284,7 +284,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<String> getDownscalingMethodTypes()throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscalingMethods/types", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/downscalingMethods/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -311,7 +311,7 @@ public class DownscalingService extends HttpServlet {
 	  String pathInfo = request.getPathInfo();
 //	  ImpactUser loggedInUser = LoginManager.getUser(request);
     if(pathInfo.equals("/subscribe")){//Configuration.getImpactWorkspace()
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/users", "POST");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users", "POST");
       urlConn.setRequestProperty("Content-Type", "application/json");
       JSONObject user = new JSONObject();
       try {
@@ -337,7 +337,7 @@ public class DownscalingService extends HttpServlet {
       String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+
           request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName")+"&scenarioName="+request.getParameter("scenarioName")+
           "&cells="+request.getParameter("cells");
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(DownscalingAuth.BASE_DP_REST_URL + "/downscale" + URIUtil.encodeQuery(params), "POST");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/downscale" + URIUtil.encodeQuery(params), "POST");
       response.getWriter().print(urlConn.getResponseMessage());
       response.setStatus(urlConn.getResponseCode());
       

@@ -11,6 +11,7 @@
    <!--  <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" /> -->
      
     <script type="text/javascript" src="../js/components/processors/useProcessor.js"></script>
+     <script type="text/javascript" src="../data/catalogbrowser/catalogbrowser.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
     <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>

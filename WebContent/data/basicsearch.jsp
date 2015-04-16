@@ -1,13 +1,19 @@
-<%@page import="impactservice.SessionManager"%>
+<%@page import="impactservice.SessionManager,impactservice.LoginManager,impactservice.ImpactUser"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.DrupalEditor"%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
    
-    <jsp:include page="../includes-ui.jsp" />
+    <jsp:include page="../includes-ext.jsp" />
     
     <script type="text/javascript" src="../js/jqueryextensions/jquery.collapsible.min.js"></script>
     <script type="text/javascript" src="/impactportal/adagucviewer/webmapjs/WMJSTools.js"></script>
 	  <script type="text/javascript" src="basicsearchsettings/variables.js"></script>
+	        <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+        <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
+            <script type="text/javascript" src="/impactportal/data/catalogbrowser/catalogbrowser.js"></script>
+             <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
+                 <script type="text/javascript" src="../js/ImpactJS.js"></script>
+    <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
 	  <script type="text/javascript" src="basicsearch.js"></script>
 	  
 	  <style>
@@ -21,6 +27,23 @@
 			
 		}
 	  </style>
+	  	 <%
+			ImpactUser user = null;
+				try{
+					user = LoginManager.getUser(request);
+				}catch(Exception e){
+			
+				}
+				
+				 if (user!=null){
+		%>
+	  	<script type="text/javascript">
+				openid = '<%=user.getOpenId()%>';
+				
+			</script>
+		<%} %>
+     
+     
 	   
 	  
 

@@ -582,6 +582,10 @@ public class GenericCart {
             dataset.put("hasdap",true);
             dataset.put("iconCls", "typeOF");
           }
+          if(fileEntry[f].getName().lastIndexOf(".catalog")>=0){
+            dataset.put("catalogurl",impactUser.getDataURL()+fileEntry[f].getName());
+            dataset.put("catalog",true);
+          }
           dataset.put("httpurl",dapLocationHTTPS+impactUser.internalName+"/"+path+fileEntry[f].getName());
           dataset.put("hashttp",true);
           dataset.put("id",path+fileEntry[f].getName());
