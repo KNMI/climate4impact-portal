@@ -106,7 +106,7 @@ public class LoginManager {
       Vector<XMLElement> services = xmlParser.getFirst().get("XRD").getList("Service");
       for(XMLElement service : services){
         if(service.get("Type").getValue().indexOf("myproxy")!=-1){
-          Debug.println("myproxyservice: "+service.get("URI").getValue());
+          Debug.println("myproxyservice retrieved from OpenId: "+service.get("URI").getValue());
           user.userMyProxyService = service.get("URI").getValue();
         }
       }
