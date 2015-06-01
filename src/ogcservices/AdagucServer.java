@@ -59,7 +59,7 @@ public class AdagucServer {
     environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
     
     String commands[] = Configuration.ADAGUCServerConfig.getADAGUCExecutable();
-    Debug.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
+    //Debug.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
     CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,outputStream,null);
   }
 

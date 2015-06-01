@@ -1,21 +1,34 @@
 package ogcservices;
 
 
+import impactservice.GenericCart;
+import impactservice.LoginManager;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.SortedSet;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+import org.xml.sax.SAXException;
+
 import tools.Debug;
+import tools.HTTPTools;
+import tools.HTTPTools.WebRequestBadStatusException;
+import tools.JSONResponse;
+import tools.KVPKey;
 import tools.MyXMLParser;
 import tools.MyXMLParser.Options;
+import wps.WebProcessingInterface;
 
 /**
  * Servlet implementation class AdagucViewer
@@ -183,7 +196,7 @@ public class AdagucViewer extends HttpServlet {
 	 */
 	private void XML2JSON(HttpServletRequest request, OutputStream out1, HttpServletResponse response) {
 	  Debug.println("XML2JSON "+request.getQueryString());
-    
+	  boolean thisIsWPSExecuteRequest = false;
     String requestStr=request.getParameter("request");
     if(requestStr==null){
       requestStr=request.getParameter("REQUEST");
@@ -207,15 +220,19 @@ public class AdagucViewer extends HttpServlet {
       Debug.println("Making XML to JSON request for "+requestStr);
 
       boolean isLocalADAGUC = false;
+      boolean isLocalWPS = false;
       
       //Determine whether the request is to the ADAGUC server in our impactportal or to any other WMS server?
       if(requestStr.indexOf("impactportal/ImpactService?")!=-1){
         isLocalADAGUC=true;
       }
+      if(requestStr.indexOf("impactportal/WPS?")!=-1){
+        isLocalWPS=true;
+      }
 
       if(isLocalADAGUC){
         //Local XML2JSON request to our local adagucserver
-        Debug.println("Running local CGI with "+requestStr);
+        Debug.println("Running local ADAGUC CGI with "+requestStr);
         //Remove /impactportal/ImpactService? from the requeststring
         int beginningOfUrl = requestStr.indexOf("?");
         if(beginningOfUrl!=-1){
@@ -229,6 +246,82 @@ public class AdagucViewer extends HttpServlet {
         }catch(Exception e){
           throw new Exception("Unable to parse XML at "+requestStr);
         }
+      }else if(isLocalWPS){
+        
+        
+        //Local XML2JSON request to our local pywpsserver
+        Debug.println("Running local WPS CGI with "+requestStr);
+        //Remove /impactportal/ImpactService? from the requeststring
+        int beginningOfUrl = requestStr.indexOf("?");
+        if(beginningOfUrl!=-1){
+          requestStr = requestStr.substring(beginningOfUrl+1);
+          Debug.println("Truncated URL to "+requestStr);
+        }
+        
+        KVPKey pq = HTTPTools.parseQueryString(requestStr);
+        Vector<String> requestKVP = pq.getValue("request");
+        if(requestKVP.size()==1){
+          if(requestKVP.get(0).equalsIgnoreCase("execute")){
+            Debug.println("THIS iS EXECUTE");
+            thisIsWPSExecuteRequest = true;
+          }
+        }else{
+          Vector<String> output = pq.getValue("output");
+          if(output.size()==1){
+            String statusLocation = request.getParameter("request");
+            Debug.println("THIS IS GET STATUS LOCATION: "+statusLocation);
+            String jsonData = "";
+            int maximumTries = 4;
+            boolean success = false;
+            try{
+              MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
+              do{
+                maximumTries--;
+                try{
+                  b.parse(new URL(statusLocation));
+                  success = true;
+                }catch(SAXException s){
+                  Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
+                  Thread.sleep(200);
+                  if(maximumTries == 0){
+                    GenericCart jobList;
+                    try {
+                      jobList = LoginManager.getUser(request,null).getProcessingJobList();
+                      String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
+                      jobList.removeDataLocator(basename);
+                    } catch (Exception e1) {
+                      // TODO Auto-generated catch block
+                      e1.printStackTrace();
+                    }
+                    throw s;
+                  }
+                }
+              }while(maximumTries>0 && success == false);
+              
+              jsonData = b.toJSON(tools.MyXMLParser.Options.NONE);
+              
+            }catch(Exception e){
+              JSONObject o = new JSONObject();
+              o.put("error", e.getMessage());
+              jsonData=o.toString();
+            }
+            response.setContentType("application/json");
+            //Output JSON using JSONP
+            out1.write((callbackStr+"("+jsonData+");").getBytes());
+            rootElement = null;
+            return;
+          }
+        }
+        
+        
+        
+        ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+        PyWPSServer.runPyWPS(request,null,stringOutputStream,requestStr,null);
+        try{
+          rootElement.parseString(stringOutputStream.toString());
+        }catch(Exception e){
+          throw new Exception("Unable to parse XML at "+requestStr);
+        }
       }else{
         //Remote XML2JSON request to external WMS service
         Debug.println("Converting XML to JSON for "+requestStr);
@@ -237,6 +330,14 @@ public class AdagucViewer extends HttpServlet {
      
       response.setContentType("application/json");
       
+      try{
+        if(thisIsWPSExecuteRequest){
+          WebProcessingInterface.trackJobForUser( LoginManager.getUser(request,null), rootElement, null);
+        }
+      }catch(Exception e){
+        e.printStackTrace();
+      }
+      
       
       //Output JSON using JSONP
       out1.write((callbackStr+"("+rootElement.toJSON(Options.NONE)+");").getBytes());
@@ -244,12 +345,28 @@ public class AdagucViewer extends HttpServlet {
       return;
       
     } catch (Exception e) {
+      
       if(e.getMessage()!=null){
-        try {
-          out1.write(e.getMessage().getBytes());
-        } catch (IOException e1) {
+        
+          response.setContentType("application/json");
+
+          JSONResponse r = new JSONResponse();
+          r.setJSONP(callbackStr);
+          
+          if(e.getClass() == WebRequestBadStatusException.class){
+            r.setErrorMessage(((WebRequestBadStatusException)e).getResult(), ((WebRequestBadStatusException)e).getStatusCode());
+          }else{
+            r.setErrorMessage(e.getMessage(),200);
+          }
+          Debug.println("Exception "+e.getMessage());
+          
+          try {
+            out1.write(r.getMessage().getBytes());
+          } catch (IOException e1) {
+            // TODO Auto-generated catch block
             e1.printStackTrace();
-        }
+          }
+        
       }
       return;
     }

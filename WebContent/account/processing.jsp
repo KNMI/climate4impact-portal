@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.*"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8" import="impactservice.ImpactUser" import="impactservice.LoginManager"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -27,7 +27,7 @@
     	var container = Ext.create('Ext.container.Container', {
  	        layout: 'fit',
  			renderTo:'container',
- 		   	minHeight:500,
+ 		   	//minHeight:500,
  		    scripts:true,
  		    autoScroll:false, 
  		    items:[wpsOverView],
@@ -36,6 +36,11 @@
     	});
     });
     <% } %>
+    jQuery(document).ready(function($) {
+	    $(".clickable-row").click(function() {
+	        window.document.location = $(this).data("href");
+	    });
+	});
     </script>
   </head>
   <body>
@@ -45,10 +50,11 @@
 		<div class="impactcontent"> 
 		
 		<div class="breadcrumb"><a href="login.jsp">Account</a> » Processing </div>
-		<h1>Processing</h1>
+		
 		<%
 		if (user==null){
 			 %>
+			 <h1>Processing - Please sign in ...</h1>
 			 	<ul>
 			 	<li>Before you can start processing, you need to <a href="#" onclick="generateLoginDialog(true)">sign in</a>
            and <a  href="" onclick='location.reload();'>refresh this page</a>.</li>
@@ -61,9 +67,16 @@
 		 	}
 		if(user!=null){
 		%>
-	
+			<h1>Processing wizards</h1>
+			<p>Choose a wizard to help you guide through processing, analysis and data extraction options.</p>
+			<div class="drupal tableborder">
+			<table class="drupal"><tr><th>Name</th><th>Description</th></tr>
+			<tr class='clickable-row' data-href='wizard_convert.jsp'><td><code class="codejobsicon"></code>&nbsp;Convert and subset</td><td>Extracts a region in space and time, regrids and converts to other formats. Uses the WCS_subsetting WPS in the background.</td></tr>
+			</table>
+			</div>
 		
-			
+			<h1>Web Processing Services</h1>
+			<p>Web processing services are processing services are used by the wizard but can be controlled manually.</p>
 			<div id="container"></div>
 		
 		<%} %>
@@ -72,4 +85,5 @@
 		<!-- /Contents -->
 	  <jsp:include page="../footer.jsp" />
   </body>
+
 </html>

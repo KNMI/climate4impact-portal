@@ -45,14 +45,12 @@ public class PyWPSServer extends HttpServlet {
     //Try to get homedir
     String userHomeDir="";
     ImpactUser user = null;
-    try{
+   
       user = LoginManager.getUser(request,response);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WPS for user: "+user.getId());
-    }catch(Exception e){    
-      throw new Exception("Warning: Anonymous user: '"+e.getMessage()+"'");
-    }
+ 
     
     if(userHomeDir.length()>0){
       environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);

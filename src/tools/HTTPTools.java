@@ -68,7 +68,7 @@ public class HTTPTools extends HttpServlet {
       'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
       'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '|', '&',
-      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')'};
+      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')',';'};
   /**
    * Validates input for valid tokens, preventing XSS attacks. Throws Exception when invalid tokens are encountered.
    * @param input The string as input
@@ -552,16 +552,17 @@ public class HTTPTools extends HttpServlet {
     String queryString = urlParts[urlParts.length - 1];
     String[] kvpparts = queryString.split("&");
     for (int j = 0; j < kvpparts.length; j++) {
-      String kvp[] = kvpparts[j].split("=");
-      if (kvp.length == 2) {
+      int equalIndex = kvpparts[j].indexOf("=");
+      if(equalIndex > 0){
+        String key = kvpparts[j].substring(0,equalIndex);
+        String value = kvpparts[j].substring(equalIndex+1);
         String valueChecked;
         try {
-          valueChecked = validateInputTokens(kvp[1]);
-          kvpKey.addKVP(kvp[0],valueChecked);
+          valueChecked = validateInputTokens(value);
+          kvpKey.addKVP(key,valueChecked);
         } catch (Exception e) {
-          kvpKey.addKVP(kvp[0],e.getMessage());
+          kvpKey.addKVP(key,e.getMessage());
         }
-        
       }
     }
     return kvpKey;

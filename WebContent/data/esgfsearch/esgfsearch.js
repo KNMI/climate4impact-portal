@@ -19,7 +19,7 @@ var SearchInterface = function(options){
   var impactESGFSearchEndPoint = "esgfsearch?";
   
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
-  query="data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+  query="";//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
   var rootElement = null;
   
   
@@ -224,14 +224,14 @@ var SearchInterface = function(options){
     var el = jQuery('<div></div>', {
         title: 'Dataset',
       }).dialog({
-        width:950,
-        height:600
+        width:450,
+        height:400
       });
       el.html('<div class="ajaxloader"></div>');
     var callback = function(data){
       
-      renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
-      //alert("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
+      //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
+        el.html("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
     }
     $.ajax({
       url: impactESGFSearchEndPoint+"service=search&request=addtobasket&query="+encodeURIComponent(query),
@@ -265,7 +265,7 @@ var SearchInterface = function(options){
     }
     html+="</div>";
     var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
-    html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
+    //html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
     rootElement.find(".searchResults").find(".searchCompBody").first().html(html);
     
     rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){

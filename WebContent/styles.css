@@ -46,6 +46,9 @@ body,.x-body {
 .ui-dialog{
 	box-shadow: 0px 0px 12px 4px #444;
 }
+.x-window{
+	box-shadow: 0px 0px 12px 4px #444;
+}
 .ui-widget-content{
 	border:2px solid #777;
 	
@@ -1225,6 +1228,7 @@ table.modellist {
 	line-height: 20px;
 	border: 1px solid white;
 	font-weight: bold;
+	
 }
 
 .modellist tr.odd td {
@@ -1235,39 +1239,51 @@ table.modellist {
 	background-color: #FFFFF3;
 }
 
-.drupal table tr th {
+/* .drupal table tr th {
 	background: #757575;
 	background: rgba(0, 0, 0, 0.51);
 	border-bottom-style: none;
 	width: 100%;
-}
+	
+} */
 
-.drupal table tr th,.drupal table tr th a,.drupal table tr th a:hover {
+/* .drupal table tr th,.drupal table tr th a,.drupal table tr th a:hover {
 	color: #FFF;
 	font-weight: bold;
 	width: 100%;
 }
-
-.drupal table tbody tr th {
+ */
+/* .drupal table tbody tr th {
 	vertical-align: top;
+
+
+} */
+
+.tableborder td, .tableborder th{
+	border:1px solid #F0F0F0;
 }
 
 .drupal tr td,.drupal tr th {
 	padding: 5px;
-	border: 1px solid #fff;
 	text-align: left; /* LTR */
+	vertical-align: middle;
 }
 
-.drupal tr.odd {
-	background: #e4e4e4;
-	background: rgba(0, 0, 0, 0.105);
+.drupal tr th{
+	color:white;
+	background: #428bca;
+	font-weight:bold;
+	font-size:14px;
+}
+ 
+.drupal tr:nth-child(even) {
+	background: #FFFFFF;
 }
 
-.drupal tr,.drupal tr.even {
-	background: #efefef;
-	background: rgba(0, 0, 0, 0.063);
-}
-
+.drupal tr:nth-child(odd){
+	background: #F5F5F5;
+} 
+ 
 .drupal table ul.links {
 	margin: 0;
 	padding: 0;
@@ -1278,14 +1294,21 @@ table.modellist {
 	padding: 0 1em 0 0;
 }
 
-table.drupal {
+ table.drupal {
 	width: 100%;
 	border: 0;
 	border-spacing: 0;
 	font-size: 0.857em;
-	margin: 10px 0;
-	color: black;
+	margin: 0px 0;
+	border-collapse: collapse;
 }
+div.drupal{
+	border:1px solid #AAA;
+	
+	margin:0px;
+	padding:0px;
+}
+
 
 div.textstandardleft {
 	/*width: 540px;*/
@@ -1409,13 +1432,6 @@ td.textstandardleft {
 	padding-top: 10px;
 }
 
-table.drupal {
-	width: 100%;
-	border: 0;
-	border-spacing: 0;
-	font-size: 0.857em;
-	margin: 10px 0;
-}
 
 strong {
 	font-weight: bolder;
@@ -2433,19 +2449,27 @@ a img {
 	   border-bottom-width: 1px !important;
 }
 .x-panel{
-
+  border-color:white;
 }
 .x-column-header-inner,.x-window-header-default{
-	   border: 0px solid #BBBBBB;
+	   border: 0px solid white;;
 	   border-bottom-width: 1px !important;
+	  	color:white;
+		background: #428bca;
+		font-weight:bold;
+		font-size:14px;
+	
+	 border-color:white !important;;
 }
 .x-column-header{
 	 border-bottom-width: 1px !important;
+	  border-color:white !important;;
+	  font-family: "Open Sans", "Helvetica Neue", sans-serif;
 }
 .x-panel-header,.x-window-header-default-top{
 		
 	background: none repeat scroll 0 0 #E0E0E0;
-	
+	 border-color:white !important;;
     padding: 5px 10px 6px 10px;
 }
 .x-window-header-default{ 
@@ -2459,7 +2483,8 @@ a img {
 }
 .x-window-header-default .x-tool-img {
     background-color: #E0E0E0;
-    
+  
+    border-color:white !important;; 
 }
 .x-border-layout-ct {
     background-color: white;
@@ -2549,4 +2574,11 @@ a img {
 .x-grid-tree-node-expanded .typeFolder{
 	    background-image:url('images/iconFolderopen.png') !important;
 	    background-repeat:no-repeat;	
+}
+
+
+.clickable-row:hover { 
+    
+   cursor: pointer;
+   background:#E2EFF8 !important;
 }

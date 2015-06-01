@@ -159,7 +159,7 @@ public class WebProcessingInterface {
 	          }catch(Exception e){}
 	        }catch(Exception e){}
 	        message+="\n\n"+extraInfo;
-	        Debug.errprintln("error: "+message);
+	        //Debug.errprintln("error: "+message);
 	        return returnErrorMessage(message);
 	      }
 	    }catch(Exception e){}
@@ -380,40 +380,9 @@ public class WebProcessingInterface {
         a.parseString(out.toString());
         out = null;
       }
-       //Check if an Exception has been thrown:
-      JSONObject exception = checkException(a,postData+"\n\n"+a.toString());
-      if(exception!=null)return exception;
       
-      //Get the reference to the started process (statuslocation)
-      String statusLocation=null;
-      String creationTime = null;
-      JSONObject data = new JSONObject();
-     
-      statusLocation=a.get("wps:ExecuteResponse").getAttrValue("statusLocation");
-      
-      a.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessAccepted");
-      creationTime = a.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");
-
-    
-      Debug.println("WPS statusLocation = '"+statusLocation+"'");
-      Debug.println("WPS creationTime = '"+creationTime+"'");
-    
-   
-      data.put("wpsurl", statusLocation);
-      data.put("status", "accepted");
-      data.put("statusLocation", statusLocation);
-      data.put("creationTime", creationTime);
-      data.put("id", procId);
-      
-      MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-      b.parseString(postData);
-      JSONObject inputDataAsJSON = b.toJSONObject(Options.STRIPNAMESPACES);
-        
-      data.put("postData", inputDataAsJSON);
-      String uniqueID=statusLocation.substring(statusLocation.lastIndexOf("/")+1);
-      data.put("uniqueid", uniqueID);
       //Track this job
-      trackJobForUser(user,uniqueID,data.toString());
+      JSONObject data = trackJobForUser(user,a,postData);
       //monitorProcess(statusLocation,request);
       return data;
     
@@ -426,15 +395,51 @@ public class WebProcessingInterface {
   }
   
   
-  private static void trackJobForUser(ImpactUser user, String id, String data) {
+  public static JSONObject trackJobForUser(ImpactUser user, XMLElement a,String postData) throws Exception {
+    Debug.println("TrackJob For user");
+    //Check if an Exception has been thrown:
+    JSONObject exception = checkException(a,postData+"\n\n"+a.toString());
+    if(exception!=null)return exception;
+    
+    //Get the reference to the started process (statuslocation)
+    String statusLocation=null;
+    String creationTime = null;
+    JSONObject data = new JSONObject();
+   
+    statusLocation=a.get("wps:ExecuteResponse").getAttrValue("statusLocation");
+    
+    a.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessAccepted");
+    creationTime = a.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");
+    String procId = a.get("wps:ExecuteResponse").get("wps:Process").get("ows:Identifier").getValue();
+  
+    Debug.println("WPS statusLocation = '"+statusLocation+"'");
+    Debug.println("WPS creationTime = '"+creationTime+"'");
+  
+ 
+    data.put("wpsurl", statusLocation);
+    data.put("status", "accepted");
+    data.put("statusLocation", statusLocation);
+    data.put("creationTime", creationTime);
+    //String id = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
+    data.put("id", procId);
+    
+    MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
+    if(postData!=null){
+      b.parseString(postData);
+      JSONObject inputDataAsJSON = b.toJSONObject(Options.STRIPNAMESPACES);
+        
+      data.put("postData", inputDataAsJSON);
+    }
+    String uniqueID=statusLocation.substring(statusLocation.lastIndexOf("/")+1);
+    data.put("uniqueid", uniqueID);
     try {
       GenericCart p=user.getProcessingJobList();
-      p.addDataLocator(id, data);
+      p.addDataLocator(uniqueID, data.toString());
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
+    return data;
   }
   
   /**
@@ -466,6 +471,15 @@ public class WebProcessingInterface {
           Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
           Thread.sleep(200);
           if(maximumTries == 0){
+            GenericCart jobList;
+            try {
+              jobList = LoginManager.getUser(request,null).getProcessingJobList();
+              String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
+              jobList.removeDataLocator(basename);
+            } catch (Exception e1) {
+              // TODO Auto-generated catch block
+              e1.printStackTrace();
+            }
             throw s;
           }
         }
@@ -522,7 +536,10 @@ public class WebProcessingInterface {
       }
       
     }catch(Exception e){
-      Debug.errprintln("error");
+      Debug.errprintln("error for "+statusLocation);
+      
+
+      
       return returnErrorMessage(e.getMessage());  
     }
     return data;

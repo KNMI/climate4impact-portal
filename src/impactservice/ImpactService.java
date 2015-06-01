@@ -288,9 +288,9 @@ public class ImpactService extends HttpServlet {
           }
           if(httpURL!=null){
             if(openid!=null){
-              httpLink="<button target=\"_blank\" href=\""+httpURL+"?openid="+openid+"\">download</button>";
+              httpLink="<button target=\"_blank\" onclick=\"window.open('"+httpURL+"?openid="+openid+"')\">download</button>";
             }else{
-              httpLink="<button href=\""+httpURL+"\">download</button>";
+              httpLink="<button href=\"window.open('"+httpURL+"')\">download</button>";
             }
           }
           //html+="</td><td>"+dapLink+"</td><td>"+httpLink;

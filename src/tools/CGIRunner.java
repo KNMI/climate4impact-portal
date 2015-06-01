@@ -102,15 +102,15 @@ public class CGIRunner {
   
     ProcessRunner.StatusPrinterInterface stdoutPrinter = new StdoutPrinter(outputStream);
     ProcessRunner.StatusPrinterInterface stderrPrinter = new StderrPrinter();
-
-/*    DebugConsole.println("Environment:");
-    for(int j=0;j<environmentVariables.length;j++){
-      DebugConsole.println(environmentVariables[j]);
-    }
-    DebugConsole.println("Commands:");
-    for(int j=0;j<commands.length;j++){
-      DebugConsole.println(commands[j]);
-    }*/
+//
+//    Debug.println("Environment:");
+//    for(int j=0;j<environmentVariables.length;j++){
+//      Debug.println(environmentVariables[j]);
+//    }
+//    Debug.println("Commands:");
+//    for(int j=0;j<commands.length;j++){
+//      Debug.println(commands[j]);
+//    }
     
     ProcessRunner processRunner = new ProcessRunner (stdoutPrinter,stderrPrinter,environmentVariables,directory);
     

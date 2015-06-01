@@ -1,5 +1,5 @@
 <!-- Header -->
-<%@page import="tools.HTTPTools" import="impactservice.*"%>
+<%@page import="tools.HTTPTools" import="impactservice.ImpactUser" import="impactservice.LoginManager"  import="impactservice.DrupalEditor"%>
 <%
 	String Home="/impactportal/";
     out.println("<div id=\"bodycontainer\">");
@@ -7,11 +7,11 @@
     ImpactUser user = null;
     try{
     	user = LoginManager.getUser(request);
-    	loginStr = "<a href=\""+Home+"account/basket.jsp\"><code class=\"codeshoppingcarticon\"></code></a>&nbsp;<a href=\""+Home+"account/login.jsp\">Account</a>";
+    	loginStr = "<a href=\""+Home+"account/login.jsp\">Account</a>&nbsp;<a href=\""+Home+"account/basket.jsp\"><code class=\"codeshoppingcarticon\"></code></a>&nbsp;<a href=\""+Home+"account/processing.jsp\"><code class=\"codejobsicon\"></code></a>";
     }catch(Exception e){
     
     }
-    	
+   
     
 %>
  

@@ -28,7 +28,7 @@
 				
 		String pageName=request.getServletPath();
 	
-		boolean highlightBasket = false,highlightAccount = false;
+		boolean highlightBasket = false,highlightAccount = false, highlightProcessing = false;
 		if(pageName.indexOf("basket.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("upload.jsp")!=-1)highlightBasket = true;
 		if(pageName.indexOf("downloadscript.jsp")!=-1)highlightBasket = true;
@@ -36,7 +36,8 @@
 		
 		if(pageName.indexOf("login.jsp")!=-1)highlightAccount = true;
 		if(pageName.indexOf("getcredential.jsp")!=-1)highlightAccount = true; 
-			
+		if(pageName.indexOf("proc")!=-1)highlightProcessing = true; 
+		if(pageName.indexOf("wizard")!=-1)highlightProcessing = true;
 		
 		//out.print(header); //returns file name and path
 		%>
@@ -44,7 +45,7 @@
   <ul style="height:20px;">
   	<li <% if(highlightAccount)out.print("class=\"sel\""); %>><a href="<%=Home%>account/login.jsp" ><code class="codeusersicon"></code>&nbsp;Account</a></li>
    	<li  <% if(highlightBasket)out.print("class=\"sel\""); %>><a href="<%=Home%>account/basket.jsp" ><code class="codeshoppingcarticon"></code>&nbsp;Basket <code id="baskettext2">(<%=numProductsString%>)</code></a></li>
-   	<li  <% if(pageName.indexOf("proc")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/processing.jsp" ><code class="codejobsicon"></code>&nbsp;Processing</a></li>
+   	<li  <% if(highlightProcessing)out.print("class=\"sel\""); %>><a href="<%=Home%>account/processing.jsp" ><code class="codejobsicon"></code>&nbsp;Processing</a></li>
   	<li  <% if(pageName.indexOf("jobs.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/jobs.jsp" ><code class="codejobsicon"></code>&nbsp;Monitor jobs&nbsp;<code id="jobnumber">(<%=numJobsString%>)</code></a></li>
   	
   	

@@ -605,7 +605,7 @@ public class ESGFSearch {
         if(limit!=null)ESGFQueryString+="limit="+limit+"&";
         if(offset!=null)ESGFQueryString+="offset="+offset+"&";
         if(datasetType!=null)ESGFQueryString+="type="+datasetType+"&";
-        ESGFQueryString+="latest=true&replica=false&";
+        ESGFQueryString+="latest=true&";//replica=false&";
         
         if(startDate!=null)ESGFQueryString+="start="+startDate+"&";
         if(stopDate!=null)ESGFQueryString+="end="+stopDate+"&";

@@ -35,6 +35,7 @@
 	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingdocs.jsp" >Documentation</a></li>
 	<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscaling.jsp" >Create <span class="text-small"> beta</span></a> </li>
 	<li <% if(highLightDownscalingJobs)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingjobs.jsp" >Jobs <span class="text-small"> beta</span></a> </li>
+	
   </ul>  
  </div>
  

@@ -250,7 +250,7 @@ public class LoginManager {
       
     //Debug.println("id == "+id);
     if(id == null){
-      throw new Exception("You are not logged in...");
+      throw new WebRequestBadStatusException(401, "Unauthorized user, you are not logged in.");
     }
     ImpactUser user = getUser(id,request);
     return user;
@@ -402,7 +402,7 @@ public class LoginManager {
         //+"HTTP.SSL.SSLv3="+user.certificateFile+"\n"
         //+"HTTP.SSL.CAPATH="+ Configuration.getImpactWorkspace()+"/esg_trusted_certificates/";
         +"HTTP.SSL.CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation();//+"/esg_trusted_certificates/";
-    Debug.println("createNCResourceFile for user "+user.getId()+":\n"+fileContents);
+    //Debug.println("createNCResourceFile for user "+user.getId()+":\n"+fileContents);
     Tools.writeFile(user.getWorkspace()+"/.httprc", fileContents) ;
     Tools.writeFile(user.getWorkspace()+"/.dodsrc", fileContents) ;
  }

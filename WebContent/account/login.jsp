@@ -32,10 +32,10 @@
 			<div style="float: right; clear: both; overflow: none; border: none;">
 				<a target="_blank" href="http://openid.net"><img
 					src="../images/openid.jpg" alt="openid logo" width="250" /></a><br />
-				<a target="_blank" href="http://esgf.org"><img
+				<a target="_blank" href="https://www.earthsystemgrid.org/about/overview.htm"><img
 					src="../images/esgf_network.png" alt="esgf network" width="250" /></a><br />
 				<div align="center" style="width: 250px; text-align: center;">
-					<a target="_blank" href="http://esgf.org/">The ESGF Federation</a>
+					<a target="_blank" href="https://www.earthsystemgrid.org/about/overview.htm">The ESGF Federation</a>
 				</div>
 
 			</div>

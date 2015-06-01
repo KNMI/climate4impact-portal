@@ -339,8 +339,24 @@ public class MyXMLParser {
      * @return the encoded JSON string
      */
     private String jsonEncode(String in){
+      //Debug.println(in);
       in = in.replaceAll("\"", "\\\\\"");
-      in = in.replaceAll("\n", "\\n");
+      in = in.replaceAll("\n", ":carriagereturn:");
+      in = in.replaceAll("\\\\", "");
+      in = in.replaceAll(":carriagereturn:","\\\\n");
+//      in = in.replaceAll("\\\\ ", " ");
+//      in = in.replaceAll("\\\\\\[", "[");
+//      in = in.replaceAll("\\\\\\]", "]");
+//      in = in.replaceAll("\\\\\\_", "_");
+//      in = in.replaceAll("\\\\\\:", ":");
+//      in = in.replaceAll("\\\\\\-", "-");
+//      in = in.replaceAll("\\\\\\+", "+");
+//      in = in.replaceAll("\\\\\\.", ".");
+//      in = in.replaceAll("\\\\\\,", ",");
+//      in = in.replaceAll("\\\\\\'", "'");
+      
+      
+     // Debug.println(in);
       return in;
     }
     
