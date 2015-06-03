@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import model.Downscaling;
 import model.Job;
 import model.Predictand;
 
@@ -199,6 +200,27 @@ public class DownscalingService extends HttpServlet {
     } catch (Exception e) {
     }
     return null;
+  }
+
+  public static List<Downscaling> getUserDownscalings(String username) throws JSONException, IOException{
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users/" + username + "/downscalings", "GET");
+    if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+      return null;
+    StringBuffer response = new StringBuffer();
+    BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
+    }
+    in.close();
+    JSONObject myObject = new JSONObject(response.toString());
+    JSONArray jsonDownscalings = myObject.getJSONArray("values");
+    List<Downscaling> downscalings = new ArrayList<Downscaling>();
+    for(int i=0; i< jsonDownscalings.length(); i++){
+      Downscaling d = new Downscaling(jsonDownscalings.getJSONObject(i));
+      downscalings.add(d);
+    }
+    return downscalings;
   }
   
   public static List<Job> getUserJobs(String username) throws JSONException, IOException{
