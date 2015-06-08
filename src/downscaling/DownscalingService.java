@@ -3,6 +3,7 @@ package downscaling;
 import impactservice.Configuration;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,7 +13,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +138,7 @@ public class DownscalingService extends HttpServlet {
       in.close();
       out.flush();
       response.setContentType("application/pdf");
-      response.setHeader("Content-Disposition", "attachment; filename=output.pdf");
+      response.setHeader("Content-Disposition", "attachment; filename=validation.pdf");
     }else if(pathInfo.matches("/datasets")){
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?zone="+request.getParameter("zone")+"&username="+request.getParameter("username"), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
@@ -173,7 +176,29 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
     }else if(pathInfo.equals("/downscalings")){
-     
+    
+    }else if(pathInfo.matches("/downscalings/download")){
+      Map<String, String[]> parameters = request.getParameterMap();
+      String params = new String();
+      for (Map.Entry<String,String[]> param : parameters.entrySet()) {
+          if (params.length() != 0) params +=('&');
+          params+=(param.getKey().toString());
+          params+=('=');
+          params+=(param.getValue()[0].toString());
+      }
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+URIUtil.encodeQuery(params.toString()), "GET");
+      OutputStream out = response.getOutputStream();
+      InputStream in = urlConn.getInputStream();
+      byte[] buffer = new byte[4096];
+      int length;
+      while ((length = in.read(buffer)) > 0){
+          out.write(buffer, 0, length);
+      }
+      in.close();
+      out.flush();
+      response.setContentType("application/zip");
+      response.setHeader("Content-Disposition", "attachment; filename=downscaling-"+request.getParameter("jobId")+".zip");
+      
     }else{
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
     }
@@ -401,6 +426,7 @@ public class DownscalingService extends HttpServlet {
         response.getWriter().print("{'errors':['Existing name'],'success':false}");
         response.setStatus(403);
       }
+      
     }else{
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
     }
