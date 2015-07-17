@@ -238,7 +238,6 @@ public class OpenDAPViewer {
           try {
             requestStrWithOpenId+="openid="+URLEncoder.encode(user.getOpenId(),"utf-8");
           } catch (UnsupportedEncodingException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
           }
         }
@@ -252,7 +251,6 @@ public class OpenDAPViewer {
       try {
         MessagePrinters.emailFatalErrorMessage("File access: "+e.getMessage(),msg+"\nUser: '"+userId+"'");
       } catch (IOException e2) {
-        // TODO Auto-generated catch block
         e2.printStackTrace();
       }
       //DebugConsole.errprintln(msg);

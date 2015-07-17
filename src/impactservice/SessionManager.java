@@ -1,6 +1,5 @@
 package impactservice;
 
-import tools.Debug;
 
 public class SessionManager {
   public static class SearchSession{

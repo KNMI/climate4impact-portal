@@ -1,8 +1,25 @@
 package tools;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ *  JSONResponse jsonResponse = new JSONResponse();
+
+    jsonResponse.setMessage("bla");
+    
+    try {
+      jsonResponse.setJSONP(request);
+      response.setContentType(jsonResponse.getMimeType());
+      response.getOutputStream().print(jsonResponse.getMessage());
+    } catch (Exception e1) {
+    
+    }
+ * @author plieger
+ *
+ */
 public class JSONResponse {
   private String message = "";
   private String mimetype = "application/json";
@@ -27,7 +44,6 @@ public class JSONResponse {
     }
   }
   public String getMimeType() {
-    // TODO Auto-generated method stub
     return mimetype;
   }
   public void setJSONP(String jsonp) {
@@ -61,6 +77,22 @@ public class JSONResponse {
   }
   public int getStatusCode(){
     return statusCode;
+  }
+  public void setJSONP(HttpServletRequest request) throws Exception {
+    try{
+      jsonp=HTTPTools.getHTTPParam(request,"jsonp");
+    }catch (Exception e) {
+      try{
+        jsonp=HTTPTools.getHTTPParam(request,"callback");
+      }catch (Exception e1) {
+      }
+    }
+  }
+  public void setMessage(JSONObject json) {
+    setMessage(json.toString());    
+  }
+  public boolean hasError(){
+    return hasError;
   }
   
 }

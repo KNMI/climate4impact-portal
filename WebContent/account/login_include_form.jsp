@@ -47,3 +47,5 @@
 <br /> If you are already registered, you can compose your OpenID based on your user name and corresponding index node:<br />
 <div id="datanodebuttons"></div>
 * You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a><br/>
+<br/>
+We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).

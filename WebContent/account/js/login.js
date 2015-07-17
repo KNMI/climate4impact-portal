@@ -140,7 +140,7 @@ $(function() {
     tips.text("");
     var bValid = true;
     bValid = bValid && checkLength(name, "username", 1, 50,showtips);
-    bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/i,  "*Username may consist of a-z, 0-9, underscores.",showtips);
+    bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _.]*$/i,  "*Username may consist of a-z, 0-9, underscores and '.' .",showtips);
    
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
     var username = name.val();

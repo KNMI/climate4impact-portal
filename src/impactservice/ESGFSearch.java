@@ -684,7 +684,6 @@ public class ESGFSearch {
                     
                   }
                   if(!opendapFound){
-                    //TODO Should ask why opendap is sometimes not listed in the ESGF search query.
                     if(HTTPServer!=null){
                       product.put("OPENDAP",HTTPServer.replace("/fileserver/","/dodsC/")+"#derivedfromhttpserver");
                     }

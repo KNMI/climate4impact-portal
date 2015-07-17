@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -78,7 +77,6 @@ public class Search {
            try {
             esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
           } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
           }
          }
@@ -115,8 +113,6 @@ public class Search {
     } catch (Exception e1) {
       r.setErrorMessage("Unable to parse XML",500);
       return r;
-      // TODO Auto-generated catch block
-      //e1.printStackTrace();
     }
     
     JSONObject facetsObj = new JSONObject();
@@ -163,7 +159,6 @@ public class Search {
       }
       
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     
@@ -217,7 +212,6 @@ public class Search {
       }
       
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     
@@ -475,7 +469,6 @@ public class Search {
       tools.Tools.writeFile(dataDir+"/test.catalog", message);
       
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     

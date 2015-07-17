@@ -20,7 +20,6 @@ public class DapServlet extends HttpServlet {
      */
     public DapServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**

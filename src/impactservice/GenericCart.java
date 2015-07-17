@@ -114,22 +114,18 @@ public class GenericCart {
       Debug.errprintln("Invalid tokens while removing "+id);
       return;
     }
-    try {
-      Debug.println("Checking "+user.getDataDir()+"/"+id);
-      File file = new File(user.getDataDir()+"/"+id);
-      if(file.exists()){
-        if(file.isFile()){
-          Debug.println("Deleting file "+file.getAbsolutePath());
-          file.delete();
-        }else{
-          if(file.isDirectory()){
-            Debug.println("Deleting directory "+file.getAbsolutePath());
-            Tools.rmdir(file);
-          }
+    Debug.println("Checking "+user.getDataDir()+"/"+id);
+    File file = new File(user.getDataDir()+"/"+id);
+    if(file.exists()){
+      if(file.isFile()){
+        Debug.println("Deleting file "+file.getAbsolutePath());
+        file.delete();
+      }else{
+        if(file.isDirectory()){
+          Debug.println("Deleting directory "+file.getAbsolutePath());
+          Tools.rmdir(file);
         }
       }
-    } catch (IOException e) {
-
     }
     Iterator<DataLocator> itr = dataLocatorList.iterator();
     while(itr.hasNext()) {
@@ -141,23 +137,9 @@ public class GenericCart {
     saveToStore();
   }
 
-  public int getNumProducts(HttpServletRequest request){
-    Debug.println("GetNumProducts" );
+  public int getNumProducts(){
+    //Debug.println("GetNumProducts" );
     int numCustomFiles = 0;
-    //	  ImpactUser impactUser;
-    //    try {
-    //      impactUser = LoginManager.getUser(request);
-    //      String dataDir = impactUser.getDataDir();
-    //      File dataDirFile = new File(dataDir);
-    //      
-    //     
-    //      if(dataDirFile.exists()){
-    //        numCustomFiles = dataDirFile.listFiles().length;
-    //      }
-    //    } catch (Exception e) {
-    //
-    //    }
-
     return dataLocatorList.size()+numCustomFiles;
   }
 
@@ -255,15 +237,21 @@ public class GenericCart {
           htmlResp+="<td><a href=\""+statusLocation+"\">"+element.id+"</a></td>\n";
 
 
-          JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
+          
           try{
-            String progress= progressObject.getString("progress");
-            if(progress.equals("100")){
-              htmlResp+="<td>ready</td>\n";
-              htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>\n";
+            JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
+            if(progressObject != null){
+              String progress= progressObject.getString("progress");
+              if(progress.equals("100")){
+                htmlResp+="<td>ready</td>\n";
+                htmlResp+="<td><a onclick='showStatusReport("+elementProps.toString()+");'>view</a></td>\n";
+              }else{
+                htmlResp+="<td>"+progress+" % </td>\n";
+                htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>\n";
+              }
             }else{
-              htmlResp+="<td>"+progress+" % </td>\n";
-              htmlResp+="<td><a onclick='processProgressMonitoring("+elementProps.toString()+");'>view</a></td>\n";
+              htmlResp+="<td>unavailable</td>";
+              htmlResp+="<td>-</td>\n";
             }
           }catch(Exception e){
             htmlResp+="<td>failed</td>";

@@ -20,13 +20,12 @@ import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
-//import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.Oid;
 
 import tools.Debug;
 import tools.HTTPTools;
-import tools.JSONResponse;
 import tools.HTTPTools.WebRequestBadStatusException;
+import tools.JSONResponse;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
@@ -61,6 +60,8 @@ import tools.Tools;
  */
 
 public class LoginManager {
+
+  
   static Vector<ImpactUser> users = new Vector<ImpactUser>();
   
   public static void getUserProxyService(ImpactUser user) throws MalformedURLException, WebRequestBadStatusException, Exception{
@@ -111,17 +112,18 @@ public class LoginManager {
         }
       }
     }
-    
-    
-
-    
-    
+/*    
+    Security.addProvider(new BouncyCastleProvider());
+    org.globus.gsi.CertUtil.setProvider("BC");
+    org.globus.gsi.CertUtil.installSecureRandomProvider();
+*/    
     MyProxy myProxy = new MyProxy(Configuration.LoginConfig.getMyProxyServerHost(),Configuration.LoginConfig.getMyProxyServerPort());
     //myProxy.setHost(Configuration.LoginConfig.getMyProxyServerHost());
     //myProxy.setPort(Configuration.LoginConfig.getMyProxyServerPort());
+  //  Debug.println("Trustroot path: "+MyProxy.getTrustRootPath());
     
     Debug.println("Setting proxy host:port as '"+Configuration.LoginConfig.getMyProxyServerHost()+":"+Configuration.LoginConfig.getMyProxyServerPort()+"'");
-    //GSSCredential retcred = myProxy.get(null,user.id, Configuration.LoginConfig.getMyProxyDefaultPassword(), 60*60*24);
+    //GSSCredential retcred = myProxy.get(null,"testyser","bbbbbghfhfh",10);
     try {
       String userName = Configuration.LoginConfig.getMyProxyDefaultUserName();
       if(userName == null){
@@ -182,16 +184,17 @@ public class LoginManager {
       id=Configuration.GlobalConfig.getDefaultUser();
     }
     
-
-    try{
-      String userId = OAuth2Handler.verifyAndReturnUserIdentifier(request);
-      
-      if(userId != null){
-        id = userId;
-        Debug.println("User ID from OAuth2 "+userId);
+    if(id == null){
+      try{
+        String userId = OAuth2Handler.verifyAndReturnUserIdentifier(request);
+        
+        if(userId != null){
+          id = userId;
+          Debug.println("User ID from OAuth2 "+userId);
+        }
+      }catch(Exception e){
+        e.printStackTrace();
       }
-    }catch(Exception e){
-      
     }
     
     if(id == null && response != null){
@@ -271,7 +274,6 @@ public class LoginManager {
     try {
       redirURLEncoded = URLEncoder.encode(redirURL,"utf-8");
     } catch (UnsupportedEncodingException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       response.sendRedirect(getLoginPage());
     }
@@ -282,7 +284,9 @@ public class LoginManager {
   public static ImpactUser getUser(HttpServletRequest request) throws Exception {
     return getUser(request,null);
   }
+ 
 
+  
   /**
    * Get user based on his/hers userId
    * @param userId The userID, equal to the OpenID identifier
@@ -295,7 +299,8 @@ public class LoginManager {
     for(int j=0;j<users.size();j++){
       if(users.get(j).getId().equals(userId)){
         ImpactUser user = users.get(j);
-        //DebugConsole.println("Found existing user "+userId);
+        user.setSessionInfo(request);
+        //Debug.println("Found existing user "+userId);
         return user;
       }
     }
@@ -305,9 +310,15 @@ public class LoginManager {
     
     user.setOpenId( (String) request.getSession().getAttribute("openid_identifier"));
     users.add(user);
+    user.setSessionInfo(request);
     try {checkLogin(userId,request);} catch (Exception e) { }
     
     return user;
+  }
+  
+  /** Get available users */
+  public synchronized static Vector<ImpactUser> getUsers(){
+    return users;
   }
   
   /**
@@ -315,13 +326,13 @@ public class LoginManager {
    * @param session
    * @throws Exception 
    */
-  public synchronized static void checkLogin(String openIdIdentifier,HttpServletRequest request) throws Exception{
+  public synchronized static void checkLogin(String userId,HttpServletRequest request) throws Exception{
 
-    Debug.println("checkLogin "+openIdIdentifier);
-    if(openIdIdentifier==null){
+    Debug.println("checkLogin "+userId);
+    if(userId==null){
       Debug.errprintln("No openIdIdentifier given");
     }
-    ImpactUser user = getUser(openIdIdentifier,request);
+    ImpactUser user = getUser(userId,request);
     
     Debug.println("Check login "+user.getId());
     user.internalName = user.getId().replace("http://", "");
@@ -435,7 +446,7 @@ public class LoginManager {
       }
   
       try {
-        HTTPTools.makeHTTPGetRequest(requestStr,certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
+        HTTPTools.makeHTTPGetRequestX509ClientAuthentication(requestStr,certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
       } catch (IOException e) {
          throw e;
       }
@@ -503,10 +514,23 @@ public class LoginManager {
   
   
   static public void logout(HttpServletRequest request){
+    
+    try {
+      ImpactUser user;
+      user = getUser(request);
+      if(user != null){
+
+        user.removeSessionId(request.getSession().hashCode());
+      }
+    } catch (Exception e) {
+    }
+    
     request.getSession().setAttribute("access_token",null);
     request.getSession().setAttribute("openid_identifier",null);
     request.getSession().setAttribute("user_identifier",null);
     request.getSession().setAttribute("email",null);
+    request.getSession().setAttribute("emailaddress",null);
+    
   }
  
 }

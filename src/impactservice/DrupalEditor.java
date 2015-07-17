@@ -96,7 +96,9 @@ public class DrupalEditor {
   		}
 		}
 		    
-		String message=HTTPTools.makeHTTPGetRequest(contentsURL);
+		String password = Configuration.DrupalConfig.getDrupalPassword();
+		String username = Configuration.DrupalConfig.getDrupalUserName();
+		String message=HTTPTools.makeHTTPGetRequestBasicAuth(contentsURL,username,password);
 		
 		HttpragmentCache.put(contentsURL, new HttpFragmentObject(message,  Calendar.getInstance().getTimeInMillis()));
 		
@@ -263,7 +265,6 @@ public class DrupalEditor {
 		        request.getRequestDispatcher("/impactportal/error_404.jsp").forward(request, response);
             
           } catch (Exception e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
           }
 		      return "";

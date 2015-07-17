@@ -404,7 +404,6 @@ public class OpenDAP {
           c=null;
           bos.flush();
         } catch (InvalidRangeException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
         int dapLength = ((int)((b.length/4.0+0.9)))*4;

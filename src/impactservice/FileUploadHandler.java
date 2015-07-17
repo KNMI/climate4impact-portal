@@ -3,13 +3,16 @@ package impactservice;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.RequestContext;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,7 +84,7 @@ public class FileUploadHandler extends HttpServlet {
         
 
             try {
-                List<FileItem> multiparts = upload.parseRequest(request);
+                List<FileItem> multiparts = upload.parseRequest((RequestContext) request);
               
                 for(FileItem item : multiparts){
                     if(!item.isFormField()){

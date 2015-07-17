@@ -61,7 +61,6 @@ public class GetDownloadScriptHandler extends HttpServlet {
    */
   public GetDownloadScriptHandler() {
     super();
-    // TODO Auto-generated constructor stub
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -238,7 +237,6 @@ public class GetDownloadScriptHandler extends HttpServlet {
       data = cred.export(ExtendedGSSCredential.IMPEXP_OPAQUE);
       cred.dispose();
     } catch (GSSException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       return null;
     }
@@ -252,7 +250,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
         out.close();
         out=null;
       } catch (FileNotFoundException e) {
-        // TODO Auto-generated catch block
+       
         if (out!=null) {
           out.close();
         }

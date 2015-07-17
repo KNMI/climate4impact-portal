@@ -132,7 +132,7 @@ public class ProcessRunner{
 		    stdoutThread.join();
 		    stderrThread.join();
 	        if (child != null) {
-	            child.getOutputStream().close();
+	            try{child.getOutputStream().close();}catch(Exception e){Debug.errprintln("Output stream was already closed");}
 	            child.getInputStream().close();
 	            child.getErrorStream().close();
 	            child.destroy();
@@ -141,6 +141,7 @@ public class ProcessRunner{
 	    exitCode=child.exitValue();
 		} 
 		catch (IOException e) {
+		  Debug.printStackTrace(e);
 			throw new Exception("Exception in ProcessRunner while executing child: "+e.getMessage());
 		}
 		return exitCode;

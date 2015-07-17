@@ -18,7 +18,7 @@ body {
 		<jsp:include page="helpmenu.jsp" />
 		
 		<div style="height:675px;">		
-		<iframe width=982 height=670 style="border:1px solid black;padding:0px;margin:0px;" src="http://askbot.climate4impact.eu/"></iframe>
+		<iframe width="982" height="670" style="border:1px solid black;padding:0px;margin:0px;" src="http://askbot.climate4impact.eu/"></iframe>
 		</div>
 		
 		

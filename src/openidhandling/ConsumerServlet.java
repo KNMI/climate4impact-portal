@@ -81,7 +81,6 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		try {
 			this.manager = new ConsumerManager();
 		} catch (ConsumerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		manager.setAssociations(new InMemoryConsumerAssociationStore());

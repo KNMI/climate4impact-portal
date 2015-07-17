@@ -47,47 +47,59 @@ public class DateFunctions {
 		return ISO8601DateTimeFormat.format(cal.getTime());
 	}
 	
-	  public static String getCurrentDateInISO8601(){
-	    	String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-		    Calendar cal = Calendar.getInstance();
-		    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-		    String currentISOTimeString = sdf.format(cal.getTime())+"Z";
-		    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
-		    //Add the T and Z characters
-		    currentISOTimeCharArray[10]='T';
-		    currentISOTimeString=new String(currentISOTimeCharArray);
-		    return currentISOTimeString;
-	    }
-	    public static String getCurrentDateinADAGUC(){
-	    	String DATE_FORMAT_NOW = "yyyyMMddHHmmss";
-		    Calendar cal = Calendar.getInstance();
-		    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-		    String currentISOTimeString = sdf.format(cal.getTime());
-		    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
-		    currentISOTimeString=new String(currentISOTimeCharArray);
-		    return currentISOTimeString;
-	    }
-	    public static String getISO8601TimeFromDate(Date date){
-		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		    String currentISOTimeString = sdf.format(date)+"Z";
-		    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
-		    //Add the T and Z characters
-		    currentISOTimeCharArray[10]='T';
-		    currentISOTimeString=new String(currentISOTimeCharArray);
-		    return currentISOTimeString;
-	    }
-	    public static String timeResolutionToISO8601(String timeResolution){
-	        String ISO8601TimeInterval = null;
-	        if(timeResolution.equalsIgnoreCase("second"))ISO8601TimeInterval="PT1S";
-	        if(timeResolution.equalsIgnoreCase("minute"))ISO8601TimeInterval="PT1M";
-	        if(timeResolution.equalsIgnoreCase("hour"))ISO8601TimeInterval="PT1H";
-	        if(timeResolution.equalsIgnoreCase("day"))ISO8601TimeInterval="P1D";
-	        //Decades do not work well yet..., just like season...
-	        //They do not have a fixed resolution, and we do currently work with a fixed resolution.
-	        if(timeResolution.equalsIgnoreCase("decade"))ISO8601TimeInterval="PT10D";
-	        if(timeResolution.equalsIgnoreCase("month"))ISO8601TimeInterval="P1M";
-	        if(timeResolution.equalsIgnoreCase("season"))ISO8601TimeInterval="P3M";
-	        if(timeResolution.equalsIgnoreCase("year"))ISO8601TimeInterval="P1Y";
+    public static String getCurrentDateInISO8601(){
+    	String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+	    Calendar cal = Calendar.getInstance();
+	    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+	    String currentISOTimeString = sdf.format(cal.getTime())+"Z";
+	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
+	    //Add the T and Z characters
+	    currentISOTimeCharArray[10]='T';
+	    currentISOTimeString=new String(currentISOTimeCharArray);
+	    return currentISOTimeString;
+    }
+    public static String getTimeStampInMillisToISO8601(long milli){
+      String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+      SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+      String currentISOTimeString = sdf.format(milli)+"Z";
+      char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
+      //Add the T and Z characters
+      currentISOTimeCharArray[10]='T';
+      currentISOTimeString=new String(currentISOTimeCharArray);
+      return currentISOTimeString;
+    }
+    
+    
+    public static String getCurrentDateinADAGUC(){
+    	String DATE_FORMAT_NOW = "yyyyMMddHHmmss";
+	    Calendar cal = Calendar.getInstance();
+	    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+	    String currentISOTimeString = sdf.format(cal.getTime());
+	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
+	    currentISOTimeString=new String(currentISOTimeCharArray);
+	    return currentISOTimeString;
+    }
+    public static String getISO8601TimeFromDate(Date date){
+	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    String currentISOTimeString = sdf.format(date)+"Z";
+	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
+	    //Add the T and Z characters
+	    currentISOTimeCharArray[10]='T';
+	    currentISOTimeString=new String(currentISOTimeCharArray);
+	    return currentISOTimeString;
+    }
+    public static String timeResolutionToISO8601(String timeResolution){
+        String ISO8601TimeInterval = null;
+        if(timeResolution.equalsIgnoreCase("second"))ISO8601TimeInterval="PT1S";
+        if(timeResolution.equalsIgnoreCase("minute"))ISO8601TimeInterval="PT1M";
+        if(timeResolution.equalsIgnoreCase("hour"))ISO8601TimeInterval="PT1H";
+        if(timeResolution.equalsIgnoreCase("day"))ISO8601TimeInterval="P1D";
+        //Decades do not work well yet..., just like season...
+        //They do not have a fixed resolution, and we do currently work with a fixed resolution.
+        if(timeResolution.equalsIgnoreCase("decade"))ISO8601TimeInterval="PT10D";
+        if(timeResolution.equalsIgnoreCase("month"))ISO8601TimeInterval="P1M";
+        if(timeResolution.equalsIgnoreCase("season"))ISO8601TimeInterval="P3M";
+        if(timeResolution.equalsIgnoreCase("year"))ISO8601TimeInterval="P1Y";
 	        return ISO8601TimeInterval;
-	    }
+    }
 }

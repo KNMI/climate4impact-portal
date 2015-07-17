@@ -7,19 +7,17 @@ import java.util.Calendar;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import esgfsearch.Search;
 import tools.Debug;
 import tools.HTTPTools;
-import tools.JSONMessageDecorator;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
+import esgfsearch.Search;
 
 public class THREDDSCatalogBrowser {
   static class Service{

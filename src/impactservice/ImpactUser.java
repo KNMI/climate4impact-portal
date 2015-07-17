@@ -1,6 +1,10 @@
 package impactservice;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -19,7 +23,7 @@ public class ImpactUser {
   public boolean credentialError = false;
   public boolean configured = false;
   private GenericCart shoppingCart = null;
-  private GenericCart processingJobsList = null;
+  
   private String emailAddress;
   public String userMyProxyService = null;
   private String openid = null;
@@ -39,6 +43,7 @@ public class ImpactUser {
 
 
   synchronized public GenericCart getProcessingJobList(){
+    GenericCart processingJobsList = null;
     Debug.println("getProcessingJobList");
     try{
       if(processingJobsList==null){
@@ -73,9 +78,17 @@ public class ImpactUser {
     return shoppingCart;
   }
 
-  public String getDataDir() throws IOException {
+  public String getDataDir()  {
     String dataDir = Tools.makeCleanPath(getWorkspace()+"/data");
-    Tools.mkdir(dataDir);
+    try {
+      Tools.mkdir(dataDir);
+    } catch (IOException e) {
+      try {
+        MessagePrinters.emailFatalErrorMessage("Unable to create directory", dataDir);
+      } catch (IOException e1) {
+        e1.printStackTrace();
+      }
+    }
     return dataDir;
   }
   
@@ -112,6 +125,58 @@ public class ImpactUser {
     url = url.replace("?","/");
     return url;
   }
+  /**
+   * Checks if user has given role
+   * @param string
+   * @return
+   */
+  public boolean hasRole(String string) {
+    if(string.equals("admin")){
+      String adminUsers[] = Configuration.Admin.getIdentifiers();
+      
+      String id = getId();
+      Debug.println("HasRole ID "+id);
+      for(int j=0;j<adminUsers.length;j++){
+        //Debug.println(adminUsers[j]+" -- "+id);
+        if(id.equals(adminUsers[j])){
+          //Debug.println("ISADMIN: "+id+"\n");
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
+  
+  class UserSessionInfo{
+    String creationTime;
+    String accessTime;
+  }
+
+  Map<Integer,UserSessionInfo> sessions = java.util.Collections.synchronizedMap(new HashMap<Integer, UserSessionInfo>());
+  
+  private void _addSessionId(int id, long creationTime,long accessTime) {
+    UserSessionInfo i = sessions.get(id);
+    if(i == null){i=new UserSessionInfo();sessions.put(id, i);}
+    
+    i.creationTime = ""+tools.DateFunctions.getTimeStampInMillisToISO8601(creationTime);
+    i.accessTime = ""+tools.DateFunctions.getTimeStampInMillisToISO8601(accessTime);
+  }
+  public void removeSessionId(int id) {
+    sessions.remove(id);
+  }
+
+  Map<Integer, UserSessionInfo> getSessionIds(){
+    return sessions;
+  }
+  
+  
+  public void setSessionInfo(HttpServletRequest request){
+    try{
+      _addSessionId(request.getSession().hashCode(),request.getSession().getCreationTime(),request.getSession().getLastAccessedTime());
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+  }
  
 }

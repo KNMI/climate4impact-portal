@@ -26,7 +26,10 @@
 		}
 		String protocol=request.getProtocol();
 		if (!request.isSecure()) {
-			response.sendRedirect("http://www.knmi.nl");//TODO: send an error if not secure
+			
+			MessagePrinters.emailFatalErrorMessage("downloadscript.jsp uses insecure connection", "downloadscript.jsp, 30");
+			response.sendRedirect("http://www.knmi.nl");
+			
 		}
 		if(user == null){
 		    response.sendRedirect(Home+"/account/login.jsp");

@@ -11,7 +11,7 @@
 		String numProductsString="-";
 		
 		try{
-			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts(request);
+			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts();
 		}catch(Exception e){				
 		}
 		if(numProducts!=0){

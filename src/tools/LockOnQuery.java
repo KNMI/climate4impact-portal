@@ -13,7 +13,6 @@ public class LockOnQuery {
           busyURLs.wait();
         }
       } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
         e.printStackTrace();
       }
       busyURLs.add(query); 

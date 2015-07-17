@@ -36,7 +36,6 @@ public class CGIRunner {
         try {
           _print(message,bytesRead);
         } catch (IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       }
@@ -123,7 +122,7 @@ public class CGIRunner {
       processRunner.runProcess(commands,postData);
     }catch(Exception e){
       Debug.println("Exception in processRunner");
-      Debug.errprintln(e.getMessage());
+      Debug.printStackTrace(e);
       
       throw(e);
     }

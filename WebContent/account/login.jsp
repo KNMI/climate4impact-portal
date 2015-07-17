@@ -81,7 +81,8 @@
 			
 			<div class="textstandardleft">
 				
-				Your ESGF OpenId Identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
+				Your climate4impact identifier is:<br/><strong><%=user.getId()%></strong><br /><br/>
+				Your ESGF OpenId identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
 				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
 				
 	

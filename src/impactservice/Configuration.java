@@ -53,7 +53,7 @@ public class Configuration {
   }
   
   
-  public static void readConfig(){
+  public static synchronized void readConfig(){
     //Re-read the config file every 10 seconds.
     if(impactWorkspace != null && readConfigPolInterval != 0){
       if(System.currentTimeMillis()<readConfigPolInterval+10000)return;
@@ -89,13 +89,27 @@ public class Configuration {
   
   public static class Admin{
     static String[] addresses={};
+    static String[] identifiers={};
     
     public static void doConfig(XMLElement  configReader){
-      addresses = configReader.getNodeValue("impactportal.admin.mailaddresses").split(",");
+      try{
+        addresses = configReader.getNodeValue("impactportal.admin.mailaddresses").split(",");
+      }catch(Exception e){
+        Debug.errprintln("impactportal.admin.mailaddresses not set");
+      }
+      try{
+        identifiers = configReader.getNodeValue("impactportal.admin.identifiers").split(",");
+      }catch(Exception e){
+        Debug.errprintln("impactportal.admin.identifiers not set");
+      }
     }
     
     public static String[] getEmailAddresses(){
        readConfig();return  addresses;
+    }
+
+    public static String[] getIdentifiers(){
+       readConfig();return  identifiers;
     }
   }
   
@@ -139,6 +153,8 @@ public class Configuration {
   }
   
   public static class DrupalConfig{
+    private static String drupalUserName=null;
+    private static String drupalPassword=null;
     private static String drupalHost="<drupalhost>";
     private static String drupalBaseURL="<drupalbaseurl>";
     private static String drupalDirectory="<drupaldirectory>";
@@ -147,22 +163,40 @@ public class Configuration {
       drupalHost=configReader.getNodeValue("impactportal.drupalconfig.drupalhost");
       drupalBaseURL=configReader.getNodeValue("impactportal.drupalconfig.drupalbaseurl");
       drupalDirectory=configReader.getNodeValue("impactportal.drupalconfig.drupaldirectory");
+      
+      try{drupalUserName=configReader.getNodeValue("impactportal.drupalconfig.username");}catch(Exception e){Debug.errprintln("impactportal.drupalconfig.username not set");}
+      try{drupalPassword=configReader.getNodeValue("impactportal.drupalconfig.password");}catch(Exception e){Debug.errprintln("impactportal.drupalconfig.password not set");}
+      
+
       //portalFilesLocation=configReader.getNodeValue("impactportal.drupalconfig.portalfileslocation");
     }
     public static String getDrupalHost(){readConfig();return drupalHost;}
     public static String getDrupalBaseURL(){readConfig();return drupalBaseURL;}
     public static String getDrupalDirectory(){readConfig();return drupalDirectory;}
     public static String getPortalFilesLocation() {readConfig();return portalFilesLocation;}
+    public static String getDrupalUserName()  {readConfig();return drupalUserName;}
+    public static String getDrupalPassword()  {readConfig();return drupalPassword;}
   }
   
   public static class Oauth2Config{
     
     public static class Oauth2Settings{
+    //  For building the web page:
+      public String description = null;
+      public String logo = null;
+      public String registerlink= null;
+      
+      //For server requests:
       public String OAuthAuthLoc = null;
       public String OAuthTokenLoc = null;
       public String OAuthClientId = null;
-      public String OAuthClientSecret = null;
       public String OAuthClientScope = null;
+      
+      //Secret thing
+      public String OAuthClientSecret = null;
+
+      
+      
       public String id = null;
       public String getConfig() {
         String config = "OAuthAuthLoc: "+OAuthAuthLoc+"\n";
@@ -175,7 +209,7 @@ public class Configuration {
     
     static Vector<Oauth2Settings> oauth2Providers = new Vector<Oauth2Settings>();
     
-    static Oauth2Settings getOauthSetting(String id){
+    private static Oauth2Settings _getOauthSetting(String id){
       for(int j=0;j<oauth2Providers.size();j++){
 //        Debug.println("Iterating "+oauth2Providers.get(j).id);
         if(oauth2Providers.get(j).id.equals(id))return oauth2Providers.get(j);
@@ -183,41 +217,62 @@ public class Configuration {
       return null;
     }
     
+    private static Vector<String> _getProviders(){
+      Vector<String> providers = new Vector<String>();
+      for(int j=0;j<oauth2Providers.size();j++){
+        providers.add(oauth2Providers.get(j).id);
+      }
+      return providers;
+    }
+    
+   
     public static void doConfig(XMLElement  configReader){
-      Vector<XMLElement> providers = null;
-      try {
-        providers = configReader.get("impactportal").get("oauth2").getList("provider");
-      } catch (Exception e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-      if(providers == null){
-        Debug.errprintln("No Oauth2 providers configured");
-        return;
-      }
-      for(int j=0;j<providers.size();j++){
-        XMLElement provider = providers.get(j);
-       
+      synchronized(oauth2Providers){
+        oauth2Providers.clear();
+        Vector<XMLElement> providers = null;
         try {
-          Oauth2Settings oauthSetting = new Oauth2Settings();
-          oauthSetting.id = provider.getAttrValue("name");
-          oauthSetting.OAuthAuthLoc = provider.get("authloc").getValue();
-          oauthSetting.OAuthTokenLoc = provider.get("tokenloc").getValue();
-          oauthSetting.OAuthClientId = provider.get("clientid").getValue();
-          oauthSetting.OAuthClientSecret = provider.get("clientsecret").getValue();
-          oauthSetting.OAuthClientScope = provider.get("scope").getValue();
-          oauth2Providers.add(oauthSetting);
-          Debug.println("Found Oauth2 provider "+oauthSetting.id);
-        } catch (Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+          providers = configReader.get("impactportal").get("oauth2").getList("provider");
+        } catch (Exception e1) {
+          e1.printStackTrace();
+        }
+        if(providers == null){
+          Debug.errprintln("No Oauth2 providers configured");
+          return;
+        }
+        for(int j=0;j<providers.size();j++){
+          XMLElement provider = providers.get(j);
+         
+          try {
+            Oauth2Settings oauthSetting = new Oauth2Settings();
+            oauthSetting.id = provider.getAttrValue("name");
+            oauthSetting.OAuthAuthLoc = provider.get("authloc").getValue();
+            oauthSetting.OAuthTokenLoc = provider.get("tokenloc").getValue();
+            oauthSetting.OAuthClientId = provider.get("clientid").getValue();
+            oauthSetting.OAuthClientSecret = provider.get("clientsecret").getValue();
+            oauthSetting.OAuthClientScope = provider.get("scope").getValue();
+            
+            try{oauthSetting.description = provider.get("description").getValue();}catch(Exception e){}
+            try{oauthSetting.logo = provider.get("logo").getValue();}catch(Exception e){}
+            try{oauthSetting.registerlink = provider.get("registerlink").getValue();}catch(Exception e){}
+            
+            oauth2Providers.add(oauthSetting);
+            Debug.println(j+") Found Oauth2 provider "+oauthSetting.id);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
       }
     }
     
     public static Oauth2Settings getOAuthSettings(String id) {
       readConfig();
-      return getOauthSetting(id);
+      return _getOauthSetting(id);
+    }
+    
+    public static Vector<String> getProviders() {
+      readConfig();
+      
+      return _getProviders();
     }
   }
   
@@ -268,6 +323,8 @@ public class Configuration {
     
   }
   
+  
+    
 
   public static class ExpertContact{
     static String[] addresses={};

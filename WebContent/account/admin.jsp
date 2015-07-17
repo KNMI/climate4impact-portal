@@ -9,12 +9,11 @@
 
 		<jsp:include page="../account/loginmenu.jsp" />
 			<div class="impactcontent">
-		<h1>OAuth2 login</h1>
-		<div class="textstandardleft">
-		<div class="oauth2loginbox" onclick="document.location.href='/impactportal/oauth'">
-<a class="oauth2loginbutton" href="#"><img src="/impactportal/images/google.png"/> Sign in with Google (beta)</a>
-</div>
-		</div>
+		<h1>Administration page</h1>
+		<h2>User information:</h2>
+		<a href="/impactportal/ImpactService?service=admin&request=getusers">Get user overview in JSON</a>
+		<h2>OAuth2 test:</h2>
+		<a href="/impactportal/account/OAuth2.jsp">OAuth2 test</a>
 		</div>
 	<!-- /Contents -->
 	<jsp:include page="../footer.jsp" />

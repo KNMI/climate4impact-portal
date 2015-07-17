@@ -116,7 +116,7 @@
 			
 				}
 				
-				 if (user==null&&1==2){
+				 if (user==null){
 		%>
 			<p>You are not signed in, please <button onclick="generateLoginDialog(true)">sign in</button></p>
 		

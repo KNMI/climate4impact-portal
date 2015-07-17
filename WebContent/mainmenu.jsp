@@ -8,7 +8,7 @@
 			
 			String numProductsString="-";
 			try{
-		int numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts(request);
+		int numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts();
 		if(numProducts!=0){
 			numProductsString = ""+numProducts;
 		}

@@ -1,15 +1,21 @@
 package wps;
 
 
+import java.io.ByteArrayOutputStream;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Vector;
+
 import impactservice.Configuration;
 import impactservice.GenericCart;
 import impactservice.LoginManager;
 import impactservice.ImpactUser;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Vector;
+
+
+
+
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -436,7 +442,6 @@ public class WebProcessingInterface {
       GenericCart p=user.getProcessingJobList();
       p.addDataLocator(uniqueID, data.toString());
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return data;
@@ -460,7 +465,7 @@ public class WebProcessingInterface {
        * It seems that the statuslocation XML file is sometimes not completely written by PyWPS, or not immediately available after the process has been executed.
        * Solution: Retry to read the XML file a couple of times until we have a good result.       * 
        */
-      int maximumTries = 4;
+      int maximumTries = 2;
       boolean success = false;
       do{
         maximumTries--;
@@ -469,7 +474,7 @@ public class WebProcessingInterface {
           success = true;
         }catch(SAXException s){
           Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
-          Thread.sleep(200);
+          Thread.sleep(100);
           if(maximumTries == 0){
             GenericCart jobList;
             try {
@@ -477,7 +482,6 @@ public class WebProcessingInterface {
               String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
               jobList.removeDataLocator(basename);
             } catch (Exception e1) {
-              // TODO Auto-generated catch block
               e1.printStackTrace();
             }
             throw s;
@@ -538,40 +542,14 @@ public class WebProcessingInterface {
     }catch(Exception e){
       Debug.errprintln("error for "+statusLocation);
       
-
-      
+      //Debug.println("Returning null");
+      //return null;
       return returnErrorMessage(e.getMessage());  
     }
     return data;
   }
 	
-  /*private static JSONObject getSubmittedJobInformation(String statusLocation,HttpServletRequest request,HttpServletResponse response) throws Exception {
-    DebugConsole.println("getSubmittedJobInformation with statusLocation"+statusLocation);
-    User user = LoginManager.getUser(request,response);
-    if(user == null)return null;
-    Iterator<DataLocator> itr = user.getProcessingJobList().dataLocatorList.iterator();
-    while(itr.hasNext()) {
-      DataLocator element = itr.next(); 
-      try {
-        JSONObject elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
-        String jobStatusLocation = elementProps.getString("wpsurl");
-        if(statusLocation.equals(jobStatusLocation)){
-          DebugConsole.println("Found job with statusLocation"+statusLocation);
-          String id= elementProps.getString("id");
-          DebugConsole.println("This job has processor id "+id);
-         // return describeProcess(id);
-          return elementProps.getJSONObject("postData");
-        }
-      }catch(Exception e){
-        return null;
-        
-      }
-      
-     }
-      // String statusLocation = elementProps.getString("wpsurl");
-    // TODO Auto-generated method stub
-    return null;
-  }*/
+ 
   /**
    * Returns an image based on statusLocation and identifier
    * @param statusLocation

@@ -70,22 +70,6 @@ public class Debug {
     System.out.println(signature+message);
   }
   
-  /*static private void mailError(String message){
-	  try {
-		  String[] cmd = {"/bin/sh","-c","echo "+message+" | mail -s impactportal plieger@knmi.nl "};
-		  Process child = Runtime.getRuntime().exec(cmd);
-		  try {
-			child.waitFor();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		  child.destroy();
-	  } catch (IOException e) {
-	  }
-
-	
-  }*/
   
   static public void errprint(String message){
     String signature = getSignature(getCaller(2)) ;

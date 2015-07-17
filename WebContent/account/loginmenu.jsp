@@ -7,23 +7,28 @@
 		String Home="/impactportal/";
 		//String header=ImpactPages.createHeader(request.getServletPath());
 		
-		int numProducts = 0,numJobs = 0;
+		int numProducts = 0,numJobs = 0,isAdmin = 0;
 		String numProductsString="-",numJobsString = "-";
 		
 		try{
-			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts(request);
+			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts();
 		}catch(Exception e){				
-		}
+		} 
 		if(numProducts!=0){
 			numProductsString = ""+numProducts;
 		}
 		
 		try{
-			numJobs = LoginManager.getUser(request).getProcessingJobList().getNumProducts(request);
+			numJobs = LoginManager.getUser(request).getProcessingJobList().getNumProducts();
 		}catch(Exception e){				
 		}
 		if(numJobs!=0){
 			numJobsString = ""+numJobs;
+		}
+		
+		try{
+			if(LoginManager.getUser(request).hasRole("admin") == true)isAdmin = 1;
+		}catch(Exception e){				
 		}
 				
 		String pageName=request.getServletPath();
@@ -35,6 +40,7 @@
 		if(pageName.indexOf("fileuploadresult")!=-1)highlightBasket = true;
 		
 		if(pageName.indexOf("login.jsp")!=-1)highlightAccount = true;
+		if(pageName.indexOf("OAuth2.jsp")!=-1)highlightAccount = true;
 		if(pageName.indexOf("getcredential.jsp")!=-1)highlightAccount = true; 
 		if(pageName.indexOf("proc")!=-1)highlightProcessing = true; 
 		if(pageName.indexOf("wizard")!=-1)highlightProcessing = true;
@@ -48,6 +54,9 @@
    	<li  <% if(highlightProcessing)out.print("class=\"sel\""); %>><a href="<%=Home%>account/processing.jsp" ><code class="codejobsicon"></code>&nbsp;Processing</a></li>
   	<li  <% if(pageName.indexOf("jobs.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/jobs.jsp" ><code class="codejobsicon"></code>&nbsp;Monitor jobs&nbsp;<code id="jobnumber">(<%=numJobsString%>)</code></a></li>
   	
+  	<% if (isAdmin==1) {%>
+  		<li  <% if(pageName.indexOf("admin.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/admin.jsp" >Administration page</a></li>
+  	<%} %>
   	
    
   </ul>  

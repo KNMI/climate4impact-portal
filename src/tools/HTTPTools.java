@@ -34,6 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ClientConnectionManager;
@@ -49,6 +52,9 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
 
+
+
+
 /**
  * Servlet implementation class DoHTTPRequest
  */
@@ -60,7 +66,6 @@ public class HTTPTools extends HttpServlet {
    */
   public HTTPTools() {
     super();
-    // TODO Auto-generated constructor stub
   }
 
   static byte[] validTokens = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
@@ -98,48 +103,6 @@ public class HTTPTools extends HttpServlet {
     return input;
   }
 
-  /*
-   * This code is public domain: you are free to use, link and/or modify it in
-   * any way you want, for all purposes including commercial applications.
-   */
-  public static class WebClientDevWrapper {
-
-    public static HttpClient wrapClient(HttpClient base) {
-      try {
-        SSLContext ctx = SSLContext.getInstance("TLS");
-        X509TrustManager tm = new X509TrustManager() {
-
-          public X509Certificate[] getAcceptedIssuers() {
-            return null;
-          }
-
-          @Override
-          public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-              throws CertificateException {
-            // TODO Auto-generated method stub
-
-          }
-
-          @Override
-          public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-              throws CertificateException {
-            // TODO Auto-generated method stub
-
-          }
-        };
-        ctx.init(null, new TrustManager[] { tm }, null);
-        SSLSocketFactory ssf = new SSLSocketFactory(ctx);
-        ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        ClientConnectionManager ccm = base.getConnectionManager();
-        SchemeRegistry sr = ccm.getSchemeRegistry();
-        sr.register(new Scheme("https", ssf, 443));
-        return new DefaultHttpClient(ccm, base.getParams());
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        return null;
-      }
-    }
-  }
 
   public static class WebRequestBadStatusException extends Exception {
     private static final long serialVersionUID = 1L;
@@ -185,25 +148,30 @@ public class HTTPTools extends HttpServlet {
   
   public static String makeHTTPGetRequest(String url)
       throws WebRequestBadStatusException, IOException {
-    return makeHTTPGetRequest(url, null, null, null);
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,null);
+  }
+  
+  public static String makeHTTPGetRequestBasicAuth(String url,String basicAuthUserName,String basicAuthPassword)
+      throws WebRequestBadStatusException, IOException {
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,basicAuthUserName,basicAuthPassword,null);
   }
 
   
-  public static String makeHTTPGetRequest(String url,KVPKey key)throws WebRequestBadStatusException, IOException{
-    return _makeHTTPGetWithHeaderRequest(url,null,null,null,key);
+  public static String makeHTTPGetRequestWithHeaders(String url,KVPKey key)throws WebRequestBadStatusException, IOException{
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,key);
   }
   
-  public static String makeHTTPGetRequest(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword,KVPKey key)throws WebRequestBadStatusException, IOException{
-    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,key);
-  }
+//  public static String makeHTTPGetRequestWithHeadersX509(String url, String pemFile,
+//      String trustRootsFile, String trustRootsPassword,KVPKey headers)throws WebRequestBadStatusException, IOException{
+//    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null,null,headers);
+//  }
   
-  public static String makeHTTPGetRequest(String url, String pemFile,
+  public static String makeHTTPGetRequestX509ClientAuthentication(String url, String pemFile,
       String trustRootsFile, String trustRootsPassword)throws WebRequestBadStatusException, IOException{
-    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null);
+    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null,null,null);
   }
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword,KVPKey key)
+      String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers)
       throws WebRequestBadStatusException, IOException {
     String connectToURL = makeCleanURL(url);
     Debug.println("  Making GET: " + connectToURL);
@@ -224,11 +192,23 @@ public class HTTPTools extends HttpServlet {
     try {
       DefaultHttpClient httpclient = null;
 
-      if (pemFile == null || trustRootsFile == null
-          || trustRootsPassword == null) {
+      if (pemFile == null || trustRootsFile == null || trustRootsPassword == null) {
+        
         httpclient = new DefaultHttpClient();
-        httpclient = (DefaultHttpClient) WebClientDevWrapper
-            .wrapClient(httpclient);
+        
+        if(basicAuthUserName!=null&&basicAuthPassword!=null){
+        
+          CredentialsProvider provider = httpclient.getCredentialsProvider();
+          UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(basicAuthUserName, basicAuthPassword);
+          
+          provider.setCredentials(AuthScope.ANY, credentials);
+        }
+        
+        
+        
+        //httpclient = (DefaultHttpClient) WebClientDevWrapper.wrapClient(httpclient);
+
+        
       } else {
         httpclient = createHTTPClientFromGSSCredential(pemFile, trustRootsFile,
             trustRootsPassword);
@@ -238,14 +218,17 @@ public class HTTPTools extends HttpServlet {
 
       HttpResponse response = null;
 
-      if(key!=null){
-        SortedSet<String> a = key.getKeys();
+      if(headers!=null){
+        SortedSet<String> a = headers.getKeys();
         for(String b : a){
-          System.out.println("Adding header "+b+"="+key.getValue(b).firstElement());
-          httpget.addHeader(b,key.getValue(b).firstElement());
+          System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
+          httpget.addHeader(b,headers.getValue(b).firstElement());
         }
         
       }
+      
+      
+      
       
       response = httpclient.execute(httpget);
 
@@ -316,6 +299,7 @@ public class HTTPTools extends HttpServlet {
       Debug.println("redirectLocation =" + redirectLocation);
     }
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
+    //System.out.println(result)
     Debug.println("Finished GET: " + connectToURL + " ("
         + (stopTimeInMillis - startTimeInMillis) + " ms)");
     //Debug.println("Retrieved "+result.length()+" bytes");
@@ -432,25 +416,6 @@ public class HTTPTools extends HttpServlet {
       return newURL;
     }
 
-    // TODO THIS does not work, sometimes http:// changes to http:/
-    // Remove double //
-    /*
-     * boolean slashAtStart = false; if(newURL.charAt(0)=='/')slashAtStart=true;
-     * 
-     * urlParts = newURL.split("/"); newURL="";
-     * 
-     * for(int j=0;j<urlParts.length;j++){
-     * 
-     * if(urlParts[j].length()>0){
-     * if(newURL.length()>0||slashAtStart)newURL+="/";
-     * //DebugConsole.println("URLPARTS"+urlParts[j]); newURL+=urlParts[j];
-     * //if(j==0) {
-     * if(urlParts[j].indexOf("http")==0||urlParts[j].indexOf("dods")==0){
-     * newURL+="/"; } } }
-     * 
-     * 
-     * } //DebugConsole.println("newURL="+newURL); return newURL;
-     */
   }
 
   public static List<String> getKVPListDecoded(String url, String key) throws Exception {
@@ -566,6 +531,47 @@ public class HTTPTools extends HttpServlet {
       }
     }
     return kvpKey;
+  }
+
+  /*
+   * This code is public domain: you are free to use, link and/or modify it in
+   * any way you want, for all purposes including commercial applications.
+   */
+  public static class WebClientDevWrapper {
+
+    public static HttpClient wrapClient(HttpClient base) {
+      try {
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        X509TrustManager tm = new X509TrustManager() {
+
+          public X509Certificate[] getAcceptedIssuers() {
+            return null;
+          }
+
+          @Override
+          public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+              throws CertificateException {
+
+          }
+
+          @Override
+          public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+              throws CertificateException {
+
+          }
+        };
+        ctx.init(null, new TrustManager[] { tm }, null);
+        SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+        ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        ClientConnectionManager ccm = base.getConnectionManager();
+        SchemeRegistry sr = ccm.getSchemeRegistry();
+        sr.register(new Scheme("https", ssf, 443));
+        return new DefaultHttpClient(ccm, base.getParams());
+      } catch (Exception ex) {
+        ex.printStackTrace();
+        return null;
+      }
+    }
   }
 
 }

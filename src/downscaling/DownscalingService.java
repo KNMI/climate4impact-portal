@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.Job;
 import model.Predictand;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.util.URIUtil;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +123,7 @@ public class DownscalingService extends HttpServlet {
     }else if(pathInfo.matches("/validation")){
       String params = "?idZone=" + 
           request.getParameter("idZone") +"&predictandName="+request.getParameter("predictandName")+"&downscalingMethod="+request.getParameter("dMethodName");
-      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + URIUtil.encodeQuery(params), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + URLEncoder.encode(params,"UTF-8"), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();
       byte[] buffer = new byte[4096];
@@ -337,7 +337,7 @@ public class DownscalingService extends HttpServlet {
       String params = "?username="+request.getParameter("username")+"&idZone="+request.getParameter("idZone")+"&predictandName="+
           request.getParameter("predictandName")+"&dMethodName="+request.getParameter("dMethodName")+"&scenarioName="+request.getParameter("scenarioName")+
           "&cells="+request.getParameter("cells");
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/downscale" + URIUtil.encodeQuery(params), "POST");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/downscale" + URLEncoder.encode(params,"UTF-8"), "POST");
       response.getWriter().print(urlConn.getResponseMessage());
       response.setStatus(urlConn.getResponseCode());
       

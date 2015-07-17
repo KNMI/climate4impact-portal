@@ -23,7 +23,6 @@ public class SendMail{
   public static void sendMail(String[] to,String from, String subject, String messageString) throws Exception{
      
      // Recipient's email ID needs to be mentioned.
-     //TODO must be configurable
      subject = subject.replaceAll("\n", " ");
      Debug.println("Sending email from "+from+" with subject ["+subject+"]");
      

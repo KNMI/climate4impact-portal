@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.SortedSet;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -290,7 +289,6 @@ public class AdagucViewer extends HttpServlet {
                       String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
                       jobList.removeDataLocator(basename);
                     } catch (Exception e1) {
-                      // TODO Auto-generated catch block
                       e1.printStackTrace();
                     }
                     throw s;
@@ -363,7 +361,6 @@ public class AdagucViewer extends HttpServlet {
           try {
             out1.write(r.getMessage().getBytes());
           } catch (IOException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
           }
         
