@@ -640,11 +640,11 @@ div.note {
 	min-height: 42px;
 }
 
-div.warning {
-	padding: 25px 25px 25px 80px;
+/*div.warning {
+	padding: 5px 5px 5px 80px;
 	background: #fffbc6 url("alert_warning_32.png") 25px center no-repeat;
 	min-height: 42px;
-}
+}*/
 
 div.seealso {
 	background: #e4ffde;
@@ -1618,11 +1618,36 @@ div.tnimagetext {
 	text-align: center;
 }
 
-.error {
-	color: #F00;
-	font-weight: bold;
+.alert-box {
+	color:#555;
+	border-radius:10px;
+	font-family:Tahoma,Geneva,Arial,sans-serif;font-size:11px;
+	padding:10px 36px;
+	margin:15px 0px 15px 0px;
+	text-align: left;
 }
-
+.alert-box span {
+	font-weight:bold;
+	text-transform:uppercase;
+}
+.error {
+	background:#ffecec url('images/error.png') no-repeat 10px 50%;
+	border:1px solid #f5aca6;
+}
+.success {
+	background:#e9ffd9 url('images/success.png') no-repeat 10px 50%;
+	border:1px solid #a6ca8a;
+}
+.warning {
+	padding: 10px 10px 10px 60px;
+	background:#fff8c4 url('alert_warning_32.png') no-repeat 10px 50%;
+	border:1px solid #f2c779;
+}
+.notice {
+	background:#e3f7fc url('images/notice.png') no-repeat 10px 50%;
+	border:1px solid #8ed9f6;
+}
+	
 .wps tr td,.wps tr th {
 	padding: 4px 9px;
 	border: 1px solid #fff;

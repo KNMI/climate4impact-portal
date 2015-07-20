@@ -347,45 +347,45 @@ public class HTMLParser {
 	      switch(ch) {
 	      case '\r':
 	        if(prevSlashR) {
-	          out.append("<br>");         
+	          out.append("<br/>");         
 	        }
 	        prevSlashR = true;
 	        break;
 	      case '\n':
 	        prevSlashR = false;
-	        out.append("<br>");
+	        out.append("<br/>");
 	        break;
 	      case '"':
 	        if(prevSlashR) {
-	          out.append("<br>");
+	          out.append("<br/>");
 	          prevSlashR = false;         
 	        }
 	        out.append("&quot;");
 	        break;
 	      case '<':
 	        if(prevSlashR) {
-	          out.append("<br>");
+	          out.append("<br/>");
 	          prevSlashR = false;         
 	        }
 	        out.append("&lt;");
 	        break;
 	      case '>':
 	        if(prevSlashR) {
-	          out.append("<br>");
+	          out.append("<br/>");
 	          prevSlashR = false;         
 	        }
 	        out.append("&gt;");
 	        break;
 	      case '&':
 	        if(prevSlashR) {
-	          out.append("<br>");
+	          out.append("<br/>");
 	          prevSlashR = false;         
 	        }
 	        out.append("&amp;");
 	        break;
 	      default:
 	        if(prevSlashR) {
-	          out.append("<br>");
+	          out.append("<br/>");
 	          prevSlashR = false;         
 	        }
 	        out.append(ch);

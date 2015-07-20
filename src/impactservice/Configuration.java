@@ -256,7 +256,7 @@ public class Configuration {
             try{oauthSetting.registerlink = provider.get("registerlink").getValue();}catch(Exception e){}
             
             oauth2Providers.add(oauthSetting);
-            Debug.println(j+") Found Oauth2 provider "+oauthSetting.id);
+            //Debug.println(j+") Found Oauth2 provider "+oauthSetting.id);
           } catch (Exception e) {
             e.printStackTrace();
           }

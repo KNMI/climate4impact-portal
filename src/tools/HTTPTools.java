@@ -5,6 +5,7 @@ import impactservice.Configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,17 +33,21 @@ import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -574,4 +579,89 @@ public class HTTPTools extends HttpServlet {
     }
   }
 
+
+  
+  public static String makeHTTPostRequestWithHeaders(String connectToURL, KVPKey headers,String postData) {
+    try{
+      
+      HttpClient httpClient=new DefaultHttpClient();
+      HttpPost httpPost=new HttpPost(connectToURL);
+      if(headers!=null){
+        SortedSet<String> a = headers.getKeys();
+        for(String b : a){
+          System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
+          httpPost.addHeader(b,headers.getValue(b).firstElement());
+        }
+      }
+      httpPost.addHeader("Content-Type","application/x-www-form-urlencoded ");
+      httpPost.setEntity(new StringEntity(postData));
+      HttpResponse httpResponse=httpClient.execute(httpPost);
+      return EntityUtils.toString(httpResponse.getEntity(),"utf-8");
+      
+    }catch(Exception e){
+      
+    }
+    return null;
+//    HttpClient httpclient = new DefaultHttpClient();
+//    HttpPost httppost = new HttpPost(connectToURL);
+//
+//    if(headers!=null){
+//      SortedSet<String> a = headers.getKeys();
+//      for(String b : a){
+//        System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
+//        httppost.addHeader(b,headers.getValue(b).firstElement());
+//      }
+//      
+//    }
+//    StringEntity stringEntity;
+//    try {
+//      stringEntity = new StringEntity(postData,"UTF-8");
+//    } catch (UnsupportedEncodingException e) {
+//      Debug.errprintln("Unable to set post data");
+//      return null;
+//    }
+//    httppost.setEntity(stringEntity);
+//    HttpResponse response;
+//    try {
+//      response = httpclient.execute(httppost);
+//    } catch (ClientProtocolException e) {
+//      Debug.errprintln("Unable execute set post");
+//      return null;
+//    } catch (IOException e) {
+//      Debug.errprintln("Unable execute set post");
+//      return null;
+//    }
+//    HttpEntity entity = response.getEntity();
+//
+//    if (entity != null) {
+//        InputStream instream = null;
+//        try {
+//          instream = entity.getContent();
+//        } catch (IllegalStateException e) {
+//          Debug.errprintln("Unable execute set post, no entity set");
+//          return null;
+//        } catch (IOException e) {
+//          Debug.errprintln("Unable execute set post, no entity set");
+//          return null;
+//        }
+//        try {
+//          byte[] bytes = IOUtils.toByteArray(instream);
+//          return bytes;
+//        } catch (IOException e) {
+//          // TODO Auto-generated catch block
+//          e.printStackTrace();
+//        } finally {
+//            try {
+//              instream.close();
+//            } catch (IOException e) {
+//              // TODO Auto-generated catch block
+//              e.printStackTrace();
+//            }
+//        }
+//    }else{
+//      Debug.errprintln("Unable execute set post, no entity set");
+//      return null;
+//    }
+//    return null;
+  }
 }

@@ -31,6 +31,7 @@ import model.Downscaling;
 import model.Job;
 import model.Predictand;
 
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;

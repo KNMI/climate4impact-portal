@@ -81,11 +81,22 @@
 			
 			<div class="textstandardleft">
 				
-				Your climate4impact identifier is:<br/><strong><%=user.getId()%></strong><br /><br/>
+				
+				<!--  Your climate4impact identifier is:<br/><strong><%=user.getId()%></strong><br /><br/>-->
 				Your ESGF OpenId identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
-				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br />  <br />
+				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br /> 
 				
 	
+		<%
+			//Print warning when retrieving SLCS has failed.
+						try {
+							impactservice.LoginManager.checkLogin(user.getId(),request);
+							out.println("<br /> <strong>Installed credential info:</strong><br/>"+tools.HTMLParser.textToHTML(user.getLoginInfo())+"<br/><br/>");
+						} catch (Exception e) {
+							impactservice.MessagePrinters.printWarningMessage(out, e);
+						}
+		%>
+			      
 				 <b>Actions:</b>
 				<ul>
 					<li>View account details: <span id="accountinfo">-</span></li>
@@ -96,14 +107,7 @@
 				</ul>
 	
 
-	<%
-			//Print warning when retrieving SLCS has failed.
-						try {
-							impactservice.LoginManager.checkLogin(user.getId(),request);
-						} catch (Exception e) {
-							impactservice.MessagePrinters.printWarningMessage(out, e);
-						}
-		%>
+
 				</div>
 		</div>
 	</div>

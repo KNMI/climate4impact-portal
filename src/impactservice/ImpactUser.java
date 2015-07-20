@@ -18,6 +18,7 @@ public class ImpactUser {
   private String id = null; // The unique ID of the user object
   public String internalName = null;
   private String usersDir = null;
+  private String loginInfo = null;
   
   public String certificateFile = null;
   public boolean credentialError = false;
@@ -40,6 +41,9 @@ public class ImpactUser {
     usersDir = _usersDir;
   }
   
+  public String getLoginInfo(){
+    return loginInfo;
+  }
 
 
   synchronized public GenericCart getProcessingJobList(){
@@ -177,6 +181,9 @@ public class ImpactUser {
     }catch(Exception e){
       e.printStackTrace();
     }
+  }
+  public void setLoginInfo(String loginMethod) {
+    this.loginInfo = loginMethod;
   }
  
 }

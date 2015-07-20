@@ -193,12 +193,16 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
     Debug.println("Validating request...");
 		Identifier identifier = this.verifyResponse(req);
 		log.debug("identifier: " + identifier);
+		
+		
+		
 		if (identifier != null) {
 		  Debug.println("Validation is OK");
 			req.setAttribute("identifier", identifier.getIdentifier());
 			//req.setAttribute("email", identifier.getIdentifier());
 			req.getSession().setAttribute("openid_identifier",identifier.getIdentifier());
 			req.getSession().setAttribute("user_identifier",identifier.getIdentifier());
+			req.getSession().setAttribute("login_method","openid");
 		}else{
 		  Debug.println("Validation is INVALID");
 		}
@@ -422,6 +426,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	// --- processing the authentication response ---
 	@SuppressWarnings("unchecked")
 	public Identifier verifyResponse(HttpServletRequest httpReq) {
+	  impactservice.LoginManager.logout(httpReq);
 		try {
 			// extract the parameters from the authentication response
 			// (which comes in as a HTTP request from the OpenID provider)

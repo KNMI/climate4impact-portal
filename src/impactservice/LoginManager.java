@@ -1,5 +1,6 @@
 package impactservice;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -7,7 +8,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,7 +94,7 @@ public class LoginManager {
    * @param user User object with identifier and home directory set
    * @throws Exception
    */
-  public synchronized static void getCredential(ImpactUser user) throws Exception{
+  private synchronized static void getCredential(ImpactUser user) throws Exception{
     
     if(Configuration.GlobalConfig.isInOfflineMode()==true){
       Debug.println("offline mode");
@@ -131,7 +136,7 @@ public class LoginManager {
       }
       if(userName == null){
         Debug.errprintln("No openid set for "+user.getId());
-        return;
+        throw new Exception("LoginManager: No openid set");
       }
       
       
@@ -186,7 +191,12 @@ public class LoginManager {
     
     if(id == null){
       try{
-        String userId = OAuth2Handler.verifyAndReturnUserIdentifier(request);
+        OAuth2Handler.UserInfo userInfo = OAuth2Handler.verifyAndReturnUserIdentifier(request);
+        String userId = null;
+        if(userInfo!=null){
+          OAuth2Handler.setSessionInfo(request, userInfo);
+          userId = userInfo.user_identifier;
+        }
         
         if(userId != null){
           id = userId;
@@ -374,14 +384,50 @@ public class LoginManager {
     }
     
   
-    
-    try{
-      getCredential(user);
-    }catch(Exception e){
-      user.credentialError=true;
-      e.printStackTrace();
-      throw new Exception("Unable to get credential for user "+user.getId()+"\n"+e.getMessage());
+    // Get Certificate
+    String certificate = (String) request.getSession().getAttribute("certificate");
+    String loginMethod = (String) request.getSession().getAttribute("login_method");
+    if(certificate == null){
+      
+      
+      //Obtain from local proxy server
+      Debug.println("Certificate not set, retrieving from MyProxy");
+      try{
+        getCredential(user);
+        user.setLoginInfo("Using "+loginMethod+", credential retrieved via impactportal MyProxy.");
+      }catch(Exception e){
+        user.credentialError=true;
+        //e.printStackTrace();
+        user.setLoginInfo("Using "+loginMethod+", unable to retrieve credential via impactportal MyProxy");
+        throw new Exception("Unable to get credential for user "+user.getId()+"\n"+e.getMessage());
+      }
+    }else{
+      Debug.println("Certificate set, writing to "+user.certificateFile);
+      FileOutputStream out = new FileOutputStream(user.certificateFile);
+      out.write(certificate.getBytes());
+      out.close();
+      user.setLoginInfo("Using "+loginMethod+", credential retrieved via remote SLCS.");
     }
+    
+    //Check certificate
+    String SLCSX509Certificate = tools.Tools.readFile(user.certificateFile);
+    
+    X509Certificate cert = null;
+    try {
+      CertificateFactory cf = CertificateFactory.getInstance("X.509");
+      cert = (X509Certificate) cf.generateCertificate( new ByteArrayInputStream(SLCSX509Certificate.getBytes(StandardCharsets.UTF_8)));
+      Date date = cert.getNotAfter();
+      user.setLoginInfo(" - "+user.getLoginInfo()+"\n - Valid till "+date.toString()+".\n - "+    cert.getSubjectDN().toString());
+      
+      
+   
+      
+    } catch (CertificateException e) {
+      throw new Exception("Unable to validate credential for user "+user.getId()+"\n"+e.getMessage());
+    }
+    
+    
+    
     
     createNCResourceFile(user);
     
@@ -514,7 +560,7 @@ public class LoginManager {
   
   
   static public void logout(HttpServletRequest request){
-    
+    Debug.println("--- LOGOUT --- "+request.getSession().getAttribute("user_identifier"));
     try {
       ImpactUser user;
       user = getUser(request);
@@ -530,7 +576,10 @@ public class LoginManager {
     request.getSession().setAttribute("user_identifier",null);
     request.getSession().setAttribute("email",null);
     request.getSession().setAttribute("emailaddress",null);
-    
+    request.getSession().setAttribute("certificate",null);
+    request.getSession().setAttribute("access_token",null);
+    request.getSession().setAttribute("login_method",null);
+    Debug.println("--- LOGOUT DONE --- ");
   }
  
 }
