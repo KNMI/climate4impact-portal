@@ -149,9 +149,12 @@ public class DownscalingAuth{
       if(!directory.exists())
         directory.mkdirs();
       String tokenFilePath = Configuration.DownscalingConfig.getTokenPath() + "/" + Configuration.DownscalingConfig.getTokenFileName();
+      
       File tokenFile = new File(tokenFilePath);
-      if(!tokenFile.exists())
+      if(!tokenFile.exists()){
+        Debug.println("Creating token file "+tokenFilePath);
         tokenFile.createNewFile();
+      }
       file = new FileWriter(tokenFilePath);
       pw = new PrintWriter(file);
       pw.println(content);
