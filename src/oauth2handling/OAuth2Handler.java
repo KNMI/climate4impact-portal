@@ -1,17 +1,53 @@
+/*
+  Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php 
+
+  Copyright (C) 2015 by Royal Netherlands Meteorological Institute (KNMI)
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+ */
+/*
+ Authors: Maarten Plieger (plieger at knmi.nl) and Ernst de Vreede, KNMI
+ */
+
 package oauth2handling;
 
 import impactservice.Configuration;
 import impactservice.Configuration.Oauth2Config.Oauth2Settings;
 import impactservice.LoginManager;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
@@ -21,7 +57,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Vector;
 
-import javax.security.auth.x500.X500Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,81 +84,69 @@ import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONResponse;
 import tools.KVPKey;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.Signature;
- 
-
-
-
 /**
- * Class which helps handling OAuth requests using APACHE oltu
+ * Class which helps handling OAuth requests. Uses APACHE oltu, bouncycastle and
+ * java security.
  * 
- * @author plieger
+ * @author Maarten Plieger and Ernst de Vreede, KNMI
+ * 
+ * If you use parts of this code, please let us know :).
  *
  */
 public class OAuth2Handler {
-  
-  /* === Remember to add accounts.google ssl certificate to truststore !!! === 
-   
-   E.g.:
-   echo | openssl s_client -connect accounts.google.com:443 2>&1 | sed -ne
-   '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > accounts.google.com
-   echo | openssl s_client -connect github.com:443 2>&1 | sed -ne '/-BEGIN
-   CERTIFICATE-/,/-END CERTIFICATE-/p' > github.com
-   keytool -import -v -trustcacerts -alias accounts.google.com -file
-   accounts.google.com -keystore esg-truststore2.ts
-   keytool -import -v -trustcacerts -alias github.com -file github.com
-   -keystore esg-truststore2.ts* 
 
-   */
-   
-
-  /* Restricted URL to check */
-  // /impactportal/ImpactService?&source=http://vesg.ipsl.fr/thredds/dodsC/esg_dataroot/CMIP5/output1/IPSL/IPSL-CM5A-LR/1pctCO2/day/atmos/cfDay/r1i1p1/v20110427/albisccp/albisccp_cfDay_IPSL-CM5A-LR_1pctCO2_r1i1p1_19700101-19891231.nc&SERVICE=WMS&&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=albisccp&WIDTH=1635&HEIGHT=955&CRS=EPSG:4326&BBOX=-105.13761467889908,-180,105.13761467889908,180&STYLES=auto/nearest&FORMAT=image/png&TRANSPARENT=TRUE&&time=1989-11-27T12:00:00Z
-
-  // E.g. wget
-  // "http://bhw485.knmi.nl:8280/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root"
-  // --header="Authorization: Bearer ya29.KwFhgkkEdgQBKh_5eRo_ODoN3h8uvdscC3gbhjcCB46wAWZpSsQg2CjFw8vm5LlygtqYRKQ6esLvuw"
-  // -O info.txt --no-check-certificate
-
-  // wget
-  // "http://bhw485.knmi.nl:8280/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root"
-  // --header="Authorization: JWT eyJhbGciOiJSUzI1NiIsImtpZCI6IjlhODEzMzhlMmFmOGVlZjA0ODE5OTA2MzgwZDBkOTZmNjBmNzI4ZjYifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwic3ViIjoiMTA4NjY0NzQxMjU3NTMxMzI3MjU1IiwiYXpwIjoiMjMxOTMzNTM3NDU2LW1zcjlwOG9zb3VpdTQwMGludmMwbWY4NTdhMTd2NGNxLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiZW1haWwiOiJtYWFydGVucGxpZWdlckBnbWFpbC5jb20iLCJhdF9oYXNoIjoiaV9nVzEzc3VpNTRWLWJiTzhHRTlFdyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdWQiOiIyMzE5MzM1Mzc0NTYtbXNyOXA4b3NvdWl1NDAwaW52YzBtZjg1N2ExN3Y0Y3EuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJpYXQiOjE0MjUzMTI3OTEsImV4cCI6MTQyNTMxNjY5MX0.cTmkv5ym0ef6KtLIYQ5DqlD3TSzpbURtrm7qmQAbKcdBtMKxhtuqeXOTd3_pNqRoaoo0vQ5yUv6TLBBlLQTe0MMj0kd5wZqfnjHzeGO0lCu2B8BijDdhYFto1pqzJqWhtluvXuBm0Ws4zZJs5NpkBnXNWMWOW1M04F6hoAfyfao"
-  // wget "https://www.googleapis.com/plus/v1/people/me/openIdConnect?"
-  // --header="Authorization: Bearer ya29.IwF2DNugbZI1KFo0EUyRMe2o_tfpgAoytDZkT4F0d98azSuGV3N9sTt4JN9zUnLXg3SQykxCz5BOzQ"
-  // -O info.txt --no-check-certificate
-  // wget
-  // "http://bhw485.knmi.nl:8280/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root"
-  // --header="Authorization: Bearer ya29.IwF2DNugbZI1KFo0EUyRMe2o_tfpgAoytDZkT4F0d98azSuGV3N9sTt4JN9zUnLXg3SQykxCz5BOzQ"
-  // --header="Discovery: https://accounts.google.com/.well-known/openid-configuration"
-  // -O info.txt --no-check-certificate
-
-  // http://self-issued.info/docs/draft-ietf-oauth-v2-bearer.html#authz-header
-
-  // http://self-issued.info/docs/draft-jones-json-web-token-01.html#DefiningRSA
-  // https://www.googleapis.com/oauth2/v2/certs
-  // https://console.developers.google.com/project
+ /* Documentation: 
+  *  
+  *  === First of all: ===
+  *    !!! Remember to add accounts.google ssl certificate to truststore !!!
+  *    And add other SSL certificates from configured Oauth2 providers like CEDA 
+  *  
+  *  === Adding an SSL cert to the truststore can be done like: ===
+  *  echo | openssl s_client -connect accounts.google.com:443 2>&1 | sed -ne
+  *  '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > accounts.google.com
+  *  echo | openssl s_client -connect github.com:443 2>&1 | sed -ne '/-BEGIN
+  *  CERTIFICATE-/,/-END CERTIFICATE-/p' > github.com
+  *  keytool -import -v -trustcacerts -alias accounts.google.com -file
+  *  accounts.google.com -keystore esg-truststore2.ts
+  *  keytool -import -v -trustcacerts -alias github.com -file github.com
+  *  -keystore esg-truststore2.ts 
+  *
+  * 
+  * === Test URLs to check which are restricted ===
+  *  /impactportal/ImpactService?&source=http://vesg.ipsl.fr/thredds/dodsC/esg_dataroot/CMIP5/output1/IPSL/IPSL-CM5A-LR/1pctCO2/day/atmos/cfDay/r1i1p1/v20110427/albisccp/albisccp_cfDay_IPSL-CM5A-LR_1pctCO2_r1i1p1_19700101-19891231.nc&SERVICE=WMS&&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=albisccp&WIDTH=1635&HEIGHT=955&CRS=EPSG:4326&BBOX=-105.13761467889908,-180,105.13761467889908,180&STYLES=auto/nearest&FORMAT=image/png&TRANSPARENT=TRUE&&time=1989-11-27T12:00:00Z
+  *
+  * === wget example to climate4impact with an OAuth2 access_token used as bearer in the headers ===
+  * "http://climate4impact.eu/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root"
+  *  --header="Authorization: Bearer <access token>"
+  *  -O info.txt --no-check-certificate
+  *   
+  * === wget example with a JWT ID Token to climate4impact ===
+  * wget "http://climate4impact.eu/impactportal/ImpactService?&service=basket&request=getoverview&_dc=1424696174221&node=root"
+  * --header="Authorization: JWT <jwt id token>"
+  * 
+  * === wget example with an access_token to Google OpenID connect services ===
+  *  wget "https://www.googleapis.com/plus/v1/people/me/openIdConnect?"
+  *  --header="Authorization: Bearer <access token>"
+  *  -O info.txt --no-check-certificate
+  *
+  * === Useful links: === 
+  * - http://self-issued.info/docs/draft-ietf-oauth-v2-bearer.html#authz-header
+  *
+  * - http://self-issued.info/docs/draft-jones-json-web-token-01.html#DefiningRSA
+  * - https://www.googleapis.com/oauth2/v2/certs
+  * - https://console.developers.google.com/project
+  * 
+  */
 
   static String oAuthCallbackURL = "/oauth"; // The external Servlet location
-  
+
   /**
    * UserInfo object used to share multiple userinfo attributes over functions.
+   * 
    * @author plieger
    *
    */
-  public static class UserInfo{
+  public static class UserInfo {
     public String user_openid = null;
     public String user_identifier = null;
     public String user_email = null;
@@ -131,6 +154,54 @@ public class OAuth2Handler {
     public String access_token;
     public String certificate_notafter;
   }
+
+  /**
+   * Endpoint which should directly be called by the servlet.
+   * 
+   * @param request
+   * @param response
+   */
+  public static void doGet(HttpServletRequest request,
+      HttpServletResponse response) {
+
+    // Check if we are dealing with getting JSON request for building up the
+    // login form
+    String makeform = null;
+    try {
+      makeform = tools.HTTPTools.getHTTPParam(request, "makeform");
+    } catch (Exception e) {
+    }
+    if (makeform != null) {
+      makeForm(request, response);
+      return;
+    }
+
+    // Check if we are dealing with step1 or step2 in the OAuth process.
+    String code = null;
+    try {
+      code = tools.HTTPTools.getHTTPParam(request, "code");
+    } catch (Exception e) {
+    }
+
+    if (code == null) {
+      // Step 1
+      Debug.println("Step 1: start GetCode request for "
+          + request.getQueryString());
+      try {
+        getCode(request, response);
+      } catch (OAuthSystemException e1) {
+        e1.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
+      // Step 2
+      Debug.println("Step 2: start makeOauthzResponse for "
+          + request.getQueryString());
+      makeOauthzResponse(request, response);
+
+    }
+  };
 
   /**
    * Step 1: Starts Oauth2 authentication request. It retrieves a one time
@@ -195,10 +266,12 @@ public class OAuth2Handler {
       }
 
       Debug
-          .println("  OAuth2 Step 2 OAuthz:  Provider retrieved from state is " + stateResponse);
+      .println("  OAuth2 Step 2 OAuthz:  Provider retrieved from state is "
+          + stateResponse);
 
       if (request.getParameter("r") != null) {
-        Debug.println("  OAuth2 Step 2 OAuthz:  Token request already done, stopping");
+        Debug
+        .println("  OAuth2 Step 2 OAuthz:  Token request already done, stopping");
         return;
       }
 
@@ -227,53 +300,49 @@ public class OAuth2Handler {
       Debug.println("  OAuth2 Step 2 OAuthz:  oauth2Response.getBody():"
           + oauth2Response.getBody());
 
-      Debug.println("  OAuth2 Step 2 OAuthz:  ACCESS TOKEN:" + oauth2Response.getAccessToken());
+      Debug.println("  OAuth2 Step 2 OAuthz:  ACCESS TOKEN:"
+          + oauth2Response.getAccessToken());
 
-      handleSpecificProviderCharacteristics(request,settings,oauth2Response);
-      
+      handleSpecificProviderCharacteristics(request, settings, oauth2Response);
+
       response.sendRedirect("/impactportal/account/login.jsp");
 
     } catch (Exception e) {
       e.printStackTrace();
     }
-
-  }
+  };
 
   /**
-   * All providers are handled a bit different.
-   * One of them is CEDA, which offers a certificate issuing service for ESGF.
+   * All providers are handled a bit different. One of them is CEDA, which
+   * offers a certificate issuing service for ESGF.
+   * 
    * @param request
    * @param settings
    * @param oauth2Response
    */
   private static void handleSpecificProviderCharacteristics(
-      HttpServletRequest request, Oauth2Settings settings, OAuthAccessTokenResponse oauth2Response) {
+      HttpServletRequest request, Oauth2Settings settings,
+      OAuthAccessTokenResponse oauth2Response) {
     if (settings.id.equals("ceda")) {
-      
-      UserInfo userInfo = makeSLCSCertificateRequest(settings.id,oauth2Response.getAccessToken());
-      setSessionInfo(request,userInfo);
-      
-      
-    
+
+      UserInfo userInfo = makeSLCSCertificateRequest(settings.id,
+          oauth2Response.getAccessToken());
+      setSessionInfo(request, userInfo);
     }
 
     if (settings.id.equals("google")) {
       try {
-
         /* Google */
         String id_token = oauth2Response.getParam("id_token");
-
-        /* Microsoft */
-        // String token = oauth2Response.getParam("authentication_token");
-        // String token = oauth2Response.getParam("user_id");
 
         if (id_token == null) {
           Debug.errprintln("ID TOKEN == NULL!");
         }
         if (id_token != null) {
           if (id_token.indexOf(".") != -1) {
-            UserInfo userInfo = getIdentifierFromJWTPayload(TokenDecoder.base64Decode(id_token.split("\\.")[1]));
-            setSessionInfo(request,userInfo);
+            UserInfo userInfo = getIdentifierFromJWTPayload(TokenDecoder
+                .base64Decode(id_token.split("\\.")[1]));
+            setSessionInfo(request, userInfo);
 
             String accessToken = oauth2Response.getAccessToken();
             Debug.println("ACCESS TOKEN:" + accessToken);
@@ -285,22 +354,22 @@ public class OAuth2Handler {
         e.printStackTrace();
       }
     }
-    
-  }
+  };
 
   /**
-   * Step 3 - Make SLCS certificate request to external OAuth2 service
-   * A - generate keypair
-   * B - generate certificate signing request (CSR)
-   * C - Request certificate from CEDA service using CSR and access_token
-   * D - Retrieve user identifier from retrieved SLCS
+   * Step 3 - Make SLCS certificate request to external OAuth2 service A -
+   * generate keypair B - generate certificate signing request (CSR) C - Request
+   * certificate from CEDA service using CSR and access_token D - Retrieve user
+   * identifier from retrieved SLCS
    * 
    * @param currentProvider
    * @param accessToken
    * @return
    */
-  private static UserInfo makeSLCSCertificateRequest(String currentProvider,String accessToken) {
-    Debug.println("Step 3 - Make SLCS certificate request to external OAuth2 service");
+  private static UserInfo makeSLCSCertificateRequest(String currentProvider,
+      String accessToken) {
+    Debug
+    .println("Step 3 - Make SLCS certificate request to external OAuth2 service");
     UserInfo userInfo = new UserInfo();
     userInfo.user_identifier = "https://ceda.ac.uk/openid/TODO_howdowegettheidentifier";
     Security.addProvider(new BouncyCastleProvider());
@@ -308,35 +377,35 @@ public class OAuth2Handler {
     PublicKey publicKey = null;
     PrivateKey privateKey = null;
     KeyPairGenerator keyGen = null;
-    
-    //Generate KeyPair
+
+    // Generate KeyPair
     Debug.println("  Step 3.1 - Generate KeyPair");
     try {
-        keyGen = KeyPairGenerator.getInstance("RSA");
+      keyGen = KeyPairGenerator.getInstance("RSA");
     } catch (NoSuchAlgorithmException e) {
-        e.printStackTrace();
-        return null;
+      e.printStackTrace();
+      return null;
     }
     keyGen.initialize(2048, new SecureRandom());
     KeyPair keypair = keyGen.generateKeyPair();
     publicKey = keypair.getPublic();
     privateKey = keypair.getPrivate();
-    
-    //Generate Certificate Signing Request
+
+    // Generate Certificate Signing Request
     Debug.println("  Step 3.2 - Generate CSR");
     String CSRinPEMFormat = null;
     try {
-      //PKCS10CertificationRequest a = new PKCS10CertificationRequest("SHA256withRSA", new X500Principal("CN=Requested Test Certificate"), publicKey, null, privateKey);
-      PKCS10CertificationRequest a = new PKCS10CertificationRequest("SHA256withRSA", new  X509Name ("CN=Requested Test Certificate"), publicKey, null, privateKey);
-      //PemObject pemObject = new PemObject("CERTIFICATE REQUEST", certRequest.getEncoded());
+
+      PKCS10CertificationRequest a = new PKCS10CertificationRequest(
+          "SHA256withRSA", new X509Name("CN=Requested Test Certificate"),
+          publicKey, null, privateKey);
       StringWriter str = new StringWriter();
       PEMWriter pemWriter = new PEMWriter(str);
       pemWriter.writeObject(a);
       pemWriter.close();
       str.close();
-      
+
       CSRinPEMFormat = str.toString();
-      //System.out.println(new String(a.getDEREncoded()));
       Debug.println("  CSR Seems OK");
     } catch (InvalidKeyException e) {
       // TODO Auto-generated catch block
@@ -354,98 +423,89 @@ public class OAuth2Handler {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
+
     Debug.println("  Step 3.3 - Use SLCS service with CSR and OAuth2 access_token");
-    //System.out.println(CSRinPEMFormat);
-    
+
     KVPKey key = new KVPKey();
-    key.addKVP("Authorization", "Bearer "+accessToken);
+    key.addKVP("Authorization", "Bearer " + accessToken);
     Debug.println("Starting request");
-    
+
     String postData = null;
     try {
-      postData = "certificate_request="+URLEncoder.encode(CSRinPEMFormat,"UTF-8");
+      postData = "certificate_request=" + URLEncoder.encode(CSRinPEMFormat, "UTF-8");
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
-    
-    //Debug.println("PostData = ["+postData+"]");
-    
-    String SLCSX509Certificate = HTTPTools.makeHTTPostRequestWithHeaders("https://slcs.ceda.ac.uk/oauth/certificate/", key,postData);
-    
-    if(SLCSX509Certificate != null){
+
+    //TODO hard coded slcs service
+    String SLCSX509Certificate = HTTPTools.makeHTTPostRequestWithHeaders(
+        "https://slcs.ceda.ac.uk/oauth/certificate/", key, postData);
+
+    if (SLCSX509Certificate != null) {
       Debug.println("Succesfully retrieved an SLCS\n");
     }
-    
+
     String privateKeyInPemFormat = null;
-    try{
+    try {
       StringWriter str = new StringWriter();
       PEMWriter pemWriter = new PEMWriter(str);
       pemWriter.writeObject(privateKey);
       pemWriter.close();
       str.close();
       privateKeyInPemFormat = str.toString();
-    }catch(Exception e){
-      
+    } catch (Exception e) {
+
     }
-    
-//    if(privateKeyInPemFormat != null){
-//      Debug.println("Corresponding private key is\n"+privateKeyInPemFormat);
-//      
-//    }
-    
-    //Debug.println("ESGF Cert is\n"+SLCSX509Certificate+privateKeyInPemFormat);
-    
 
-    
     Debug.println("Finished request");
-    
-    String CertOpenIdIdentifier = null;
-    //org.apache.catalina.authenticator.SSLAuthenticator
 
-    
+    String CertOpenIdIdentifier = null;
+
     X509Certificate cert = null;
     try {
       CertificateFactory cf = CertificateFactory.getInstance("X.509");
-      cert = (X509Certificate) cf.generateCertificate( new ByteArrayInputStream(SLCSX509Certificate.getBytes(StandardCharsets.UTF_8)));
+      cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
+          SLCSX509Certificate.getBytes(StandardCharsets.UTF_8)));
     } catch (CertificateException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
-    
+
     String subjectDN = cert.getSubjectDN().toString();
-    Debug.println("getSubjectDN: "+subjectDN);
+    Debug.println("getSubjectDN: " + subjectDN);
     String[] dnItems = subjectDN.split(", ");
-    for(int j=0;j<dnItems.length;j++){
+    for (int j = 0; j < dnItems.length; j++) {
       int CNIndex = dnItems[j].indexOf("CN");
-      if(CNIndex != -1){
-        CertOpenIdIdentifier = dnItems[j].substring("CN=".length()+CNIndex);
+      if (CNIndex != -1) {
+        CertOpenIdIdentifier = dnItems[j].substring("CN=".length() + CNIndex);
       }
     }
     userInfo.user_identifier = CertOpenIdIdentifier;
     userInfo.user_openid = CertOpenIdIdentifier;
 
-    userInfo.certificate = SLCSX509Certificate+privateKeyInPemFormat;
+    userInfo.certificate = SLCSX509Certificate + privateKeyInPemFormat;
     userInfo.access_token = accessToken;
-    
+
     return userInfo;
-  }
+  };
 
   /**
    * Sets session parameters for the impactportal
+   * 
    * @param request
    * @param userInfo
    */
   public static void setSessionInfo(HttpServletRequest request,
       UserInfo userInfo) {
-      request.getSession().setAttribute("openid_identifier", userInfo.user_openid);
-      request.getSession().setAttribute("user_identifier", userInfo.user_identifier);
-      request.getSession().setAttribute("emailaddress", userInfo.user_email);
-      request.getSession().setAttribute("certificate", userInfo.certificate);
-      request.getSession().setAttribute("access_token", userInfo.access_token);
-      request.getSession().setAttribute("login_method", "oauth2");
-  }
+    request.getSession()
+    .setAttribute("openid_identifier", userInfo.user_openid);
+    request.getSession().setAttribute("user_identifier",
+        userInfo.user_identifier);
+    request.getSession().setAttribute("emailaddress", userInfo.user_email);
+    request.getSession().setAttribute("certificate", userInfo.certificate);
+    request.getSession().setAttribute("access_token", userInfo.access_token);
+    request.getSession().setAttribute("login_method", "oauth2");
+  };
 
   /**
    * Verifies a signed JWT Id_token with RSA SHA-256
@@ -520,7 +580,7 @@ public class OAuth2Handler {
 
     // Find the discovery page
     JSONObject JWTPayLoadObject = (JSONObject) new JSONTokener(JWTPayload)
-        .nextValue();
+    .nextValue();
     String iss = JWTPayLoadObject.getString("iss");
     Debug.println("iss=" + iss);
 
@@ -539,7 +599,7 @@ public class OAuth2Handler {
     Debug.println("jwks_keys:" + jwks_keys.length());
 
     JSONObject JWTHeaderObject = (JSONObject) new JSONTokener(JWTHeader)
-        .nextValue();
+    .nextValue();
     String kid = JWTHeaderObject.getString("kid");
     Debug.println("kid=" + kid);
 
@@ -556,7 +616,7 @@ public class OAuth2Handler {
     }
     return RSASSA_PKCS1_V1_5_VERIFY(modulus, exponent, JWTSigningInput,
         JWTSignature);
-  }
+  };
 
   /**
    * RSASSA-PKCS1-V1_5-VERIFY ((n, e), M, S) using SHA-256
@@ -602,66 +662,11 @@ public class OAuth2Handler {
     return isVerified;
   }
 
+
   /**
-   * Check if an access token was provided in the HttpServletRequest object and return a user identifier on success.
-   * 
-   * It returns the unique user identifier. It does this by calling the userinfo_endpoint using the access_token. 
-   * All endpoints are discovered by reading the open-id Discovery service.
-   * This is one of the OpenId-Connect extensions on OAuth2
-   * 
-   * @param request
-   * @return
-   * @throws JSONException
-   * @throws WebRequestBadStatusException
-   * @throws IOException
-   */
-  public static UserInfo verifyAndReturnUserIdentifier(HttpServletRequest request)
-      throws JSONException, WebRequestBadStatusException, IOException {
-
-    //1) Find the Authorization header containing the access_token
-    String access_token = request.getHeader("Authorization");
-    if (access_token == null){
-      //No access token, probably not an OAuth2 request, skip.
-      return null;
-    }
-    Debug.println("Authorization    : " + access_token);
-    
-    //2) Find the Discovery service, it might have been passed in the request headers:
-    String discoveryURL = request.getHeader("Discovery");
-    if (discoveryURL == null) {
-      discoveryURL = "https://accounts.google.com/.well-known/openid-configuration";
-    }
-    Debug.println("Discovery        : " + discoveryURL);
-    
-    //3 Retrieve the Discovery service, so we get all service endpoints
-    String discoveryData = HTTPTools.makeHTTPGetRequest(discoveryURL);
-    JSONObject jsonObject = (JSONObject) new JSONTokener(discoveryData)
-        .nextValue();
-    
-    //4) Retrieve userinfo endpoint
-    String userInfoEndpoint = jsonObject.getString("userinfo_endpoint");
-    Debug.println("userInfoEndpoint:" + userInfoEndpoint);
-
-    //5) Make a get request with Authorization headers set, the access_token is used here as Bearer.
-    KVPKey key = new KVPKey();
-    key.addKVP("Authorization", access_token);
-    Debug.println("Starting request");
-    String id_token = HTTPTools.makeHTTPGetRequestWithHeaders(userInfoEndpoint, key);// ,"Authorization: Bearer "+access_token);
-    Debug.println("Finished request");
-
-    //6) The ID token is retrieved, now return the identifier from this token.
-    Debug.println("Retrieved id_token=" + id_token);
-    return getIdentifierFromJWTPayload(id_token);
-  }
-
-  
-  
-  
-  /**
-   * Returns unique user identifier from id_token (JWTPayload). The JWT token is *NOT* verified.
-   * Several impact portal session attributes are set:
-   * - user_identifier
-   * - emailaddress
+   * Returns unique user identifier from id_token (JWTPayload). The JWT token is
+   * *NOT* verified. Several impact portal session attributes are set: -
+   * user_identifier - emailaddress
    * 
    * @param request
    * @param JWT
@@ -703,98 +708,110 @@ public class OAuth2Handler {
     userInfo.user_identifier = user_identifier;
     userInfo.user_openid = user_openid;
     userInfo.user_email = email;
-    
 
-
-    Debug.println("getIdentifierFromJWTPayload: Found unique ID" + user_identifier);
+    Debug.println("getIdentifierFromJWTPayload: Found unique ID"
+        + user_identifier);
 
     return userInfo;
 
   }
 
   /**
-   * Endpoint which should directly be called by the servlet.
+   * Makes a JSON object and sends it to response with information needed for
+   * building the OAuth2 login form.
    * 
    * @param request
    * @param response
    */
-  public static void doGet(HttpServletRequest request,
+  private static void makeForm(HttpServletRequest request,
       HttpServletResponse response) {
-
-    //Check if we are dealing with getting JSON request for building up the login form
-    String makeform = null;
-    try {
-      makeform = tools.HTTPTools.getHTTPParam(request, "makeform");
-    } catch (Exception e) {
-    }
-    if(makeform != null){
-      makeForm(request,response);
-      return;
-    }
-    
-    //Check if we are dealing with step1 or step2 in the OAuth process.
-    String code = null;
-    try {
-      code = tools.HTTPTools.getHTTPParam(request, "code");
-    } catch (Exception e) {
-    }
-
-    if (code == null) {
-      //Step 1
-      Debug.println("Step 1: start GetCode request for " + request.getQueryString());
-      try {
-        getCode(request, response);
-      } catch (OAuthSystemException e1) {
-        e1.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
-      //Step 2
-      Debug.println("Step 2: start makeOauthzResponse for " + request.getQueryString());
-      makeOauthzResponse(request, response);
-
-    }
-
-  }
-
-  /**
-   * Makes a JSON object and sends it to response with information needed for building the OAuth2 login form.
-   * @param request
-   * @param response
-   */
-  private static void makeForm(HttpServletRequest request, HttpServletResponse response) {
     JSONResponse jsonResponse = new JSONResponse();
 
     JSONObject form = new JSONObject();
     try {
-      
+
       JSONArray providers = new JSONArray();
       form.put("providers", providers);
       Vector<String> providernames = Configuration.Oauth2Config.getProviders();
-      
-      for(int j=0;j<providernames.size();j++){
-        Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config.getOAuthSettings( providernames.get(j));
+
+      for (int j = 0; j < providernames.size(); j++) {
+        Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config
+            .getOAuthSettings(providernames.get(j));
         JSONObject provider = new JSONObject();
         provider.put("id", providernames.get(j));
         provider.put("description", settings.description);
         provider.put("logo", settings.logo);
         provider.put("registerlink", settings.registerlink);
         providers.put(provider);
-        
+
       }
     } catch (JSONException e) {
     }
     jsonResponse.setMessage(form);
-    
+
     try {
       jsonResponse.setJSONP(request);
       response.setContentType(jsonResponse.getMimeType());
       response.getOutputStream().print(jsonResponse.getMessage());
     } catch (Exception e1) {
-    
+
     }
+
+  };
+
+   /* Check if an access token was provided in the HttpServletRequest object
+     and return a user identifier on success.
+     *
+     * It returns the unique user identifier. It does this by calling the
+     userinfo_endpoint using the access_token.
+     * All endpoints are discovered by reading the open-id Discovery service.
+     * This is one of the OpenId-Connect extensions on OAuth2
+     *
+     * @param request
+     * @return
+     * @throws JSONException
+     * @throws WebRequestBadStatusException
+     * @throws IOException
+     */
+   public static UserInfo verifyAndReturnUserIdentifier(HttpServletRequest request)
+     throws JSONException, WebRequestBadStatusException, IOException {
     
-  }
+     //1) Find the Authorization header containing the access_token
+     String access_token = request.getHeader("Authorization");
+     if (access_token == null){
+     //No access token, probably not an OAuth2 request, skip.
+     return null;
+     }
+     Debug.println("Authorization    : " + access_token);
+    
+     //2) Find the Discovery service, it might have been passed in the request  headers:
+     String discoveryURL = request.getHeader("Discovery");
+     if (discoveryURL == null) {
+     discoveryURL =
+     "https://accounts.google.com/.well-known/openid-configuration";
+     }
+     Debug.println("Discovery        : " + discoveryURL);
+    
+     //3 Retrieve the Discovery service, so we get all service endpoints
+     String discoveryData = HTTPTools.makeHTTPGetRequest(discoveryURL);
+     JSONObject jsonObject = (JSONObject) new JSONTokener(discoveryData)
+     .nextValue();
+    
+     //4) Retrieve userinfo endpoint
+     String userInfoEndpoint = jsonObject.getString("userinfo_endpoint");
+     Debug.println("userInfoEndpoint:" + userInfoEndpoint);
+    
+     //5) Make a get request with Authorization headers set, the access_token is used here as Bearer.
+     KVPKey key = new KVPKey();
+     key.addKVP("Authorization", access_token);
+     Debug.println("Starting request");
+     String id_token = HTTPTools.makeHTTPGetRequestWithHeaders(userInfoEndpoint,
+     key);// ,"Authorization: Bearer "+access_token);
+     Debug.println("Finished request");
+    
+     //6) The ID token is retrieved, now return the identifier from this token.
+     Debug.println("Retrieved id_token=" + id_token);
+     return getIdentifierFromJWTPayload(id_token);
+   };
 
 }

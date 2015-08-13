@@ -589,7 +589,7 @@ public class HTTPTools extends HttpServlet {
       if(headers!=null){
         SortedSet<String> a = headers.getKeys();
         for(String b : a){
-          System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
+          //System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
           httpPost.addHeader(b,headers.getValue(b).firstElement());
         }
       }
