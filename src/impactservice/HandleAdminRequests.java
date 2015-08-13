@@ -29,7 +29,7 @@ public class HandleAdminRequests {
     }
     
     if(user != null){
-      Debug.println("USer: "+user.internalName);
+      Debug.println("User: "+user.internalName);
       if(user.hasRole("admin")==false){
         jsonResponse.setErrorMessage("Unauthorized", 403);
       }
@@ -71,9 +71,9 @@ public class HandleAdminRequests {
             }
             
             jsonUser.put("sessions", sessionIds);
-            
-            jsonUser.put("basketsize", user.getShoppingCart().getNumProducts());
-            jsonUser.put("processingjobsize", user.getProcessingJobList().getNumProducts());
+            ImpactUser infoUser = userList.get(j);
+            jsonUser.put("basketsize", infoUser.getShoppingCart().getNumProducts());
+            jsonUser.put("processingjobsize", infoUser.getProcessingJobList().getNumProducts());
             
             jsonUserList.put(jsonUser);
           }
