@@ -1,19 +1,14 @@
-.page{
-  border:0px solid black;
-  width:900px;
-  padding:3px;
-}
 
-.searchSelectFacet{
+.esgfsearch-selectfacet{
   margin:5px 0px 5px 0px;
 }
 
-.selectedElementList{
+.esgfsearch-selectedelementlist{
   margin:0px;
   padding:0px;
 }
 
-.roundborder{
+.esgfsearch-roundedborder{
   -moz-border-radius-topleft: 3px;
   -moz-border-radius-topright:3px;
   -moz-border-radius-bottomleft:3px;
@@ -28,7 +23,7 @@
   border-bottom-right-radius:3px;
 }
 
-.facets{
+.esgfsearch-facets{
   padding:1px 6px 1px 6px;
   margin:2px;
   border:1px solid black;
@@ -39,28 +34,28 @@
   display:inline-block;
 }
 
-.facets:hover  {
+.esgfsearch-facets:hover  {
   background-color: #8F8;
   color:black;
 }
 
-.facetSelected{
+.esgfsearch-facetselected{
   background-color: #D8E8FC;
   border:1px solid #7DA2CE;
   color:black;
 }
 
-.facetSelected:hover{
+.esgfsearch-facetselected:hover{
   background-color:#FFFF80;
  border:1px solid #6D82aE;
 }
 
-.facetDisabled{
+.esgfsearch-facetdisabled{
   background-color:#888;
   border:1px solid #888;
 }
 
-.elementSelector{
+.esgfsearch-property{
   padding:0px 16px 0px 16px;
   margin:0px;
   overflow:hidden;
@@ -75,107 +70,37 @@
   border-bottom:1px solid #FFF;
 }
 
-.elementSelectorEven{
+.esgfsearch-property-even{
    background-color: #FFF;
 }
 
-.elementSelectorOdd{
+.esgfsearch-property-odd{
   background-color:#FFF ;
 }
 
-.elementSelector:hover  {
+.esgfsearch-property:hover  {
   background-color: #D0FFD0;
   color:black;
 /*   border:1px solid #999;*/
 
 }
-.elementSelected{
+.esgfsearch-property-selected{
   background-color: #D8E8FC;
 }
 
-.elementSelected:hover{
+.esgfsearch-property-selected:hover{
   background-color:#FFFF80;
 }
 
-.elementSelectorContainer{
+.esgfsearch-property-container{
    overflow:auto;
    max-height:150px;
    margin:2px;
    border:1px solid #668;
 }
 
-.button_facetselectorclose{
-  float:right;
-}
-
-.button_elementselectorok{
-float:right;
-}
-
-.button_filterresults{
-  float:right;
-}
-
-.button_removefilter{
-  height:20px;
-  width:20px;
-  line-height:15px;
-  padding:0px;
-  margin:0px;
-}
-
-.div_filterresults{
-  display:block;
-  line-height:25px;
-}
-
-
-.overlay{
-  position:fixed;
-  display:inline;
- background: rgba(255,255,255,.7);
-  z-index:10000;
-}
-
-/*All components should be put in here */
-.searchCompContainer{
-   background: white; 
-  border: 1px solid white;;
-  border-radius: 1px;
-  padding: 0px;
-}
-
-.searchComp{
-  border-radius:2px;
-  margin:4px 2px 8px 2px;
-  border:1px solid #EEF;
-}
-
-.searchCompHeader{
-  font-weight: bold;
-  background:#428bca;
-  font-size:16px;
-  color:white;
-   /*background: rgba(0,0,0,.30);*/
-  border-bottom-style:solid;
-  border-color:#91847C;
-  border-bottom-width:1px;
-   padding:2px 6px 1px 6px;
-   
-}
-
-.searchCompBody{
-  padding:6px 6px 6px 6px;
-  height:100%;
-  background:#e0ebeb;
-}
-
-.searchCompFooter{
-}
-
-
 /* Field 1 on top showing all selected elements */
-.selectedElements{
+.esgfsearch-selectedelements{
   /*background-color:#D9FFD4;*/
   /*padding:10px;
   margin-bottom:2px;*/
@@ -189,19 +114,19 @@ float:right;
 }
 
 /*Field 3 Bottom component displaying search results*/
-.searchResults{
+.esgfsearch-results{
   /* background-color:#FFDAC3; */
   /* border:1px solid #91847C; */ 
 }
 
-.resultList{
+.esgfsearch-resultlist{
   overflow:auto;
   max-height:260px;
   border:1px solid #668;
   background-color:#FFF; 
 }
 
-.resultItem{
+.esgfsearch-resultitem{
  padding:0px 16px 0px 16px;
  margin:0px;
  overflow:hidden;
@@ -216,19 +141,42 @@ float:right;
  border-bottom:1px solid #FFF;
 }
 
-.resultItemChecking{
+.esgfsearch-resultitem-checking{
    background-color: #999;
 }
 
-.resultItemOk{
+.esgfsearch-resultitem-ok{
    background-color: #FFF;
 }
 
-.resultItemWrong{
-   background-color: #F44;
+.esgfsearch-resultitem-wrong{
+   background-color: #F88;
 }
 
-.resultItem:hover  {
+.esgfsearch-resultitem:hover  {
   background-color: #D0FFD0;
   color:black;
 }
+
+
+
+
+.esgfsearch-property-buttonapply{
+float:right;
+}
+
+.esgfsearch-buttonremovefilterproperty{
+  height:20px;
+  width:20px;
+  line-height:15px;
+  padding:0px;
+  margin:0px;
+}
+
+
+.esgfsearch-loader{
+  background-image:url("ajax-loader.gif") !important;
+  width:32px;
+  height:32px;
+}
+

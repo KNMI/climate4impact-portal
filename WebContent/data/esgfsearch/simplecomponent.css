@@ -1,0 +1,35 @@
+/*All components should be put in here */
+.simplecomponent-container{
+   background: white; 
+  border: 1px solid white;;
+  border-radius: 1px;
+  padding: 0px;
+}
+
+.simplecomponent{
+  border-radius:2px;
+  margin:4px 2px 8px 2px;
+  border:1px solid #EEF;
+}
+
+.simplecomponent-header{
+  font-weight: bold;
+  background:#428bca;
+  font-size:16px;
+  color:white;
+   /*background: rgba(0,0,0,.30);*/
+  border-bottom-style:solid;
+  border-color:#91847C;
+  border-bottom-width:1px;
+   padding:2px 6px 1px 6px;
+   
+}
+
+.simplecomponent-body{
+  padding:6px 6px 6px 6px;
+  height:100%;
+  background:#e0ebeb;
+}
+
+.simplecomponent-footer{
+}

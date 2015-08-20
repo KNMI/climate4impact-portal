@@ -273,32 +273,32 @@ public class HTTPTools extends HttpServlet {
       throw unknownHostException;
     } catch (IOException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403, "IOException: Forbidden");
+      throw new WebRequestBadStatusException(404, "IOException: Forbidden");
     } catch (UnrecoverableKeyException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"UnrecoverableKeyException");
     } catch (KeyManagementException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"KeyManagementException");
     } catch (KeyStoreException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"KeyStoreException");
     } catch (NoSuchAlgorithmException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"NoSuchAlgorithmException");
     } catch (CertificateException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"CertificateException");
     } catch (GSSException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,"GSSException");
     } catch (WebRequestBadStatusException e) {
       //Debug.printStackTrace(e);
       throw e;
     } catch (Exception e) {
       Debug.printStackTrace(e);
       Debug.println("HTTP Exception");
-      throw new WebRequestBadStatusException(403);
+      throw new WebRequestBadStatusException(400,e.getMessage());
     }
     if (redirectLocation != null) {
       Debug.println("redirectLocation =" + redirectLocation);

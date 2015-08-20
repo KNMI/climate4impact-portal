@@ -25,19 +25,20 @@ var SearchInterface = function(options){
   
   
   /**
-  * Class to make Ajax Calls which will complete in the same order as called.
+  * Class to make Ajax Calls which will complete in the same order as called; e.g. it blocks calls.
   * 
   * How it works: 
-  * 1) Make a new object of this class (e.g. var a = new AsyncFifo();
-  * 2) Make your own ajax function with two arguments: the first is for passing arguments and the second is called when you finished
-  *    e.g. var myfunction = function(myargs,ready){};
-  * 3) Pass your function with your arguments to AsyncFifo like this : a.call(myfunction,myargs);
-  * 4) Everything will now be called in the right order, one call at a time!
+  * 1) Make your own ajax function with two arguments: the first is for passing arguments and the second is called when you finished
+  *  e.g. var myfunction = function(myargs,ready){}; You have to call ready when your done, this is a trigger for the following call.
+  * 2) Make a new object of this class (e.g. var a = new AsyncFifo(myfunction);
+  * 3) Pass your function with your arguments to AsyncFifo like this : a.call(myargs);
+  * 4) Callback function with provided args will now be called asynchronousely in the same order as requested.
   */
-  function AsyncFifo(){
+  function AsyncFifo(callback,timeout){
+    var fnToCall = callback;
     var calls = [];
     var busy = false;
-    this.call = function(fnToCall,args){
+    this.call = function(args){
       calls.push(args);
       if(busy === true)return;
       busy = true;
@@ -46,10 +47,13 @@ var SearchInterface = function(options){
           busy = false;
         }else{
           var f = calls.shift();
+          if(isDefined(timeout)){
+            setTimeout(function(){ go();}, timeout); 
+          }
           try{
             fnToCall(f,go);
           }catch(e){
-            console.log("Something when wrong in AsyncFifo:");
+            console.log("Something went wrong in AsyncFifo:");
             console.log(e);
             go();
           }
@@ -110,27 +114,27 @@ var SearchInterface = function(options){
 
   
   this.renderSearchInterface = function(options){
-    $.blockUI.defaults.message='<img src="esgfsearch/ajax-loader.gif"/>';
+    $.blockUI.defaults.message='<div class="esgfsearch-loader"></div>';
     $.blockUI.defaults.css.border='none';
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
     rootElement = options.element;
-    options.element.html('<div class="searchCompContainer">'+
-    '  <div class="searchComp facetOverview">'+
-    '    <div class="searchCompHeader">Filters</div>'+
-    '    <div class="searchCompBody"></div>'+
-    '    <div class="searchCompFooter"></div>'+
+    options.element.html('<div class="simplecomponent-container">'+
+    '  <div class="simplecomponent esgfsearch-facetoverview">'+
+    '    <div class="simplecomponent-header">Filters</div>'+
+    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
-    '  <div class="searchComp selectedElements">'+
-    '    <div class="searchCompHeader">Selected filters</div>'+
-    '    <div class="searchCompBody"></div>'+
-    '    <div class="searchCompFooter"></div>'+
+    '  <div class="simplecomponent esgfsearch-selectedelements">'+
+    '    <div class="simplecomponent-header">Selected filters</div>'+
+    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
-    '  <div class="searchComp searchResults">'+
-    '    <div class="searchCompHeader">Results</div>'+
-    '    <div class="searchCompBody"></div>'+
-    '    <div class="searchCompFooter"></div>'+
+    '  <div class="simplecomponent esgfsearch-results">'+
+    '    <div class="simplecomponent-header">Results</div>'+
+    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
     '</div>');
@@ -154,7 +158,7 @@ var SearchInterface = function(options){
         height:400,
         modal:true
       });
-      el.html('<div class="ajaxloader"></div>');
+      el.html('<div class="esgfsearch-loader"></div>');
       var helpReturned = function(data){
         el.html(data);    
       }
@@ -165,23 +169,23 @@ var SearchInterface = function(options){
       })
     });
     
-    addFilter();
+    addFilterProperty();
   };
   
-  var checkResponseFifo = new AsyncFifo();
+ 
   
   var recentlyCheckedResponses = [];
   
   var _checkResponse = function(arg,ready){
     var setResult = function(arg,a){
       var el = rootElement.find("span[name=\""+arg+"\"]").first();
-      el.removeClass("resultItemChecking");
+      el.removeClass("esgfsearch-resultitem-checking");
       if(a.ok=="ok"){
-        el.addClass("resultItemOk");
+        el.addClass("esgfsearch-resultitem-ok");
         recentlyCheckedResponses[arg]=a;
         el.children().first().html("");
       }else{
-        el.addClass("resultItemWrong");
+        el.addClass("esgfsearch-resultitem-wrong");
         el.children().first().html(a.message);
         recentlyCheckedResponses[arg]=false;
       }
@@ -196,14 +200,16 @@ var SearchInterface = function(options){
       setResult(arg,a);
     };
     
+    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg);
     $.ajax({
-      url: impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg),
+      url: url,
           crossDomain:true,
           dataType:"jsonp"
     }).done(function(d) {
       httpCallback(d)
     }).fail(function() {
-      alert("fail 154");
+      //alert("fail 154");
+      console.log("Ajax call failed: "+url);
       httpCallback("Failed for "+arg);
     }).always(function(){
       if(ready){
@@ -213,10 +219,12 @@ var SearchInterface = function(options){
     
   };
   
+  var checkResponseFifo = new AsyncFifo(_checkResponse,5000);
+   
   var checkResponses = function(data){
     checkResponseFifo.stop();
     for(var r in data.response.results){
-      checkResponseFifo.call(_checkResponse,data.response.results[r].url);
+      checkResponseFifo.call(data.response.results[r].url);
     }
   };
   
@@ -227,7 +235,7 @@ var SearchInterface = function(options){
         width:450,
         height:400
       });
-      el.html('<div class="ajaxloader"></div>');
+      el.html('<div class="esgfsearch-loader"></div>');
     var callback = function(data){
       
       //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
@@ -246,33 +254,36 @@ var SearchInterface = function(options){
     });
   }
   
-  
+  /*
+   * Callback for ajax query, both facets and results are included.
+   */
   var showResponse = function(data){
+    
     var limit = data.response.limit;
     if(limit>data.response.numfound)limit = data.response.numfound;
     var html="";
-    rootElement.find(".searchResults").find(".searchCompHeader").html("Datasets: Found "+data.response.numfound+", displaying "+limit+" of "+ data.response.numfound+" results.");
+    rootElement.find(".esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying "+limit+" of "+ data.response.numfound+" results.");
     function getPageName(url) {
       var index = url.lastIndexOf("/") + 1;
       var extensionIndex = url.lastIndexOf(".")-index;
       var filename = url.substr(index,extensionIndex);
       //filename = filename.replace(/\./g," ");
       return filename;          
-    }
-    html+="<div class=\"resultList roundborder\">";
+    };
+    html+="<div class=\"esgfsearch-resultlist esgfsearch-roundedborder\">";
     for(var r in data.response.results){
-      html+="<span class=\"resultItem resultSelector resultItemChecking\" name=\""+data.response.results[r].url+"\">"+data.response.results[r].id+" <span>checking...</span></span>";
+      html+="<span class=\"esgfsearch-resultitem resultSelector esgfsearch-resultitem-checking\" name=\""+data.response.results[r].url+"\">"+data.response.results[r].id+" <span>checking...</span></span>";
     }
     html+="</div>";
     var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
     //html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
-    rootElement.find(".searchResults").find(".searchCompBody").first().html(html);
+    rootElement.find(".esgfsearch-results").find(".simplecomponent-body").first().html(html);
     
     rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
       addToBasket();
     });
     
-    rootElement.find(".resultItem").attr('onclick','').click(function(t){
+    rootElement.find(".esgfsearch-resultitem").attr('onclick','').click(function(t){
       var clickedURL = $(this).attr("name");
       var catalogObject = null;
       for(var r in data.response.results){
@@ -282,13 +293,15 @@ var SearchInterface = function(options){
         }
       }
       if(catalogObject == null){
-        alert("Internal error at esgfsearch.js at line 173");
+        alert("Catalog contains no valid URL / link.");
+        //alert("Internal error at esgfsearch.js at line 173");
+        return;
       }
       
-      if($(this).hasClass("facetSelected")){
-        $(this).removeClass("facetSelected");
+      if($(this).hasClass("esgfsearch-facetselected")){
+        $(this).removeClass("esgfsearch-facetselected");
       }else{
-        $(this).addClass("facetSelected");
+        $(this).addClass("esgfsearch-facetselected");
       }
       
       var el = jQuery('<div></div>', {
@@ -306,13 +319,9 @@ var SearchInterface = function(options){
     checkResponses(data);
   };
   
-  var facetFIFO = new AsyncFifo();
+
   
-  var getFacetsForFacetName = function(arg){
-    facetFIFO.call(_getFacetsForFacetName,arg);
-  };
-  
-  var _getFacetsForFacetName = function(args,ready){
+  var _getPropertiesForFacetName = function(args,ready){
     var name = args.name;
     var callback= args.callback;
     
@@ -322,6 +331,7 @@ var SearchInterface = function(options){
       showResponse(result);
       var data = result.facets;
       var facet = data[name];
+
       callback(facet);
       
     };
@@ -341,22 +351,27 @@ var SearchInterface = function(options){
       }
     });
   };
+    
+  var facetFIFO = new AsyncFifo(_getPropertiesForFacetName);
   
-  
-  /**
-  * Happens when something inside a facet is clicked.
-  */
-  
-  var elementSelectorClick = function(id){
-    //  console.log("elementSelectorClick:"+$(this).attr("name"));
+  var getPropertiesForFacetName = function(arg){
+    facetFIFO.call(arg);
   };
   
   /**
-  * Happens when a category, e.g. standard_name, model, experiment is clicked
+  * Happens when a property inside a facet is clicked.
+  */
+  
+  var propertyClick = function(id){
+    //  console.log("propertyClick:"+$(this).attr("name"));
+  };
+  
+  /**
+  * Happens when a facet, e.g. standard_name, model, experiment is clicked
   */
   var facetClick = function(container,name){
     
-    var facetselectordiv=container.find(".searchSelectFacet");
+    var facetselectordiv=container.find(".esgfsearch-selectfacet");
     
     
     
@@ -370,33 +385,33 @@ var SearchInterface = function(options){
       var html="";
       var even = 0;
       for(var i in facetList){
-        if(even == 0)oddEvenClass="elementSelectorEven";else oddEvenClass="elementSelectorOdd"
+        if(even == 0)oddEvenClass="esgfsearch-property-even";else oddEvenClass="esgfsearch-property-odd"
           
-          html+="<span name=\""+facetList[i]+"\" class=\"elementSelector "+oddEvenClass+"\">"+facetList[i]+"</span>";
+          html+="<span name=\""+facetList[i]+"\" class=\"esgfsearch-property "+oddEvenClass+"\">"+facetList[i]+"</span>";
         even = 1-even;
       }
       var autocomplete = "Filter: <input class=\"searchautocomplete\" =\"text\"></input>";
       
-      var appliedElements = "<div>&nbsp;<span class=\"selectedElementList\"></span></div>";
-      var applyButton = "<button class=\"button_elementselectorok\">Apply</button>";
-      facetselectordiv.html("<div style=\"margin:0 0 4px 5px;\">"+autocomplete+"</div><div class=\"elementSelectorContainer roundborder\">"+html+"</div>"+"<div style=\"padding:5px;margin-bottom:5px;\">"+appliedElements+"<hr/><div style=\"clear: both;\">"+applyButton+"<br/></div></div>");
+      var appliedElements = "<div>&nbsp;<span class=\"esgfsearch-selectedelementlist\"></span></div>";
+      var applyButton = "<button class=\"esgfsearch-property-buttonapply\">Apply</button>";
+      facetselectordiv.html("<div style=\"margin:0 0 4px 5px;\">"+autocomplete+"</div><div class=\"esgfsearch-property-container esgfsearch-roundedborder\">"+html+"</div>"+"<div style=\"padding:5px;margin-bottom:5px;\">"+appliedElements+"<hr/><div style=\"clear: both;\">"+applyButton+"<br/></div></div>");
       
-      rootElement.find(".button_elementselectorok").button().attr('onclick','').click(function(t){
-        selectedElementsForFacet();
+      rootElement.find(".esgfsearch-property-buttonapply").button().attr('onclick','').click(function(t){
+        selectedPropertiesForFacet();
       });
       
       var selectElement = function(element,alwaysselect){
-        if(element.hasClass("elementSelected")){
+        if(element.hasClass("esgfsearch-property-selected")){
           if(alwaysselect !== true){
-            element.removeClass("elementSelected");
+            element.removeClass("esgfsearch-property-selected");
           }
         }else{
-          element.addClass("elementSelected");
+          element.addClass("esgfsearch-property-selected");
         }
-        elementSelectorClick(element);
+        propertyClick(element);
         
         
-        var selEl = rootElement.find(".elementSelected");
+        var selEl = rootElement.find(".esgfsearch-property-selected");
         
         
         var subquery="";
@@ -404,10 +419,10 @@ var SearchInterface = function(options){
         var html="";
         for(var j=0;j<selEl.length;j++){
           if(j>0)html+="+";
-          html+="<span class=\"facets roundborder\">"+$(selEl[j]).attr("name")+"</span>";
+          html+="<span class=\"esgfsearch-facets esgfsearch-roundedborder\">"+$(selEl[j]).attr("name")+"</span>";
           
         }
-        rootElement.find(".selectedElementList").first().html(html);
+        rootElement.find(".esgfsearch-selectedelementlist").first().html(html);
         
         
         
@@ -427,25 +442,25 @@ var SearchInterface = function(options){
         }
       });
       
-      rootElement.find(".elementSelector").attr('onclick','').click(function(evt){
+      rootElement.find(".esgfsearch-property").attr('onclick','').click(function(evt){
         selectElement($(this));
       });
-      rootElement.find(".elementSelector").attr('ondblclick','').dblclick(function(evt){
+      rootElement.find(".esgfsearch-property").attr('ondblclick','').dblclick(function(evt){
         selectElement($(this),true);
         if (evt.ctrlKey == false){
-          selectedElementsForFacet();
+          selectedPropertiesForFacet();
         }
       });
       
     };
-    getFacetsForFacetName({name:name,callback:callback});
+    getPropertiesForFacetName({name:name,callback:callback});
   };
   
-  var addFilter = function(){
+  var addFilterProperty = function(){
     //showFilters();
     getAllFacets();
   };
-  var removeFilter = function(facet,element){
+  var removeFilterProperty = function(facet,element){
     //alert(facet+":"+element);
     var k = new KVP(query);
     var kvps = k.getKeyValues();
@@ -469,70 +484,86 @@ var SearchInterface = function(options){
     for(var kvp in kvps){
       for(var vkey in kvps[kvp]){
         var v= kvps[kvp][vkey];
-        html+="<span class=\"facets roundborder\">"+kvp+" : "+decodeURIComponent(v)+"&nbsp;<button class=\"button_removefilter\" name=\""+kvp+","+v+"\">X</button></span>";
+        html+="<span class=\"esgfsearch-facets esgfsearch-roundedborder\">"+kvp+" : "+decodeURIComponent(v)+"&nbsp;<button class=\"esgfsearch-removefilterproperty\" name=\""+kvp+","+v+"\">X</button></span>";
       }
     }
     if(html.length==0){
       html="none";
     }
     //html+=getFilterResultsButton();
-    var el = rootElement.find(".selectedElements").find(".searchCompBody").first();
+    var el = rootElement.find(".esgfsearch-selectedelements").find(".simplecomponent-body").first();
     el.html(html);
-    el.find(".button_removefilter").attr('onclick','').click(function(t){
+    el.find(".esgfsearch-removefilterproperty").attr('onclick','').click(function(t){
       var facetAndValue = ($(this).attr('name')).split(",");
-      removeFilter(facetAndValue[0],facetAndValue[1]);
+      removeFilterProperty(facetAndValue[0],facetAndValue[1]);
     });
     
     
     
   };
   
-  var selectedElementsForFacet = function(){
-    var selEl = rootElement.find(".elementSelected");
-    var selFacet = rootElement.find(".facetSelected").attr("name");
+  var selectedPropertiesForFacet = function(){
+    var selEl = rootElement.find(".esgfsearch-property-selected");
+    var selFacet = rootElement.find(".esgfsearch-facetselected").attr("name");
     var subquery="";
     for(var j=0;j<selEl.length;j++){
       subquery+=selFacet+"="+encodeURIComponent($(selEl[j]).attr("name"))+"&";
     }
     query+=subquery;
-    addFilter();
+    addFilterProperty();
   };
   
-  var getAllFacetsFIFO = new AsyncFifo();
-  
-  var getAllFacets = function(){
-    getAllFacetsFIFO.call(_getAllFacets);
-  };
-  
+
   var _getAllFacets = function(args,ready){
     showFilters();
-    rootElement.find(".facetOverview").find(".searchCompBody").first().block();//('<div class="overlay"></div>');
+    rootElement.find(".esgfsearch-facetoverview").find(".simplecomponent-body").first().block();
     var callback = function(result){
+      //Show found results
       showResponse(result);
-      var d= result.facets;
+      
+      //result.facets.sort();
+      
+      var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "models"];
+      
+      //List corresponding facets
+      var facets= [];
+      
+      for(var j=0;j<primaryFacets.length;j++){
+        var key = primaryFacets[j];
+       // console.log(key);
+        if(result.facets[key]){
+          facets[key]=result.facets[key];
+        }
+      }
+      for(var key in result.facets){
+        //console.log(key);
+        if(!facets[key]){
+          facets[key]=result.facets[key];
+        }
+      }
       var count;
       var html = "";
-      for(var a in d){
+      for(var facetkey in facets){
         count =0;
-        for(var b in d[a]){
+        for(var property in facets[facetkey]){
           count++;
         }
         if(count>1){
-          html+="<span name=\""+a+"\" class=\"clickablefacet facets roundborder\">"+a+" ("+count+")</span>";
+          html+="<span name=\""+facetkey+"\" class=\"clickablefacet esgfsearch-facets esgfsearch-roundedborder\">"+facetkey+" ("+count+")</span>";
         }else if(count>0){
-          html+="<span name=\""+a+"\" class=\"clickablefacet facetDisabled facets roundborder\">"+a+" ("+count+")</span>";
+          html+="<span name=\""+facetkey+"\" class=\"clickablefacet esgfsearch-facetdisabled esgfsearch-facets esgfsearch-roundedborder\">"+facetkey+" ("+count+")</span>";
         }
       }
-      html+="<div class=\"searchSelectFacet\"></div>";
+      html+="<div class=\"esgfsearch-selectfacet\"></div>";
       html+="</div>";
       
-      rootElement.find(".facetOverview").find(".searchCompBody").first().html(html);
+      rootElement.find(".esgfsearch-facetoverview").find(".simplecomponent-body").first().html(html);
       
       showFilters();
       
       rootElement.find(".clickablefacet").attr('onclick','').click(function(t){
-        rootElement.find(".clickablefacet").removeClass("facetSelected");
-        $(this).addClass("facetSelected");
+        rootElement.find(".clickablefacet").removeClass("esgfsearch-facetselected");
+        $(this).addClass("esgfsearch-facetselected");
         facetClick($(this).parent(),$(this).attr("name"));
       });
       
@@ -550,6 +581,13 @@ var SearchInterface = function(options){
       ready();
     });
   };
+  
+  var getAllFacetsFIFO = new AsyncFifo(_getAllFacets);
+  
+  var getAllFacets = function(){
+    getAllFacetsFIFO.call();
+  };
+  
   
   this.renderSearchInterface(options);
 };

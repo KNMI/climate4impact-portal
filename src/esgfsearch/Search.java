@@ -43,7 +43,7 @@ public class Search {
   public JSONResponse getFacets(String facets, String query) {
     int searchLimit = 50;
     try{
-      LockOnQuery.lock(facets+query);
+      LockOnQuery.lock(facets+query,0);
       JSONResponse r = _getFacetsImp(facets,query,searchLimit);
       LockOnQuery.release(facets+query);
       return r;
@@ -247,7 +247,18 @@ public class Search {
   public JSONResponse checkURL(String query,HttpServletRequest request) {
     
     Debug.println("Checking: "+query);
-    LockOnQuery.lock(query);
+    int status = LockOnQuery.lock(query,1000);
+    if(status == 1){
+      JSONResponse r = new JSONResponse();
+      JSONObject a = new JSONObject();
+      try {
+        a.put("message","timeout");
+      } catch (JSONException e) {
+      }
+      r.setMessage(a);
+      return r;
+    }
+    
 
     JSONResponse r = _checkURL(query,request);
     
@@ -328,7 +339,7 @@ public class Search {
       getCatalog(query,request);
       jsonresult.put("ok", "ok");
     }catch(Exception e){
-      Debug.println(e.getMessage());
+      //Debug.println(e.getMessage());
       try {
         jsonresult.put("ok", "false");
         jsonresult.put("message", e.getMessage());
@@ -380,7 +391,7 @@ public class Search {
     try{
       //DOSTUFF
       int searchLimit = 200;
-      LockOnQuery.lock(query);
+      LockOnQuery.lock(query,0);
       JSONResponse r = _getFacetsImp(null,query,searchLimit);
       LockOnQuery.release(query);
 

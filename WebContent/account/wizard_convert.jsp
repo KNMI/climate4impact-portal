@@ -43,7 +43,10 @@
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSlider.js"></script>
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSProcessing.js"></script>
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSCoverage.js"></script>
-    
+    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImage.js"></script>
+    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImageStore.js"></script>
+    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDivBuffer.js"></script>
+    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSelector.js"></script>
     <script type="text/javascript" src="../adagucviewer/config.js"></script>
     
     
