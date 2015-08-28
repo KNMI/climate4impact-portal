@@ -11,6 +11,41 @@ var renderSearchInterface = function(options){
   return new SearchInterface(options);
 };
 
+/**
+* Splits a url into key value pairs.
+*/
+function ESGFSearch_KVP(query){
+  var kvplist = [];
+  function parse(query){
+    var splittedKVP = query.split("&");
+    if(splittedKVP){
+      for(var kvpkey in splittedKVP){
+        var kvp = splittedKVP[kvpkey];
+        var kvps=kvp.split("=");
+        if(kvps.length==2){
+          var key = kvps[0];
+          var value = kvps[1];
+          if(!kvplist[key])kvplist[key] = [];
+          kvplist[key].push(value);
+        }
+      }
+    }
+  };
+  this.getKeys = function(){
+    var keys = new MySet();
+    for(key in kvplist){
+      keys.add(key);
+    }
+    return keys;
+  };
+  this.getValues = function(key){
+    return kvplist[key];
+  }
+  this.getKeyValues = function(){
+    return kvplist;
+  };
+  parse(query);
+};
 
 
 var SearchInterface = function(options){
@@ -18,11 +53,21 @@ var SearchInterface = function(options){
   //var impactESGFSearchEndPoint = "http://bhw485.knmi.nl:8280/impactportal/esgfsearch?";
   var impactESGFSearchEndPoint = "esgfsearch?";
   
+  var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access","institute","data_node","realm"];
+  
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
-  query="";//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+  query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+  
+ //query="variable=tas";
+  var currentFacetList = undefined;
+  var currentSelectedFacet = undefined;
   var rootElement = null;
   
   
+ 
+  
+  var propertyChooser = [];
+  var propertyTabMenu = "";
   
   /**
   * Class to make Ajax Calls which will complete in the same order as called; e.g. it blocks calls.
@@ -68,41 +113,7 @@ var SearchInterface = function(options){
     };
   };
   
-  /**
-  * Splits a url into key value pairs.
-  */
-  function KVP(query){
-    var kvplist = [];
-    function parse(query){
-      var splittedKVP = query.split("&");
-      if(splittedKVP){
-        for(var kvpkey in splittedKVP){
-          var kvp = splittedKVP[kvpkey];
-          var kvps=kvp.split("=");
-          if(kvps.length==2){
-            var key = kvps[0];
-            var value = kvps[1];
-            if(!kvplist[key])kvplist[key] = [];
-            kvplist[key].push(value);
-          }
-        }
-      }
-    };
-    this.getKeys = function(){
-      var keys = new MySet();
-      for(key in kvplist){
-        keys.add(key);
-      }
-      return keys;
-    };
-    this.getValues = function(key){
-      return kvplist[key];
-    }
-    this.getKeyValues = function(){
-      return kvplist;
-    };
-    parse(query);
-  };
+
   
   /**
   * A normal unordered set, e.g. a list containing no duplicates.
@@ -114,24 +125,24 @@ var SearchInterface = function(options){
 
   
   this.renderSearchInterface = function(options){
-    $.blockUI.defaults.message='<div class="esgfsearch-loader"></div>';
+    $.blockUI.defaults.message='<div class="c4i-esgfsearch-loader"></div>';
     $.blockUI.defaults.css.border='none';
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
     rootElement = options.element;
     options.element.html('<div class="simplecomponent-container">'+
-    '  <div class="simplecomponent esgfsearch-facetoverview">'+
-    '    <div class="simplecomponent-header">Filters</div>'+
+    '  <div class="simplecomponent c4i-esgfsearch-selectedelements">'+
+    '    <div class="simplecomponent-header">Selected filters:</div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
-    '  <div class="simplecomponent esgfsearch-selectedelements">'+
-    '    <div class="simplecomponent-header">Selected filters</div>'+
+    '  <div class="simplecomponent c4i-esgfsearch-facetoverview">'+
+    '    <div class="simplecomponent-header">Filters:</div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
-    '  <div class="simplecomponent esgfsearch-results">'+
+    '  <div class="simplecomponent c4i-esgfsearch-results">'+
     '    <div class="simplecomponent-header">Results</div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
@@ -147,6 +158,8 @@ var SearchInterface = function(options){
       impactESGFSearchEndPoint = options.service;
     }
     
+ 
+    
     $(".headerhelpbutton").button({
       
       icons: {
@@ -158,7 +171,7 @@ var SearchInterface = function(options){
         height:400,
         modal:true
       });
-      el.html('<div class="esgfsearch-loader"></div>');
+      el.html('<div class="c4i-esgfsearch-loader"></div>');
       var helpReturned = function(data){
         el.html(data);    
       }
@@ -169,7 +182,10 @@ var SearchInterface = function(options){
       })
     });
     
-    addFilterProperty();
+    getAllFacets();
+    
+    propertyChooser["project"] = new ProjectPropertyChooser();
+    propertyChooser["variable"] = new VariablePropertyChooser();
   };
   
  
@@ -178,29 +194,37 @@ var SearchInterface = function(options){
   
   var _checkResponse = function(arg,ready){
     var setResult = function(arg,a){
-      var el = rootElement.find("span[name=\""+arg+"\"]").first();
-      el.removeClass("esgfsearch-resultitem-checking");
+    
+      var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
+     
+      el.removeClass("c4i-esgfsearch-resultitem-checking");
       if(a.ok=="ok"){
-        el.addClass("esgfsearch-resultitem-ok");
-        recentlyCheckedResponses[arg]=a;
+        el.addClass("c4i-esgfsearch-resultitem-ok");
+        recentlyCheckedResponses[arg.id]=a;
         el.children().first().html("");
       }else{
-        el.addClass("esgfsearch-resultitem-wrong");
-        el.children().first().html(a.message);
-        recentlyCheckedResponses[arg]=false;
+        el.addClass("c4i-esgfsearch-resultitem-wrong");
+        el.children().first().html(" - "+a.message);
+        recentlyCheckedResponses[arg.id]=false;
       }
     }
-    if(recentlyCheckedResponses[arg]){
-      setResult(arg,recentlyCheckedResponses[arg]);
+    if(recentlyCheckedResponses[arg.id]){
+      setResult(arg,recentlyCheckedResponses[arg.id]);
       ready();
       return;
     }
     
     var httpCallback = function(a){
+
       setResult(arg,a);
     };
-    
-    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg);
+    //console.log(arg);
+    if(!arg.url){
+      httpCallback({message:"Error: no URL defined."});
+      ready();
+      return;
+    }
+    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
     $.ajax({
       url: url,
           crossDomain:true,
@@ -212,6 +236,7 @@ var SearchInterface = function(options){
       console.log("Ajax call failed: "+url);
       httpCallback("Failed for "+arg);
     }).always(function(){
+      
       if(ready){
         ready();
       }
@@ -223,8 +248,11 @@ var SearchInterface = function(options){
    
   var checkResponses = function(data){
     checkResponseFifo.stop();
+    if(!data.response){
+      return;
+    }
     for(var r in data.response.results){
-      checkResponseFifo.call(data.response.results[r].url);
+      checkResponseFifo.call(data.response.results[r]);
     }
   };
   
@@ -235,7 +263,7 @@ var SearchInterface = function(options){
         width:450,
         height:400
       });
-      el.html('<div class="esgfsearch-loader"></div>');
+      el.html('<div class="c4i-esgfsearch-loader"></div>');
     var callback = function(data){
       
       //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
@@ -250,6 +278,7 @@ var SearchInterface = function(options){
     }).fail(function() {
       alert("fail 474");
     }).always(function(){
+    
       //ready();
     });
   }
@@ -258,11 +287,15 @@ var SearchInterface = function(options){
    * Callback for ajax query, both facets and results are included.
    */
   var showResponse = function(data){
-    
+   
+    if(data.response == undefined){
+      checkResponses(data);
+      return;
+    }
     var limit = data.response.limit;
     if(limit>data.response.numfound)limit = data.response.numfound;
     var html="";
-    rootElement.find(".esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying "+limit+" of "+ data.response.numfound+" results.");
+    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying "+limit+" of "+ data.response.numfound+" results.");
     function getPageName(url) {
       var index = url.lastIndexOf("/") + 1;
       var extensionIndex = url.lastIndexOf(".")-index;
@@ -270,50 +303,53 @@ var SearchInterface = function(options){
       //filename = filename.replace(/\./g," ");
       return filename;          
     };
-    html+="<div class=\"esgfsearch-resultlist esgfsearch-roundedborder\">";
+    html+="<div class=\"c4i-esgfsearch-resultlist\">";
     for(var r in data.response.results){
-      html+="<span class=\"esgfsearch-resultitem resultSelector esgfsearch-resultitem-checking\" name=\""+data.response.results[r].url+"\">"+data.response.results[r].id+" <span>checking...</span></span>";
+      html+="<span class=\"c4i-esgfsearch-resultitem resultSelector c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">Id: "+data.response.results[r].id+" <span>checking...</span><br/><span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span></span>";
     }
     html+="</div>";
     var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
     //html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
-    rootElement.find(".esgfsearch-results").find(".simplecomponent-body").first().html(html);
+    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").first().html(html);
     
     rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
+      
       addToBasket();
     });
     
-    rootElement.find(".esgfsearch-resultitem").attr('onclick','').click(function(t){
-      var clickedURL = $(this).attr("name");
-      var catalogObject = null;
-      for(var r in data.response.results){
-        if(clickedURL == data.response.results[r].url){
-          catalogObject = data.response.results[r];
-          break;
+    rootElement.find(".c4i-esgfsearch-resultitem").attr('onclick','').click(function(t){
+      if(!getSelection().toString()){
+        var clickedID = $(this).attr("name");
+        var catalogObject = null;
+        for(var r in data.response.results){
+          if(clickedID == data.response.results[r].id){
+            catalogObject = data.response.results[r];
+            break;
+          }
         }
+        if(catalogObject == null){
+          alert("Catalog contains no valid URL / link.");
+          //alert("Internal error at esgfsearch.js at line 173");
+          return;
+        }
+        
+        if($(this).hasClass("c4i-esgfsearch-facetselected")){
+          $(this).removeClass("c4i-esgfsearch-facetselected");
+        }else{
+          $(this).addClass("c4i-esgfsearch-facetselected");
+        }
+        
+        var el = jQuery('<div></div>', {
+          title: 'Dataset '+catalogObject.id,
+        }).dialog({
+          width:950,
+          height:600
+        });
+        
+        
+        
+        renderCatalogBrowser({element:el,url:catalogObject.url});
       }
-      if(catalogObject == null){
-        alert("Catalog contains no valid URL / link.");
-        //alert("Internal error at esgfsearch.js at line 173");
-        return;
-      }
-      
-      if($(this).hasClass("esgfsearch-facetselected")){
-        $(this).removeClass("esgfsearch-facetselected");
-      }else{
-        $(this).addClass("esgfsearch-facetselected");
-      }
-      
-      var el = jQuery('<div></div>', {
-        title: 'Dataset '+catalogObject.id,
-      }).dialog({
-        width:950,
-        height:600
-      });
-      
-      
-      
-      renderCatalogBrowser({element:el,url:catalogObject.url});
     });
     
     checkResponses(data);
@@ -363,184 +399,317 @@ var SearchInterface = function(options){
   */
   
   var propertyClick = function(id){
-    //  console.log("propertyClick:"+$(this).attr("name"));
+    showFilters();
+  };
+  
+  /* Generate the propertylist for selected facet */
+  var generatePropertyListSelector = function(facetList,facetName){
+    if(!isDefined(facetList)){
+      return;
+    }
+    
+    //Get property_descriptions
+    var descriptions = "";
+    if(property_descriptions){
+     if(property_descriptions[facetName]){
+       descriptions = property_descriptions[facetName];
+     }
+    }
+    
+    //Get selected filters and properties from query.
+    var k = new ESGFSearch_KVP(query);
+    var selectedFacets = k.getKeyValues();
+    var selectedPropertiesForFacet = selectedFacets[facetName];
+    var html="";
+    var even = 0;
+    var autocompleteList = [];
+    for(var i in facetList){
+      var oddEvenClass = "";
+      var selectedClass = "";  
+      var checkboxclass = "c4i-esgfsearch-checkboxclear";
+      if(even == 0)oddEvenClass="c4i-esgfsearch-property-even";else oddEvenClass="c4i-esgfsearch-property-odd";
+      if(selectedPropertiesForFacet){
+        if(selectedPropertiesForFacet.indexOf(facetList[i])!=-1){
+          selectedClass = "c4i-esgfsearch-property-selected";
+          checkboxclass = "c4i-esgfsearch-checkbox";
+        }
+      }
+      var description = "";
+      description = descriptions[facetList[i]];
+      if(!description)description = "";
+      if(description.length>0) {
+        autocompleteList.push(description);
+      }
+      html+="<span name=\""+facetList[i]+"\" class=\"c4i-esgfsearch-property "+selectedClass+" "+oddEvenClass+"\">"+
+      "<span class=\"c4i-esgfsearch-property-checkbox "+checkboxclass+"\"></span><span style=\"width:170px;display:inline-block;\">"+facetList[i]+"</span><i>"+description+"</i></span>";
+      even = 1-even;
+      
+      autocompleteList.push(facetList[i]);
+      
+    }
+    
+    var tabPropertySelector = "<div class=\"c4i-esgfsearch-property-container c4i-esgfsearch-tabcontainer\">"+html+"</div>"+
+       "<div class=\"c4i-esgfsearch-autocomplete\"><input class=\"c4i-esgfsearch-searchautocomplete\" ></input></div>";
+
+    rootElement.find(".c4i-esgfsearch-selectfacet-container").html(tabPropertySelector);
+    
+    rootElement.find(".c4i-esgfsearch-property-container").show();
+    var noPropertyChooser = true;
+    //if(!selectedPropertiesForFacet)
+    {
+      if(propertyChooser){
+        if(propertyChooser[facetName]){
+          noPropertyChooser = false;
+          rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+            "<div class=\"c4i-esgfsearch-property-menu c4i-esgfsearch-tabcontainer\">"+
+              propertyChooser[facetName].html+
+            "</div>"
+          );
+          var numprops = propertyChooser[facetName].init(rootElement,facetName,facetList,query,_this.addFilterProperty);
+          
+        
+          
+          rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+            "<div class=\"c4i-esgfsearch-tabmain\">"+
+            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu\">Quick select</div>"+
+            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties\">All "+facetName+" properties ("+facetList.length+")</div>"+
+            "</div>"
+          );
+          if(numprops >0){
+            rootElement.find(".c4i-esgfsearch-property-container").hide();
+            rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+          }else{
+            rootElement.find(".c4i-esgfsearch-property-menu").hide();
+            rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
+          }
+        }
+      }
+      
+      if(noPropertyChooser){
+         rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+            "<div class=\"c4i-esgfsearch-tabmain\">"+
+            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties c4i-esgfsearch-tab-selected\">"+facetName+" ("+facetList.length+")</div>"+
+            "</div>"
+          );
+      }
+    }
+    
+    var showPropertyTab = function(){
+      rootElement.find(".c4i-esgfsearch-property-menu").hide();
+      rootElement.find(".c4i-esgfsearch-tab-menu").removeClass("c4i-esgfsearch-tab-selected");
+      
+      rootElement.find(".c4i-esgfsearch-property-container").show();
+      rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
+      propertyTabMenu = "allproperties";
+    };
+    
+    if(propertyTabMenu == "allproperties"){
+      showPropertyTab();
+    }
+    
+    rootElement.find(".c4i-esgfsearch-tab-properties").attr('onclick','').click(function(evt){showPropertyTab();});
+    
+    rootElement.find(".c4i-esgfsearch-tab-menu").attr('onclick','').click(function(evt){
+      rootElement.find(".c4i-esgfsearch-property-container").hide();
+      rootElement.find(".c4i-esgfsearch-tab-properties").removeClass("c4i-esgfsearch-tab-selected");
+      
+      rootElement.find(".c4i-esgfsearch-property-menu").show();
+      rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+      propertyTabMenu = "quickmenu";
+    });
+    
+
+    
+    var selectElement = function(element){
+      if(element.hasClass("c4i-esgfsearch-property-selected")){
+     
+        element.removeClass("c4i-esgfsearch-property-selected");
+        element.find(".c4i-esgfsearch-property-checkbox").removeClass("c4i-esgfsearch-checkbox");
+        element.find(".c4i-esgfsearch-property-checkbox").addClass("c4i-esgfsearch-checkboxclear");
+        
+        removeFilterProperty(facetName,element.attr("name"));
+        
+        
+        if(isCtrl == false){
+          if(rootElement.find(".c4i-esgfsearch-property-selected").length==0){
+            removeFilterProperty(facetName);
+            loadAndDisplayFacet(facetName);
+          }
+        }
+      
+      }else{
+        element.addClass("c4i-esgfsearch-property-selected");
+        element.find(".c4i-esgfsearch-property-checkbox").removeClass("c4i-esgfsearch-checkboxclear");
+        element.find(".c4i-esgfsearch-property-checkbox").addClass("c4i-esgfsearch-checkbox");
+     
+        _this.addFilterProperty(facetName,element.attr("name"));
+     
+      }
+      
+      propertyClick(element);
+      
+    };
+    
+    rootElement.find(".c4i-esgfsearch-searchautocomplete" ).first().autocomplete({
+      autoFocus:true,
+      source: function( request, response ) {
+        var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+        response( $.grep( autocompleteList, function( item ){
+          
+          return matcher.test( item );
+        }) );
+      },
+      select:function(event,ui){
+        //Search first in dom
+        var el =rootElement.find("span[name=\""+ui.item.value+"\"]");
+        if(el.length == 0){
+          //Search in descriptions
+          if(descriptions){
+            for(var i in facetList){
+              if(descriptions[facetList[i]] == ui.item.value){
+//                 console.log("Found "+facetList[i]);
+//                 console.log("Found "+i);
+                el =rootElement.find("span[name=\""+facetList[i]+"\"]");
+                break;
+              }
+            }
+          }
+        }
+        selectElement(el.first());
+      }
+    });
+    
+    rootElement.find(".c4i-esgfsearch-property").attr('onclick','').click(function(evt){
+      if(!getSelection().toString()){
+        selectElement($(this));
+      }
+    });
   };
   
   /**
   * Happens when a facet, e.g. standard_name, model, experiment is clicked
   */
-  var facetClick = function(container,name){
-    
-    var facetselectordiv=container.find(".esgfsearch-selectfacet");
-    
-    
-    
-    
-    // facetselectordiv.addClass("facetLoading");
-    //facetselectordiv.html("Loading "+name);
-    
-    facetselectordiv.block();//setLoading();
-    
-    var callback = function(facetList){
-      var html="";
-      var even = 0;
-      for(var i in facetList){
-        if(even == 0)oddEvenClass="esgfsearch-property-even";else oddEvenClass="esgfsearch-property-odd"
-          
-          html+="<span name=\""+facetList[i]+"\" class=\"esgfsearch-property "+oddEvenClass+"\">"+facetList[i]+"</span>";
-        even = 1-even;
-      }
-      var autocomplete = "Filter: <input class=\"searchautocomplete\" =\"text\"></input>";
-      
-      var appliedElements = "<div>&nbsp;<span class=\"esgfsearch-selectedelementlist\"></span></div>";
-      var applyButton = "<button class=\"esgfsearch-property-buttonapply\">Apply</button>";
-      facetselectordiv.html("<div style=\"margin:0 0 4px 5px;\">"+autocomplete+"</div><div class=\"esgfsearch-property-container esgfsearch-roundedborder\">"+html+"</div>"+"<div style=\"padding:5px;margin-bottom:5px;\">"+appliedElements+"<hr/><div style=\"clear: both;\">"+applyButton+"<br/></div></div>");
-      
-      rootElement.find(".esgfsearch-property-buttonapply").button().attr('onclick','').click(function(t){
-        selectedPropertiesForFacet();
-      });
-      
-      var selectElement = function(element,alwaysselect){
-        if(element.hasClass("esgfsearch-property-selected")){
-          if(alwaysselect !== true){
-            element.removeClass("esgfsearch-property-selected");
-          }
-        }else{
-          element.addClass("esgfsearch-property-selected");
-        }
-        propertyClick(element);
-        
-        
-        var selEl = rootElement.find(".esgfsearch-property-selected");
-        
-        
-        var subquery="";
-        
-        var html="";
-        for(var j=0;j<selEl.length;j++){
-          if(j>0)html+="+";
-          html+="<span class=\"esgfsearch-facets esgfsearch-roundedborder\">"+$(selEl[j]).attr("name")+"</span>";
-          
-        }
-        rootElement.find(".esgfsearch-selectedelementlist").first().html(html);
-        
-        
-        
-      };
-      
-      rootElement.find(".searchautocomplete" ).first().autocomplete({
-        source: function( request, response ) {
-          var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
-          response( $.grep( facetList, function( item ){
-            
-            return matcher.test( item );
-          }) );
-        },
-        select:function(event,ui){
-          var el =rootElement.find("span[name=\""+ui.item.value+"\"]");
-          selectElement(el.first());
-        }
-      });
-      
-      rootElement.find(".esgfsearch-property").attr('onclick','').click(function(evt){
-        selectElement($(this));
-      });
-      rootElement.find(".esgfsearch-property").attr('ondblclick','').dblclick(function(evt){
-        selectElement($(this),true);
-        if (evt.ctrlKey == false){
-          selectedPropertiesForFacet();
-        }
-      });
-      
-    };
-    getPropertiesForFacetName({name:name,callback:callback});
+  var loadAndDisplayFacet = function(facetName){
+    var facetselectordiv=rootElement.find(".c4i-esgfsearch-selectfacet-container");
+    facetselectordiv.block();
+    getPropertiesForFacetName({name:facetName,callback:function(facetList){currentFacetList = facetList;currentSelectedFacet=facetName;generatePropertyListSelector(facetList,facetName);}});
   };
   
-  var addFilterProperty = function(){
-    //showFilters();
-    getAllFacets();
-  };
-  var removeFilterProperty = function(facet,element){
-    //alert(facet+":"+element);
-    var k = new KVP(query);
+  this.addFilterProperty = function(facet,property){
+    var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
     query = "";
     for(var kvp in kvps){
       for(var vkey in kvps[kvp]){
         var v= kvps[kvp][vkey];
-        if(!(kvp==facet&&element==v)){
+        //if(!(kvp==facet&&property==v)){
           query+=kvp+"="+encodeURIComponent(v)+"&";
+        //}
+      }
+    }
+     query+=facet+"="+encodeURIComponent(property)+"&";
+     
+     window.location.hash = query;
+     
+    if(isCtrl == false){
+//      showFilters();
+      getAllFacets();
+    }
+  };
+  var removeFilterProperty = function(facet,property){
+    
+    //console.log("Remove");
+    var k = new ESGFSearch_KVP(query);
+    var kvps = k.getKeyValues();
+    query = "";
+    for(var kvp in kvps){
+      for(var vkey in kvps[kvp]){
+        var v= kvps[kvp][vkey];
+        if(isDefined(property)){
+          if(!(kvp==facet&&property==v)){
+            query+=kvp+"="+encodeURIComponent(v)+"&";
+          }
+        }else{
+           if(!(kvp==facet)){
+            query+=kvp+"="+encodeURIComponent(v)+"&";
+          }
         }
       }
     }
+    window.location.hash = query;
+    if(isCtrl == false){
+//      showFilters();
+      getAllFacets();
+    }
     
-    showFilters();
-    getAllFacets();
   };
   var showFilters = function(){
-    var k = new KVP(query);
+    var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
     var html = "";
     for(var kvp in kvps){
       for(var vkey in kvps[kvp]){
         var v= kvps[kvp][vkey];
-        html+="<span class=\"esgfsearch-facets esgfsearch-roundedborder\">"+kvp+" : "+decodeURIComponent(v)+"&nbsp;<button class=\"esgfsearch-removefilterproperty\" name=\""+kvp+","+v+"\">X</button></span>";
+        html+="<span class=\"c4i-esgfsearch-facets c4i-esgfsearch-facetchoosed c4i-esgfsearch-roundedborder\"><span class=\"c4i-esgfsearch-removefilterproperty c4i-esgfsearch-checkbox\" name=\""+kvp+","+v+"\"></span>"+kvp+" : "+decodeURIComponent(v)+"</span>";
       }
     }
     if(html.length==0){
       html="none";
     }
     //html+=getFilterResultsButton();
-    var el = rootElement.find(".esgfsearch-selectedelements").find(".simplecomponent-body").first();
+    var el = rootElement.find(".c4i-esgfsearch-selectedelements").find(".simplecomponent-body").first();
     el.html(html);
-    el.find(".esgfsearch-removefilterproperty").attr('onclick','').click(function(t){
+    el.find(".c4i-esgfsearch-removefilterproperty").attr('onclick','').click(function(t){
       var facetAndValue = ($(this).attr('name')).split(",");
       removeFilterProperty(facetAndValue[0],facetAndValue[1]);
+      loadAndDisplayFacet(currentSelectedFacet);
     });
     
     
     
   };
   
-  var selectedPropertiesForFacet = function(){
-    var selEl = rootElement.find(".esgfsearch-property-selected");
-    var selFacet = rootElement.find(".esgfsearch-facetselected").attr("name");
-    var subquery="";
-    for(var j=0;j<selEl.length;j++){
-      subquery+=selFacet+"="+encodeURIComponent($(selEl[j]).attr("name"))+"&";
-    }
-    query+=subquery;
-    addFilterProperty();
-  };
-  
+
 
   var _getAllFacets = function(args,ready){
     showFilters();
-    rootElement.find(".esgfsearch-facetoverview").find(".simplecomponent-body").first().block();
+    rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").first().block();
     var callback = function(result){
+      
+      if(result == undefined)return;
+      if(result.response == undefined){
+        checkResponses(result);
+        return;
+      } 
+      if(result.facets == undefined)return;
       //Show found results
       showResponse(result);
-      
-      //result.facets.sort();
-      
-      var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "models"];
       
       //List corresponding facets
       var facets= [];
       
+      //Get all selected filter names
+      var k = new ESGFSearch_KVP(query);
+      var selectedFacets = k.getKeyValues();
+      
+      //Sort them so that primaryFacets are always in front.
       for(var j=0;j<primaryFacets.length;j++){
         var key = primaryFacets[j];
-       // console.log(key);
         if(result.facets[key]){
           facets[key]=result.facets[key];
         }
       }
-      for(var key in result.facets){
+      
+      //Add remaining facets sorted
+      var sortedList = [];for(var key in result.facets){sortedList.push(key);};sortedList.sort();
+      for(var j=0;j<sortedList.length;j++){
+        var key = sortedList[j];
         //console.log(key);
         if(!facets[key]){
           facets[key]=result.facets[key];
         }
       }
+      
       var count;
       var html = "";
       for(var facetkey in facets){
@@ -548,25 +717,38 @@ var SearchInterface = function(options){
         for(var property in facets[facetkey]){
           count++;
         }
-        if(count>1){
-          html+="<span name=\""+facetkey+"\" class=\"clickablefacet esgfsearch-facets esgfsearch-roundedborder\">"+facetkey+" ("+count+")</span>";
-        }else if(count>0){
-          html+="<span name=\""+facetkey+"\" class=\"clickablefacet esgfsearch-facetdisabled esgfsearch-facets esgfsearch-roundedborder\">"+facetkey+" ("+count+")</span>";
+        var facet = "<span name=\""+facetkey+"\" class=\"c4i-esgfsearch-clickablefacet c4i-esgfsearch-facets c4i-esgfsearch-roundedborder";
+        
+        
+        //Gray out facets which are already selected of cannot be selected again.
+        if(selectedFacets[facetkey]){
+          facet+=" c4i-esgfsearch-facetchoosed";
+        }else{
+          if(count==1){
+            facet+=" c4i-esgfsearch-facetdisabled";
+          }
         }
+        facet+="\">"+facetkey+" ("+count+")</span>";
+        
+        //if(!selectedFacets[facetkey]){
+          if(count>0){
+            html+=facet;
+          }
+        //}
       }
-      html+="<div class=\"esgfsearch-selectfacet\"></div>";
+      html+="<div class=\"c4i-esgfsearch-selectfacet-container\"></div>";
       html+="</div>";
       
-      rootElement.find(".esgfsearch-facetoverview").find(".simplecomponent-body").first().html(html);
+      rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").first().html(html);
       
       showFilters();
       
-      rootElement.find(".clickablefacet").attr('onclick','').click(function(t){
-        rootElement.find(".clickablefacet").removeClass("esgfsearch-facetselected");
-        $(this).addClass("esgfsearch-facetselected");
-        facetClick($(this).parent(),$(this).attr("name"));
+      rootElement.find(".c4i-esgfsearch-clickablefacet").attr('onclick','').click(function(t){
+        rootElement.find(".c4i-esgfsearch-clickablefacet").removeClass("c4i-esgfsearch-facetselected");
+        $(this).addClass("c4i-esgfsearch-facetselected");
+        loadAndDisplayFacet($(this).attr("name"));
       });
-      
+      generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };
     
     $.ajax({
@@ -578,6 +760,7 @@ var SearchInterface = function(options){
     }).fail(function() {
       alert("fail 474");
     }).always(function(){
+    
       ready();
     });
   };
@@ -588,6 +771,28 @@ var SearchInterface = function(options){
     getAllFacetsFIFO.call();
   };
   
+  
+  
+  var isCtrl = false;
+  $(document).keydown(function(e) {
+    if(e.ctrlKey === true) {
+      if(e.keyCode==67 || e.keyCode==88){
+        isCtrl = false;
+        return;
+      }
+      isCtrl = true;
+    }
+  });
+  $(document).keyup(function(e) {
+    if(e.ctrlKey == false){
+      if(isCtrl == true){
+        showFilters();
+        getAllFacets();
+      }
+      isCtrl = false;
+    }
+    
+  });        
   
   this.renderSearchInterface(options);
 };

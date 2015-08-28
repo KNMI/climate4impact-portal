@@ -7,9 +7,12 @@
       <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
               <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="esgfsearch/property_descriptions.js"></script>
+    <script type="text/javascript" src="esgfsearch/esgfsearch-propertychooserconf.js"></script>
+    <script type="text/javascript" src="esgfsearch/esgfsearch-propertychoosers.js"></script>
     <script type="text/javascript" src="esgfsearch/esgfsearch.js"></script>
-     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
-         <script type="text/javascript" src="../js/ImpactJS.js"></script>
+    <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="../js/ImpactJS.js"></script>
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
   <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
 	 <link rel="stylesheet" href="esgfsearch/esgfsearch.css" />

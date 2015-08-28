@@ -589,10 +589,10 @@ public class OpenDAP {
   protected static void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String queryString = request.getQueryString();
     if(queryString == null)queryString="";
-
+    Debug.println("queryString: =["+queryString+"]");
     String path = request.getPathInfo();
     if(path==null)return;
-   
+    Debug.println("path: =["+path+"]");
     String filename = null;//"/home/c4m/Downloads/australia.nc";
 
 

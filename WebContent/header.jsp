@@ -20,7 +20,7 @@
     <div style="float: right; margin-top: 0.5em;">
     <table><tr style="line-height:20px;">
      <td valign="middle"><a href="https://www.linkedin.com/groups/Climate4Impact-Webportal-8137458?home=&gid=8137458&trk=groups_members-h-logo" target="_blank">
-     <img src="https://static.licdn.com/scds/common/u/images/logos/linkedin/logo_in_nav_44x36.png" alt="linked in logo" height="20"/></a></td>
+     <img src="/impactportal/images/logo_in_nav_44x36.png" alt="linked in logo" height="20"/></a></td>
       <td valign="middle">| <a target="_blank" href="https://is.enes.org/">IS-ENES</a></td>
        <td valign="middle">| <a href="<%=Home%>help/contactexpert.jsp">Contact</a></td>
         <td valign="middle">| <%=loginStr%></td>
