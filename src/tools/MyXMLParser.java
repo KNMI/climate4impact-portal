@@ -340,9 +340,10 @@ public class MyXMLParser {
      */
     private String jsonEncode(String in){
       //Debug.println(in);
-      in = in.replaceAll("\"", "\\\\\"");
+      
       in = in.replaceAll("\n", ":carriagereturn:");
       in = in.replaceAll("\\\\", "");
+      in = in.replaceAll("\"", "\\\\\"");
       in = in.replaceAll(":carriagereturn:","\\\\n");
 //      in = in.replaceAll("\\\\ ", " ");
 //      in = in.replaceAll("\\\\\\[", "[");

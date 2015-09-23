@@ -30,7 +30,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debugger{
-  static boolean DebugOpenDAP = false;
+  static boolean DebugOpenDAP = true;
 }
 
 class DimInfo{
@@ -129,22 +129,22 @@ public class OpenDAP {
     return null;
   }
 
-  public static String getDDSFromNetCDFFile(NetcdfFile ncfile,String fileName){
-    List<Variable> var = ncfile.getVariables();
-
-    StringBuilder ddsResult = new StringBuilder();
-    ddsResult.append("Dataset {\n");
-    for(int j=0;j<var.size();j++){
-      if(var.get(j).getDataType().toString().equals("String")==false){
-        ddsResult.append(getDDSForVariable(var.get(j),ncfile,""));
-      }else{
-        Debug.errprintln("Warning: OpenDAP tries to read STRING variable type for variable with name "+var.get(j).getFullName());
-      }
-
-    }
-    ddsResult.append("} "+fileName+";\n");
-    return ddsResult.toString();
-  }
+//  public static String getDDSFromNetCDFFile(NetcdfFile ncfile,String fileName){
+//    List<Variable> var = ncfile.getVariables();
+//
+//    StringBuilder ddsResult = new StringBuilder();
+//    ddsResult.append("Dataset {\n");
+//    for(int j=0;j<var.size();j++){
+//      if(var.get(j).getDataType().toString().equals("String")==false){
+//        ddsResult.append(getDDSForVariable(var.get(j),ncfile,""));
+//      }else{
+//        Debug.errprintln("Warning: OpenDAP tries to read STRING variable type for variable with name "+var.get(j).getFullName());
+//      }
+//
+//    }
+//    ddsResult.append("} "+fileName+";\n");
+//    return ddsResult.toString();
+//  }
 
   private static StringBuilder getDDSForVariable(Variable variable,NetcdfFile ncfile,String variableDodsQuery) {
 
@@ -235,16 +235,33 @@ public class OpenDAP {
     }
     if(queryString.equals("null")) queryString = "";
     
+    StringBuilder ddsResult = new StringBuilder();
     
-    if(queryString.length() == 0){
-      if(Debugger.DebugOpenDAP)Debug.println("getDatasetDDSFromNetCDFFile: "+queryString);
-            return getDDSFromNetCDFFile(ncfile,fileName).getBytes();
-    }
+//    if(Debugger.DebugOpenDAP)Debug.println("getDatasetDDSFromNetCDFFile: "+queryString);
+//    ddsResult.append(getDDSFromNetCDFFile(ncfile,fileName));
+//  
+//    if(queryString.length() == 0){
+//      return ddsResult.toString().getBytes();
+//    }
 
     if(Debugger.DebugOpenDAP)Debug.println("getDatasetDODSFromNetCDFFile: ["+queryString+"]");
-    String[] varNames = queryString.split(",");
+    
+    
+    String[] varNames = null;
+    
+    if(queryString.length() != 0){
+      Debug.println("Selection");
+      varNames = queryString.split(",");
+    }else{
+      Debug.println("ALL");
+      List<Variable> var = ncfile.getVariables();
+      for(int j=0;j<var.size();j++){
+        Debug.println("Adding ["+var.get(j).getFullName()+"]");
+        varNames = tools.Tools.appendString(varNames, var.get(j).getFullName());
+      }
+    }
 
-    StringBuilder ddsResult = new StringBuilder();
+  
     ddsResult.append("Dataset {\n");
 
     DimInfo[] dimInfo = new DimInfo[varNames.length];
@@ -252,7 +269,7 @@ public class OpenDAP {
       String variableDodsQuery = "";
       int subSetRequestP = varNames[j].indexOf(".");;
       String varName = varNames[j];
-      
+      Debug.println("Processing "+varName);
       if(subSetRequestP!=-1){
         varName = varNames[j].substring(0, subSetRequestP);
         variableDodsQuery = varNames[j].substring(subSetRequestP+1);
@@ -431,7 +448,7 @@ public class OpenDAP {
             //dos.writeDouble(variable.readScalarByte());
           }
           if(type == CDMTypes.Int16||type == CDMTypes.UInt16){
-            dos.writeDouble(variable.readScalarShort());
+            dos.writeInt(variable.readScalarShort());
           }
           if(type == CDMTypes.Int32||type == CDMTypes.UInt32){
             if(Debugger.DebugOpenDAP)Debug.println("Writing scalar int32");

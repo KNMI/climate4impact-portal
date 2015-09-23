@@ -20,7 +20,7 @@ var CatalogBrowser = function(options){
         title: 'Dataset',
       }).dialog({
         width:950,
-        height:600
+        height:700
       });
       options.element.html('<div class="ajaxloader"></div>');
     }

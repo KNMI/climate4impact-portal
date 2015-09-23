@@ -184,11 +184,11 @@ var ExtFileViewer = function() {
 	          '<a onclick=toggleAttributes(\'{variable}\');><div id=\'{variable}-attricon\' class="attribute-icon-closed"></div></a><b>{variable}</b> - <i>{longname}</i> - (<tpl for="dimensions">{name}</tpl>)',
 	          '<tpl for="isDimension"> dimension of length {length}. </tpl>',
 	          '<tpl if="isViewable"> - ',
-	          // '<a
-	          // onclick={fileViewerPanel.fireEvent("visualize","{variable}","{service}");}>visualize</a>',
-	          '<a onclick={visualizeVariable("{variable}","{service}");}>visualize</a>',
-	          // ' - <a target="_blank"
-	          // href='+adagucwmservice+'{service}&service=WCS&request=getcoverage&format=AAIGRID&coverage={variable}>get</a>',
+	          
+	          '<a onclick={visualizeVariable("{variable}","{service}");}>Add to viewer</a>',
+	          ' - <a target="_blank" href='+adagucwmservice+'{service}&service=WMS&request=getcapabilities>WMS link</a>',
+	          ' - <a target="_blank" href='+adagucwmservice+'{service}&service=WCS&request=getcapabilities&>WCS link</a>',
+	          '<div class="previewstyle" onclick={visualizeVariable("{variable}","{service}");}>Preview: <img alt="(loading image ...)" src="'+adagucwmservice+'{service}&service=WMS&request=getmap&format=image/png&layers=baselayer,{variable},overlay,grid10&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true"/></div>',
 	          '</tpl>', '<div id=\'{variable}-attr\' class="variable-attributes">',
 	          '<ul><tpl for="attributes">', '<li>{name}: {value}</li>',
 	          '</tpl></ul>', '</div>', '</div></tpl></tpl>',{

@@ -111,7 +111,16 @@ var Basket = function(){
 	
 	this.postIdentifiersToBasket = function(options){
 		var doneFunction = function(json){
-			if(json.error){customalert(json.error);}
+			if(json.error){
+				if(json.statuscode){
+					if(json.statuscode==401){
+						generateLoginDialog(function(){basket.postIdentifiersToBasket(options);})
+						return;
+					}
+				}
+				customalert(json.error);
+				
+			}
 			adjustNumberOfDataSetsDisplayedInMenuBar(json);
 		}
 		 //alert(dump(options));

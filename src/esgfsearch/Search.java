@@ -249,7 +249,7 @@ public class Search {
     Debug.println("Checking: "+query);
     int status = LockOnQuery.lock(query,1000);
     if(status == 1){
-      JSONResponse r = new JSONResponse();
+      JSONResponse r = new JSONResponse(request);
       JSONObject a = new JSONObject();
       try {
         a.put("message","timeout");
@@ -347,7 +347,7 @@ public class Search {
       }
     }
     String message = jsonresult.toString();
-    JSONResponse result = new JSONResponse();
+    JSONResponse result = new JSONResponse(request);
     result.setMessage(message);
     return result;
   }
@@ -386,7 +386,7 @@ public class Search {
     }
   }
   public JSONResponse addtobasket(String query,HttpServletRequest request) {
-    JSONResponse result = new JSONResponse();
+    JSONResponse result = new JSONResponse(request);
     JSONObject jsonresult = new JSONObject();
     try{
       //DOSTUFF

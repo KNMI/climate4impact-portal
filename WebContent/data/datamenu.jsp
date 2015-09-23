@@ -52,8 +52,8 @@
 
   <ul style="height:20px;">
   <!-- 	<li <% if(highLightHome)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Overview</a></li>-->
-  <li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>
-  <li <% if(highLightESGFSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/esgfsearch.jsp" >Faceted Search</a></li>
+  <!-- >li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>-->
+  <li <% if(highLightESGFSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/esgfsearch.jsp" >Search</a></li>
    <!--  <li <% if(highLightAdvancedSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/advancedsearch.jsp" >Advanced Search</a></li> -->
     <li <% if(highLightCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/catalogs.jsp" >Catalogs</a></li>
     <li <% if(highLightCustomCatalogs)out.print("class=\"sel\""); %>><a href="<%=Home%>data/customcatalog.jsp" >Explore your own catalogs or files</a></li>

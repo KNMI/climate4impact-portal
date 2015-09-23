@@ -35,7 +35,7 @@ public class OpenDAPViewer {
 
 
   private JSONResponse viewOpenDap(String requestStr,HttpServletRequest request, HttpServletResponse response){
-    JSONResponse jsonResponse = new JSONResponse();
+    JSONResponse jsonResponse = new JSONResponse(request);
     /* Check if we really have an URL here and not a localfile */
     String prefixCheck = requestStr.toLowerCase();
     if(prefixCheck.startsWith("http")==false&&prefixCheck.startsWith("dods")==false){
@@ -142,8 +142,28 @@ public class OpenDAPViewer {
           String[] varDimensions = variables.get(j).getAttrValue("shape").split(" ");
           if(varDimensions.length>=2){
             if(variables.get(j).getAttrValue("name").indexOf("bnds")==-1){
-              if(variables.get(j).getAttrValue("name").equals("lon")==false&&variables.get(j).getAttrValue("name").equals("lat")==false){
-                jsonVariable1.put("isViewable",1);
+              
+              boolean show = true;
+              for(String dim : varDimensions){
+                if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
+                  show=false;break;
+                }
+                boolean foundDim = false;
+                for(int i=0;i<variables.size();i++){
+                  if(variables.get(i).getAttrValue("name").equals(dim)){
+                    foundDim=true;break;
+                  }
+                }
+                if(foundDim==false){show=false;break;}
+              }
+              if(show){
+                if(variables.get(j).getAttrValue("name").equals("lon")==false&&
+                    variables.get(j).getAttrValue("name").equals("lat")==false&&
+                    variables.get(j).getAttrValue("name").equals("Actual_latitude")==false&&
+                    variables.get(j).getAttrValue("name").equals("Actual_longitude")==false
+                    ){
+                  jsonVariable1.put("isViewable",1);
+                }
               }
             }
           }

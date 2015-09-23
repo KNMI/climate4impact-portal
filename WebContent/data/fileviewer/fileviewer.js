@@ -19,7 +19,7 @@ var FileViewer = function(options){
     var fileViewer = new ExtFileViewer();
     var w = Ext.create('Ext.Window', {
       width : 900,
-      height : 500,
+      height : 680,
       
       autoScroll : true,
       autoDestroy : true,

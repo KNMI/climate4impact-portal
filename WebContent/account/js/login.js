@@ -202,51 +202,55 @@ var openDialog = function(datacentre) {
 }
 
 var closeLoginPopupDialog = function(){
-  
+  console.log("closeLoginPopupDialog")
   var isDialogTrueOrWindowFalse = false;
   
   if(window.parent){
     isDialogTrueOrWindowFalse = true;
   }
   
-  //console.log("closeLoginPopupDialog, isDialogTrueOrWindowFalse: "+isDialogTrueOrWindowFalse );
+  console.log("closeLoginPopupDialog, isDialogTrueOrWindowFalse: "+isDialogTrueOrWindowFalse );
   
 
   var reloadWindow = function(){
-    //console.log('reloadWindow: isDialogTrueOrWindowFalse'+isDialogTrueOrWindowFalse);
+    console.log('reloadWindow: isDialogTrueOrWindowFalse'+isDialogTrueOrWindowFalse);
     var doReload = false;
     if(isDialogTrueOrWindowFalse == false){
       try{doReload = window.opener.getReloadAfterLogin();}catch(e){
-        //console.log("Window: opener window has no reload function: "+e);
+        console.log("Window: opener window has no reload function: "+e);
       }
       if(doReload == true){
-        //console.log('start window');
+        console.log('start window');
         window.opener.location.reload(true)
       }
     }
     if(isDialogTrueOrWindowFalse == true){
       try{doReload = window.parent. getReloadAfterLogin();}catch(e){
-        //console.log("Dialog: parent window has no reload function: "+e);
+        console.log("Dialog: parent window has no reload function: "+e);
       }
       if(doReload == true){
-        //console.log('start reload dialog');
+        console.log('start reload dialog');
         window.parent.location.reload(true);
       }
     }
-  }
+  };
   if(isDialogTrueOrWindowFalse == true){
     window.parent.$('#loginDialog').dialog('close');
     var t = new Timer();
-    //console.log('calling reload by timer');
+    console.log('calling reload by timer');
     t.InitializeTimer(50,reloadWindow);
   }else{
-    //console.log('calling reload directly');
+    console.log('calling reload directly');
     reloadWindow();
   }
   
 };
 
+/*
+ *  return the parameter for a certain key 
+ */
 var getUrlVar = function(key){
+//	console.log("getURLVar"+key)
   var result = new RegExp(key + "=([^&]*)", "i").exec(window.location.search);
   return result && unescape(result[1]) || "";
 };
@@ -254,7 +258,7 @@ var getUrlVar = function(key){
 var doReloadAfterLogin = false;
 /*Being called by the dialog popup*/
 var setReloadAfterLogin = function(reload){
-  //console.log("Reload function called with value "+reload);
+  //console.log("Reload function called by popup with value "+reload);
   if(reload == 'true'){
     doReloadAfterLogin = true;
   }
@@ -266,6 +270,10 @@ var getReloadAfterLogin = function(){
   return doReloadAfterLogin;
 }
 
+/**
+ * Generated a popup login dialog
+ * @param doReload Can be true, the page will reload. When a function is provided, this will be triggered when done.
+ */
 var generateLoginDialog = function(doReload){
   
 //  console.log(generateLoginDialog);
@@ -273,34 +281,39 @@ var generateLoginDialog = function(doReload){
   //var footer = $('<div class="logindialogfooter" ><a onclick="window.open(\'/impactportal/account/login_embed.jsp?doreload=true\',\'targetWindow\',\'toolbar=no,location=no,status=no,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=800,height=500\')" >Do you encounter an untrusted connection? Click here.</a></div>');
   var footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
   
- 
-    var loginDialog = $("<div id=\"loginDialog\" class=\"loginDialog\" ></div>").append(iframe).append(footer).appendTo("body").dialog({
-        autoOpen: false,
-        modal: true,
-        resizable: false,
-        width: "900px",
-        dialogClass: 'topDialog',
-        close: function () {
-            iframe.attr("src", "");
-        },
-        hide: {
-          effect: "fade",
-          duration: 200
-         }
-    });
-  
-   
+	 
+  var loginDialog = $("<div id=\"loginDialog\" class=\"loginDialog\" ></div>").append(iframe).append(footer).appendTo("body").dialog({
+	autoOpen: false,
+	modal: true,
+	resizable: false,
+	width: "900px",
+	dialogClass: 'topDialog',
+	close: function () {
+	    iframe.attr("src", "");
+	},
+	hide: {
+	  effect: "fade",
+	          duration: 200
+	         }
+	    });
+	  
+		
       var src = "/impactportal/account/login_embed.jsp";
-      if(doReload === true){
-        src+="?doreload=true";
-      }else{
-        loginDialog.bind('dialogclose', function(event) {
-          if(doReload){
-            doReload();
-          }
-        });
-        
-      }
+	  if(doReload === true){
+	    src+="?doreload=true";
+	  }
+    loginDialog.bind('dialogclose', function(event) {
+
+	    if (typeof doReload === "function") {
+	    	console.log("calling function");
+	    	doReload();
+	    }else if(doReload === true){
+	    	console.log("reload page");
+	    	location.reload();
+	    }
+    });
+	    
+      
       var title = "Sign in with your ESGF OpenID account";
       var width = 900;
       var height = 500;

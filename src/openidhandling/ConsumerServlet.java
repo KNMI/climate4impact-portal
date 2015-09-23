@@ -7,6 +7,7 @@ import impactservice.MessagePrinters;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
+
 
 
 
@@ -215,10 +217,18 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	}
 
 	private String getValidReferrer(HttpServletRequest req) {
+//	  Enumeration headerNames = req.getHeaderNames();
+//	  while(headerNames.hasMoreElements()) {
+//	    String headerName = (String)headerNames.nextElement();
+//	    Debug.println("" + headerName);
+//	    Debug.println("" + req.getHeader(headerName));
+//	  }
 	  String returnURL = "/account/login.jsp";
+	  
 	  String referrer = null; 
     try {
       referrer = URLDecoder.decode(req.getParameter("returnurl"),"UTF-8");
+      Debug.println("Found referer in returnurl: "+referrer);
     } catch (Exception e) {
     }
     
@@ -226,23 +236,22 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
       String r=req.getHeader("referer");
       if(r!=null){
         referrer = r;
+        Debug.println("Found referer in header: "+referrer);
       }
     }
 	  
 	  if(referrer!=null){
 	    Debug.println("Referrer was "+referrer);
       if(referrer.startsWith("/") == false){
-        String homeURL=null;
-        if(referrer.startsWith("http")){
-          homeURL = Configuration.getHomeURLHTTP();
-        }
-        if(referrer.startsWith("https")){
-          homeURL = Configuration.getHomeURLHTTPS();
-        }
-        Debug.println("HomeURL: "+homeURL);
-     
-        if(referrer.startsWith(homeURL)){
-          returnURL = referrer.substring(homeURL.length());
+        Debug.println(Configuration.getHomeURLHTTP());
+        Debug.println(Configuration.getHomeURLHTTPS());
+        if(referrer.startsWith(Configuration.getHomeURLHTTP())){
+          returnURL = referrer.substring(Configuration.getHomeURLHTTP().length());
+        }else if(referrer.startsWith(Configuration.getHomeURLHTTPS())){
+          returnURL = referrer.substring(Configuration.getHomeURLHTTPS().length());
+        }else{
+          req.getSession().setAttribute("message", "Invalid referer found in login dialog.");
+          returnURL = "/exception.jsp";
         }
       }else{
         returnURL = referrer;

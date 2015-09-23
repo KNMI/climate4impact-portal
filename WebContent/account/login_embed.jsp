@@ -18,6 +18,8 @@ body,.x-body {
 </style>
 <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
 <script type="text/javascript">
+	//Set Reload parameter in login.js, for parent window (this is the Iframe popup)
+	//If set to true the parent frame will  reload when the iframe is finished logging in.
   try {
     opener.setReloadAfterLogin(getUrlVar('doreload') + '');
   } catch (e) {
@@ -60,8 +62,13 @@ body,.x-body {
 
 	<script type="text/javascript">
     var t = new Timer();
-    t.InitializeTimer(250, closeLoginPopupDialog);
-  </script>
+    console.log("starting closeLoginPopupDialog");
+    t.InitializeTimer(250, function(){
+    	console.log("triggerd closeLoginPopupDialog");
+    	closeLoginPopupDialog();
+    });
+    </script>
+  
 
 	<%
 		//Print warning when retrieving SLCS has failed.

@@ -35,7 +35,9 @@
  		    loader: {} 
     	});
     });
+    </script>
     <% } %>
+     <script type="text/javascript">
     jQuery(document).ready(function($) {
 	    $(".clickable-row").click(function() {
 	        window.document.location = $(this).data("href");
@@ -56,9 +58,8 @@
 			 %>
 			 <h1>Processing - Please sign in ...</h1>
 			 	<ul>
-			 	<li>Before you can start processing, you need to <a href="#" onclick="generateLoginDialog(true)">sign in</a>
-           and <a  href="" onclick='location.reload();'>refresh this page</a>.</li>
-			 	<li>See  <a href="../documentation/processing.jsp">processing documentation section.</a></li>
+			 	<li>Before you can start processing, you need to <a href="#" onclick="generateLoginDialog(true)">sign in</a>.</li>
+			 	<!-- <li>See  <a href="/impactportal/documentation/processing.jsp">processing documentation section.</a></li>-->
 			 	</ul>
 			 	
 			 <%
@@ -68,8 +69,9 @@
 		if(user!=null){
 		%>
 			<h1>Processing wizards</h1>
+			<!-- <a href="/impactportal/account/logout.jsp?redirect=%2Fimpactportal%2Faccount%2Fprocessing.jsp%23">logout</a>-->
 			<p>Choose a wizard to help you guide through processing, analysis and data extraction options.</p>
-			<div class="drupal tableborder">
+			<div class="drupal">
 			<table class="drupal"><tr><th>Name</th><th>Description</th></tr>
 			<tr class='clickable-row' data-href='wizard_convert.jsp'><td><code class="codejobsicon"></code>&nbsp;Convert and subset</td><td>Extracts a region in space and time, regrids and converts to other formats. Uses the WCS_subsetting WPS in the background.</td></tr>
 			</table>

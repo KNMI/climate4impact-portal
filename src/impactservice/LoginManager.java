@@ -474,7 +474,7 @@ public class LoginManager {
    * @throws IOException
    */
   public static JSONResponse identifyWhyGetRequestFailed(String requestStr,HttpServletRequest request,HttpServletResponse response) throws  WebRequestBadStatusException, IOException  {
-    JSONResponse jsonResponse = new JSONResponse();
+    JSONResponse jsonResponse = new JSONResponse(request);
     ImpactUser user = null;
     try {
       user = getUser(request);

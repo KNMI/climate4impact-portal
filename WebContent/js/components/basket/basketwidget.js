@@ -62,7 +62,11 @@ var BasketWidget = function() {
                 Ext.MessageBox.alert("Error","Remote: Unable to load basket from server: "+response+ arg);
               }else{
                 if(t.getReader().rawData.statuscode == 401){
-                  generateLoginDialog(true);
+                  generateLoginDialog(function(){ 
+                	  store.reload();
+                	//  basketWindow.show();
+            	  });
+                  return;
                 }else{
                   Ext.MessageBox.alert("Error","Response: Unable to load basket from server:\n"+ (t.getReader().rawData.message));
                 }
@@ -293,7 +297,7 @@ var BasketWidget = function() {
         var fileViewer = new ExtFileViewer();
         var w = Ext.create('Ext.Window', {
           width : 900,
-          height : 500,
+          height : 680,
           autoScroll : true,
           autoDestroy : true,
           closeAction : 'destroy',
@@ -390,8 +394,7 @@ var BasketWidget = function() {
 	  
     _callbackFunction = callbackFunction;
     if (basketWindow == undefined) {
-    	
-      _init();
+	  _init();
       basketWindow = Ext.create('Ext.Window', {
         width : 900,
         height : 550,
@@ -414,7 +417,7 @@ var BasketWidget = function() {
         }
       });
     }
-
+  
     basketWindow.show();
   };
   

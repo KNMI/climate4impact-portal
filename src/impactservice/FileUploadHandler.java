@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
@@ -24,13 +27,24 @@ import tools.HTTPTools;
  * Servlet to handle File upload request from Client
  * @author Javin Paul, Maarten Plieger
  */
+
+@MultipartConfig
 public class FileUploadHandler extends HttpServlet {
     /**
    * 
    */
   private static final long serialVersionUID = 1L;
    
-  
+    private String extractFileName(Part part) {
+      String contentDisp = part.getHeader("content-disposition");
+      String[] items = contentDisp.split(";");
+      for (String s : items) {
+          if (s.trim().startsWith("filename")) {
+              return s.substring(s.indexOf("=") + 2, s.length()-1);
+          }
+      }
+      return "";
+  }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -84,16 +98,16 @@ public class FileUploadHandler extends HttpServlet {
         
 
             try {
-                List<FileItem> multiparts = upload.parseRequest((RequestContext) request);
+                for (Part part : request.getParts()) {
+                  String name = extractFileName(part);
+               
               
-                for(FileItem item : multiparts){
-                    if(!item.isFormField()){
-                        long fileSize = item.getSize();
+                        long fileSize = part.getSize();
                         JSONObject jsonFile = new JSONObject();
                         jsonFileList.put(jsonFile);
                         
-                        File remotefile =  new File(item.getName());
-                        String name = remotefile.getName();
+   
+                       
                         
                         
                         if(name.length()<1){
@@ -119,7 +133,7 @@ public class FileUploadHandler extends HttpServlet {
                             Debug.println("Uploading file "+name+" "+fileSize);
                             try{
                               File file = new File(UPLOAD_DIRECTORY + File.separator + name);
-                              item.write( file);
+                              part.write( file.toString());
                             }catch(Exception e){
                               jsonFile.put("error", e.getMessage());
                             }
@@ -141,7 +155,7 @@ public class FileUploadHandler extends HttpServlet {
                         
                         
                     }
-                }
+                
            
                //File uploaded successfully
                request.setAttribute("message", "File uploaded successfully!");
@@ -153,6 +167,7 @@ public class FileUploadHandler extends HttpServlet {
                 jsonFile.put("name",  ex.getMessage());
                 jsonFile.put("error",  ex.getMessage());
                 Debug.errprintln("User "+user.internalName+" tried to upload: exception: "+ex.getMessage());
+                ex.printStackTrace();
               } catch (JSONException e) {
               }
               request.setAttribute("message", ex.getMessage());

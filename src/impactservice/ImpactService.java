@@ -28,6 +28,7 @@ import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONMessageDecorator;
+import tools.JSONResponse;
 import wps.WebProcessingInterface;
 //import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 
@@ -658,7 +659,7 @@ public class ImpactService extends HttpServlet {
 
     private void handleBasketRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
       
-    	String mode=null;
+    
     	String requestStr=null;
     	
     	try {
@@ -710,55 +711,48 @@ public class ImpactService extends HttpServlet {
       
     	
     	
-    	//Mode is add
+    	//Mode add
     	try{
-    	
-    		mode=HTTPTools.getHTTPParam(request,"mode");
-    		if(mode.equals("add")){
-    		
-    		  GenericCart shoppingCart = null;
-    		  shoppingCart = LoginManager.getUser(request,response).getShoppingCart();
-    		
-    		  Debug.println("Adding data to basket"+request.getParameter("id"));
-    		  
-    		  int currentNumProducts=shoppingCart.getNumProducts();
-    		  
-    		  if(request.getParameter("id")!=null){
-    		    JSONObject el=new JSONObject();
-    		    el.put("id", request.getParameter("id"));
-    		    el.put("OPENDAP", request.getParameter("OPENDAP"));
-    		    el.put("HTTPServer", request.getParameter("HTTPServer"));
-    		    el.put("catalogURL", request.getParameter("catalogURL"));
-    		    el.put("filesize", request.getParameter("filesize"));
-    		    addFileToBasket(shoppingCart,el);
-    		  }
-
-    			
-    			try{
-      			JSONArray jsonData = (JSONArray) new JSONTokener(request.getParameter("json")).nextValue();
-      			for(int j=0;j<jsonData.length();j++){
-      				
-      				JSONObject el=((JSONObject)jsonData.get(j));
-      				addFileToBasket(shoppingCart,el);
-      			}
-    			}catch(Exception e){}
-    			PrintWriter out1 = getPrintWriter(response);
-    			String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
-    			result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
-    			
-    			Debug.println(result);
-          response.setContentType("application/json");
-    			out1.print(result);
+    		if(HTTPTools.getHTTPParam(request,"mode").equals("add")){
+    		  JSONResponse jsonResponse = new JSONResponse(request);
+    		  try{
+      		  GenericCart shoppingCart = null;
+      		  shoppingCart = LoginManager.getUser(request,response).getShoppingCart();
+      		
+      		  Debug.println("Adding data to basket"+request.getParameter("id"));
+      		  
+      		  int currentNumProducts=shoppingCart.getNumProducts();
+      		  
+      		  if(request.getParameter("id")!=null){
+      		    JSONObject el=new JSONObject();
+      		    el.put("id", request.getParameter("id"));
+      		    el.put("OPENDAP", request.getParameter("OPENDAP"));
+      		    el.put("HTTPServer", request.getParameter("HTTPServer"));
+      		    el.put("catalogURL", request.getParameter("catalogURL"));
+      		    el.put("filesize", request.getParameter("filesize"));
+      		    addFileToBasket(shoppingCart,el);
+      		  }
+  
+      			
+      			try{
+        			JSONArray jsonData = (JSONArray) new JSONTokener(request.getParameter("json")).nextValue();
+        			for(int j=0;j<jsonData.length();j++){
+        				
+        				JSONObject el=((JSONObject)jsonData.get(j));
+        				addFileToBasket(shoppingCart,el);
+        			}
+      			}catch(Exception e){}
+      			String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
+      			result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
+      			Debug.println(result);
+      			jsonResponse.setMessage(result);
+  		    } catch(Exception e){
+  		      jsonResponse.setException("Unable to add file to basket",e);
+          }
+    		  jsonResponse.print(response);
     		}
     	}catch(Exception e){
-      		JSONObject error = new JSONObject();
-  			try {
-  				error.put("error",e.getMessage());
-  			} catch (JSONException e2) {
-  				return;
-  			}
-  			PrintWriter out1 = null;try {out1 = response.getWriter();} catch (IOException e1) {Debug.errprint(e1.getMessage());return;}
-  			out1.print(error.toString());
+
   			return;
     	}
     }

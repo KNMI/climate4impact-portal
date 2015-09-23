@@ -1,4 +1,4 @@
 <%
-    response.sendRedirect("basicsearch.jsp");
+    response.sendRedirect("esgfsearch.jsp");
 %>
  

@@ -18,7 +18,7 @@ import tools.JSONResponse;
 
 public class HandleAdminRequests {
   public static void handleAdminRequests(HttpServletRequest request, HttpServletResponse response) {
-    JSONResponse jsonResponse = new JSONResponse();
+    JSONResponse jsonResponse = new JSONResponse(request);
 
     ImpactUser user = null;
     try {
@@ -88,9 +88,7 @@ public class HandleAdminRequests {
     }
     
     try {
-      jsonResponse.setJSONP(request);
-      response.setContentType(jsonResponse.getMimeType());
-      response.getOutputStream().print(jsonResponse.getMessage());
+      jsonResponse.print(response);
     } catch (Exception e1) {
       e1.printStackTrace();
     }

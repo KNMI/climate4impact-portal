@@ -2607,3 +2607,13 @@ a img {
    cursor: pointer;
    background:#E2EFF8 !important;
 }
+
+.previewstyle{
+	margin:4px;padding:4px;
+	border:1px solid gray;
+	background-color:#DDD;
+	width:400px;
+	cursor: pointer;
+	
+}
+

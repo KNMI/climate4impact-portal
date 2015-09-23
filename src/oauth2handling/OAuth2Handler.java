@@ -725,7 +725,7 @@ public class OAuth2Handler {
    */
   private static void makeForm(HttpServletRequest request,
       HttpServletResponse response) {
-    JSONResponse jsonResponse = new JSONResponse();
+    JSONResponse jsonResponse = new JSONResponse(request);
 
     JSONObject form = new JSONObject();
     try {
@@ -750,9 +750,7 @@ public class OAuth2Handler {
     jsonResponse.setMessage(form);
 
     try {
-      jsonResponse.setJSONP(request);
-      response.setContentType(jsonResponse.getMimeType());
-      response.getOutputStream().print(jsonResponse.getMessage());
+      jsonResponse.print(response);
     } catch (Exception e1) {
 
     }

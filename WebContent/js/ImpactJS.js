@@ -1,5 +1,19 @@
 var mouseXPosition;
 var mouseYPosition; 
+
+var makeconsole = function(){
+	console = [];
+	console.log = function(){
+	};
+};
+
+if(!console){
+	makeconsole();
+}
+if(!console.log){
+	makeconsole();
+}
+
 function IsNumeric(sText){
    var ValidChars = "0123456789.";
    var IsNumber=true;
@@ -382,7 +396,7 @@ function IsNumeric(sText){
     var ValidChars = "0123456789.";
     var IsNumber=true;
     var Char;
-    for (i = 0; i < sText.length && IsNumber == true; i++){ 
+    for (i = 0; i < sText.length && IsNumber == true; i++){ c4i
       Char = sText.charAt(i); 
       if (ValidChars.indexOf(Char) == -1) {
             IsNumber = false;
@@ -477,6 +491,7 @@ function IsNumeric(sText){
 
 	function makeHTTPRequest(urlRequest,callbackHTTP,callbackError,passObjPointer,tryProxyRequestOnFailure){
 	  if(urlRequest==undefined)return;
+	  console.log(urlRequest)
 	  if(urlRequest.indexOf('?')==-1)urlRequest+='?';
 	  if(tryProxyRequestOnFailure==undefined)tryProxyRequestOnFailure=true;
 	  urlRequest+="&rand="+Math.random();
@@ -492,13 +507,15 @@ function IsNumeric(sText){
 	    else if(callbackHTTP)callbackHTTP(undefined,passObjPointer);
 	  }
 	  
-	  function makeProxyURL(urlRequest){ 
+	  function makeProxyURL(urlRequest){
+		console.log("Error: makeProxyURL empty")
 	    return;
-		  alert("proxy url not set\n"+urlRequest);
+		  //alert("proxy url not set\n"+urlRequest);
 	   // return "http://localhost:8083/ImpactPortal/get?request="+URLEncode(urlRequest);
 	  }
 	  function redirRequest(xhr){
 	    //Let try an alternative way: redirect using JSP
+		  
 	    if(tryProxyRequestOnFailure==true){
 	      makeHTTPRequest(makeProxyURL(urlRequest),callbackHTTP,callbackError,passObjPointer,false);
 	    }else{

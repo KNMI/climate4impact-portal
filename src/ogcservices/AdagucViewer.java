@@ -206,8 +206,8 @@ public class AdagucViewer extends HttpServlet {
     }
 
     try {
-      if(requestStr==null || callbackStr == null){
-        String msg="REQUEST param or CALLBACK param missing";
+      if(requestStr==null ){
+        String msg="REQUEST param missing";
         Debug.errprintln(msg);
         out1.write(msg.getBytes());
         return;
@@ -305,7 +305,11 @@ public class AdagucViewer extends HttpServlet {
             }
             response.setContentType("application/json");
             //Output JSON using JSONP
-            out1.write((callbackStr+"("+jsonData+");").getBytes());
+            if(callbackStr!=null){
+              out1.write((callbackStr+"("+jsonData+");").getBytes());
+            }else{
+              out1.write(jsonData.getBytes());
+            }
             rootElement = null;
             return;
           }
@@ -338,7 +342,11 @@ public class AdagucViewer extends HttpServlet {
       
       
       //Output JSON using JSONP
-      out1.write((callbackStr+"("+rootElement.toJSON(Options.NONE)+");").getBytes());
+      if(callbackStr!=null){
+        out1.write((callbackStr+"("+rootElement.toJSON(Options.NONE)+");").getBytes());
+      }else{
+        out1.write((rootElement.toJSON(Options.NONE)).getBytes());
+      }
       rootElement = null;
       return;
       
@@ -348,8 +356,8 @@ public class AdagucViewer extends HttpServlet {
         
           response.setContentType("application/json");
 
-          JSONResponse r = new JSONResponse();
-          r.setJSONP(callbackStr);
+          JSONResponse r = new JSONResponse(request);
+          if(callbackStr!=null)r.setJSONP(callbackStr);
           
           if(e.getClass() == WebRequestBadStatusException.class){
             r.setErrorMessage(((WebRequestBadStatusException)e).getResult(), ((WebRequestBadStatusException)e).getStatusCode());
