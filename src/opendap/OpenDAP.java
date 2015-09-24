@@ -30,7 +30,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debugger{
-  static boolean DebugOpenDAP = true;
+  static boolean DebugOpenDAP = false;
 }
 
 class DimInfo{
@@ -250,13 +250,13 @@ public class OpenDAP {
     String[] varNames = null;
     
     if(queryString.length() != 0){
-      Debug.println("Selection");
+//      Debug.println("Selection");
       varNames = queryString.split(",");
     }else{
-      Debug.println("ALL");
+//      Debug.println("ALL");
       List<Variable> var = ncfile.getVariables();
       for(int j=0;j<var.size();j++){
-        Debug.println("Adding ["+var.get(j).getFullName()+"]");
+//        Debug.println("Adding ["+var.get(j).getFullName()+"]");
         varNames = tools.Tools.appendString(varNames, var.get(j).getFullName());
       }
     }
@@ -269,7 +269,7 @@ public class OpenDAP {
       String variableDodsQuery = "";
       int subSetRequestP = varNames[j].indexOf(".");;
       String varName = varNames[j];
-      Debug.println("Processing "+varName);
+      //Debug.println("Processing "+varName);
       if(subSetRequestP!=-1){
         varName = varNames[j].substring(0, subSetRequestP);
         variableDodsQuery = varNames[j].substring(subSetRequestP+1);
