@@ -37,6 +37,20 @@ public class WebProcessingInterface {
   //public static String WPSURL="http://webgis.nmdc.eu/cgi-bin/wps/pywps.cgi";
   //public static String WPSURL="http://bhw222.knmi.nl:8081/impactportal/WPS";
  // public static String WPSURL="http://climate4impact.eu/impactportal/WPS";
+ // public static String WPSURL = "http://localhost:8094/wps?";
+  /**
+   * Returns the external URL of the Web Processing Service
+   * @return the external URL of the Web Processing Service
+   */
+  private static String getWPSURL() {
+    //return WPSURL;
+    //return "http://mouflon.dkrz.de/wps?";
+    return Configuration.getHomeURLHTTP()+"/WPS?";
+  }
+  
+  private static boolean isLocal(){
+    return true;
+  }
    private static WebProcessingInterface instance = null;
    protected WebProcessingInterface() {
       // Exists only to defeat instantiation.
@@ -109,18 +123,7 @@ public class WebProcessingInterface {
 	}
 	
 	
-	/**
-	 * Returns the external URL of the Web Processing Service
-	 * @return the external URL of the Web Processing Service
-	 */
-	private static String getWPSURL() {
-	  //return "http://mouflon.dkrz.de/wps?";
-	  return Configuration.getHomeURLHTTP()+"/WPS?";
-  }
-	
-	private static boolean isLocal(){
-	  return true;
-	}
+
 	
 	/**
 	 * Encapsulates a String message into a JSON object which can be shown by the UI
