@@ -4,9 +4,12 @@ import impactservice.Configuration;
 import impactservice.ImpactUser;
 import impactservice.LoginManager;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,7 +20,12 @@ import tools.JSONResponse;
 import tools.Tools;
 
 
-public class AdagucServer {
+public class AdagucServer extends HttpServlet{
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Runs the ADAGUC WMS server as executable on the system. 
@@ -62,5 +70,38 @@ public class AdagucServer {
     //Debug.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
     CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,outputStream,null);
   }
+  
+  /**
+   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+   */
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doGet(request,response);
+  }
+  
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    Debug.println("Handle ADAGUC WMS requests");
+    OutputStream out1 = null;
+    //response.setContentType("application/json");
+    try {
+      out1 = response.getOutputStream();
+    } catch (IOException e) {
+      Debug.errprint(e.getMessage());
+      return;
+    }
+  
+    try {
+      AdagucServer.runADAGUCWMS(request,response,request.getQueryString(),out1);
+
+    } catch (Exception e) {
+      response.setStatus(401);
+      try {
+        out1.write(e.getMessage().getBytes());
+      } catch (IOException e1) {
+        Debug.errprintln("Unable to write to stream");
+        Debug.printStackTrace(e);
+      }
+    }    
+  }
+
 
 }

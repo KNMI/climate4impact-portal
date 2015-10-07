@@ -2617,3 +2617,13 @@ a img {
 	
 }
 
+.link {
+	color: #0071ff;
+	font: bold 14px tahoma, arial, helvetica, sans-serif;
+	text-decoration: none;
+	font-weight: normal;
+	cursor: pointer
+	text-align:center;
+	cursor: pointer
+}
+

@@ -49,7 +49,7 @@
     <servlet-name>GetHTTPUrl</servlet-name>
     <url-pattern>/get</url-pattern>
   </servlet-mapping>
-  <servlet>
+  <!-- <servlet>
     <description></description>
     <display-name>ProxyHTTPRequest</display-name>
     <servlet-name>ProxyHTTPRequest</servlet-name>
@@ -58,7 +58,7 @@
   <servlet-mapping>
     <servlet-name>ProxyHTTPRequest</servlet-name>
     <url-pattern>/proxy</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping>-->
   <servlet>
     <description></description>
     <display-name>OpenIdReturn</display-name>
@@ -83,6 +83,16 @@
     <servlet-name>AdagucViewer</servlet-name>
     <url-pattern>/AdagucViewer</url-pattern>
   </servlet-mapping>
+   <servlet>
+    <description></description>
+    <display-name>ADAGUCServer</display-name>
+    <servlet-name>ADAGUCServer</servlet-name>
+    <servlet-class>ogcservices.AdagucServer</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ADAGUCServer</servlet-name>
+    <url-pattern>/adagucserver/*</url-pattern>
+  </servlet-mapping>
   <servlet>
     <description></description>
     <display-name>PyWPSServer</display-name>
@@ -91,7 +101,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>PyWPSServer</servlet-name>
-    <url-pattern>/WPS</url-pattern>
+    <url-pattern>/WPS/*</url-pattern>
   </servlet-mapping>
   <context-param>
     <param-name>extjslocation</param-name>

@@ -611,22 +611,27 @@ public class OpenDAP {
     if(path==null)return;
     Debug.println("path: =["+path+"]");
     String filename = null;//"/home/c4m/Downloads/australia.nc";
-
+    
+    
 
     //DebugConsole.println("path: "+path);
 
     String fileNameFromPath = path.substring(path.lastIndexOf("/")+1); 
     String opendapNameFromPath = fileNameFromPath.substring(0,fileNameFromPath.lastIndexOf("."));
     String userIdFromPath = path.substring(1,path.lastIndexOf("/"));
-    //DebugConsole.println("file: "+fileNameFromPath);
-    //DebugConsole.println("userid: "+userIdFromPath);
+    
+    Debug.println("opendapNameFromPath: "+opendapNameFromPath);
+    Debug.println("fileNameFromPath:    "+fileNameFromPath);
+    Debug.println("userIdFromPath:      "+userIdFromPath);
+    
     try {
       ImpactUser user =  LoginManager.getUser(request,response);
       
       
-      String filePath = userIdFromPath.substring(user.internalName.length());
-      
+      String filePath = userIdFromPath.substring(userIdFromPath.length());
+      Debug.println("filePath        : "+filePath);
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
+      Debug.println("fileNameFromPath: "+fileNameFromPath);
       
       filename = user.getDataDir()+"/"+filePath+"/"+opendapNameFromPath;
       
@@ -634,11 +639,12 @@ public class OpenDAP {
       //Debug.println("Local file name is "+filename);
       
       //Debug.println("Comparing "+user.internalName + "==" + userIdFromPath);
-      if(!userIdFromPath.startsWith(user.internalName)){
-        response.setStatus(403);
-        response.getOutputStream().print("403 Forbidden (Wrong user id)");
-        return;
-      }
+//      if(!userIdFromPath.startsWith(user.internalName)){
+//        Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.internalName);
+//        response.setStatus(403);
+//        response.getOutputStream().print("403 Forbidden (Wrong user id)");
+//        return;
+//      }
     } catch (Exception e) {
       String message = "401 No user information provided: "+e.getMessage();
       response.setStatus(401);
@@ -678,12 +684,12 @@ public class OpenDAP {
       }
 
     } catch (IOException ioe) {
-      Debug.errprintln("trying to open " + filename, ioe);
+      Debug.println("Error opening: " + filename);
     } finally { 
       if (null != ncFile) try {
         ncFile.close();
       } catch (IOException ioe) {
-        Debug.errprintln("trying to close " + filename, ioe);
+        Debug.println("Error closing: " + filename);
       }
     }
   }

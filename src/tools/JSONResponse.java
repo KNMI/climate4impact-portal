@@ -24,7 +24,7 @@ import org.json.JSONObject;
     }
     
     try {
-      response.print();
+      jsonResponse.print(response);
     } catch (Exception e1) {
     
     }
@@ -66,6 +66,9 @@ public class JSONResponse {
   private String errorMessage = null;
   boolean hasError = false; 
   public String getMessage(){
+    if(message.length()==0){
+      setErrorMessage("JSONResponse: no message set",200);
+    }
     if(jsonp!=null){
       if(jsonp.length()>0){
         return jsonp+"("+message+");";

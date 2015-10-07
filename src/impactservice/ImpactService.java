@@ -280,16 +280,14 @@ public class ImpactService extends HttpServlet {
           }
           
           if(openDAPURL!=null){
-           
-              //dapLink="<a href=\"/impactportal/data/datasetviewer.jsp?dataset="+URLEncoder.encode(openDAPURL,"UTF-8")+"\">view</a>";
-              dapLink="<a href=\"\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</a>";
-            
+              dapLink="<span class=\"link\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</span>";
+              //dapLink="<a href=\"#\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</a>";
           }
           if(httpURL!=null){
             if(openid!=null){
-              httpLink="<a href=\""+httpURL+"\" target=\"_blank\" onclick=\"window.open('"+httpURL+"?openid="+openid+"')\">download</a>";
+              httpLink="<a href=\""+httpURL+"?openid="+openid+"\" target=\"_blank\"\">download</a>";
             }else{
-              httpLink="<button href=\"window.open('"+httpURL+"')\">download</button>";
+              httpLink="<a href=\""+httpURL+"\">download</a>";
             }
           }
           //html+="</td><td>"+dapLink+"</td><td>"+httpLink;
@@ -845,14 +843,14 @@ public class ImpactService extends HttpServlet {
 		if(serviceStr!=null){serviceStr=URLDecoder.decode(serviceStr,"UTF-8");}else{errorResponder.printexception("serviceStr="+serviceStr);return;}
 		
 		/**
-		 * Handle WMS requests
+		 * Handle WMS requests (deprecated since 2015-Oct-07, use adagucserver servlet instead!)
 		 */
     if(serviceStr.equalsIgnoreCase("WMS")){
      handleWMSRequests(request,response);
 
     }
     /**
-     * Handle WCS requests
+     * Handle WCS requests (deprecated since 2015-Oct-07, use adagucserver servlet instead!)
      */
     if(serviceStr.equalsIgnoreCase("WCS")){
      handleWMSRequests(request,response);
@@ -920,20 +918,35 @@ public class ImpactService extends HttpServlet {
 			handleBasketRequest(request,response,errorResponder);
 		}
 		
-		/*
-		 * Handle BasicSearch requests
-		 */ 
-//		if(serviceStr.equals("basicsearch")){
-//			BasicSearch.handleBasicSearchRequest(request,response,errorResponder);
-//		}
-	
-		/*
-		 * Handle data requests
-		 */
-    /*if(serviceStr.equals("data")){
-      handleDataRequest(request,response,errorResponder);
-    }*/
-  
+    if(serviceStr.equals("account")){
+      Debug.println("Service \"account\"");
+      JSONResponse jsonResponse = new JSONResponse(request);
+      try {
+        String requestStr=HTTPTools.getHTTPParam(request, "request");
+        ImpactUser user = null;
+        user = LoginManager.getUser(request,response);
+        if(requestStr.equals("generatetoken")){
+          jsonResponse.setMessage(LoginManager.generateAccessToken(user).toString());
+        }
+        if(requestStr.equals("listtokens")){
+          JSONArray a = new JSONArray();
+          String[] accessTokens = user.listAccessTokens();
+          for(int j=0;j<accessTokens.length;j++){
+            a.put((JSONObject) new JSONTokener(accessTokens[j]).nextValue());
+          }
+          jsonResponse.setMessage(a.toString());
+        }
+      } catch(Exception e){
+        jsonResponse.setException("Service account failed",e);
+      }
+      
+      try {
+        jsonResponse.print(response);
+      } catch (Exception e1) {
+      
+      }
+    }
+    
 		
 
 	}
@@ -968,6 +981,7 @@ public class ImpactService extends HttpServlet {
 
 
 
+	//Deprecated
   private void handleWMSRequests(HttpServletRequest request, HttpServletResponse response) {
 	  Debug.println("Handle WMS requests");
     OutputStream out1 = null;

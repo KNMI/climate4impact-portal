@@ -2,13 +2,37 @@ var downloadWin;
 // var
 // adagucviewservice='/impactportal/adagucviewer/adagucportal/index.jsp?srs=EPSG:4326&bbox=-180,-90,180,90&service=/impactportal/ImpactService%253Fsource%3D'+service+'&layer='+variable+'$image/png$true$auto/nearest$1$0&selected=0&baselayers=world_raster$nl_world_line&zoomtolayer=1'
 
-var adagucwmservice = '/impactportal/ImpactService?source=';
-var adagucviewservice = '/impactportal/adagucviewer/index.html?srs=EPSG:4326&bbox=-180,-90,180,90&service=/impactportal/ImpactService%253Fsource%3D';
+var adagucwmservice = '/impactportal/adagucserver?source=';
+var adagucviewservice = '/impactportal/adagucviewer/index.html?srs=EPSG:4326&bbox=-180,-90,180,90&service=/impactportal/adagucserver%253Fsource%3D';
 var adagucviewer = '/impactportal/adagucviewer/';
 var fileheaderservice = '/impactportal/ImpactService?service=getvariables&request=';
 
 var thisSigninWindow;
 
+var filelocationwithopenid;
+var openid;
+
+var openDownloadWindow = function(thisSigninWindow){
+    var request = thisSigninWindow.getFileLocation();
+    if (request.indexOf('aggregation') > 0) {
+      alert('Aggregations cannot be downloaded directly.');
+      return;
+    }
+    var downloadURL = request.replace('dodsC', 'fileServer');
+    try{
+      if(openid){
+        if(openid!=""){
+          downloadURL+="?openid="+openid;
+        }
+      }
+    }catch(e){
+    }
+
+    if (downloadWin)
+      downloadWin.close();
+    downloadWin = window.open(downloadURL, 'jav','width=900,height=600,resizable=yes');
+    return;
+}
 
 var toggleAttributes = function(a) {
 
@@ -119,25 +143,7 @@ var ExtFileViewer = function() {
 	          text : 'Download',
 	          iconCls : 'icon-download',
 	          handler : function() {
-	            var request = _this.getFileLocation();
-	            if (request.indexOf('aggregation') > 0) {
-	              alert('Aggregations cannot be downloaded directly.');
-	              return;
-	            }
-	            var downloadURL = request.replace('dodsC', 'fileServer');
-	            try{
-  	            if(openid){
-  	              if(openid!=""){
-  	                downloadURL+="?openid="+openid;
-  	              }
-  	            }
-	            }catch(e){
-	            }
-
-	            if (downloadWin)
-	              downloadWin.close();
-	            downloadWin = window.open(downloadURL, 'jav',
-	                'width=900,height=600,resizable=yes');
+	        	  openDownloadWindow(_this);
 	          }
 	        },{
 	          xtype : 'tbseparator'
@@ -172,11 +178,12 @@ var ExtFileViewer = function() {
 	          '<tpl if="error">',
 	
 	          '<div class="variable-error">{error}<br/>You can try the following:<ul>',
-	          '<li>Click directly on the link above, you will get a hint on what is going wrong.</li>',
-	          '<li>If you are not signed in, <a href="#" onclick="generateLoginDialog(function(){refreshFileViewer(thisSigninWindow);})">sign in</a>',
-	          ' and <a onclick=\'location.reload();\'>refresh this page</a>.</li>',
-	          '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a target="_blank" href="/impactportal/help/howto.jsp?q=create_esgf_account">-> HowTo</a>.</li>',
+	          
+	          '<li><a href="#" onclick="generateLoginDialog(function(){refreshFileViewer(thisSigninWindow);})">Sign in</a></li>',
+	          '<li><a onclick=\'thisSigninWindow.reload();\'>Reload</a></li>',
 	          '<li><a onclick="window.open(\'/impactportal/help/contactexpert.jsp\',\'targetWindow\',\'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=1020,height=800\')" >Request help</a>.</li>',
+	          '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a target="_blank" href="/impactportal/help/howto.jsp?q=create_esgf_account">-> HowTo</a>.</li>',
+	          '<li>Open this file directly in your browser  <a href="#" onclick="openDownloadWindow(thisSigninWindow)">here</a>, you might get a hint on what is going wrong.</li>',
 	          '</ul></div>',
 	          '</tpl>',
 	          '<tpl if="variable">',
@@ -193,6 +200,7 @@ var ExtFileViewer = function() {
 	          '<ul><tpl for="attributes">', '<li>{name}: {value}</li>',
 	          '</tpl></ul>', '</div>', '</div></tpl></tpl>',{
 	            reload:function(){
+	            	thisSigninWindow.reload();
 	              console.log("reload in template");
 	            }
 	          }),
@@ -217,7 +225,7 @@ var ExtFileViewer = function() {
     fileStore.fireEvent('load');
     var proxy = fileStore.getProxy();
     proxy.url = fileheaderservice + URLEncode(fileLocation);
-    fileViewerPanel.getComponent('variableheader').update('File location: <a target="_blank" href="'+filelocationwithopenid+'">'+_filelocation+'</a>');
+    fileViewerPanel.getComponent('variableheader').update(_filelocation);
     fileStore.load();
   };
 

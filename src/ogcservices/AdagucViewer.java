@@ -225,6 +225,9 @@ public class AdagucViewer extends HttpServlet {
       if(requestStr.indexOf("impactportal/ImpactService?")!=-1){
         isLocalADAGUC=true;
       }
+      if(requestStr.indexOf("impactportal/adagucserver?")!=-1){
+        isLocalADAGUC=true;
+      }
       if(requestStr.indexOf("impactportal/WPS?")!=-1){
         isLocalWPS=true;
       }

@@ -139,7 +139,7 @@ public class PyWPSServer extends HttpServlet {
   
   protected void doGet(HttpServletRequest request, HttpServletResponse response) {
     
-    Debug.println("PWS QueryString: "+request.getQueryString());
+    Debug.println("WPS QueryString: "+request.getQueryString());
     //Check if this is a WPS status request, which means reading a local XML file which resides on disk.
     try{
         String output = null;
