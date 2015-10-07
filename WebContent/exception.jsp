@@ -15,6 +15,7 @@
 
       <%
       out.print(session.getAttribute("message")); 
+      session.setAttribute("message",null);
       session.removeAttribute("message");
       %>
       <br/><br/>

@@ -9,7 +9,7 @@
       'PCMDI':       {
     	  name:'PCMDI'       ,
     	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
-    	  createaccount:'https://pcmdi9.llnl.gov/esgf-web-fe/createAccount',
+    	  createaccount:'https://pcmdi9.llnl.gov/user/add/?next=https://pcmdi9.llnl.gov/projects/cmip5/',
     	  accountinfo:'http://pcmdi9.llnl.gov/esgf-web-fe/accountsview',
     	  logocls:'logo_USA'},
   	  'IPSL':       {

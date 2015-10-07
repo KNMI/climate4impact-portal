@@ -27,6 +27,7 @@ import java.util.SortedSet;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -172,12 +173,12 @@ public class HTTPTools extends HttpServlet {
 //  }
   
   public static String makeHTTPGetRequestX509ClientAuthentication(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword)throws WebRequestBadStatusException, IOException{
+      String trustRootsFile, String trustRootsPassword)throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException{
     return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null,null,null);
   }
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
       String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers)
-      throws WebRequestBadStatusException, IOException {
+      throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException {
     String connectToURL = makeCleanURL(url);
     Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
@@ -269,6 +270,8 @@ public class HTTPTools extends HttpServlet {
         entity.getContent().close();
       } catch (Exception e) {
       }
+    } catch (SSLPeerUnverifiedException sSLPeerUnverifiedException){
+      throw sSLPeerUnverifiedException;
     } catch (UnknownHostException unknownHostException) {
       throw unknownHostException;
     } catch (IOException e) {

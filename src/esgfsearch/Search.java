@@ -270,7 +270,7 @@ public class Search {
   
   public String getCatalog(String catalogURL,HttpServletRequest request) throws Exception{
   
-    String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, 600*60);
+    String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, 5*60);
     if(response!=null){
       Debug.println("CATALOG FROM CACHE "+catalogURL);
       return response;

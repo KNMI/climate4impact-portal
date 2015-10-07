@@ -491,11 +491,11 @@ public class LoginManager {
         }
       }
   
-      try {
+      //try {
         HTTPTools.makeHTTPGetRequestX509ClientAuthentication(requestStr,certificateLocation,Configuration.LoginConfig.getTrustStoreFile(),Configuration.LoginConfig.getTrustStorePassword());
-      } catch (IOException e) {
-         throw e;
-      }
+      //} catch (IOException e) {
+       //  throw e;
+      //}
  
     }catch( javax.net.ssl.SSLPeerUnverifiedException e){
       
@@ -514,7 +514,7 @@ public class LoginManager {
       jsonResponse.setErrorMessage(msg,500);
       return jsonResponse;
     }catch(WebRequestBadStatusException e){
-      
+      Debug.println("WebRequestBadStatusException: "+e.getMessage()+":"+e.getStatusCode());
       if(e.getStatusCode()==400){
         msg+="HTTP status code "+e.getStatusCode()+": Bad request\n";
         if(user == null){
@@ -579,6 +579,7 @@ public class LoginManager {
     request.getSession().setAttribute("certificate",null);
     request.getSession().setAttribute("access_token",null);
     request.getSession().setAttribute("login_method",null);
+    request.getSession().setAttribute("message",null);
     Debug.println("--- LOGOUT DONE --- ");
   }
  

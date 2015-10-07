@@ -282,12 +282,12 @@ public class ImpactService extends HttpServlet {
           if(openDAPURL!=null){
            
               //dapLink="<a href=\"/impactportal/data/datasetviewer.jsp?dataset="+URLEncoder.encode(openDAPURL,"UTF-8")+"\">view</a>";
-              dapLink="<button onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</button>";
+              dapLink="<a href=\"\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</a>";
             
           }
           if(httpURL!=null){
             if(openid!=null){
-              httpLink="<button target=\"_blank\" onclick=\"window.open('"+httpURL+"?openid="+openid+"')\">download</button>";
+              httpLink="<a href=\""+httpURL+"\" target=\"_blank\" onclick=\"window.open('"+httpURL+"?openid="+openid+"')\">download</a>";
             }else{
               httpLink="<button href=\"window.open('"+httpURL+"')\">download</button>";
             }

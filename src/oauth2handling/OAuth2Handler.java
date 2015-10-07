@@ -371,7 +371,7 @@ public class OAuth2Handler {
     Debug
     .println("Step 3 - Make SLCS certificate request to external OAuth2 service");
     UserInfo userInfo = new UserInfo();
-    userInfo.user_identifier = "https://ceda.ac.uk/openid/TODO_howdowegettheidentifier";
+    userInfo.user_identifier = null;//retrieved from slc x509 CN
     Security.addProvider(new BouncyCastleProvider());
 
     PublicKey publicKey = null;
