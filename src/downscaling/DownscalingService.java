@@ -31,7 +31,7 @@ import model.Downscaling;
 import model.Job;
 import model.Predictand;
 
-import org.apache.commons.httpclient.util.URIUtil;
+
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -186,7 +186,7 @@ public class DownscalingService extends HttpServlet {
           params+=('=');
           params+=(param.getValue()[0].toString());
       }
-      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+URIUtil.encodeQuery(params.toString()), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+URLEncoder.encode(params.toString(),"UTF-8"), "GET");
       OutputStream out = response.getOutputStream();
       InputStream in = urlConn.getInputStream();
       byte[] buffer = new byte[4096];

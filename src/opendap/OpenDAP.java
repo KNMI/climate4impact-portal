@@ -30,7 +30,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debugger{
-  static boolean DebugOpenDAP = false;
+  static boolean DebugOpenDAP = true;
 }
 
 class DimInfo{
@@ -117,6 +117,9 @@ public class OpenDAP {
   }
 
   public static String CDMTypeToString(CDMTypes cdmType){
+    if(Debugger.DebugOpenDAP){
+      System.out.println(cdmType);
+    }
     if(cdmType == CDMTypes.String)return "String";
     if(cdmType == CDMTypes.Byte)return "Byte";
     
@@ -151,6 +154,12 @@ public class OpenDAP {
     StringBuilder ddsResult = new StringBuilder();
 
     int rank = variable.getRank();
+    Debug.println(variable.getDODSName());
+    Debug.println(variable.getFullName());
+    Debug.println(variable.getDataType().toString());
+    Debug.println(variable.getDataType().name());
+    Debug.println(variable.getDataType().getPrimitiveClassType().getName());
+    
     if(rank == 0){
       ddsResult.append("    "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
     }

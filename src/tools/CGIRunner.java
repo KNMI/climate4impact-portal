@@ -135,7 +135,7 @@ public class CGIRunner {
     }
     
     if(response!=null){
-      if(processRunner.exitValue()!=0){
+      if(processRunner.exitValue()!=0&&processRunner.exitValue()!=1){
         response.setStatus(500);
         String msg="Internal server error: CGI returned code "+processRunner.exitValue();
         Debug.errprintln(msg);
