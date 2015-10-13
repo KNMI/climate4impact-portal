@@ -30,7 +30,6 @@ public class ImpactUser {
   private String emailAddress;
   public String userMyProxyService = null;
   private String openid = null;
-  private static Vector<String> user_access_tokens= new Vector<String>();
   
   public ImpactUser(String userId) {
     id = userId;
@@ -190,16 +189,7 @@ public class ImpactUser {
     this.loginInfo = loginMethod;
   }
   
-  public void addAccessToken(String token) {
-    user_access_tokens.add(token);    
-  }
   
-  public String[] listAccessTokens(){
-    String[] accessTokens = new String[user_access_tokens.size()];
-    for(int j=0;j<user_access_tokens.size();j++){
-      accessTokens[j]=user_access_tokens.get(j);
-    }
-    return accessTokens;
-  }
+  
  
 }

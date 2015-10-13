@@ -32,7 +32,9 @@ public class DateFunctions {
 		if(dateResolutionString.equalsIgnoreCase("hour"))cal.add(Calendar.HOUR, 1);
 		//Add days
 		if(dateResolutionString.equalsIgnoreCase("day"))cal.add(Calendar.DATE, 1);
-		//Add decade
+		//Add week
+		if(dateResolutionString.equalsIgnoreCase("week"))cal.add(Calendar.DATE, 7);
+    //Add decade
 		if(dateResolutionString.equalsIgnoreCase("decade"))cal.add(Calendar.DATE, 10);
 		//Add months
 		if(dateResolutionString.equalsIgnoreCase("month"))cal.add(Calendar.MONTH, 1);
@@ -101,5 +103,21 @@ public class DateFunctions {
         if(timeResolution.equalsIgnoreCase("season"))ISO8601TimeInterval="P3M";
         if(timeResolution.equalsIgnoreCase("year"))ISO8601TimeInterval="P1Y";
 	        return ISO8601TimeInterval;
+    }
+
+    public static long getMillisFromISO8601Date(String stringDate) throws Exception {
+      Date dateStartTime = null;
+      try {
+        dateStartTime = ISO8601DateTimeFormat.parse(stringDate);
+      } catch (ParseException e1) {
+        throw new Exception("Unable to parse start date: "+stringDate+" Exception message: "+e1.getMessage());
+      }
+      return dateStartTime.getTime();
+    }
+
+    public static long getCurrentDateInMillis() {
+      Calendar cal = Calendar.getInstance();
+      return cal.getTimeInMillis();
+      
     }
 }

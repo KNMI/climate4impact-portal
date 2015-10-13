@@ -13,7 +13,9 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.Vector;
@@ -28,8 +30,10 @@ import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -77,31 +81,7 @@ public class LoginManager {
 
   private static Vector<ImpactUser> users = new Vector<ImpactUser>();
   
-  private static Map<String,String> access_tokens= new TreeMap<String,String>();
   
-  public static void saveAccessTokens(){
-    String file = Configuration.getImpactWorkspace()+"tokens.xml";
-    Debug.print("saveAccessTokens:"+file);
-        
-    XMLElement x = new XMLElement();
-    //TODO SAVE AS XML or JSON
-  }
-  
-  public static JSONObject generateAccessToken(ImpactUser user){
-    UUID idOne = UUID.randomUUID();
-    Debug.println("UUID :"+idOne);
-    JSONObject jsonObject = new JSONObject();
-    try {
-      jsonObject.put("token", ""+idOne);
-    } catch (JSONException e) {
-    }
-    String token = jsonObject.toString();
-    user.addAccessToken(token);
-    access_tokens.put("UUID :"+idOne, token);
-    saveAccessTokens();
-    return jsonObject;
-  }
-
   public static void getUserProxyService(ImpactUser user)
       throws MalformedURLException, WebRequestBadStatusException, Exception {
     // Test met openID URL
@@ -267,6 +247,13 @@ public class LoginManager {
         }
         path = path.replaceAll("/", "");
         Debug.println("getPathInfo: "+path);
+        try{
+          JSONObject token = (JSONObject) new JSONTokener(AccessTokenStore.checkIfTokenIsValid(path)).nextValue();
+          Debug.println("Valid token "+token.toString()+" obtained");
+          id = token.getString("userid");
+        }catch(Exception e){
+          e.printStackTrace();
+        }
   
       }
     }
