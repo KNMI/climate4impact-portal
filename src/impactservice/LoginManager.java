@@ -1,5 +1,8 @@
 package impactservice;
 
+import impactservice.AccessTokenStore.AccessTokenHasExpired;
+import impactservice.AccessTokenStore.AccessTokenIsNotYetValid;
+
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -204,6 +207,7 @@ public class LoginManager {
   public static ImpactUser getUser(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
 
+    
     //Get user from session
     HttpSession session = request.getSession();
     String id = (String) session.getAttribute("user_identifier");
@@ -211,6 +215,23 @@ public class LoginManager {
       id = Configuration.GlobalConfig.getDefaultUser();
     }
 
+    //Get user from access token provided in the request
+    if (id == null ) {
+      try{
+       
+        try{
+          JSONObject token = AccessTokenStore.checkIfTokenIsValid(request);
+          if(token!=null){
+            Debug.println("Valid token "+token.toString()+" obtained");
+            id = token.getString("userid");
+          }
+        }catch(Exception e){
+        }
+      }catch(Exception e){
+        //e.printStackTrace();
+      }
+   
+    }
     if (id == null) {
       try {
         OAuth2Handler.UserInfo userInfo = OAuth2Handler
@@ -230,33 +251,7 @@ public class LoginManager {
       }
     }
     
-    //Get user from access token provided in the path
-    if (id == null ) {
-      String pathInfo = request.getPathInfo();
-      if(pathInfo!=null){
-        String[] paths = pathInfo.split("/");
-        String path  = null;
-       
-        //Strip access code from path and build a new path
-        for(int j=0;j<paths.length&&j<2;j++){
-          if(path==null){
-            if(paths[j].length()>1){
-              path = paths[j];
-            }
-          }
-        }
-        path = path.replaceAll("/", "");
-        Debug.println("getPathInfo: "+path);
-        try{
-          JSONObject token = (JSONObject) new JSONTokener(AccessTokenStore.checkIfTokenIsValid(path)).nextValue();
-          Debug.println("Valid token "+token.toString()+" obtained");
-          id = token.getString("userid");
-        }catch(Exception e){
-          e.printStackTrace();
-        }
-  
-      }
-    }
+
 
     //"Trying to get user info from X509 cert"
     if (id == null && response != null) {

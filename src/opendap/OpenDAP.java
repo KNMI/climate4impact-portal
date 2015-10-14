@@ -1,5 +1,8 @@
 package opendap;
 
+import impactservice.AccessTokenStore;
+import impactservice.AccessTokenStore.AccessTokenHasExpired;
+import impactservice.AccessTokenStore.AccessTokenIsNotYetValid;
 import impactservice.ImpactUser;
 import impactservice.LoginManager;
 
@@ -9,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import tools.Debug;
 import ucar.ma2.Array;
@@ -30,7 +34,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debugger{
-  static boolean DebugOpenDAP = true;
+  static boolean DebugOpenDAP = false;
 }
 
 class DimInfo{
@@ -154,11 +158,11 @@ public class OpenDAP {
     StringBuilder ddsResult = new StringBuilder();
 
     int rank = variable.getRank();
-    Debug.println(variable.getDODSName());
-    Debug.println(variable.getFullName());
-    Debug.println(variable.getDataType().toString());
-    Debug.println(variable.getDataType().name());
-    Debug.println(variable.getDataType().getPrimitiveClassType().getName());
+//    Debug.println(variable.getDODSName());
+//    Debug.println(variable.getFullName());
+//    Debug.println(variable.getDataType().toString());
+//    Debug.println(variable.getDataType().name());
+//    Debug.println(variable.getDataType().getPrimitiveClassType().getName());
     
     if(rank == 0){
       ddsResult.append("    "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
@@ -613,6 +617,24 @@ public class OpenDAP {
 
 
   protected static void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    /* Three ways of authentication are possible:
+     * 1) - browser session based
+     * 2) - X509, for command line
+     * 3) - Access token, for commandline/browsers
+     * 
+     * When an access token is provided, it is part of the path. 
+     */
+    
+    
+    //Get User ID from tokenstore 
+    JSONObject token = null;
+    try {
+      token = AccessTokenStore.checkIfTokenIsValid(request);
+    } catch (AccessTokenIsNotYetValid e1) {
+    } catch (AccessTokenHasExpired e1) {
+    }
+    
+    
     String queryString = request.getQueryString();
     if(queryString == null)queryString="";
     Debug.println("queryString: =["+queryString+"]");
@@ -623,22 +645,54 @@ public class OpenDAP {
     
     
 
-    //DebugConsole.println("path: "+path);
-
-    String fileNameFromPath = path.substring(path.lastIndexOf("/")+1); 
-    String opendapNameFromPath = fileNameFromPath.substring(0,fileNameFromPath.lastIndexOf("."));
-    String userIdFromPath = path.substring(1,path.lastIndexOf("/"));
+    //Retrieve user ID from path
+    String userIdFromPath = "";
+    String cleanPath = "";//Complete string
+    String[] pathParts = path.split("/");
+    int pathPartsIndex = 0;
+    boolean skipTokenFirst=false;
+    if(token!=null){
+      Debug.println("Found token.");
+      skipTokenFirst = true;//token is the first piece of the part.
+    }
+    while(pathPartsIndex<pathParts.length){
+      String pathParth = pathParts[pathPartsIndex];
+      if(skipTokenFirst){
+        try {
+          if(pathParth.equals(token.getString("token"))){
+            skipTokenFirst = false;
+          }
+        } catch (JSONException e) {
+        }
+      }
+      else{
+        if(pathParth.length()>0){
+          if(userIdFromPath.length()==0){
+            userIdFromPath = pathParth;
+          }
+          cleanPath+="/"+pathParth;
+        }
+      }
+      pathPartsIndex++;
+    }
     
+    token = null;
+    
+    String fileNameFromPath = cleanPath.substring(cleanPath.lastIndexOf("/")+1); 
+    String opendapNameFromPath = fileNameFromPath.substring(0,fileNameFromPath.lastIndexOf("."));
+  
+    Debug.println("cleanPath: "+cleanPath);
     Debug.println("opendapNameFromPath: "+opendapNameFromPath);
     Debug.println("fileNameFromPath:    "+fileNameFromPath);
     Debug.println("userIdFromPath:      "+userIdFromPath);
-    
+    String filePath = cleanPath.substring(userIdFromPath.length()+1);
+    filePath = filePath.substring(0,filePath.lastIndexOf("/"));
+    Debug.println("filePath        : "+filePath);
     try {
       ImpactUser user =  LoginManager.getUser(request,response);
       
       
-      String filePath = userIdFromPath.substring(userIdFromPath.length());
-      Debug.println("filePath        : "+filePath);
+      
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
       Debug.println("fileNameFromPath: "+fileNameFromPath);
       
@@ -647,13 +701,15 @@ public class OpenDAP {
       
       //Debug.println("Local file name is "+filename);
       
-      //Debug.println("Comparing "+user.internalName + "==" + userIdFromPath);
-//      if(!userIdFromPath.startsWith(user.internalName)){
-//        Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.internalName);
-//        response.setStatus(403);
-//        response.getOutputStream().print("403 Forbidden (Wrong user id)");
-//        return;
-//      }
+      
+      if(!userIdFromPath.startsWith(user.internalName)){
+        Debug.println("Comparing "+user.internalName + "==" + userIdFromPath+ " UNEQUAL");
+        Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.internalName);
+        response.setStatus(403);
+        response.getOutputStream().print("403 Forbidden (Wrong user id)");
+        return;
+      }
+      Debug.println("Comparing "+user.internalName + "==" + userIdFromPath+ " OK");
     } catch (Exception e) {
       String message = "401 No user information provided: "+e.getMessage();
       response.setStatus(401);
