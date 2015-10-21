@@ -985,11 +985,36 @@ var buildWPSInterface = function(componentToBuild, wpsInputList,
 			//}
 		}
 		
+		
+		/*
+     * ComplexInput
+     */
+    if (input.ComplexInput) {
+      try {
+        /* String */
+        if (input.ComplexInput.Default.Format.MimeType.value == 'application/opendap') 
+        {
+//          console.log("ComplexData->application/netcdf")
+          var literalDataInput = input.ComplexInput;
+          
+            var item = createComplexDataGrid(input, preConfiguredInput);
+            if (configuredWPSItems)configuredWPSItems.push(item);
+            componentToBuild.add(item);
+          
+        }
+      } catch (e) {
+        alert('ComplexData process: ' + e);
+      }
+    }
+		
+		/*
+		 * ComplexData
+		 */
 		if (input.ComplexData) {
 			try {
 				/* String */
-				if (input.ComplexData.Default.Format.MimeType.value == 'application/opendap') 
-				{
+			//	if (input.ComplexData.Default.Format.MimeType.value == 'application/opendap') {
+			//	{
 //					console.log("ComplexData->application/netcdf")
 					var literalDataInput = input.ComplexData;
 					
@@ -997,7 +1022,7 @@ var buildWPSInterface = function(componentToBuild, wpsInputList,
 						if (configuredWPSItems)configuredWPSItems.push(item);
 						componentToBuild.add(item);
 					
-				}
+				//}
 			} catch (e) {
 				alert('ComplexData process: ' + e);
 			}
