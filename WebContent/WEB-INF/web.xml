@@ -17,7 +17,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>ImpactService</servlet-name>
-    <url-pattern>/ImpactService</url-pattern>
+    <url-pattern>/ImpactService/*</url-pattern>
   </servlet-mapping>
   <servlet>
     <description></description>
@@ -81,7 +81,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>AdagucViewer</servlet-name>
-    <url-pattern>/AdagucViewer</url-pattern>
+    <url-pattern>/AdagucViewer/*</url-pattern>
   </servlet-mapping>
    <servlet>
     <description></description>
