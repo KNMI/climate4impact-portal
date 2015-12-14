@@ -41,7 +41,7 @@ public class AdagucServer extends HttpServlet{
     String[] environmentVariables = Configuration.ADAGUCServerConfig.getADAGUCEnvironment();
     
     //Try to get homedir, ignore if failed
-    String userHomeDir="";
+    String userHomeDir="/tmp/";
     try{
       ImpactUser user = LoginManager.getUser(request,response);
       if(user == null)return;
@@ -65,6 +65,8 @@ public class AdagucServer extends HttpServlet{
 
     environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
     environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
+    environmentVariables=Tools.appendString( environmentVariables,"ADAGUC_ONLINERESOURCE="+Configuration.getHomeURLHTTPS()+"/adagucserver?");
+    environmentVariables=Tools.appendString( environmentVariables,"ADAGUC_TMP="+userHomeDir+"/tmp/");
     
     String commands[] = Configuration.ADAGUCServerConfig.getADAGUCExecutable();
     //Debug.println("ADAGUCExec"+Configuration.ADAGUCServerConfig.getADAGUCExecutable()[0]);
