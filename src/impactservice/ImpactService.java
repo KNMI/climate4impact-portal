@@ -228,14 +228,19 @@ public class ImpactService extends HttpServlet {
       }
     }
     
-    String buildHTML(JSONArray array,String root,int oddEven,String openid){
+    class BuildHTMlResult{
+      String result;
+      int rn;
+    }
+    
+    BuildHTMlResult buildHTML(JSONArray array,String root,int oddEven,String openid,int rn){
       if(array == null)return null;
       StringBuffer html = new StringBuffer();
       try {
         //Try to get the catalogURL 
-        
+     
         for(int j=0;j<array.length();j++){
-          
+          rn++;
           String openDAPURL=null;
           String httpURL=null;
           String hrefURL=null;
@@ -253,10 +258,10 @@ public class ImpactService extends HttpServlet {
           oddEven = 1-oddEven;
           if(oddEven==0){
             //html+="<tr class=\"even\"><td>";
-            html.append("<tr class=\"even\"><td>");
+            html.append("<tr class=\"even\"><td>"+rn+"</td><td>");
           }else{
             //html+="<tr class=\"odd\"><td>";
-            html.append("<tr class=\"odd\"><td>");
+            html.append("<tr class=\"odd\"><td>"+rn+"</td><td>");
           }
           if(hrefURL == null){
            // html+=root+nodeText+"<br/>";
@@ -292,27 +297,35 @@ public class ImpactService extends HttpServlet {
           }
           //html+="</td><td>"+dapLink+"</td><td>"+httpLink;
           html.append("</td><td>");html.append(dapLink);html.append("</td><td>");html.append(httpLink);
+          html.append("</td>");
           if(httpURL == null && openDAPURL == null && catalogURL == null){
             //html+="</td><td>-";  
-            html.append("</td><td>");
+            html.append("<td></td>");
           }else{
             //html+="</td><td><span onclick=\"postIdentifierToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"'});\" class=\"shoppingbasketicon\"/>";
-            html.append("</td><td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/>\n");
+            html.append("<td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/></td>\n");
           }
           
           
           //html+="</td></tr>";
-          html.append("</td></tr>");
+          html.append("</tr>");
+          
           try{
             JSONArray children = a.getJSONArray("children");
             //html+=buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",oddEven);
-            html.append(buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",1-oddEven,openid));
+            BuildHTMlResult b=buildHTML(children,root+"&nbsp;&nbsp;&nbsp;&nbsp;",1-oddEven,openid,rn);
+            html.append(b.result);
+            rn=b.rn;
           } catch (JSONException e) {
           }
         }
       } catch (JSONException e) {
       }
-      return html.toString();
+      
+      BuildHTMlResult b=new BuildHTMlResult();
+      b.result=html.toString();
+      b.rn=rn;
+      return b;
     }
     
     
@@ -374,10 +387,10 @@ public class ImpactService extends HttpServlet {
               
             }
             
-            
+           
             Debug.println("variableFilter: '"+variableFilter+"'");
             Debug.println("textFilter: '"+textFilter+"'");
-            html+="<div id=\"variableandtextfilter\"><form id=\"varFilter\" class=\"varFilter\">";
+            html+="<div class=\"c4i-catalogbrowser-variableandtextfilter\"><form  class=\"varFilter\">";
             if(availableVars.size()>0){
               html+="<b>Variables:</b>";
               for(int j=0;j<availableVars.size();j++){
@@ -389,18 +402,26 @@ public class ImpactService extends HttpServlet {
                 }
                 html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
               }
-              html+="<hr/>";
+              html+="<br/><br/>";
             }
             html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
-            html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
+            html+="<br/>";
+            //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
             
             html+="</form></div>";
           }catch(Exception e){
             e.printStackTrace();
           }
           
-          html += "<div id=\"datasetfilelist\"><table class=\"basket\">";
-          html+="<tr><td width=\"100%\" class=\"basketheader\"><b>Title</b></td><td class=\"basketheader\"><b>Size</b></td><td class=\"basketheader\"><b>OPENDAP</b></td><td class=\"basketheader\"><b>HTTP</b></td><td class=\"basketheader\"><b>Basket</b></td></tr>";
+          html+="<div id=\"datasetfilelist\"><table class=\"c4i-catalogbrowser-table\">";
+          html+="<tr>";
+          html+="<th>#</th>";
+          html+="<th width=\"100%\" class=\"c4i-catalogbrowser-th\">Resource title</th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Size</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Opendap</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Download</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Basket</b></th>";
+          html+="</tr>";
           
           long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           
@@ -409,7 +430,7 @@ public class ImpactService extends HttpServlet {
             openid= LoginManager.getUser(request).getOpenId();
           }catch(Exception e){            
           }
-          html+=buildHTML(treeElements,"",0,openid)+"</table></div>";
+          html+=buildHTML(treeElements,"",0,openid,0).result+"</table></div>";
           long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
           Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
   		    response.getWriter().print(html);

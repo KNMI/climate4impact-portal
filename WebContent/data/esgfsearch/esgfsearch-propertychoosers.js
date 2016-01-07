@@ -5,17 +5,20 @@ var esgfsearch_pc_mutiplyHexColor = function(hexcolor,factor){
   return "#"+r+g+b;
 };
 
-var ProjectPropertyChooser = function(){
+var PropertyChooser = function(config){
+  this.config = config;
 }
 
-ProjectPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
+PropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 
-ProjectPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+  var config = this.config;
   var k = new ESGFSearch_KVP(query);
   var selectedFacets = k.getKeyValues();
   var selectedPropertiesForFacet = selectedFacets[facetName];
   var foundProperties = 0;
   var createTile = function(color,enabled,name,description){
+   
     var extraCls = "";
     var cbcls = "c4i-esgfsearch-checkboxclear";
     if(!enabled){
@@ -35,7 +38,9 @@ ProjectPropertyChooser.prototype.init = function(parentEl, facetName,facetList,q
     var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\" style=\"background-color:"+color+";\"/>");
     d.attr('name',name);
     var title = name;
-
+    if(config.tilewidth){
+      d.css({"width":config.tilewidth});
+    }
     d.html(
       "<div class=\"esgfsearch-ppc-tileheader\">"+ "<div class=\""+cbcls+"\" style=\"float:none;\"></div>&nbsp;<span>"+name+""+
       "</span></div>"+
@@ -53,14 +58,14 @@ ProjectPropertyChooser.prototype.init = function(parentEl, facetName,facetList,q
   
   
   var main=$("<div class=\"esgfsearch-ppc-main\" ></div>");
-  for(var j=0;j<esgfsearch_pc_project.length;j++){
+  for(var j=0;j<this.config.properties.length;j++){
     var enable = true;
     if(facetList){
-      if(facetList.indexOf(esgfsearch_pc_project[j].name)==-1){
+      if(facetList.indexOf(this.config.properties[j].name)==-1){
         enable = false;
       }
     }
-    main.append(createTile(esgfsearch_pc_project[j].color,enable,esgfsearch_pc_project[j].name,esgfsearch_pc_project[j].longname));
+    main.append(createTile(this.config.properties[j].color,enable,this.config.properties[j].name,this.config.properties[j].longname));
   
   }
   parentEl.find(".esgfsearch-ppc").empty();
@@ -70,15 +75,19 @@ ProjectPropertyChooser.prototype.init = function(parentEl, facetName,facetList,q
 };
 
 
-var VariablePropertyChooser = function(){
+var NestedPropertyChooser = function(config){
+  this.config = config;
 }
 
-VariablePropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
+NestedPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 
-VariablePropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
-  
+NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+  var config = this.config;
   var createTile = function(color,name,description){
     var d= $("<div class=\"esgfsearch-ppc-tile\" style=\"background-color:"+color+";\"/>");
+    if(config.tilewidth){
+      d.css({"width":config.tilewidth});
+    }
     d.attr('name',name);
     d.html(
       "<div class=\"esgfsearch-ppc-tileheader\">"+name+""+
@@ -101,11 +110,11 @@ VariablePropertyChooser.prototype.init = function(parentEl, facetName,facetList,
   
   var main=$("<div class=\"esgfsearch-ppc-main\"></div>");
   var foundProperties = 0;
-  for(var j=0;j<esgfsearch_pc_variables.length;j++){
+  for(var j=0;j<this.config.properties.length;j++){
     
     var tilehtml=  "";
-    for(var i=0;i<esgfsearch_pc_variables[j].children.length;i++){
-      var c= esgfsearch_pc_variables[j].children[i];
+    for(var i=0;i<this.config.properties[j].children.length;i++){
+      var c= this.config.properties[j].children[i];
       var cls = "";
       var cbcls = "c4i-esgfsearch-checkboxclear";
       
@@ -124,12 +133,12 @@ VariablePropertyChooser.prototype.init = function(parentEl, facetName,facetList,
       }
       
   
-      tilehtml+="<div class=\"c4i-esgfsearch-property "+cls+" esgfsearch-ppc-tileproperty\" name=\""+c.name+"\">"+
+      tilehtml+="<div class=\"c4i-esgfsearch-property esgfsearch-ppc-tileproperty "+cls+"\" name=\""+c.name+"\">"+
         "<span class=\""+cbcls+"\"></span>"+c.shortname+" ("+c.name+")</div>";
       
     }
   
-    main.append(createTile(esgfsearch_pc_variables[j].color,esgfsearch_pc_variables[j].shortname,tilehtml));
+    main.append(createTile(this.config.properties[j].color,this.config.properties[j].shortname,tilehtml));
   }
   
   parentEl.find(".esgfsearch-ppc").empty();
@@ -138,3 +147,6 @@ VariablePropertyChooser.prototype.init = function(parentEl, facetName,facetList,
   parentEl.find(".esgfsearch-ppc").append(main);
   return foundProperties;
 };
+
+
+

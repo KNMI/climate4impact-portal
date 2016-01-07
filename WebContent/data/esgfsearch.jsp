@@ -51,9 +51,9 @@
 <div class="impactcontent">
 	
 
-<table class="headertable" ><tr><td><h1>Faceted search</h1></td><td class="headerhelptd"><button class="headerhelpbutton">Help</button></td></tr></table>
+<!-- <table class="headertable" ><tr><td><h1>Faceted search</h1></td><td class="headerhelptd"><button class="headerhelpbutton">Help</button></td></tr></table>-->
 
-<div id="searchcontainer"></div>
+<div id="searchcontainer" style="margin-top:15px;"></div>
 
 
 </div>   

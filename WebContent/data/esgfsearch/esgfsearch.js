@@ -53,7 +53,18 @@ var SearchInterface = function(options){
   //var impactESGFSearchEndPoint = "http://bhw485.knmi.nl:8280/impactportal/esgfsearch?";
   var impactESGFSearchEndPoint = "esgfsearch?";
   
-  var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access","institute","data_node","realm"];
+  var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access"];
+  var facetNameMapping = {
+    "project":"Project",
+    "variable":"Parameter",
+    "time_frequency":"Frequency",
+    "experiment":"RCP/Experiment",
+    "cf_standard_name":"CF name",
+    "cmor_table":"CMOR table",   
+    "data_node":"Data node",
+    "experiment_family":"Experiment family",
+    "variable_long_name":"Variable long name"
+  };
   
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
   query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
@@ -184,8 +195,10 @@ var SearchInterface = function(options){
     
     getAllFacets();
     
-    propertyChooser["project"] = new ProjectPropertyChooser();
-    propertyChooser["variable"] = new VariablePropertyChooser();
+    propertyChooser["project"] = new PropertyChooser(esgfsearch_pc_project);
+    propertyChooser["variable"] = new NestedPropertyChooser(esgfsearch_pc_variables);
+    propertyChooser["experiment"] = new NestedPropertyChooser(esgfsearch_pc_experiments);
+    propertyChooser["time_frequency"] = new PropertyChooser(esgfsearch_pc_time_frequency);
   };
   
  
@@ -201,10 +214,10 @@ var SearchInterface = function(options){
       if(a.ok=="ok"){
         el.addClass("c4i-esgfsearch-resultitem-ok");
         recentlyCheckedResponses[arg.id]=a;
-        el.children().first().html("");
+        el.find(".c4i-esgfsearch-resultitem-checker").html("");
       }else{
         el.addClass("c4i-esgfsearch-resultitem-wrong");
-        el.children().first().html(" - "+a.message);
+        el.find(".c4i-esgfsearch-resultitem-checker").html(" - "+a.message);
         recentlyCheckedResponses[arg.id]=false;
       }
     }
@@ -305,7 +318,24 @@ var SearchInterface = function(options){
     };
     html+="<div class=\"c4i-esgfsearch-resultlist\">";
     for(var r in data.response.results){
-      html+="<span class=\"c4i-esgfsearch-resultitem resultSelector c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">Id: "+data.response.results[r].id+" <span>checking...</span><br/><span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span></span>";
+     // html+="<span  name=\""+data.response.results[r].id+"\">";
+      html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">";
+      
+      html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\"></span>";
+       html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
+       html+= data.response.results[r].id.replaceAll("."," ");
+       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking...</span><br/>";
+//        html+="<span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span>";
+       html+="</span>";
+       //html+= "<span style=\"float:right;\">";
+//        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-download\"></span>";
+//        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-process\"></span>";
+      // html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-selectable c4i-esgfsearch-dataset-imgunchecked\"></span>";
+       html+="<span class=\"c4i-esgfsearch-dataset-expandedarea\">";
+       html+="<span class=\"c4i-esgfsearch-dataset-catalogurl\"></span>";
+       html+="<span class=\"c4i-esgfsearch-dataset-catalogdetails\"></span>";
+      html+="</span>";
+       html+="</span>";
     }
     html+="</div>";
     var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
@@ -313,43 +343,70 @@ var SearchInterface = function(options){
     rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").first().html(html);
     
     rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
-      
       addToBasket();
     });
+   
+    rootElement.find(".c4i-esgfsearch-dataset-expandedarea").hide();
     
-    rootElement.find(".c4i-esgfsearch-resultitem").attr('onclick','').click(function(t){
-      if(!getSelection().toString()){
-        var clickedID = $(this).attr("name");
-        var catalogObject = null;
-        for(var r in data.response.results){
-          if(clickedID == data.response.results[r].id){
-            catalogObject = data.response.results[r];
-            break;
-          }
-        }
-        if(catalogObject == null){
-          alert("Catalog contains no valid URL / link.");
-          //alert("Internal error at esgfsearch.js at line 173");
-          return;
-        }
-        
-        if($(this).hasClass("c4i-esgfsearch-facetselected")){
-          $(this).removeClass("c4i-esgfsearch-facetselected");
-        }else{
-          $(this).addClass("c4i-esgfsearch-facetselected");
-        }
-        
-        var el = jQuery('<div></div>', {
-          title: 'Dataset '+catalogObject.id,
-        }).dialog({
-          width:950,
-          height:600
-        });
-        
-        
-        
-        renderCatalogBrowser({element:el,url:catalogObject.url});
+    rootElement.find(".c4i-esgfsearch-dataset-selectable").attr('onclick','').click(function(t){
+      if($(this).hasClass("c4i-esgfsearch-dataset-imgchecked")){
+        $(this).removeClass("c4i-esgfsearch-dataset-imgchecked");
+        $(this).addClass("c4i-esgfsearch-dataset-imgunchecked");
+      }else{
+        $(this).removeClass("c4i-esgfsearch-dataset-imgunchecked");
+        $(this).addClass("c4i-esgfsearch-dataset-imgchecked");
       }
+    });
+    
+    rootElement.find(".c4i-esgfsearch-dataset-collapsible").attr('onclick','').click(function(t){
+   
+      if($(this).hasClass("c4i-esgfsearch-dataset-imgcollapsed")){
+        $(this).removeClass("c4i-esgfsearch-dataset-imgcollapsed");
+        $(this).addClass("c4i-esgfsearch-dataset-imgexpand");
+        if(!getSelection().toString()){
+          var clickedID = $(this).parent().attr("name");
+          var catalogObject = null;
+          for(var r in data.response.results){
+            if(clickedID == data.response.results[r].id){
+              catalogObject = data.response.results[r];
+              break;
+            }
+          }
+          if(catalogObject == null){
+            alert("Catalog contains no valid URL / link.");
+            //alert("Internal error at esgfsearch.js at line 173");
+            return;
+          }
+          el = $(this).parent().find(".c4i-esgfsearch-dataset-expandedarea").first().show();
+          el = $(this).parent().find(".c4i-esgfsearch-dataset-catalogurl");
+          el.html("<b>Catalog Url:</b> <a href=\""+catalogObject.url+"\">"+catalogObject.url+"</a>");
+          el = $(this).parent().find(".c4i-esgfsearch-dataset-catalogdetails");
+          
+          var k = new ESGFSearch_KVP(query);
+          var selectedFacets = k.getKeyValues();
+          var selectedPropertiesForFacet = selectedFacets["variable"];
+          var variableFilter='';
+          if(selectedPropertiesForFacet){
+            console.log(selectedPropertiesForFacet);
+        
+            for(var j=0;j<selectedPropertiesForFacet.length;j++){
+              if(variableFilter.length>0)variableFilter+="|";
+              variableFilter+=selectedPropertiesForFacet[j];
+            }
+          }
+          renderCatalogBrowser({element:el,url:catalogObject.url,variables:variableFilter});
+        }
+      }else{
+        $(this).removeClass("c4i-esgfsearch-dataset-imgexpand");
+        $(this).addClass("c4i-esgfsearch-dataset-imgcollapsed");
+        $(this).parent().find(".c4i-esgfsearch-dataset-expandedarea").hide();
+
+      }
+//     });
+// 
+//     
+//     rootElement.find(".c4i-esgfsearch-resultitem").attr('onclick','').click(function(t){
+
     });
     
     checkResponses(data);
@@ -650,7 +707,9 @@ var SearchInterface = function(options){
     for(var kvp in kvps){
       for(var vkey in kvps[kvp]){
         var v= kvps[kvp][vkey];
-        html+="<span class=\"c4i-esgfsearch-facets c4i-esgfsearch-facetchoosed c4i-esgfsearch-roundedborder\"><span class=\"c4i-esgfsearch-removefilterproperty c4i-esgfsearch-checkbox\" name=\""+kvp+","+v+"\"></span>"+kvp+" : "+decodeURIComponent(v)+"</span>";
+        html+="<span class=\"c4i-esgfsearch-facets c4i-esgfsearch-facetchoosed c4i-esgfsearch-roundedborder\">";
+        html+="<span class=\"c4i-esgfsearch-removefilterproperty c4i-esgfsearch-checkbox\" name=\""+kvp+","+v+"\"></span>"+_getFacetName(kvp)+" : "+decodeURIComponent(v);
+        html+="</span>";
       }
     }
     if(html.length==0){
@@ -669,7 +728,17 @@ var SearchInterface = function(options){
     
   };
   
+  var _getFacetName = function(id){
 
+    if(facetNameMapping[id]){
+      return facetNameMapping[id];
+    }else{
+      var d=id;
+      return d.charAt(0).toUpperCase() + d.slice(1);
+    }
+  };
+  
+  var listAllFacets = false;
 
   var _getAllFacets = function(args,ready){
     showFilters();
@@ -700,16 +769,20 @@ var SearchInterface = function(options){
         }
       }
       
+
+      
       //Add remaining facets sorted
-      var sortedList = [];for(var key in result.facets){sortedList.push(key);};sortedList.sort();
-      for(var j=0;j<sortedList.length;j++){
-        var key = sortedList[j];
-        //console.log(key);
-        if(!facets[key]){
-          facets[key]=result.facets[key];
+      if(listAllFacets){
+        var sortedList = [];for(var key in result.facets){sortedList.push(key);};sortedList.sort();
+        for(var j=0;j<sortedList.length;j++){
+          var key = sortedList[j];
+          //console.log(key);
+          if(!facets[key]){
+            facets[key]=result.facets[key];
+          }
         }
       }
-      
+
       var count;
       var html = "";
       for(var facetkey in facets){
@@ -728,13 +801,19 @@ var SearchInterface = function(options){
             facet+=" c4i-esgfsearch-facetdisabled";
           }
         }
-        facet+="\">"+facetkey+" ("+count+")</span>";
+        facet+="\">"+_getFacetName(facetkey)+" ("+count+")</span>";
         
         //if(!selectedFacets[facetkey]){
           if(count>0){
             html+=facet;
           }
         //}
+      }
+      
+      if(!listAllFacets){
+        html+="<span name=\"showall\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">&gt; more...</span>";
+      }else{
+         html+="<span name=\"showdefault\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">^ less</span>";
       }
       html+="<div class=\"c4i-esgfsearch-selectfacet-container\"></div>";
       html+="</div>";
@@ -747,6 +826,14 @@ var SearchInterface = function(options){
         rootElement.find(".c4i-esgfsearch-clickablefacet").removeClass("c4i-esgfsearch-facetselected");
         $(this).addClass("c4i-esgfsearch-facetselected");
         loadAndDisplayFacet($(this).attr("name"));
+      });
+      rootElement.find(".c4i-esgfsearch-listallfacets").attr('onclick','').click(function(t){
+        if($(this).attr("name")=="showall"){
+          listAllFacets=true;
+        }else{
+           listAllFacets=false;
+        }
+         getAllFacets();
       });
       generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };

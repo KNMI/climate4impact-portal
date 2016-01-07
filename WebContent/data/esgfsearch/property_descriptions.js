@@ -97,7 +97,7 @@ var property_descriptions = {
     "piControl": "pre-industrial control",
     "rcp26": "representative concentration pathway with radiative forcing of 2.6 W m-2",
     "rcp45": "representative concentration pathway with radiative forcing of 4.5 W m-2",
-    "rcp60": "representative concentration pathway with radiative forcing of 60 W m-2",
+    "rcp60": "representative concentration pathway with radiative forcing of 6.0 W m-2",
     "rcp85": "representative concentration pathway with radiative forcing of 8.5 W m-2",
     "sst2030": "2030 time-slice",
     "sst2090": "2090 time slice",

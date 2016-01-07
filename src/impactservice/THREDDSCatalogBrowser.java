@@ -279,22 +279,20 @@ public class THREDDSCatalogBrowser {
                 if(variableList.length() == 0){
                   put = true;
                 }else{
+                  boolean foundSomething=false;
                   for(int v=0;v<variableList.length();v++){
                     try{
                       if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
                         put=true;
+                        foundSomething=true;
                         break;
                       }
                     }catch(Exception e){
                     }
                   }
+                  //if(foundSomething==false)put=true;
                 }
-                //if(variableList.length()==0)put=true;
-//                if(variableList.length()==0){
-//                  Debug.println(leaf.getString("text")+" - "+c.length());
-//                 // if(a!=null)put=true;
-//                        
-//                }
+
               }
             }catch(Exception e){
               Debug.errprintln(e.getMessage());

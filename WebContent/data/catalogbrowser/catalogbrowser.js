@@ -33,7 +33,7 @@ var CatalogBrowser = function(options){
         var input = $(this);
         if(input.is(":checked")){
           if(variableFilter.length>0)variableFilter+="|";
-                                                          variableFilter+=input.attr('id');
+          variableFilter+=input.attr('id');
         }
         
       });
@@ -65,11 +65,20 @@ var CatalogBrowser = function(options){
         options.element.find(".varFilter").keydown(preventSubmit);
         options.element.find(".varFilter").keyup(preventSubmit);
         
-        options.element.find(".varFilter").find('input[type="button"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});
+        options.element.find(".varFilter").find('input[type="checkbox"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});
+        //options.element.find(".varFilter").find('input[type="checkbox"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});1
         options.element.find('a').attr('target','_blank');
       };
       
       var url = "/impactportal/ImpactService?service=catalogbrowser&format=text/html&node="+encodeURIComponent(options.url);
+      if(variableFilter==undefined){
+        if(options.variables && options.variablesSet!==true){
+          if(variableFilter==undefined)variableFilter="";
+          if(variableFilter.length>0)variableFilter+="|";
+          variableFilter+=options.variables;
+          options.variablesSet= true;
+        }
+      }
       var filters = "";
       if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}
       if(variableFilter!=undefined){filters+="&variables="+encodeURIComponent(variableFilter);}

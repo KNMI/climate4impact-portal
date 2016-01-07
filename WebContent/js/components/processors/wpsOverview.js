@@ -89,7 +89,8 @@ var wpsOverView = {
       text : "WPS identifier",
       flex : 1,
       dataIndex : 'id',
-      sortable : true
+      sortable : true,
+      hidden:true
     }
 
     ],

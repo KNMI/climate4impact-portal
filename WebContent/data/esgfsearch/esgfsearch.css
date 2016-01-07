@@ -58,6 +58,12 @@
 .c4i-esgfsearch-facets:hover  {
   background-color: #8F8;
   color:black;
+ 
+}
+
+.c4i-esgfsearch-facets-selectmoreless{
+  background-color: #77F;
+
 }
 
 .c4i-esgfsearch-facetselected{
@@ -130,9 +136,10 @@
 }
 
 .c4i-esgfsearch-property-disabled{
-  color:#333;
+  color:#888 !important;
  text-decoration: line-through;
   font-weight:normal;
+ 
 }
 .c4i-esgfsearch-property-disabled:hover{
  /*color:gray;
@@ -173,16 +180,18 @@
 .c4i-esgfsearch-resultlist{
   overflow:auto;
   /*max-height:260px;*/
+  margin:0px;padding:0px;
   border:1px solid #668;
   background-color:#FFF; 
 }
 
 .c4i-esgfsearch-resultitem{
- padding:0px 16px 0px 16px;
+ padding:0px;
  margin:0px;
  overflow:hidden;
- cursor: pointer; cursor: hand;
- line-height:20px;
+ 
+ line-height:16px;
+
  background-color: #FFF;
  color:black;
  display:block;
@@ -204,12 +213,17 @@
    background-color: #F88;
 }
 
+/*
 .c4i-esgfsearch-resultitem:hover  {
   background-color: #D0FFD0;
   color:black;
+}*/
+
+
+.c4i-esgfsearch-resultitem-content{
+  line-height:32px;
+   display:inline-block;
 }
-
-
 
 
 .c4i-esgfsearch-property-buttonapply{
@@ -325,7 +339,7 @@ text-align:center;
 }
 
 .esgfsearch-ppc-tileheader{
-  width:200px;
+  width:100%;
   height:28px;
   line-height:28px;
   font-weight:bold;
@@ -376,7 +390,7 @@ line-height:16px;
   border-radius: 5px 5px 0px 0px;
   background:#C8C8CF;
   font-weight:normal;
-  width:185px;
+  width:210px;
   height:24px;
   text-align:center;
   line-height:24px;
@@ -413,5 +427,107 @@ line-height:16px;
    background-color:#FFF;
  border:1px solid #668;
  padding:0px;
+  
+}
+
+.c4i-esgfsearch-dataset-baseimage{
+
+  width:32px;
+  height:32px;
+  line-height:0px;
+  display:inline-block;
+  cursor: pointer; cursor: hand;
+  margin:1px 0px 1px 2px;
+  padding:0px;
+  float:left;
+   overflow: hidden;
+
+
+}
+.c4i-esgfsearch-dataset-baseimage:hover{
+    opacity: 0.4;
+    filter: alpha(opacity=40); /* For IE8 and earlier */
+}
+
+
+.c4i-esgfsearch-dataset-imgcollapsed{
+    background-image:url("icon_right.png") !important;
+}
+.c4i-esgfsearch-dataset-imgexpand{
+    background-image:url("icon_down.png") !important;
+}
+
+.c4i-esgfsearch-dataset-imgchecked{
+    background-image:url("icon_checkboxchecked.png") !important;
+}
+.c4i-esgfsearch-dataset-imgunchecked{
+    background-image:url("icon_checkboxunchecked.png") !important;
+}
+
+.c4i-esgfsearch-dataset-process{
+    background-image:url("icon_calculator.png") !important;
+}
+
+.c4i-esgfsearch-dataset-download{
+    background-image:url("icon_download.png") !important;
+}
+
+.c4i-esgfsearch-dataset-expandedarea{
+  margin:0px 0px 1px 17px;
+  padding:5px;
+  background-color:#FFF;
+  /*border-top:1px solid #AAB;
+  border-left:1px solid #AAB;
+  border-bottom:1px solid #AAB;*/
+ /* border-bottom:2px solid #DDD;*/
+  display:block;
+    background-color:#FFF;
+}
+.c4i-esgfsearch-dataset-catalogurl{
+  margin:5px;
+  line-height:20px;
+  height:20px;
+  font-weight: bold; 
+ 
+}
+.c4i-esgfsearch-dataset-catalogdetails{
+  /* display:block;
+   margin:0px;*/
+   background-color:#FFF;
+}
+
+.c4i-catalogbrowser-variableandtextfilter{
+  margin:4px;
+}
+
+.c4i-catalogbrowser-table  {
+    border-collapse: collapse;
+    width: 100%;
+
+    border-spacing: 0;
+}
+
+.c4i-catalogbrowser-table th, .c4i-catalogbrowser-table td {
+  border: 1px solid #ddd;
+  padding: 3px 8px 3px 8px;
+  text-align: left;
+    text-align: left;
+    padding: 8px;
+}
+
+
+
+.c4i-catalogbrowser-table tr:nth-child(even){background-color: #f5f5f5}
+
+/*.c4i-catalogbrowser-table tr:hover {background-color: #f0f0f0 !important}*/
+
+.c4i-catalogbrowser-table th{
+     background: none repeat scroll 0 0 #428bca;
+  
+  
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+  
   
 }
