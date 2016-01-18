@@ -5,14 +5,22 @@ import impactservice.LoginManager;
 import impactservice.THREDDSCatalogBrowser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,13 +43,16 @@ import tools.Tools;
 public class Search {
   private String searchEndPoint = null;
   private String cacheLocation = null;
-  public Search(String searchEndPoint, String cacheLocation) {
+  private ExecutorService getCatalogExecutor = null;
+  
+  public Search(String searchEndPoint, String cacheLocation, ExecutorService getCatalogExecutor) {
     this.searchEndPoint = searchEndPoint;
     this.cacheLocation = cacheLocation;
+    this.getCatalogExecutor =getCatalogExecutor;
   }
 
   public JSONResponse getFacets(String facets, String query) {
-    int searchLimit = 50;
+    int searchLimit = 25;
     try{
       LockOnQuery.lock(facets+query,0);
       JSONResponse r = _getFacetsImp(facets,query,searchLimit);
@@ -243,29 +254,86 @@ public class Search {
     return r;
   }
 
- 
-  public JSONResponse checkURL(String query,HttpServletRequest request) {
-    
-    Debug.println("Checking: "+query);
-    int status = LockOnQuery.lock(query,1000);
-    if(status == 1){
-      JSONResponse r = new JSONResponse(request);
-      JSONObject a = new JSONObject();
-      try {
-        a.put("message","timeout");
-      } catch (JSONException e) {
+
+  
+  public class ASyncGetCatalogRequest implements Callable<ASyncGetCatalogResponse> {
+    private String url;
+    private HttpServletRequest request;
+    public ASyncGetCatalogRequest(String url, HttpServletRequest request) {
+        this.url = url;
+        this.request = request;
+    }
+
+    @Override
+    public ASyncGetCatalogResponse call() throws Exception {
+        return new ASyncGetCatalogResponse(getCatalog(url,request));
+    }
+  }
+  
+  public class ASyncGetCatalogResponse {
+      private String body;
+      boolean _isFinished=false;
+  
+      public ASyncGetCatalogResponse(String string) {
+          this.body = string;
+          _isFinished=true;
       }
-      r.setMessage(a);
-      return r;
+  
+      public String getBody() {
+          return body;
+      }
+      
+      public boolean isFinished(){
+        return _isFinished;
+      }
+  }
+  
+
+  static Map<String,URLBeingChecked> urlsBeingChecked = new  ConcurrentHashMap<String, URLBeingChecked> ();
+  
+  class URLBeingChecked{
+    public Future<ASyncGetCatalogResponse> response;
+    public URLBeingChecked(String query, HttpServletRequest request) {
+      try {
+        response = getCatalogExecutor.submit(new ASyncGetCatalogRequest(query,request));
+        
+      } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
     
+  }
 
-    JSONResponse r = _checkURL(query,request);
-    
-    LockOnQuery.release(query);
-    Debug.println("Finished: "+query);
-    
-    return r;
+  public  JSONResponse  checkURL(String query,HttpServletRequest request) {
+    synchronized(urlsBeingChecked){
+      Debug.println("Checking: "+query);
+      JSONResponse r = new JSONResponse(request);
+      if(urlsBeingChecked.containsKey((String)query)==false){
+        Debug.println("INSERT");
+        URLBeingChecked urlBeingChecked = new URLBeingChecked(query,request);
+        urlsBeingChecked.put((String)query, urlBeingChecked);
+        r.setMessage("{\"message\":\"start checking\",\"ok\":\"busy\"}");
+      }else{
+        URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
+        if(urlBeingChecked.response.isDone()==false){
+          r.setMessage("{\"message\":\"still checking\",\"ok\":\"busy\"}");
+          Debug.println("STILL");
+        }else{
+          try {
+            r.setMessage(urlBeingChecked.response.get().getBody());
+          } catch (InterruptedException e) {
+            r.setException("InterruptedException", e);
+            e.printStackTrace();
+          } catch (ExecutionException e) {
+            r.setException("ExecutionException", e);
+            e.printStackTrace();
+          }
+          Debug.println("Done");
+        }
+      }
+      return r;
+    }
   }
   
   public String getCatalog(String catalogURL,HttpServletRequest request) throws Exception{
@@ -308,6 +376,8 @@ public class Search {
         catalogURL = catalogURL.split("#")[0];
       }
       
+      
+      
       response = HTTPTools.makeHTTPGetRequest(catalogURL);
       ISOK = true;
     } catch (WebRequestBadStatusException e) {
@@ -316,6 +386,8 @@ public class Search {
         errorMessage = "Not found (404)";
       }else if(e.getStatusCode()==403){
         errorMessage = "Unauthorized (403)";
+      }else if(e.getStatusCode()==504){
+        errorMessage = "Gateway timeout (504)";
       }else{
         errorMessage = "Code ("+e.getStatusCode()+")";
       }
@@ -333,24 +405,8 @@ public class Search {
     return response;
   }
   
-  private JSONResponse _checkURL(String query,HttpServletRequest request) {
-    JSONObject jsonresult = new JSONObject();
-    try{
-      getCatalog(query,request);
-      jsonresult.put("ok", "ok");
-    }catch(Exception e){
-      //Debug.println(e.getMessage());
-      try {
-        jsonresult.put("ok", "false");
-        jsonresult.put("message", e.getMessage());
-      } catch (JSONException e1) {
-      }
-    }
-    String message = jsonresult.toString();
-    JSONResponse result = new JSONResponse(request);
-    result.setMessage(message);
-    return result;
-  }
+  
+
   private class MakeFlat{
     JSONArray result = null;
    

@@ -342,6 +342,12 @@ public class OAuth2Handler {
           if (id_token.indexOf(".") != -1) {
             UserInfo userInfo = getIdentifierFromJWTPayload(TokenDecoder
                 .base64Decode(id_token.split("\\.")[1]));
+            
+//            userInfo.user_openid =userInfo.user_identifier;
+//            userInfo.user_openid =  userInfo.user_openid.replaceAll("\\/", "_");
+//            userInfo.user_openid =  userInfo.user_openid.replaceAll("\\.", "_");
+//            userInfo.user_openid = "https://climate4impact.eu/"+userInfo.user_openid ;
+//            Debug.println("Setting openid to ["+ userInfo.user_openid+"]");
             setSessionInfo(request, userInfo);
 
             String accessToken = oauth2Response.getAccessToken();

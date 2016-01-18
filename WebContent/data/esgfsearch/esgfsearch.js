@@ -206,37 +206,61 @@ var SearchInterface = function(options){
   var recentlyCheckedResponses = [];
   
   var _checkResponse = function(arg,ready){
-    var setResult = function(arg,a){
-    
+  
+    var setResult = function(arg,a){    
       var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
-     
-      el.removeClass("c4i-esgfsearch-resultitem-checking");
+      
       if(a.ok=="ok"){
-        el.addClass("c4i-esgfsearch-resultitem-ok");
-        recentlyCheckedResponses[arg.id]=a;
-        el.find(".c4i-esgfsearch-resultitem-checker").html("");
+    	  el.removeClass("c4i-esgfsearch-resultitem-checking");
+    	  el.addClass("c4i-esgfsearch-resultitem-ok");
+    	  el.find(".c4i-esgfsearch-resultitem-checker").html("");
+      }else if(a.ok=="false"){
+    	  el.removeClass("c4i-esgfsearch-resultitem-checking");
+    	  el.addClass("c4i-esgfsearch-resultitem-wrong");
+    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - "+a.message);
       }else{
-        el.addClass("c4i-esgfsearch-resultitem-wrong");
-        el.find(".c4i-esgfsearch-resultitem-checker").html(" - "+a.message);
-        recentlyCheckedResponses[arg.id]=false;
+    	  var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
+    	  el.addClass(".c4i-esgfsearch-resultitem-checking"); 
+    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - checking .. ");
+    	  
+    	 // console.log("Busy for "+arg.id);
+    	  
+    	  function retry(arg){
+    		  el.find(".c4i-esgfsearch-resultitem-checker").html(" - checking ... ");
+    		  setTimeout(function(){
+    			  checkResponseFifo.call(arg);
+    		  }, 300); 
+    		  
+    	  };
+    	  
+    	  setTimeout(function(){
+    		  retry(arg);
+		  }, 5000); 
       }
-    }
+    };
+    
     if(recentlyCheckedResponses[arg.id]){
-      setResult(arg,recentlyCheckedResponses[arg.id]);
-      ready();
-      return;
+      if(recentlyCheckedResponses[arg.id].ok=="ok"){
+	    setResult(arg,recentlyCheckedResponses[arg.id]);
+	    ready();
+	    return;
+      }
     }
     
     var httpCallback = function(a){
-
-      setResult(arg,a);
+      recentlyCheckedResponses[arg.id]=a;
+      setResult(arg,recentlyCheckedResponses[arg.id]);
+ 
+      return;
     };
+    
     //console.log(arg);
     if(!arg.url){
       httpCallback({message:"Error: no URL defined."});
       ready();
       return;
     }
+    
     var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
     $.ajax({
       url: url,
@@ -324,7 +348,7 @@ var SearchInterface = function(options){
       html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\"></span>";
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
        html+= data.response.results[r].id.replaceAll("."," ");
-       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking...</span><br/>";
+       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span><br/>";
 //        html+="<span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span>";
        html+="</span>";
        //html+= "<span style=\"float:right;\">";

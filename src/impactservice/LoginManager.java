@@ -153,6 +153,9 @@ public class LoginManager {
       String userName = Configuration.LoginConfig.getMyProxyDefaultUserName();
       if (userName == null) {
         userName = user.getOpenId();
+        if(userName == null){
+          userName = user.getInternalName();
+        }
       }
       if (userName == null) {
         Debug.errprintln("No openid set for " + user.getId());

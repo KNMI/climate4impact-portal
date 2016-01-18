@@ -17,6 +17,7 @@ import tools.Debug;
 import tools.HTTPTools;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
+import esgfsearch.ESGFSearchServlet;
 import esgfsearch.Search;
 
 public class THREDDSCatalogBrowser {
@@ -67,7 +68,7 @@ public class THREDDSCatalogBrowser {
       //Debug.println("Getting "+rootCatalog);
 
       //Try to get from local storage:
-      Search esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      Search esgfSearch = ESGFSearchServlet.getSearch();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
       String result = esgfSearch.getCatalog(catalogURL,request);
       
       //Debug.println("catalogURL"+catalogURL);
