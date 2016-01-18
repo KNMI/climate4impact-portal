@@ -318,7 +318,6 @@ public class Search {
         URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
         if(urlBeingChecked.response.isDone()==false){
           r.setMessage("{\"message\":\"still checking\",\"ok\":\"busy\"}");
-          Debug.println("STILL");
         }else{
           try {
             r.setMessage(urlBeingChecked.response.get().getBody());

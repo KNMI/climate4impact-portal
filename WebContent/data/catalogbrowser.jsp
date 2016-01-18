@@ -6,6 +6,8 @@
     <jsp:include page="../includes-ext.jsp" />
     <script type="text/javascript" src="/impactportal/js/jqueryextensions/jquery.collapsible.min.js"></script>
     <link href="/impactportal/js/es-doc/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
+    
+    <link href="/impactportal/data/esgfsearch/esgfsearch.css" media="screen" rel="stylesheet" type="text/css" />
     <script src="/impactportal/js/es-doc/esdoc-min.js" type="text/javascript"></script>
       <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
         <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
