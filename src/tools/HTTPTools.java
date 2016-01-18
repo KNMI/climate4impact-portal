@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
@@ -50,6 +51,8 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -134,7 +137,7 @@ public class HTTPTools extends HttpServlet {
     }
 
     public String getMessage() {
-      return "HTTP status code " + statusCode;
+      return result;
     }
   }
 
@@ -233,7 +236,10 @@ public class HTTPTools extends HttpServlet {
         
       }
       
-      
+      int timeout = 5; // seconds
+      HttpParams httpParams = httpclient.getParams();
+      HttpConnectionParams.setConnectionTimeout(httpParams, timeout * 1000); // http.connection.timeout
+      HttpConnectionParams.setSoTimeout(httpParams, timeout * 1000); // http.socket.timeout
       
       
       response = httpclient.execute(httpget);
@@ -274,9 +280,12 @@ public class HTTPTools extends HttpServlet {
       throw sSLPeerUnverifiedException;
     } catch (UnknownHostException unknownHostException) {
       throw unknownHostException;
-    } catch (IOException e) {
+    } catch(SocketTimeoutException e){
+      //Debug.printStackTrace(e);
+      throw new WebRequestBadStatusException(408, "Request time out");
+    }catch (IOException e) {
       Debug.printStackTrace(e);
-      throw new WebRequestBadStatusException(404, "IOException: Forbidden");
+      throw new WebRequestBadStatusException(400, "IOException");
     } catch (UnrecoverableKeyException e) {
       Debug.printStackTrace(e);
       throw new WebRequestBadStatusException(400,"UnrecoverableKeyException");

@@ -214,11 +214,7 @@ var SearchInterface = function(options){
     	  el.removeClass("c4i-esgfsearch-resultitem-checking");
     	  el.addClass("c4i-esgfsearch-resultitem-ok");
     	  el.find(".c4i-esgfsearch-resultitem-checker").html("");
-      }else if(a.ok=="false"){
-    	  el.removeClass("c4i-esgfsearch-resultitem-checking");
-    	  el.addClass("c4i-esgfsearch-resultitem-wrong");
-    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - "+a.message);
-      }else{
+      }else if(a.ok=="busy"){
     	  var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
     	  el.addClass(".c4i-esgfsearch-resultitem-checking"); 
     	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - checking .. ");
@@ -236,6 +232,10 @@ var SearchInterface = function(options){
     	  setTimeout(function(){
     		  retry(arg);
 		  }, 5000); 
+      }else {
+    	  el.removeClass("c4i-esgfsearch-resultitem-checking");
+    	  el.addClass("c4i-esgfsearch-resultitem-wrong");
+    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - "+a.message);
       }
     };
     

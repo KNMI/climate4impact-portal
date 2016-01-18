@@ -310,7 +310,7 @@ public class Search {
       Debug.println("Checking: "+query);
       JSONResponse r = new JSONResponse(request);
       if(urlsBeingChecked.containsKey((String)query)==false){
-        Debug.println("INSERT");
+        //Debug.println("INSERT");
         URLBeingChecked urlBeingChecked = new URLBeingChecked(query,request);
         urlsBeingChecked.put((String)query, urlBeingChecked);
         r.setMessage("{\"message\":\"start checking\",\"ok\":\"busy\"}");
@@ -318,16 +318,27 @@ public class Search {
         URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
         if(urlBeingChecked.response.isDone()==false){
           r.setMessage("{\"message\":\"still checking\",\"ok\":\"busy\"}");
+          //Debug.println("STILL");
         }else{
           try {
             r.setMessage(urlBeingChecked.response.get().getBody());
-          } catch (InterruptedException e) {
-            r.setException("InterruptedException", e);
+          } catch (Exception e) {
             e.printStackTrace();
-          } catch (ExecutionException e) {
-            r.setException("ExecutionException", e);
-            e.printStackTrace();
+            JSONObject m = new JSONObject();
+            try {
+              String message = e.getMessage();
+              message=message.replaceAll("tools.HTTPTools\\$WebRequestBadStatusException: ", "");
+              Debug.errprintln("Failed:"+message);
+              m.put("message",message);
+              m.put("ok", "false" );
+           
+            } catch (JSONException e1) {
+            }
+            r.setMessage(m);
+            
+            
           }
+          urlsBeingChecked.remove(query);
           Debug.println("Done");
         }
       }
@@ -379,17 +390,17 @@ public class Search {
       
       response = HTTPTools.makeHTTPGetRequest(catalogURL);
       ISOK = true;
-    } catch (WebRequestBadStatusException e) {
-      Debug.println("CATALOG GET WebRequestBadStatusException");
-      if(e.getStatusCode()==404){
-        errorMessage = "Not found (404)";
-      }else if(e.getStatusCode()==403){
-        errorMessage = "Unauthorized (403)";
-      }else if(e.getStatusCode()==504){
-        errorMessage = "Gateway timeout (504)";
-      }else{
-        errorMessage = "Code ("+e.getStatusCode()+")";
-      }
+//    } catch (WebRequestBadStatusException e) {
+//      Debug.println("CATALOG GET WebRequestBadStatusException");
+//      if(e.getStatusCode()==404){
+//        errorMessage = "Not found (404)";
+//      }else if(e.getStatusCode()==403){
+//        errorMessage = "Unauthorized (403)";
+//      }else if(e.getStatusCode()==504){
+//        errorMessage = "Gateway timeout (504)";
+//      }else{
+//        errorMessage = e.getMessage()+" code ("+e.getStatusCode()+")";
+//      }
     } catch (IOException e) {
       Debug.println("CATALOG GET IOException");
       errorMessage = e.getMessage();
