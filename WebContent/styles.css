@@ -2355,78 +2355,12 @@ input[type=text],input[type="password"],textarea {
 	border: 1px solid red;
 }
 
-.openid_identifier {
-	background: #fff url("images/openid.gif") no-repeat;
-	background-position: 0 50%;
-	padding-left: 18px;
-	border: 1px solid gray;
-	height: 18px;
-	padding-top: 3px;
-	padding-bottom: 3px;
-	width: 518px;
-}
-
-.logo_USA {
-	background-image: url("images/countries/USA.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_UK {
-	background-image: url("images/countries/UK.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_Sweden {
-	background-image: url("images/countries/Sweden.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_Germany {
-	background-image: url("images/countries/Germany.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_France {
-	background-image: url("images/countries/France.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_China {
-	background-image: url("images/countries/China.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_Italy {
-	background-image: url("images/countries/Italy.png") !important;
-	width: 16px;
-	height: 16px;
-}
-
-.logo_Australie {
-	background-image: url("images/countries/Australia.png") !important;
-	width: 16px;
-	height: 16px;
-}
 
 a img {
 	border: none;
 }
 
 
-.logindialogfooter{
-	border:none;
-	padding:5px;
-	background:white;
-	color:#666;
-	font-size:12px;
-	margin:0px;
-}
 
 .topDialog{
 	z-index:300000 !important;
@@ -2558,14 +2492,6 @@ a img {
 
 
 
-.oauth2loginbox{
-	 line-height: 40px;
-}
-.oauth2loginbox img{
-	vertical-align: middle;
-	width:40px;
-	height:40px;
-}
 
 /*
 .x-grid-tree-node-expanded .x-tree-icon-parent {

@@ -19,6 +19,17 @@
     <servlet-name>ImpactService</servlet-name>
     <url-pattern>/ImpactService/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>ImpactService</servlet-name>
+    <url-pattern>/tokenapi/*</url-pattern>
+  </servlet-mapping>
+  
+    <servlet-mapping>
+    <servlet-name>ImpactService</servlet-name>
+    <url-pattern>/basket/*</url-pattern>
+  </servlet-mapping>
+  
   <servlet>
     <description></description>
     <display-name>DownscalingService</display-name>
@@ -156,7 +167,8 @@
     <servlet-name>OAuth2Servlet</servlet-name>
     <url-pattern>/oauth</url-pattern>
   </servlet-mapping>
-   <servlet>
+  
+  <servlet>
     <description></description>
     <display-name>ESGFSearchServlet</display-name>
     <servlet-name>ESGFSearchServlet</servlet-name>
@@ -166,4 +178,5 @@
     <servlet-name>ESGFSearchServlet</servlet-name>
     <url-pattern>/esgfsearch</url-pattern>
   </servlet-mapping>
+  
 </web-app>

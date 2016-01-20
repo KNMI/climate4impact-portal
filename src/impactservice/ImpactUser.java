@@ -118,6 +118,12 @@ public class ImpactUser {
   public String getOpenId(){
     return this.openid ;
   }
+  public String getOpenIdAsString(){
+    if(this.openid==null){
+      return "Not available from this identity provider.";
+    }
+    return this.openid ;
+  }
   public void setOpenId(String openid) {
     this.openid = openid;
   }

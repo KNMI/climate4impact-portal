@@ -8,8 +8,10 @@
 <jsp:include page="../includes-ui.jsp" />
 <link rel="stylesheet" href="/impactportal/account/login.css" type="text/css" />
 <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
+
 </head>
 <body>
+
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="login_include_openidcomposition.jsp" />
 	
@@ -40,7 +42,7 @@
 
 			</div>
 
-			<h1>Sign in with your ESGF OpenID account</h1>
+			<h1>Sign in</h1>
 			<div class="textstandardleft" style="width:540px;">
 
 				
@@ -83,7 +85,7 @@
 				
 				
 				<!--  Your climate4impact identifier is:<br/><strong><%=user.getId()%></strong><br /><br/>-->
-				Your ESGF OpenId identifier is:<br/><strong><%=user.getOpenId()%></strong><br /><br/>
+				Your ESGF OpenId identifier is:<br/><strong><%=user.getOpenIdAsString()%></strong><br /><br/>
 				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br /> 
 				
 	
@@ -99,7 +101,7 @@
 			      
 				 <b>Actions:</b>
 				<ul>
-					<li>View account details: <span id="accountinfo">-</span></li>
+					
 					<li>To register for groups: <a
 						href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo:
 							Create an ESGF account.</a><br /></li>

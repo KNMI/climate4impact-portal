@@ -308,6 +308,14 @@ public class OAuth2Handler {
       response.sendRedirect("/impactportal/account/login.jsp");
 
     } catch (Exception e) {
+      request.getSession().setAttribute("message", "Error in OAuth2 service:\n"+e.getMessage());
+      try {
+        impactservice.MessagePrinters.emailFatalErrorException("Error in OAuth2 service", e);
+        response.sendRedirect("/impactportal/exception.jsp");
+      } catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
       e.printStackTrace();
     }
   };
@@ -319,10 +327,11 @@ public class OAuth2Handler {
    * @param request
    * @param settings
    * @param oauth2Response
+   * @throws Exception 
    */
   private static void handleSpecificProviderCharacteristics(
       HttpServletRequest request, Oauth2Settings settings,
-      OAuthAccessTokenResponse oauth2Response) {
+      OAuthAccessTokenResponse oauth2Response) throws Exception {
     if (settings.id.equals("ceda")) {
 
       UserInfo userInfo = makeSLCSCertificateRequest(settings.id,
@@ -371,9 +380,10 @@ public class OAuth2Handler {
    * @param currentProvider
    * @param accessToken
    * @return
+   * @throws Exception 
    */
   private static UserInfo makeSLCSCertificateRequest(String currentProvider,
-      String accessToken) {
+      String accessToken) throws Exception {
     Debug
     .println("Step 3 - Make SLCS certificate request to external OAuth2 service");
     UserInfo userInfo = new UserInfo();
@@ -449,6 +459,8 @@ public class OAuth2Handler {
 
     if (SLCSX509Certificate != null) {
       Debug.println("Succesfully retrieved an SLCS\n");
+    }else{
+      throw new Exception("Unable to retrieve SLC from SLCS");
     }
 
     String privateKeyInPemFormat = null;

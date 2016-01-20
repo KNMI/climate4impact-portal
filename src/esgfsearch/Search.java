@@ -293,10 +293,15 @@ public class Search {
   
   class URLBeingChecked{
     public Future<ASyncGetCatalogResponse> response;
+    private long creationDate;
+    public long getCreationDate(){
+      return creationDate;
+    }
     public URLBeingChecked(String query, HttpServletRequest request) {
+      creationDate = tools.DateFunctions.getCurrentDateInMillis();
       try {
         response = getCatalogExecutor.submit(new ASyncGetCatalogRequest(query,request));
-        
+        creationDate = tools.DateFunctions.getCurrentDateInMillis();
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -316,12 +321,19 @@ public class Search {
         r.setMessage("{\"message\":\"start checking\",\"ok\":\"busy\"}");
       }else{
         URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
+        if(urlBeingChecked.getCreationDate()+1000*60*5<tools.DateFunctions.getCurrentDateInMillis()){
+          urlsBeingChecked.remove(query);
+          urlBeingChecked.response.cancel(true);
+          Debug.println("Refiring "+query);
+          return checkURL(query,request);
+        }
         if(urlBeingChecked.response.isDone()==false){
           r.setMessage("{\"message\":\"still checking\",\"ok\":\"busy\"}");
           //Debug.println("STILL");
         }else{
           try {
-            r.setMessage(urlBeingChecked.response.get().getBody());
+            urlBeingChecked.response.get().getBody();
+            r.setMessage("{\"message\":\"status ok\",\"ok\":\"ok\"}");
           } catch (Exception e) {
             e.printStackTrace();
             JSONObject m = new JSONObject();
@@ -338,7 +350,7 @@ public class Search {
             
             
           }
-          urlsBeingChecked.remove(query);
+         
           Debug.println("Done");
         }
       }

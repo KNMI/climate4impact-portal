@@ -33,11 +33,13 @@ div#users-contain table td,div#users-contain table th {
 
 .datanodebutton{
 	width:175px;
+	margin:4px;
 	
 }
-#datanodebuttons{
-	padding:0px;
-	margin:0px;
+
+#openidcompositor{
+	
+	
 }
 
 #loginDialog{
@@ -47,4 +49,104 @@ div#users-contain table td,div#users-contain table th {
 	height:100%;
 	margin:0px;
 	padding:0px;
+}
+
+.oauth2loginbox{
+	 line-height: 40px;
+	 border-radius:4px;
+	 background-color:#EEE;
+	 border:1px solid #CCC;
+	 width:350px;
+	 padding:4px;
+	 text-align:center;
+	 padding:5px;
+}
+.oauth2loginbox:hover{
+	  border:1px solid #888;
+	 background-color:#DDD;
+	 
+}
+.oauth2loginbox img{
+	vertical-align: middle;
+	width:40px;
+	height:40px;
+	float:left;
+}
+
+#c4i_customopenidcomposer{
+	display:none;
+	padding:20px;
+	border:1px solid #EEE;
+	border-radius:4px;
+	margin:3px;
+	
+}
+
+.openid_identifier {
+	background: #fff url("/impactportal/images/openid.gif") no-repeat;
+	background-position: 0 50%;
+	padding-left: 18px;
+	border: 1px solid gray;
+	height: 18px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	
+	width: 95%;
+}
+
+.logo_USA {
+	background-image: url("images/countries/USA.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_UK {
+	background-image: url("images/countries/UK.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_Sweden {
+	background-image: url("images/countries/Sweden.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_Germany {
+	background-image: url("images/countries/Germany.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_France {
+	background-image: url("images/countries/France.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_China {
+	background-image: url("images/countries/China.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_Italy {
+	background-image: url("images/countries/Italy.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logo_Australie {
+	background-image: url("images/countries/Australia.png") !important;
+	width: 16px;
+	height: 16px;
+}
+
+.logindialogfooter{
+	border:none;
+	padding:5px;
+	background:white;
+	color:#666;
+	font-size:12px;
+	margin:0px;
 }

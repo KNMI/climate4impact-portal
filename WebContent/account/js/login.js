@@ -1,12 +1,24 @@
 
   var OpenIDProviders = {
-      'SMHI-NSC-LIU':{
-        name:'SMHI-NSC-LIU',
-        openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
-        createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
-        accountinfo:'http://esg-dn1.nsc.liu.se/esgf-web-fe/accountsview',
-        logocls:'logo_Sweden'},
-      'PCMDI':       {
+      
+      'CEDA':{
+    	name:'BADC/CEDA'   ,
+    	openidprefix:'https://ceda.ac.uk/openid/',
+    	createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
+    	accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
+    	logocls:'logo_UK',
+    	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
+    	needsusername:false
+      },'SMHI-NSC-LIU':{
+          name:'SMHI-NSC-LIU',
+          openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
+          createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
+          accountinfo:'http://esg-dn1.nsc.liu.se/esgf-web-fe/accountsview',
+          logocls:'logo_Sweden',
+          logo:'/impactportal/images/nsclogo.png',
+          needsusername:true
+  	  },
+      /*'PCMDI':       {
     	  name:'PCMDI'       ,
     	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
     	  createaccount:'https://pcmdi9.llnl.gov/user/add/?next=https://pcmdi9.llnl.gov/projects/cmip5/',
@@ -18,29 +30,24 @@
         createaccount:'https://esgf-node.ipsl.fr/esgf-web-fe/createAccount',
         accountinfo:'http://esgf-node.ipsl.fr/esgf-web-fe/accountsview',
         logocls:'logo_France'},
-      'CEDA':        {
-    	  name:'BADC/CEDA'   ,
-    	  openidprefix:'https://ceda.ac.uk/openid/',
-    	  createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
-    	  accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
-    	  logocls:'logo_UK'},
+      
       'DKRZ':        {
     	  name:'DKRZ'        ,
     	  openidprefix:'https://esgf-data.dkrz.de/esgf-idp/openid/',
     	  createaccount:'https://esgf-data.dkrz.de/esgf-web-fe/createAccount',
     	  accountinfo:'https://esgf-data.dkrz.de/esgf-web-fe/accountsview',
-    	  logocls:'logo_Germany'},
+    	  logocls:'logo_Germany'},*/
 	  /*'NCI':        {
     	  name:'NCI'        ,
     	  openidprefix:'https://esg2.nci.org.au/esgf-idp/openid/' ,
     	  createaccount:'https://esg2.nci.org.au/esgf-web-fe/createAccount',
     	  logocls:'logo_Germany'},*/
-      'PIK':         {
+     /* 'PIK':         {
     	  name:'PIK Potsdam' ,
     	  openidprefix:'https://esg.pik-potsdam.de/esgf-idp/openid/',
     	  createaccount:'https://esg.pik-potsdam.de/esgf-web-fe/createAccount',
     	  accountinfo:'https://esg.pik-potsdam.de/esgf-web-fe/accountsview',
-    	  logocls:'logo_Germany'}
+    	  logocls:'logo_Germany'}*/
       
   };
 
@@ -65,18 +72,35 @@ var checkOpenIdCookie = function(a) {
 };
 
 $( document ).ready(function() {
-  var dataNodeButtons = $("#datanodebuttons");
-  var html='<ul>';
-  for(var id in OpenIDProviders){
-    html+='<li><button id="dnb_'+id+'" class="datanodebutton" onclick="openDialog(\''+id+'\');">'+OpenIDProviders[id].name+'</button></li>';// - '+ OpenIDProviders[id].url+ '&lt;username&gt;</li>' ;
-    //alert(id.name);
-  }
-  html+='</ul>';
-  dataNodeButtons.html(html);
-  for(var id in OpenIDProviders){
- 
-    $("#dnb_"+id).button({icons: {primary: OpenIDProviders[id].logocls},text:true});
-  }
+	 $.ajax('/impactportal/oauth?makeform').done(function(data){
+		 
+		 var html ="";
+		 for(var j=0;j<data.providers.length;j++){
+		 	var provider = data.providers[j];
+			html+='<div class="oauth2loginbox" onclick="document.location.href=\'/impactportal/oauth?provider='+provider.id+'&\'">';
+			html+=' <a class="oauth2loginbutton" href="#"><img src="'+provider.logo+'"/> '+provider.description+'</a>';
+			if(provider.registerlink){
+				html+=' - <a class="c4i_openidcompositor_registerlink" href="'+provider.registerlink+'"><i> Register</i></a>';
+			}
+			html+='</div><br/>';
+		 }
+		 html+="";
+		 $('.oauthform').html(html);
+
+	 });
+	 
+	var html="";
+	for(var id in OpenIDProviders){
+		html+='<div class="oauth2loginbox" onclick="openDialog(\''+id+'\')">';
+		html+=' <a class="oauth2loginbutton" href="#"><img src="'+OpenIDProviders[id].logo+'"/> '+OpenIDProviders[id].name+'</a>';
+		if(OpenIDProviders[id].createaccount){
+			html+=' - <a class="c4i_openidcompositor_registerlink" href="'+OpenIDProviders[id].createaccount+'"><i> Register</i></a>';
+		}
+		html+='</div><br/>';
+	}
+	$(".openidform").html(html);
+
+  $("#openidcompositor").button().click(function(){openDialog();});
   $('#login_button').button();
 });
 
@@ -84,7 +108,7 @@ $(function() {
 
   
   
-  var name = $("#name"),  allFields = $([]).add(name), tips = $(".validateTips");
+  var name = $("#c4i_openidcompositor_inputname"),  allFields = $([]).add(name), tips = $(".validateTips");
   name.keyup(function(e) {
     if (e.keyCode == 13) {
       $('#composeidentifierbutton').click();
@@ -139,8 +163,10 @@ $(function() {
     tips.removeClass("ui-state-highlight");
     tips.text("");
     var bValid = true;
-    bValid = bValid && checkLength(name, "username", 1, 50,showtips);
-    bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _.]*$/i,  "*Username may consist of a-z, 0-9, underscores and '.' .",showtips);
+    //bValid = bValid && checkLength(name, "username", 0, 50,showtips);
+    if(name.val().length>0){
+    	bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _.]*$/i,  "*Username may consist of a-z, 0-9, underscores and '.' .",showtips);
+    }
    
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
     var username = name.val();
@@ -177,6 +203,8 @@ $(function() {
               if(openid){
                 $('#openid_identifier_input').val(openid);
                 $('#login_button').click();
+                $("#login_button").hide();
+                $("#openid_identifier_input").prop('disabled',true);
                 $(this).dialog("close");
               }
             }
@@ -190,16 +218,57 @@ $(function() {
       }
 });
 });
+
+var dataNodeButtonClicked = function(datacentre){
+
+	  if(OpenIDProviders[datacentre].needsusername==false){
+		  
+		  $('#openid_identifier_input').val(OpenIDProviders[datacentre].openidprefix);
+		  $('#login_button').click();
+		  $("#login_button").hide();
+          $("#openid_identifier_input").prop('disabled',true);
+          $('#dialog-form').dialog("close");
+        
+		  return;
+	  }
+	  $('#dialog-form').dialog("option", "datacentre", datacentre);
+	  $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
+	  if(OpenIDProviders[datacentre].createaccount){
+		  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
+		  		"- <a target=\"_blank\" href=\"/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
+	  }
+	  $(".c4i_openidcompositor_entername").show();
+	  $(".c4i_openidcompositor_chooseprovider").hide();
+	  $("#composeidentifierbutton").show();
+	  $("#c4i_openidcompositor_inputname").focus();
+};
+
 var openDialog = function(datacentre) {
-  
-  $('#dialog-form').dialog('open');
-  $('#dialog-form').dialog("option", "datacentre", datacentre);
-  $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
-  if(OpenIDProviders[datacentre].createaccount){
-	  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
-	  		"- <a target=\"_blank\" href=\"/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
+	
+  if(datacentre){
+	  $('#dialog-form').dialog('open');
+	  dataNodeButtonClicked(datacentre);
+  }else{
+	  $(".c4i_openidcompositor_entername").hide();
+	  $("#composeidentifierbutton").hide();
+	  $(".c4i_openidcompositor_chooseprovider").show();
+	  var html='<ul>';
+	  for(var id in OpenIDProviders){
+	    html+='<li><button id="dnb_'+id+'" class="datanodebutton" onclick="dataNodeButtonClicked(\''+id+'\');">'+OpenIDProviders[id].name+'</button> <i>('+OpenIDProviders[id].openidprefix+')<i></li>';// - '+ OpenIDProviders[id].url+ '&lt;username&gt;</li>' ;
+	    //alert(id.name);
+	  }
+	  html+='</ul>';
+	  $("#datanodebuttons").html(html);
+	  for(var id in OpenIDProviders){
+	    $("#dnb_"+id).button({icons: {primary: OpenIDProviders[id].logocls},text:true});
+	    
+	  }
+	  $('#dialog-form').dialog('open');
   }
-}
+
+  
+
+};
 
 var closeLoginPopupDialog = function(){
   console.log("closeLoginPopupDialog")
@@ -329,3 +398,13 @@ var generateLoginDialog = function(doReload){
 
 }
 
+var c4i_openidcompositor_isshowed =false;
+var c4i_openidcompositor_show = function(){
+	if(c4i_openidcompositor_isshowed == false){
+		$("#c4i_customopenidcomposer").show();
+		c4i_openidcompositor_isshowed = true;
+	}else{
+		$("#c4i_customopenidcomposer").hide();
+		c4i_openidcompositor_isshowed = false;
+	}
+};

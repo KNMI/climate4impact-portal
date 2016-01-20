@@ -1,3 +1,12 @@
+<span>Choose one of the following identity providers:</span><br/><br/>
+
+<div class="openidform"></div>
+<div class="oauthform"></div>
+
+<div class="oauth2loginbox" onclick="c4i_openidcompositor_show()">
+  <a class="oauth2loginbutton" href="#">Other OpenId ...</a>
+</div><br/>
+
 <%
 	String openid_identifier = "";
 	String keep_openid_identifier = "";
@@ -18,7 +27,7 @@
 		checkKeepId = false;
 	}
 
-	out.print("<form method=\"post\" action=\"/impactportal/consumer\">"
+	out.print("<div id=\"c4i_customopenidcomposer\"><form method=\"post\" action=\"/impactportal/consumer\">"
 			
 			+ "<input id=\"openid_identifier_input\" type=\"text\" name=\"openid_identifier\"  class=\"openid_identifier\" value=\""
 			+ openid_identifier
@@ -38,14 +47,10 @@
 	//Not registered?				
 	out.print(
 			"<span style=\"padding:0px;margin:0px;float:left;\"><a href=\"/impactportal/help/howto.jsp?q=create_esgf_account\"><i>Not registered?</i></a></span>"
-			+ "</form>"
+			+ "</form><br/></br><button id=\"openidcompositor\">Compose your openid</button></div>"
 	);
 %>
 
-<br />
-<br />
-<br /> If you are already registered, you can compose your OpenID based on your user name and corresponding index node:<br />
-<div id="datanodebuttons"></div>
+<!-- We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).-->
 * You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a><br/>
-<br/>
-We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).
+
