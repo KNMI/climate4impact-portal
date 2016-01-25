@@ -343,7 +343,7 @@ public class Search {
               Debug.errprintln("Failed:"+message);
               m.put("message",message);
               m.put("ok", "false" );
-           
+              urlsBeingChecked.remove(query);
             } catch (JSONException e1) {
             }
             r.setMessage(m);

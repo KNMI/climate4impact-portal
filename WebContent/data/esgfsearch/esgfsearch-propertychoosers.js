@@ -29,7 +29,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
       foundProperties++;
     }
     if(selectedPropertiesForFacet){
-      if(selectedPropertiesForFacet.indexOf(name)!=-1){
+      if(esgfSearchIndexOf(selectedPropertiesForFacet,name)!=-1){
         extraCls+= " c4i-esgfsearch-property-selected";
         cbcls = "c4i-esgfsearch-checkbox";
       }
@@ -61,7 +61,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
   for(var j=0;j<this.config.properties.length;j++){
     var enable = true;
     if(facetList){
-      if(facetList.indexOf(this.config.properties[j].name)==-1){
+      if(esgfSearchIndexOf(facetList,this.config.properties[j].name)==-1){
         enable = false;
       }
     }
@@ -118,14 +118,14 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
       var cls = "";
       var cbcls = "c4i-esgfsearch-checkboxclear";
       
-      if(facetList.indexOf(c.name)==-1){
+      if(esgfSearchIndexOf(facetList,c.name)==-1){
         cls = "c4i-esgfsearch-property-disabled"
       }else{
         foundProperties++;
       }
       
       if(selectedPropertiesForFacet){
-        if(selectedPropertiesForFacet.indexOf(c.name)!=-1){
+        if(esgfSearchIndexOf(selectedPropertiesForFacet,c.name)!=-1){
           cls+= " c4i-esgfsearch-property-selected";
           cbcls = "c4i-esgfsearch-checkbox";
           

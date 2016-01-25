@@ -11,6 +11,13 @@ var renderSearchInterface = function(options){
   return new SearchInterface(options);
 };
 
+var esgfSearchIndexOf = function(thisobj,obj, start) {
+    for (var i = (start || 0), j = thisobj.length; i < j; i++) {
+        if (thisobj[i] === obj) { return i; }
+    }
+    return -1;
+}
+
 /**
 * Splits a url into key value pairs.
 */
@@ -25,7 +32,7 @@ function ESGFSearch_KVP(query){
         if(kvps.length==2){
           var key = kvps[0];
           var value = kvps[1];
-          if(!kvplist[key])kvplist[key] = [];
+          if(!(kvplist[key] instanceof Array))kvplist[key] = [];
           kvplist[key].push(value);
         }
       }
@@ -387,7 +394,8 @@ var SearchInterface = function(options){
       if($(this).hasClass("c4i-esgfsearch-dataset-imgcollapsed")){
         $(this).removeClass("c4i-esgfsearch-dataset-imgcollapsed");
         $(this).addClass("c4i-esgfsearch-dataset-imgexpand");
-        if(!getSelection().toString()){
+        //if(!getSelection().toString())
+        {
           var clickedID = $(this).parent().attr("name");
           var catalogObject = null;
           for(var r in data.response.results){
@@ -510,7 +518,7 @@ var SearchInterface = function(options){
       var checkboxclass = "c4i-esgfsearch-checkboxclear";
       if(even == 0)oddEvenClass="c4i-esgfsearch-property-even";else oddEvenClass="c4i-esgfsearch-property-odd";
       if(selectedPropertiesForFacet){
-        if(selectedPropertiesForFacet.indexOf(facetList[i])!=-1){
+        if(esgfSearchIndexOf(selectedPropertiesForFacet,facetList[i])!=-1){
           selectedClass = "c4i-esgfsearch-property-selected";
           checkboxclass = "c4i-esgfsearch-checkbox";
         }
@@ -661,9 +669,9 @@ var SearchInterface = function(options){
     });
     
     rootElement.find(".c4i-esgfsearch-property").attr('onclick','').click(function(evt){
-      if(!getSelection().toString()){
+      //if(!getSelection().toString()){
         selectElement($(this));
-      }
+      //}
     });
   };
   
