@@ -338,8 +338,8 @@ public class Search {
             e.printStackTrace();
             JSONObject m = new JSONObject();
             try {
-              String message = e.getMessage();
-              message=message.replaceAll("tools.HTTPTools\\$WebRequestBadStatusException: ", "");
+              String message = e.getCause().getMessage();
+              //message=message.replaceAll("tools.HTTPTools\\$WebRequestBadStatusException: ", "");
               Debug.errprintln("Failed:"+message);
               m.put("message",message);
               m.put("ok", "false" );
