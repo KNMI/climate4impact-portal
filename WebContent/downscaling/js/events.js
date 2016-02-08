@@ -6,10 +6,10 @@ $(document).on('click', '.link', function(event, ui){
   showDialog('Predictand');
   $('#predictand-details').appendTo('#dialog-content');
   var firedInput = $(event.target).parent().prev('input');
-  var idZone = $(firedInput).attr('data-id-zone');
+  var zone = $(firedInput).attr('data-zone');
   var predictor = $(firedInput).attr('data-predictor');
   var predictand = $(firedInput).attr('data-predictand');
-  loadPredictandDetails(idZone,predictor,predictand);
+  loadPredictandDetails(zone,predictor,predictand);
 });
 
 $(document).ready(function() {
@@ -42,7 +42,7 @@ $(document).on('click', 'button', function(event, ui){
     insertHashProperty("eYear", $('#date-range-end').val(), sortedKeys);
     loadScenarios();
   }else if(id=="button-downscale"){
-    if(getValueFromHash("scenarioName") != null)
+    if(getValueFromHash("scenario") != null)
       downscalingSubmit();
     else
       alert("You have to fill in the whole form to Downscale");
@@ -67,52 +67,52 @@ $(window).on("hashchange", function(e){
 });
 
 $(document).on('change', 'input:radio', function(event, ui){
-  if($(this).attr('name') == 'variable-type'){
+  if($(this).attr('name') === 'variableType'){
     //delete elements from here
     var variableType = $(this).attr('value');
     insertHashProperty('variableType', variableType, sortedKeys);
     if($(this).is(':checked')){
-      removeHashProperty("variableName");
+      removeHashProperty("variable");
       removeHashProperty("zone");
-      removeHashProperty("predictandName");
-      removeHashProperty("dMethodName");
+      removeHashProperty("predictand");
+      removeHashProperty("downscalingMethod");
       loadVariables();
     }
   }else if($(this).attr('name') == 'variable'){
     var variable = encodeURIComponent($(this).attr('data-variable'));
     if($(this).is(':checked')){
-      insertHashProperty('variableName', variable, sortedKeys);
+      insertHashProperty('variable', variable, sortedKeys);
       removeHashProperty("zone");
-      removeHashProperty("predictandName");
-      removeHashProperty("dMethodName");
+      removeHashProperty("predictand");
+      removeHashProperty("downscalingMethod");
       loadPredictands();
     }
   }else if($(this).attr('name') == 'predictand'){
-    var idZone = encodeURIComponent($(this).attr('data-id-zone'));
+    var zone = encodeURIComponent($(this).attr('data-zone'));
     var predictor = encodeURIComponent($(this).attr('data-predictor'));
     var predictand = encodeURIComponent($(this).attr('data-predictand'));
     if($(this).is(':checked')){
-      insertHashProperty('zone', idZone, sortedKeys);
-      insertHashProperty('predictandName', predictand, sortedKeys);
-      removeHashesFrom("dMethodType", sortedKeys);
+      insertHashProperty('zone', zone, sortedKeys);
+      insertHashProperty('predictand', predictand, sortedKeys);
+      removeHashesFrom("downscalingType", sortedKeys);
       loadDownscalingMethods();
     }
-  }else if($(this).attr('name') == 'downscaling-method-type'){
-      var dMethodType = encodeURIComponent($(this).attr('data-downscaling-method-type'));
-      insertHashProperty('dMethodType', dMethodType, sortedKeys);
+  }else if($(this).attr('name') == 'downscalingType'){
+      var downscalingType = encodeURIComponent($(this).attr('data-downscaling-type'));
+      insertHashProperty('downscalingType', downscalingType, sortedKeys);
       loadDownscalingMethods(); //send type
   }else if($(this).attr('name') == 'downscalingMethod'){
-    var idZone = encodeURIComponent($(this).attr('data-zone'));
+    var zone = encodeURIComponent($(this).attr('data-zone'));
     var predictand = encodeURIComponent($(this).attr('data-predictand'));
     var downscalingMethod = encodeURIComponent($(this).attr('data-downscaling-method'));
     if($(this).is(':checked')){
-      insertHashProperty('dMethodName', downscalingMethod, sortedKeys);
-      $('#validation').html("<a href='../DownscalingService/validation?idZone="+idZone+"&predictandName="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
+      insertHashProperty('downscalingMethod', downscalingMethod, sortedKeys);
+      $('#validation').html("<a href='../DownscalingService/validation?zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
       $('#downscalingmethod-header').collapsible('open');
       loadValidationReport();
       loadDatasets();
     }
-  }else if($(this).attr('name') == 'dataset-type'){
+  }else if($(this).attr('name') == 'datasetType'){
     var datasetType = encodeURIComponent($(this).attr('data-dataset-type'));
     if($(this).is(':checked')){
       insertHashProperty('datasetType', datasetType, sortedKeys);
@@ -121,13 +121,13 @@ $(document).on('change', 'input:radio', function(event, ui){
   }else if($(this).attr('name') == 'dataset'){
     var dataset = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('datasetName', dataset, sortedKeys);
+      insertHashProperty('dataset', dataset, sortedKeys);
       loadScenarios();
     }
   }else if($(this).attr('name') == 'scenario'){
     var scenario = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('scenarioName', scenario, sortedKeys);
+      insertHashProperty('scenario', scenario, sortedKeys);
     }
   }
 });

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 
@@ -49,6 +51,24 @@ public class DownscalingAuth{
     HttpURLConnection urlConn;
     url = new URL(URI);
     urlConn = (HttpURLConnection)url.openConnection();
+    urlConn.setRequestMethod(type);
+    urlConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf8");
+    urlConn.setRequestProperty("Accept", "application/json");
+    urlConn.setRequestProperty("token", getToken());
+    urlConn.setDoOutput(true);
+    return urlConn;
+  }
+  
+  protected static InputStream getConnectionInputStream(String URI, String type) throws IOException{
+    return prepareQuery(URI, type).getInputStream();
+  }
+  
+  protected static HttpsURLConnection prepareSecureQuery(String URI, String type) throws IOException{
+    Debug.println("Subscribe user -- Building statement for URI: " + URI);
+    URL url;
+    HttpsURLConnection urlConn;
+    url = new URL(URI);
+    urlConn = (HttpsURLConnection)url.openConnection();
     urlConn.setRequestMethod(type);
     urlConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf8");
     urlConn.setRequestProperty("Accept", "application/json");
@@ -92,7 +112,7 @@ public class DownscalingAuth{
           try {
             expiration = formatter.parse(parts[1]);
             Date now = new Date();
-            if(now.compareTo(expiration)<0) //now before expiration: valid
+            if(expiration.compareTo(now)<0) //now before expiration: valid
               isValid=true;
           } catch (ParseException e) {
             isValid = false;

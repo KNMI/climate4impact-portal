@@ -22,11 +22,11 @@ function loadMap(startLat, startLon, endLat, endLon, zone, predictand){
 }
 
 function showDialog(title){
-  $('#dialog').dialog({
+  $("#dialog").dialog({
     dialogClass: 'custom-dialog', 
     height: 600,
-      width: 850,
-      modal: true,
+    width: 850,
+    modal: true,
     resizable: true,
     title: title,
     open: function(event, ui){
@@ -40,7 +40,7 @@ function showDialog(title){
       $('#map').css('height','');
     }
   });
-}
+ }
 
 function showSaveConfigDialog(message){
   showMessageDialog(message);
@@ -122,17 +122,17 @@ function loadVariables(){
 
   
 function loadPredictands(){
-  var URL = '../DownscalingService/users/'+loggedInUser+'/predictands';
-  var variableName = getValueFromHash("variableName");
-  var defaultPredictandName = getValueFromHash("predictandName");
+  var URL = '../DownscalingService/predictands?username=' + loggedInUser;
+  var variableName = getValueFromHash("variable");
+  var defaultpredictand = getValueFromHash("predictand");
   $("#predictands").html('');
   if(variableName != null){
-    URL += '?variableName=' + variableName;
+    URL += '&variable=' + variableName;
     $.get( URL, function( data ) {
       $.each(data.values, function(index, value){
-          $('#predictands').append("<td><input class='input-predictand' data-predictand='"+value.predictandName+"' data-id-zone='"+value.idZone+"' data-predictor='"+ value.predictorName+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><span class='link'>"+value.predictandName+"</span></abbr></td>");
-          if(defaultPredictandName != null && defaultPredictandName == value.predictandName)
-            $('#predictands').find("[data-predictand='" + value.predictandName + "']").prop('checked',true);
+          $('#predictands').append("<td><input class='input-predictand' data-predictand='"+value.predictand+"' data-zone='"+value.zone+"' data-predictor='"+ value.predictor+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><span class='link'>"+value.predictand+"</span></abbr></td>");
+          if(defaultpredictand != null && defaultpredictand == value.predictand)
+            $('#predictands').find("[data-predictand='" + value.predictand + "']").prop('checked',true);
       });
     });
     $('#predictand-type-header').collapsible('open');
@@ -143,30 +143,30 @@ function loadPredictands(){
 }
 
 function loadPredictandDetails(zone,predictor,predictand){
-  $.get( "../DownscalingService/users/"+loggedInUser+"/zones/"+zone+"/predictors/"+predictor+"/predictands/" + predictand, function( data ) {
-        $('#predictand-info').html('Name: ' + data.value.predictandName +'</br> Variable: ' + data.value.variable + ' </br> Variable type: ' + data.value.variableType + '</br> Dataset: ' + data.value.dataset);
+  $.get( "../DownscalingService/zones/"+zone+"/predictands/"+predictand+"?username=" + loggedInUser, function( data ) {
+        $('#predictand-info').html('Name: ' + data.value.predictand +'</br> Variable: ' + data.value.variable + ' </br> Variable type: ' + data.value.variableType + '</br> Dataset: ' + data.value.dataset);
         loadMap(data.value.startLat, data.value.startLon, data.value.endLat, data.value.endLon,zone,predictand);
       });
 }
 
 function loadDownscalingMethods(){
   var zone = getValueFromHash("zone");
-  var predictandName = getValueFromHash("predictandName");
-  var defaultDownscalingMethod = getValueFromHash("dMethodName");
-  var dMethodType = getValueFromHash("dMethodType");
+  var predictand = getValueFromHash("predictand");
+  var defaultDownscalingMethod = getValueFromHash("downscalingMethod");
+  var downscalingType = getValueFromHash("downscalingType");
   var parameters = "";
   $('#downscaling-methods').html('');
-  if(dMethodType == null){
-    dMethodType = "ALL";
-    insertHashProperty("dMethodType",dMethodType, sortedKeys);
+  if(downscalingType == null){
+    downscalingType = "ALL";
+    insertHashProperty("downscalingType",downscalingType, sortedKeys);
   }
-  $("input:radio[name='downscaling-method-type'][value='"+dMethodType+"']").prop('checked', true);
-  if(dMethodType != "ALL") 
-    parameters = "?dMethodType=" + dMethodType;
-  if(zone != null && predictandName != null){
-    $.get( "../DownscalingService/users/"+loggedInUser+"/zones/"+zone+"/predictands/" + predictandName + "/downscalingMethods" + parameters, function( data ) {
+  $("input:radio[name='downscaling-method-type'][value='"+downscalingType+"']").prop('checked', true);
+  if(downscalingType != "ALL") 
+    parameters = "?username="+loggedInUser+"downscalingType=" + downscalingType;
+  if(zone != null && predictand != null){
+    $.get( "../DownscalingService/zones/"+zone+"/predictands/" + predictand + "/downscalingMethods" + parameters, function( data ) {
         $.each(data.values, function(index, value){
-          $('#downscaling-methods').append("<td><input class='input-downscaling-method' data-zone='"+zone+"' data-predictand='"+ predictandName+"' data-downscaling-method='"+value.name+"' type='radio' name='downscalingMethod' value='"+value.name+"'/>"+value.name+"</td>");
+          $('#downscaling-methods').append("<td><input class='input-downscaling-method' data-zone='"+zone+"' data-predictand='"+ predictand+"' data-downscaling-method='"+value.name+"' type='radio' name='downscalingMethod' value='"+value.name+"'/>"+value.name+"</td>");
           if(defaultDownscalingMethod != null && defaultDownscalingMethod == value.name){
               $("input[name='downscalingMethod'][value='"+value.name+"']").prop('checked',true);
               loadValidationReport();
@@ -181,17 +181,17 @@ function loadDownscalingMethods(){
 
 function loadValidationReport(){
   var zone = getValueFromHash("zone");
-  var predictandName = getValueFromHash("predictandName");
-  var dMethodName = getValueFromHash("dMethodName");
-  if(zone != null && predictandName != null && dMethodName != null){
-    $('#validation').html("<a href='../DownscalingService/validation?idZone="+zone+"&predictandName="+predictandName+"&dMethodName="+dMethodName+"' download='report'>Download validation report</a>");
+  var predictand = getValueFromHash("predictand");
+  var downscalingMethod = getValueFromHash("downscalingMethod");
+  if(zone != null && predictand != null && downscalingMethod != null){
+    $('#validation').html("<a href='../DownscalingService/validation?zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
   }
 }
 
 function loadDatasets(){
     var zone = getValueFromHash("zone");
     var datasetType = getValueFromHash("datasetType");
-    var defaultDatasetValue = getValueFromHash("datasetName");
+    var defaultDatasetValue = getValueFromHash("dataset");
     $('#datasets').html('');
     if(datasetType == null){
       datasetType = "CLIMATE";
@@ -212,8 +212,8 @@ function loadDatasets(){
 
 function loadScenarios(){
     var zone = getValueFromHash("zone");
-    var datasetName = getValueFromHash("datasetName");
-    var defaultScenarioValue = getValueFromHash("scenarioName");
+    var dataset = getValueFromHash("dataset");
+    var defaultScenarioValue = getValueFromHash("scenario");
     var sYear = getValueFromHash("sYear");
     var eYear = getValueFromHash("eYear");
     if(sYear != null){
@@ -225,8 +225,8 @@ function loadScenarios(){
       $('#date-range-end').change();
     }
     $('#scenarios').html('');
-    if(zone != null && datasetName != null){
-    $.get( "../DownscalingService"+"/datasets/"+datasetName+"/scenarios?zone=" + zone +"&sYear=" + $('#date-range-start').val() + "&eYear=" + $('#date-range-end').val(), function( data ) {
+    if(zone != null && dataset != null){
+    $.get( "../DownscalingService"+"/datasets/"+dataset+"/scenarios?zone=" + zone +"&sYear=" + $('#date-range-start').val() + "&eYear=" + $('#date-range-end').val(), function( data ) {
         $.each(data.values, function(index, value){
           $('#scenarios').append("<td><input class='input-scenario' data-name='"+value.name+"' type='radio' name='scenario' value='"+value.name+"'/><abbr title='"+'From ' + value.metadata.split(';')[1].split('=')[1]+' to '+value.metadata.split(';')[2].split('=')[1]+"'><span >"+ value.name +"</span></abbr></td>");
           if(defaultScenarioValue == value.name)
