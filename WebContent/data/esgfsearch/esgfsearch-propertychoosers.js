@@ -17,7 +17,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
   var selectedFacets = k.getKeyValues();
   var selectedPropertiesForFacet = selectedFacets[facetName];
   var foundProperties = 0;
-  var createTile = function(color,enabled,name,description){
+  var createTile = function(color,enabled,name,description,tileobj){
    
     var extraCls = "";
     var cbcls = "c4i-esgfsearch-checkboxclear";
@@ -38,6 +38,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
     var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\" style=\"background-color:"+color+";\"/>");
     d.attr('name',name);
     var title = name;
+    if(tileobj.shortname)name=tileobj.shortname;
     if(config.tilewidth){
       d.css({"width":config.tilewidth});
     }
@@ -65,7 +66,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
         enable = false;
       }
     }
-    main.append(createTile(this.config.properties[j].color,enable,this.config.properties[j].name,this.config.properties[j].longname));
+    main.append(createTile(this.config.properties[j].color,enable,this.config.properties[j].name,this.config.properties[j].longname,this.config.properties[j]));
   
   }
   parentEl.find(".esgfsearch-ppc").empty();

@@ -1,5 +1,5 @@
 var esgfsearch_pc_project={
-   "tilewidth":"240px",
+   "tilewidth":"200px",
   "properties":[
     {
       "name":"CMIP5",
@@ -16,7 +16,12 @@ var esgfsearch_pc_project={
       "longname":"Seasonal-to-decadal climate Prediction for the improvement of European Climate Services",
       "shortname":"SPECS",
       "color":"#d32c2c"
-    }
+    },{
+        "name":"clipc",
+        "longname":"Climate Information Platform for Copernicus",
+        "shortname":"CLIPC",
+        "color":"#dda606"
+      }
   ]
 };
 

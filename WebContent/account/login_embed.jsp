@@ -14,7 +14,7 @@ body,.x-body {
 	background: white;
 	height: auto;
 	border: none;
-	overflow: hidden;
+	overflow: scroll;
 
 }
 </style>
@@ -33,7 +33,7 @@ body,.x-body {
 </script>-->
 </head>
 <body>
-<div id="bodycontainer">
+<div >
 	<jsp:include page="login_include_openidcomposition.jsp" />
 	<!-- Contents -->
 	<%
@@ -49,7 +49,7 @@ body,.x-body {
 	%>
 	<div class="impactcontent">
 		<div class="cmscontent">
-			<h1>Sign in with your ESGF OpenID account</h1>
+		
 			<jsp:include page="login_include_form.jsp" />
 		</div>
 	</div>
