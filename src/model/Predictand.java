@@ -6,9 +6,9 @@ import org.json.JSONObject;
 
 public class Predictand {
 
-  private int idZone;
-  private String predictandName;
-  private String predictorName;
+  private int zone;
+  private String predictand;
+  private String predictor;
   private String description;
   private String dataset;
   private String variable;
@@ -21,9 +21,9 @@ public class Predictand {
   private float resLon;
   
   private Predictand(PredictandBuilder builder){
-      this.idZone = builder.idZone;
-      this.predictandName = builder.predictandName;
-      this.predictorName = builder.predictorName;
+      this.zone = builder.zone;
+      this.predictand = builder.predictand;
+      this.predictor = builder.predictor;
       this.description = builder.description;
       this.dataset = builder.dataset;
       this.variable = builder.variable;
@@ -37,9 +37,9 @@ public class Predictand {
   }
 
   public static class PredictandBuilder {
-    private int idZone;
-    private String predictandName;
-    private String predictorName;
+    private int zone;
+    private String predictand;
+    private String predictor;
     private String description;
     private String dataset;
     private String variable;
@@ -53,9 +53,9 @@ public class Predictand {
       
       public PredictandBuilder(JSONObject jsonObject){
         try {
-          this.idZone = jsonObject.getInt("idZone");
-          this.predictandName = jsonObject.getString("predictandName");
-          this.predictorName = jsonObject.getString("predictorName");
+          this.zone = jsonObject.getInt("zone");
+          this.predictand = jsonObject.getString("predictand");
+          this.predictor = jsonObject.getString("predictor");
           this.description = jsonObject.getString("description");
           this.dataset = jsonObject.getString("dataset");
           this.variable = jsonObject.getString("variable");
@@ -76,28 +76,28 @@ public class Predictand {
       }   
   }
 
-  public int getIdZone() {
-    return idZone;
+  public int getZone() {
+    return zone;
   }
 
-  public void setIdZone(int idZone) {
-    this.idZone = idZone;
+  public void setZone(int zone) {
+    this.zone = zone;
   }
 
-  public String getPredictandName() {
-    return predictandName;
+  public String getPredictand() {
+    return predictand;
   }
 
-  public void setPredictandName(String predictandName) {
-    this.predictandName = predictandName;
+  public void setPredictand(String predictand) {
+    this.predictand = predictand;
   }
 
-  public String getPredictorName() {
-    return predictorName;
+  public String getPredictor() {
+    return predictor;
   }
 
-  public void setPredictorName(String predictorName) {
-    this.predictorName = predictorName;
+  public void setPredictor(String predictor) {
+    this.predictor = predictor;
   }
 
   public String getDescription() {

@@ -42,7 +42,7 @@
       		}
       	%>
 		var loggedInUser = '${loggedInUser}';
-      	var sortedKeys = ['variableType','variableName','zone','predictandName','dMethodType','dMethodName','datasetType','datasetName', 'sYear', 'eYear', 'scenarioName'];
+      	var sortedKeys = ['variableType','variable','zone','predictand','downscalingType','downscalingMethod','datasetType','dataset', 'sYear', 'eYear', 'scenario'];
       	  
 
      		
@@ -77,21 +77,21 @@
 		});
 		
 		function downscalingSubmit(){
-			var idZone = getValueFromHash("zone");
-			var variableName = getValueFromHash("variableName");
-			var predictandName = getValueFromHash("predictandName");
-			var dMethodName = getValueFromHash("dMethodName");
+			var zone = getValueFromHash("zone");
+			var variable = getValueFromHash("variable");
+			var predictand = getValueFromHash("predictand");
+			var downscalingMethod = getValueFromHash("downscalingMethod");
 			var datasetType = getValueFromHash("datasetType");
-			var datasetName = getValueFromHash("datasetName");
-			var scenarioName = getValueFromHash("scenarioName");
+			var dataset = getValueFromHash("dataset");
+			var scenario = getValueFromHash("scenario");
 		    var sYear = $('#date-range-start').val();
 		    var eYear = $('#date-range-end').val();
-		  	var cells = sYear+" "+eYear+" "+ datasetName+" 0";
-		  	var params ="?username="+loggedInUser+"&idZone="+idZone+"&predictandName="+predictandName+"&dMethodName="+dMethodName+"&scenarioName="+scenarioName+"&cells="+cells;
+		  	var cells = sYear+" "+eYear+" "+ dataset+" 0";
+		  	var params ="?username="+loggedInUser+"&zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"&dataset="+dataset+"&scenario="+scenario+"&sYear="+sYear+"&eYear="+eYear;
 		  	var url="../DownscalingService/downscalings/downscale" + params;
-		  	showOKDialog("<p>Are you sure you want to Downscale this Downscaling configuration?<\p>" + "<p>Variable: "+variableName +"<\p>" + 
-		  	    "<p>Predictand: "+predictandName+"<\p>"+"<p>Downscaling method: "+dMethodName+"<\p>" + "<p>Dataset: "+ datasetName+"<\p>"+
-		  	    "<p>Scenario: " + scenarioName + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
+		  	showOKDialog("<p>Are you sure you want to Downscale this Downscaling configuration?<\p>" + "<p>Variable: "+variable +"<\p>" + 
+		  	    "<p>Predictand: "+predictand+"<\p>"+"<p>Downscaling method: "+downscalingMethod+"<\p>" + "<p>Dataset: "+ dataset+"<\p>"+
+		  	    "<p>Scenario: " + scenario + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
 		}
 		
 		function postData(url){
@@ -109,15 +109,15 @@
 		}
 		
 		function saveConfig(configName){
-		  	var idZone = getValueFromHash("zone");
+		  	var zone = getValueFromHash("zone");
 		  	var variableType = getValueFromHash("variableType");
-			var variableName = getValueFromHash("variableName");
-			var predictandName = getValueFromHash("predictandName");
-			var dMethodType = getValueFromHash("dMethodType");
-			var dMethodName = getValueFromHash("dMethodName");
+			var variable = getValueFromHash("variable");
+			var predictand = getValueFromHash("predictand");
+			var downscalingType = getValueFromHash("downscalingType");
+			var downscalingMethod = getValueFromHash("downscalingMethod");
 			var datasetType = getValueFromHash("datasetType");
-			var datasetName = getValueFromHash("datasetName");
-			var scenarioName = getValueFromHash("scenarioName");
+			var dataset = getValueFromHash("dataset");
+			var scenario = getValueFromHash("scenario");
 		    var sYear = $('#date-range-start').val();
 		    var eYear = $('#date-range-end').val();
 			$.ajax({
@@ -127,14 +127,14 @@
 		    	  'configName' : configName,
 		    	  'username' : loggedInUser,
 		    	  'variableType':variableType,
-		    	  'variableName':variableName,
-		    	  'zone' : idZone, 
-		    	  'predictandName' : predictandName,
-		    	  'dMethodType' : dMethodType,
-		    	  'dMethodName' : dMethodName,
+		    	  'variable':variable,
+		    	  'zone' : zone, 
+		    	  'predictand' : predictand,
+		    	  'downscalingType' : downscalingType,
+		    	  'downscalingMethod' : downscalingMethod,
 		    	  'datasetType' : datasetType,
-		    	  'datasetName' : datasetName,
-		    	  'scenarioName' : scenarioName,
+		    	  'dataset' : dataset,
+		    	  'scenario' : scenario,
 		    	  'sYear': sYear,
 		    	  'eYear': eYear,
 		    	},
@@ -213,7 +213,7 @@
 				  						<div id="variable-types"> 
 					  						<%
 					  							for(String type : DownscalingService.getVariableTypes()){
-					  									out.print("<td><input type='radio' name='variable-type' data-variable-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
+					  									out.print("<td><input type='radio' name='variableType' data-variable-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
 					  							}
 					  						%>
 					  					</div>
@@ -268,9 +268,9 @@
 				  					<tr>
 					  					<div id="downscaling-method-types"> 
 						  					<%
-						  						out.print("<input type='radio' name='downscaling-method-type' data-downscaling-method-type ='ALL' value = 'ALL' class='input-downscaling-method-type'>ALL</input>");
+						  						out.print("<input type='radio' name='downscalingType' data-downscaling-method-type ='ALL' value = 'ALL' class='input-downscaling-method-type'>ALL</input>");
 						  						for(String type : DownscalingService.getDownscalingMethodTypes()){
-													out.print("<input type='radio' name='downscaling-method-type' data-downscaling-method-type='" + type + "' value = '" + type + "' class='input-downscaling-method-type'>"+type+"</input>");		
+													out.print("<input type='radio' name='downscalingType' data-downscaling-method-type='" + type + "' value = '" + type + "' class='input-downscaling-type'>"+type+"</input>");		
 					  							}
 						  					%>
 						  				</div>

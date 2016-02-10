@@ -6,7 +6,7 @@ import org.json.JSONObject;
 public class Downscaling {
 
 
-  int jobId, status, idZone, sYear, eYear;
+  int jobId, status, zone, sYear, eYear;
   String username, predictand, downscalingMethod, type, project, scenario, date;
   
   public Downscaling(){}
@@ -15,7 +15,7 @@ public class Downscaling {
     try {
       this.jobId = jsonObject.getInt("jobId");
       this.status = jsonObject.getInt("status");
-      this.idZone = jsonObject.getInt("idZone");
+      this.zone = jsonObject.getInt("zone");
       this.sYear = jsonObject.getInt("sYear");
       this.eYear = jsonObject.getInt("eYear");
       
@@ -37,12 +37,15 @@ public class Downscaling {
   public void setJobId(int jobId) {
     this.jobId = jobId;
   }
-  public int getIdZone() {
-    return idZone;
+ 
+  public int getZone() {
+    return zone;
   }
-  public void setIdZone(int idZone) {
-    this.idZone = idZone;
+
+  public void setZone(int zone) {
+    this.zone = zone;
   }
+
   public int getsYear() {
     return sYear;
   }
