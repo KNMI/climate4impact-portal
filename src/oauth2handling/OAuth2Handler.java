@@ -163,7 +163,7 @@ public class OAuth2Handler {
    */
   public static void doGet(HttpServletRequest request,
       HttpServletResponse response) {
-
+    
     // Check if we are dealing with getting JSON request for building up the
     // login form
     String makeform = null;
@@ -215,7 +215,14 @@ public class OAuth2Handler {
   static void getCode(HttpServletRequest httpRequest,
       HttpServletResponse response) throws OAuthSystemException, IOException {
     LoginManager.logout(httpRequest);
-
+    Debug.println("getQueryString:"+httpRequest.getQueryString());
+    
+    String c4i_redir = "";
+    try {
+      c4i_redir=HTTPTools.getHTTPParam(httpRequest, "c4i_redir");
+    } catch (Exception e1) {
+      Debug.errprintln("No redir URL given");
+    }
     String provider = null;
     try {
       provider = tools.HTTPTools.getHTTPParam(httpRequest, "provider");
@@ -230,13 +237,23 @@ public class OAuth2Handler {
       return;
     }
     Debug.println("  OAuth2 Step 1 getCode: Using " + settings.id);
+    
+    JSONObject state = new JSONObject();
+    try {
+      state.put("provider", provider);
+      state.put("c4i_redir", c4i_redir);
+    } catch (JSONException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
 
     OAuthClientRequest oauth2ClientRequest = OAuthClientRequest
         .authorizationLocation(settings.OAuthAuthLoc)
         .setClientId(settings.OAuthClientId)
         .setRedirectURI(Configuration.getHomeURLHTTPS() + oAuthCallbackURL)
         .setScope(settings.OAuthClientScope).setResponseType("code")
-        .setState(provider).buildQueryMessage();
+        .setState(state.toString()).buildQueryMessage();
 
     Debug.println("  OAuth2 Step 1 getCode: locationuri = "
         + oauth2ClientRequest.getLocationUri());
@@ -256,28 +273,39 @@ public class OAuth2Handler {
       OAuthAuthzResponse oar = OAuthAuthzResponse
           .oauthCodeAuthzResponse(request);
 
-      String stateResponse = oar.getState();
-      if (stateResponse == null) {
-        stateResponse = "";
+      String stateResponseAsString = oar.getState();
+      if (stateResponseAsString == null) {
+        stateResponseAsString = "";
       }
-      if (stateResponse.equals("")) {
+      if (stateResponseAsString.equals("")) {
         Debug.errprintln("  OAuth2 Step 2 OAuthz:  FAILED");
         return;
       }
 
       Debug
-      .println("  OAuth2 Step 2 OAuthz:  Provider retrieved from state is "
-          + stateResponse);
+      .println("  OAuth2 Step 2 OAuthz:  State is "
+          + stateResponseAsString);
 
+      JSONObject stateResponseAsJSONObject = (JSONObject) new JSONTokener(stateResponseAsString)
+          .nextValue();
+      
+      String c4i_redir= stateResponseAsJSONObject.getString("c4i_redir");
+      
+      Debug.println("  OAuth2 Step 2 OAuthz: c4i_redir="+c4i_redir);
+      
       if (request.getParameter("r") != null) {
         Debug
         .println("  OAuth2 Step 2 OAuthz:  Token request already done, stopping");
         return;
       }
+      
+      String currentProvider = stateResponseAsJSONObject.getString("provider");
+      Debug.println("  OAuth2 Step 2 OAuthz: Provider="+currentProvider);
 
       Debug.println("  OAuth2 Step 2 OAuthz:  Starting token request");
 
-      String currentProvider = stateResponse;
+ 
+    
 
       Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config
           .getOAuthSettings(currentProvider);
@@ -305,7 +333,12 @@ public class OAuth2Handler {
 
       handleSpecificProviderCharacteristics(request, settings, oauth2Response);
 
-      response.sendRedirect("/impactportal/account/login.jsp");
+      if(c4i_redir.equals("")==false){
+        Debug.println(" sendRedirect("+"/impactportal/account/login_embed.jsp?c4i_redir="+c4i_redir);
+        response.sendRedirect("/impactportal/account/login_embed.jsp?c4i_redir="+c4i_redir);
+      }else{
+        response.sendRedirect("/impactportal/account/login.jsp");
+      }
 
     } catch (Exception e) {
       request.getSession().setAttribute("message", "Error in OAuth2 service:\n"+e.getMessage());

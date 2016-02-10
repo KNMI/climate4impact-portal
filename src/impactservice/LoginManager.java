@@ -210,6 +210,11 @@ public class LoginManager {
   public static ImpactUser getUser(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
 
+//    String doLogOut = tools.HTTPTools.getHTTPParam(request,"c4i_dologout");
+//    if(doLogOut.equals("true")==true){
+//      logout(request);
+//      return null;
+//    }
     
     //Get user from session
     HttpSession session = request.getSession();

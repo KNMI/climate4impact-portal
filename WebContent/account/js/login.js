@@ -72,12 +72,13 @@ var checkOpenIdCookie = function(a) {
 };
 
 $( document ).ready(function() {
+	var currentRedir=getUrlVar("c4i_redir");
 	 $.ajax('/impactportal/oauth?makeform').done(function(data){
 		 
 		 var html ="";
 		 for(var j=0;j<data.providers.length;j++){
 		 	var provider = data.providers[j];
-			html+='<div class="oauth2loginbox" onclick="document.location.href=\'/impactportal/oauth?provider='+provider.id+'&\'">';
+			html+='<div class="oauth2loginbox" onclick="document.location.href=\'/impactportal/oauth?provider='+provider.id+'&c4i_redir='+URLEncode(currentRedir)+'\'">';
 			html+=' <a class="oauth2loginbutton" href="#"><img src="'+provider.logo+'"/> '+provider.description+'</a>';
 			if(provider.registerlink){
 				html+=' - <a class="c4i_openidcompositor_registerlink" href="'+provider.registerlink+'"><i> Register</i></a>';
@@ -324,26 +325,43 @@ var getUrlVar = function(key){
   return result && unescape(result[1]) || "";
 };
 
-var doReloadAfterLogin = false;
-/*Being called by the dialog popup*/
-var setReloadAfterLogin = function(reload){
-  //console.log("Reload function called by popup with value "+reload);
-  if(reload == 'true'){
-    doReloadAfterLogin = true;
-  }
-}
-var getReloadAfterLogin = function(){
-  if(doReloadAfterLogin == false){
-    setReloadAfterLogin(getUrlVar('doreload')) ;
-  }
-  return doReloadAfterLogin;
-}
+//var doReloadAfterLogin = false;
+///*Being called by the dialog popup*/
+//var setReloadAfterLogin = function(reload){
+//  //console.log("Reload function called by popup with value "+reload);
+//  if(reload == 'true'){
+//    doReloadAfterLogin = true;
+//  }
+//}
+//var getReloadAfterLogin = function(){
+//  if(doReloadAfterLogin == false){
+//    setReloadAfterLogin(getUrlVar('doreload')) ;
+//  }
+//  return doReloadAfterLogin;
+//}
+
+/**
+ * Generated a popup login dialog
+ * @param doReload Can be true, the page will reload. When a function is provided, this will be triggered when done.
+ */
+var generateLoginDialogNewPage = function(doReload){
+  var src = "/impactportal/account/login_embed.jsp";
+  src+="?c4i_redir="+URLEncode(window.location.href) ;
+  window.open(src);
+};
+
 
 /**
  * Generated a popup login dialog
  * @param doReload Can be true, the page will reload. When a function is provided, this will be triggered when done.
  */
 var generateLoginDialog = function(doReload){
+	$.ajax('/impactportal/account/logout.jsp').done(function(data){
+		_generateLoginDialog(doReload);
+	});
+};
+
+var _generateLoginDialog = function(doReload){
   
 //  console.log(generateLoginDialog);
   var iframe = $('<iframe frameborder="0" marginwidth="0" marginheight="0" scrolling="0" style="overflow:auto;padding:0px;margin:0px;" ></iframe>');
@@ -367,9 +385,10 @@ var generateLoginDialog = function(doReload){
 	    });
 	  
 		
-      var src = "/impactportal/account/login_embed.jsp";
+  var src = "/impactportal/account/login_embed.jsp?";
+  src+="&c4i_redir="+URLEncode(window.location.href) ;
 	  if(doReload === true){
-	    src+="?doreload=true";
+	    src+="&doreload=true";
 	  }
     loginDialog.bind('dialogclose', function(event) {
 
@@ -396,7 +415,10 @@ var generateLoginDialog = function(doReload){
       }
      
 
-}
+};
+
+
+
 
 var c4i_openidcompositor_isshowed =false;
 var c4i_openidcompositor_show = function(){
