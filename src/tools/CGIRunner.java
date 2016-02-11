@@ -21,10 +21,11 @@ public class CGIRunner {
    */
   public static void runCGIProgram(String[] commands,String[] environmentVariables,String directory,final HttpServletResponse response,OutputStream outputStream,String postData) throws Exception{
     Debug.println("Working Directory: "+directory);
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}}
+    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}      public void setError(String message) {}public String getError() {      return null;    }}
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
       boolean headersSent = false;
       boolean foundLF = false;
+      boolean hasError = false;
       OutputStream output = null;
       StringBuffer header = new StringBuffer();
       public StdoutPrinter(OutputStream outputStream) {
@@ -36,13 +37,14 @@ public class CGIRunner {
         try {
           _print(message,bytesRead);
         } catch (IOException e) {
-          e.printStackTrace();
+          this.hasError = true;
+          //Debug.errprintln("Unable to write data: "+e.getMessage());
         }
       }
       
       public void _print(byte[] message,int bytesRead) throws IOException {
         //Try to extract HTML headers and Content-Type 
-      
+        if(hasError)return;
         if(headersSent==false){
           int endHeaderIndex=0;
           for(int j=0;j<bytesRead;j++){
@@ -97,6 +99,16 @@ public class CGIRunner {
           output.write(message,0,bytesRead);
         }
       }
+
+     
+      public void setError(String message) {
+        hasError = true;
+      }
+
+      public String getError() {
+        if(hasError)return "yes";
+        return null;
+      }
     }
   
     ProcessRunner.StatusPrinterInterface stdoutPrinter = new StdoutPrinter(outputStream);
@@ -129,11 +141,12 @@ public class CGIRunner {
     
     if(processRunner.exitValue()!=0){
       Debug.errprintln("Warning: exit code: "+processRunner.exitValue());
+    }else{
+      Debug.println("Exit code 0 == OK");
     }
-    else{
-      Debug.errprintln("Exit code 0 == OK");
+    if(stdoutPrinter.getError()!=null){
+      Debug.errprintln("Warning: errors occured while writing to pipe");
     }
-    
     if(response!=null){
       if(processRunner.exitValue()!=0&&processRunner.exitValue()!=1){
         response.setStatus(500);
@@ -145,6 +158,11 @@ public class CGIRunner {
     
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
     Debug.println("Finished CGI with code "+processRunner.exitValue()+": "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
-    outputStream.flush();
+    try{
+      outputStream.flush();
+    }catch(org.apache.catalina.connector.ClientAbortException e){
+      Debug.println("Stream already closed");
+      
+    }
   }
 }

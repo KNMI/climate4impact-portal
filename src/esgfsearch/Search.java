@@ -312,7 +312,7 @@ public class Search {
 
   public  JSONResponse  checkURL(String query,HttpServletRequest request) {
     synchronized(urlsBeingChecked){
-      Debug.println("Checking: "+query);
+      //Debug.println("Checking: "+query);
       JSONResponse r = new JSONResponse(request);
       if(urlsBeingChecked.containsKey((String)query)==false){
         //Debug.println("INSERT");
@@ -362,7 +362,7 @@ public class Search {
   
     String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, 5*60);
     if(response!=null){
-      Debug.println("CATALOG FROM CACHE "+catalogURL);
+      //Debug.println("CATALOG FROM CACHE "+catalogURL);
       return response;
     }
     boolean ISOK = false;

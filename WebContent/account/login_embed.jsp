@@ -6,6 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
+
 <jsp:include page="../includes-ui.jsp" />
 <link rel="stylesheet" href="/impactportal/account/login.css"
 	type="text/css" />
@@ -47,6 +48,9 @@ body,.x-body {
 
 		if (user == null) {
 	%>
+	<script type="text/javascript">
+	 c4i_user=false;
+	</script>
 	<div class="impactcontent">
 		<div class="cmscontent">
 		
@@ -66,6 +70,7 @@ body,.x-body {
 	</div>
 
 	<script type="text/javascript">
+	c4i_user=true;
     var t = new Timer();
     console.log("starting closeLoginPopupDialog");
     var c4i_redir=getUrlVar('c4i_redir')

@@ -2,10 +2,14 @@ package tools;
 
 import impactservice.Configuration;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -17,6 +21,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -26,6 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -48,12 +55,20 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
@@ -591,89 +606,60 @@ public class HTTPTools extends HttpServlet {
     }
   }
 
-
   
-  public static String makeHTTPostRequestWithHeaders(String connectToURL, KVPKey headers,String postData) {
-    try{
-      
-      HttpClient httpClient=new DefaultHttpClient();
-      HttpPost httpPost=new HttpPost(connectToURL);
-      if(headers!=null){
-        SortedSet<String> a = headers.getKeys();
-        for(String b : a){
-          //System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
-          httpPost.addHeader(b,headers.getValue(b).firstElement());
-        }
-      }
-      httpPost.addHeader("Content-Type","application/x-www-form-urlencoded ");
-      httpPost.setEntity(new StringEntity(postData));
-      HttpResponse httpResponse=httpClient.execute(httpPost);
-      return EntityUtils.toString(httpResponse.getEntity(),"utf-8");
-      
-    }catch(Exception e){
-      
-    }
-    return null;
-//    HttpClient httpclient = new DefaultHttpClient();
-//    HttpPost httppost = new HttpPost(connectToURL);
+  public static String makeHTTPostRequestWithHeaders(String connectToURL, KVPKey headers,String postData) throws Exception {
+//    String trustRootsFile = "/nobackup/users/plieger/c4i_dev/certs/esg-truststore.ts";
+//    String trustRootsPassword="changeit";
+//    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 //
-//    if(headers!=null){
-//      SortedSet<String> a = headers.getKeys();
-//      for(String b : a){
-//        System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
-//        httppost.addHeader(b,headers.getValue(b).firstElement());
+//    // Load trustroots
+//    FileInputStream trustStoreStream = new FileInputStream(new File(
+//        trustRootsFile));
+//    try {
+//      keyStore.load(trustStoreStream, "changeit".toCharArray());
+//    } finally {
+//      try {
+//        trustStoreStream.close();
+//      } catch (Exception ignore) {
 //      }
-//      
 //    }
-//    StringEntity stringEntity;
-//    try {
-//      stringEntity = new StringEntity(postData,"UTF-8");
-//    } catch (UnsupportedEncodingException e) {
-//      Debug.errprintln("Unable to set post data");
-//      return null;
-//    }
-//    httppost.setEntity(stringEntity);
-//    HttpResponse response;
-//    try {
-//      response = httpclient.execute(httppost);
-//    } catch (ClientProtocolException e) {
-//      Debug.errprintln("Unable execute set post");
-//      return null;
-//    } catch (IOException e) {
-//      Debug.errprintln("Unable execute set post");
-//      return null;
-//    }
-//    HttpEntity entity = response.getEntity();
+//    trustStoreStream.close();
 //
-//    if (entity != null) {
-//        InputStream instream = null;
-//        try {
-//          instream = entity.getContent();
-//        } catch (IllegalStateException e) {
-//          Debug.errprintln("Unable execute set post, no entity set");
-//          return null;
-//        } catch (IOException e) {
-//          Debug.errprintln("Unable execute set post, no entity set");
-//          return null;
-//        }
-//        try {
-//          byte[] bytes = IOUtils.toByteArray(instream);
-//          return bytes;
-//        } catch (IOException e) {
-//          // TODO Auto-generated catch block
-//          e.printStackTrace();
-//        } finally {
-//            try {
-//              instream.close();
-//            } catch (IOException e) {
-//              // TODO Auto-generated catch block
-//              e.printStackTrace();
-//            }
-//        }
-//    }else{
-//      Debug.errprintln("Unable execute set post, no entity set");
-//      return null;
-//    }
-//    return null;
+//
+//    // Create a trustmanager
+//    TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+//    tmf.init(keyStore);
+//
+//    // Create a keymanager
+//    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+//    kmf.init(keyStore, trustRootsPassword.toCharArray());
+//
+//    // Setup SSL context
+//    SSLContext sslcontext = SSLContext.getInstance("SSL");
+//    sslcontext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+//        new java.security.SecureRandom());
+//    SSLSocketFactory socketFactory = new SSLSocketFactory(sslcontext);
+//
+//    Scheme sch = new Scheme("https", socketFactory, 443);
+//
+//    
+    DefaultHttpClient httpclient =new DefaultHttpClient();
+//    httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+    
+    HttpPost httpPost=new HttpPost(connectToURL);
+    if(headers!=null){
+      SortedSet<String> a = headers.getKeys();
+      for(String b : a){
+        //System.out.println("Adding header "+b+"="+headers.getValue(b).firstElement());
+        httpPost.addHeader(b,headers.getValue(b).firstElement());
+        Debug.println("addHeader ["+b+","+headers.getValue(b).firstElement()+"]");
+      }
+    }
+    httpPost.addHeader("Content-Type","application/x-www-form-urlencoded ");
+    httpPost.setEntity(new StringEntity(postData));
+    Debug.println("connectToURL ["+connectToURL+"]");
+    Debug.println("Posting ["+postData+"]");
+    HttpResponse httpResponse=httpclient.execute(httpPost);
+    return EntityUtils.toString(httpResponse.getEntity(),"utf-8");
   }
 }

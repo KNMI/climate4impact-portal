@@ -6,11 +6,35 @@ import tools.ProcessRunner;
 public class NetCDFC {
   static class NCDump{
     private String ncdumpResult="";
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}}
+    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}
+
+    @Override
+    public void setError(String message) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public String getError() {
+      // TODO Auto-generated method stub
+      return null;
+    }}
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {
         ncdumpResult+=new String(message,0,bytesRead);
 
       }
+
+    @Override
+    public void setError(String message) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public String getError() {
+      // TODO Auto-generated method stub
+      return null;
+    }
     }
 
      

@@ -42,6 +42,7 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -55,8 +56,15 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Map;
+import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -102,14 +110,17 @@ public class OAuth2Handler {
   *    And add other SSL certificates from configured Oauth2 providers like CEDA 
   *  
   *  === Adding an SSL cert to the truststore can be done like: ===
-  *  echo | openssl s_client -connect accounts.google.com:443 2>&1 | sed -ne
-  *  '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > accounts.google.com
+  *  echo | openssl s_client -connect accounts.google.com:443 2>&1 | sed -ne  '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > accounts.google.com
   *  echo | openssl s_client -connect github.com:443 2>&1 | sed -ne '/-BEGIN
   *  CERTIFICATE-/,/-END CERTIFICATE-/p' > github.com
   *  keytool -import -v -trustcacerts -alias accounts.google.com -file
   *  accounts.google.com -keystore esg-truststore2.ts
   *  keytool -import -v -trustcacerts -alias github.com -file github.com
   *  -keystore esg-truststore2.ts 
+  *  
+echo | openssl s_client -connect slcs.ceda.ac.uk:443 2>&1 | sed -ne  '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > slcs.ceda.ac.uk
+keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -keystore /usr/people/plieger/impactportal/esg-truststore2.ts
+
   *
   * 
   * === Test URLs to check which are restricted ===
@@ -137,6 +148,28 @@ public class OAuth2Handler {
   * - https://console.developers.google.com/project
   * 
   */
+  
+  static Map<String,StateObject> states = new ConcurrentHashMap<String,StateObject>();//Remembered states
+  
+  public static class StateObject{
+    StateObject(String redirectURL){
+      this.redirectURL = redirectURL;
+      creationTimeMillies = tools.DateFunctions.getCurrentDateInMillis();
+    }
+    public String redirectURL ="";
+    long creationTimeMillies;
+  }
+  
+  private static void cleanStateObjects(){
+    long currentTimeMillis = tools.DateFunctions.getCurrentDateInMillis();
+    for (Map.Entry<String, StateObject> entry : states.entrySet()){
+      StateObject stateObject = entry.getValue();
+      if(currentTimeMillis-stateObject.creationTimeMillies>1000*60){
+        Debug.println("Removing unused state with key" +entry.getKey());
+        states.remove(entry.getKey());
+      }
+    }
+  }
 
   static String oAuthCallbackURL = "/oauth"; // The external Servlet location
 
@@ -215,14 +248,23 @@ public class OAuth2Handler {
   static void getCode(HttpServletRequest httpRequest,
       HttpServletResponse response) throws OAuthSystemException, IOException {
     LoginManager.logout(httpRequest);
+  
+    
     Debug.println("getQueryString:"+httpRequest.getQueryString());
     
     String c4i_redir = "";
     try {
       c4i_redir=HTTPTools.getHTTPParam(httpRequest, "c4i_redir");
     } catch (Exception e1) {
-      Debug.errprintln("No redir URL given");
+      Debug.println("Note: No redir URL given");
     }
+    
+    cleanStateObjects();
+    
+    String stateID = UUID.randomUUID().toString();
+    long currentTimeMillis = tools.DateFunctions.getCurrentDateInMillis();
+    states.put(stateID, new StateObject(c4i_redir));
+    
     String provider = null;
     try {
       provider = tools.HTTPTools.getHTTPParam(httpRequest, "provider");
@@ -241,7 +283,7 @@ public class OAuth2Handler {
     JSONObject state = new JSONObject();
     try {
       state.put("provider", provider);
-      state.put("c4i_redir", c4i_redir);
+      state.put("state_id", stateID);
     } catch (JSONException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -289,9 +331,9 @@ public class OAuth2Handler {
       JSONObject stateResponseAsJSONObject = (JSONObject) new JSONTokener(stateResponseAsString)
           .nextValue();
       
-      String c4i_redir= stateResponseAsJSONObject.getString("c4i_redir");
+      String stateID= stateResponseAsJSONObject.getString("state_id");
       
-      Debug.println("  OAuth2 Step 2 OAuthz: c4i_redir="+c4i_redir);
+      Debug.println("  OAuth2 Step 2 OAuthz: stateID="+stateID);
       
       if (request.getParameter("r") != null) {
         Debug
@@ -330,9 +372,22 @@ public class OAuth2Handler {
 
       Debug.println("  OAuth2 Step 2 OAuthz:  ACCESS TOKEN:"
           + oauth2Response.getAccessToken());
-
+      
+    
+      
+      StateObject stateObject = states.get(stateID);
+      
+      if(stateObject == null){
+        throw new Exception("  OAuth2 Step 2 OAuthz:  Given STATE parameter is not matching, incorrect!!!");
+      }else{
+        Debug.println("  OAuth2 Step 2 OAuthz:  Found state object with key "+stateID);
+      }
+      
       handleSpecificProviderCharacteristics(request, settings, oauth2Response);
 
+
+      
+      String c4i_redir = stateObject.redirectURL;
       if(c4i_redir.equals("")==false){
         Debug.println(" sendRedirect("+"/impactportal/account/login_embed.jsp?c4i_redir="+c4i_redir);
         response.sendRedirect("/impactportal/account/login_embed.jsp?c4i_redir="+c4i_redir);
@@ -486,9 +541,34 @@ public class OAuth2Handler {
       e.printStackTrace();
     }
 
+//    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//    
+//    trustManagerFactory.init((KeyStore)null);
+//     
+//    System.out.println("JVM Default Trust Managers:");
+//    for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+//        System.out.println(trustManager);
+//        
+//        if (trustManager instanceof X509TrustManager) {
+//            X509TrustManager x509TrustManager = (X509TrustManager)trustManager;
+//            
+//            System.out.println("\tAccepted issuers count : " + x509TrustManager.getAcceptedIssuers().length);
+//            for(int j=0;j< x509TrustManager.getAcceptedIssuers().length;j++){
+//              X509Certificate issuer = x509TrustManager.getAcceptedIssuers()[j];
+//              Debug.println("getIssuerDN"+issuer.getIssuerDN().getName().toString());
+//            }
+//        }
+//    }
+    
     //TODO hard coded slcs service
-    String SLCSX509Certificate = HTTPTools.makeHTTPostRequestWithHeaders(
-        "https://slcs.ceda.ac.uk/oauth/certificate/", key, postData);
+    String SLCSX509Certificate = null;
+    try{
+      SLCSX509Certificate = HTTPTools.makeHTTPostRequestWithHeaders(
+          "https://slcs.ceda.ac.uk/oauth/certificate/", key, postData);
+    }catch(SSLPeerUnverifiedException e){
+      Debug.printStackTrace(e);
+      throw new Exception("SSLPeerUnverifiedException: Unable to retrieve SLC from SLCS for https://slcs.ceda.ac.uk/");
+    }
 
     if (SLCSX509Certificate != null) {
       Debug.println("Succesfully retrieved an SLCS\n");

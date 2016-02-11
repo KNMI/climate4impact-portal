@@ -11,11 +11,14 @@ public class ProcessRunner{
 	Process child = null;
 	int exitCode = 0;
 	public interface StatusPrinterInterface{
+	  public void setError(String message);
+	  public String getError();
 		public void print(byte[] message,int bytesRead);
 	}
 	//This threads runs during the execution of the child program
 	private class StatusPrinterThread extends Thread{
 	  InputStream reader = null;
+	
 		StatusPrinterInterface printer = null;
 		StatusPrinterThread (StatusPrinterInterface _printer,InputStream brstdout){
 			reader=brstdout;		
@@ -31,7 +34,7 @@ public class ProcessRunner{
 
 		    }
 		    catch (Exception e) {
-		      Debug.printStackTrace(e);
+		      
 		      String msg=("Exception in ProcessRunner.StatusPrinterThread: " + e.getMessage());
 		    	printer.print(msg.getBytes(),msg.length());
 		    }

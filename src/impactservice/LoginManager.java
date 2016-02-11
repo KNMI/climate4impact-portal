@@ -583,7 +583,7 @@ public class LoginManager {
 //      jsonResponse.setErrorMessage(msg, 500);
 //      return jsonResponse;
     } catch (WebRequestBadStatusException e) {
-      Debug.println("WebRequestBadStatusException: " + e.getMessage() + ":"
+      Debug.println("WebRequestBadStatusException: " +":"
           + e.getStatusCode());
       if (e.getStatusCode() == 400) {
         msg += "HTTP status code " + e.getStatusCode() + ": Bad request\n";

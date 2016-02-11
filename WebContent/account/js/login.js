@@ -1,4 +1,4 @@
-
+	var c4i_user=false;
   var OpenIDProviders = {
       
       'CEDA':{
@@ -295,7 +295,7 @@ var closeLoginPopupDialog = function(){
       }
     }
     if(isDialogTrueOrWindowFalse == true){
-      try{doReload = window.parent. getReloadAfterLogin();}catch(e){
+      try{doReload = window.parent.getReloadAfterLogin();}catch(e){
         console.log("Dialog: parent window has no reload function: "+e);
       }
       if(doReload == true){
@@ -304,8 +304,9 @@ var closeLoginPopupDialog = function(){
       }
     }
   };
+  
   if(isDialogTrueOrWindowFalse == true){
-    window.parent.$('#loginDialog').dialog('close');
+    window.parent.$('.loginDialog').dialog('close');
     var t = new Timer();
     console.log('calling reload by timer');
     t.InitializeTimer(50,reloadWindow);
@@ -371,7 +372,8 @@ function c4i_checkiframe(fr) {
 	try{
 	  if (!fr.contentDocument.location) throw(1);
 	}catch(e){
-		c4i_logindialog_dialog.dialog().html("<div style=\"height:300px;\"><h1>Sorry, an error occured</h1>Unable to open iframe!<br/><br/>Showing the login window is probably denied by X-Frame-Options from the identity provider.<br/><br/><br/>Please go to the main login page, and try there. After signing in you can close this window.</div>").append(c4i_login_dialog_footer);
+		
+		c4i_logindialog_dialog.dialog().html("<div style=\"height:300px;\"><h1>Sorry, an error occured</h1>Unable to open iframe!<br/><br/>Showing the login window is probably denied by X-Frame-Options from the identity provider.<br/><br/><br/>Please  <a target=\"_blank\" href=\"/impactportal/account/login.jsp\">Go to the main login page.</a>, and try there. After signing in you can close this window.</div>").append(c4i_login_dialog_footer);
 	}
 };
 	
@@ -409,13 +411,16 @@ var _generateLoginDialog = function(doReload){
 	    src+="&doreload=true";
 	  }
 	  c4i_logindialog_dialog.bind('dialogclose', function(event) {
-
+		if(c4i_user==true){ //Set in login_embed.jsp
 	    if (typeof doReload === "function") {
 	    	console.log("calling function");
-	    	doReload();
+	    	
+	    		doReload();
+	    	
 	    }else if(doReload === true){
 	    	console.log("reload page");
 	    	location.reload();
+	    }
 	    }
     });
 	    
