@@ -1,4 +1,5 @@
-	var c4i_user=false;
+  var c4i_user=false;
+  
   var OpenIDProviders = {
       
       'CEDA':{
@@ -272,6 +273,7 @@ var openDialog = function(datacentre) {
 };
 
 var closeLoginPopupDialog = function(){
+  c4i_user=true;
   console.log("closeLoginPopupDialog")
   var isDialogTrueOrWindowFalse = false;
   
@@ -283,6 +285,7 @@ var closeLoginPopupDialog = function(){
   
 
   var reloadWindow = function(){
+	
     console.log('reloadWindow: isDialogTrueOrWindowFalse'+isDialogTrueOrWindowFalse);
     var doReload = false;
     if(isDialogTrueOrWindowFalse == false){
@@ -326,20 +329,21 @@ var getUrlVar = function(key){
   return result && unescape(result[1]) || "";
 };
 
-//var doReloadAfterLogin = false;
-///*Being called by the dialog popup*/
-//var setReloadAfterLogin = function(reload){
-//  //console.log("Reload function called by popup with value "+reload);
-//  if(reload == 'true'){
-//    doReloadAfterLogin = true;
-//  }
-//}
-//var getReloadAfterLogin = function(){
-//  if(doReloadAfterLogin == false){
-//    setReloadAfterLogin(getUrlVar('doreload')) ;
-//  }
-//  return doReloadAfterLogin;
-//}
+var doReloadAfterLogin = false;
+/*Being called by the dialog popup*/
+var setReloadAfterLogin = function(reload){
+  c4i_user=true;
+  //console.log("Reload function called by popup with value "+reload);
+  if(reload == 'true'){
+    doReloadAfterLogin = true;
+  }
+}
+var getReloadAfterLogin = function(){
+  if(doReloadAfterLogin == false){
+    setReloadAfterLogin(getUrlVar('doreload')) ;
+  }
+  return doReloadAfterLogin;
+}
 
 /**
  * Generated a popup login dialog
@@ -411,7 +415,8 @@ var _generateLoginDialog = function(doReload){
 	    src+="&doreload=true";
 	  }
 	  c4i_logindialog_dialog.bind('dialogclose', function(event) {
-		if(c4i_user==true){ //Set in login_embed.jsp
+		if(c4i_user===true){ //Set in login_embed.jsp
+			console.log("Found user info");
 	    if (typeof doReload === "function") {
 	    	console.log("calling function");
 	    	
@@ -421,6 +426,10 @@ var _generateLoginDialog = function(doReload){
 	    	console.log("reload page");
 	    	location.reload();
 	    }
+	    }else if(c4i_user===false){
+	    	console.log("No user info set.");
+	    }else{
+	    	console.log("User info undefined.");
 	    }
     });
 	    

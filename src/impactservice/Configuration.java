@@ -158,7 +158,7 @@ public class Configuration {
     private static String drupalHost="<drupalhost>";
     private static String drupalBaseURL="<drupalbaseurl>";
     private static String drupalDirectory="<drupaldirectory>";
-    private static String portalFilesLocation="http://climate4impact.eu/files/";
+    private static String portalFilesLocation="https://climate4impact.eu/files/";
     public static void doConfig(XMLElement  configReader){
       drupalHost=configReader.getNodeValue("impactportal.drupalconfig.drupalhost");
       drupalBaseURL=configReader.getNodeValue("impactportal.drupalconfig.drupalbaseurl");

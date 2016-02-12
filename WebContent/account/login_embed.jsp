@@ -7,6 +7,7 @@
 <head>
 
 
+
 <jsp:include page="../includes-ui.jsp" />
 <link rel="stylesheet" href="/impactportal/account/login.css"
 	type="text/css" />
@@ -50,6 +51,7 @@ body,.x-body {
 	%>
 	<script type="text/javascript">
 	 c4i_user=false;
+	 console.log("Setting user info to false");
 	</script>
 	<div class="impactcontent">
 		<div class="cmscontent">
@@ -71,6 +73,7 @@ body,.x-body {
 
 	<script type="text/javascript">
 	c4i_user=true;
+	console.log("Setting user info to true");
     var t = new Timer();
     console.log("starting closeLoginPopupDialog");
     var c4i_redir=getUrlVar('c4i_redir')

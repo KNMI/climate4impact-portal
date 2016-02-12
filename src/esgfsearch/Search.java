@@ -266,26 +266,41 @@ public class Search {
 
     @Override
     public ASyncGetCatalogResponse call() throws Exception {
-        return new ASyncGetCatalogResponse(getCatalog(url,request));
+     Exception e = null;
+     String a = null;
+      try{
+        a=getCatalog(url,request);
+        //Debug.println("Catalog OK ");
+      }catch(Exception e2){
+        //Debug.errprintln("ASyncGetCatalogResponse: exception: "+e2.getMessage());
+        e=e2;
+      }
+      return new ASyncGetCatalogResponse(a,e);
     }
   }
   
   public class ASyncGetCatalogResponse {
       private String body;
-      boolean _isFinished=false;
+      private Exception exception;
+//      boolean _isFinished=false;
   
-      public ASyncGetCatalogResponse(String string) {
+      public ASyncGetCatalogResponse(String string, Exception exception) {
           this.body = string;
-          _isFinished=true;
+          this.exception = exception;
+//          _isFinished=true;
       }
   
       public String getBody() {
           return body;
       }
       
-      public boolean isFinished(){
-        return _isFinished;
+      public Exception getException(){
+        return exception;
       }
+      
+//      public boolean isFin2ished(){
+//        return _isFinished;
+//      }
   }
   
 
@@ -332,15 +347,44 @@ public class Search {
           //Debug.println("STILL");
         }else{
           try {
-            urlBeingChecked.response.get().getBody();
-            r.setMessage("{\"message\":\"status ok\",\"ok\":\"ok\"}");
+            ASyncGetCatalogResponse response = urlBeingChecked.response.get();
+            Exception e = response.getException();
+            if(e!=null){
+              if(e instanceof WebRequestBadStatusException){
+                WebRequestBadStatusException w = ((WebRequestBadStatusException)e);
+                JSONObject m = new JSONObject();
+                try {
+                  String message = "Error, code: "+w.getStatusCode();
+                  m.put("message",message);
+                  m.put("ok", "false" );
+                  urlsBeingChecked.remove(query);
+                } catch (JSONException e1) {
+                }
+                r.setMessage(m);
+              }else{
+                Debug.println("Exception"+e.getMessage());
+                JSONObject m = new JSONObject();
+                try {
+                  String message = e.getClass().getSimpleName();
+                  m.put("message",message);
+                  m.put("ok", "false" );
+                  urlsBeingChecked.remove(query);
+                } catch (JSONException e1) {
+                }
+                r.setMessage(m);
+              }
+            }else{
+              //String body = urlBeingChecked.response.get().getBody();
+              r.setMessage("{\"message\":\"status ok\",\"ok\":\"ok\"}");
+            }
+            
+            
+            
           } catch (Exception e) {
-            e.printStackTrace();
+            Debug.printStackTrace(e);
             JSONObject m = new JSONObject();
             try {
               String message = e.getCause().getMessage();
-              //message=message.replaceAll("tools.HTTPTools\\$WebRequestBadStatusException: ", "");
-              Debug.errprintln("Failed:"+message);
               m.put("message",message);
               m.put("ok", "false" );
               urlsBeingChecked.remove(query);
@@ -421,9 +465,9 @@ public class Search {
     if(ISOK == false){
       throw new Exception("Unable to GET catalog "+catalogURL+" : "+errorMessage);
     }
-    Debug.println("CATALOG GET SET");
+    //Debug.println("CATALOG GET SET");
     DiskCache.set_2(cacheLocation, "dataset_"+catalogURL, response);
-    Debug.println("CATALOG GET SET DONE");
+    //Debug.println("CATALOG GET SET DONE");
     return response;
   }
   
