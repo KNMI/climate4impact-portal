@@ -361,6 +361,7 @@ var generateLoginDialogNewPage = function(doReload){
  * @param doReload Can be true, the page will reload. When a function is provided, this will be triggered when done.
  */
 var generateLoginDialog = function(doReload){
+	c4i_user=false;
 	$.ajax('/impactportal/account/logout.jsp').done(function(data){
 		_generateLoginDialog(doReload);
 	});
@@ -370,6 +371,11 @@ var generateLoginDialog = function(doReload){
 var c4i_logindialog_dialog;
 
 
+var c4i_logindialog_dialog_reload = function(){
+	c4i_user=true;
+	c4i_logindialog_dialog.dialog('close');
+}
+
 var c4i_login_dialog_footer = $('<div class="logindialogfooter" ><i>Do you encounter an untrusted connection or do you have other problems? <a href="#" onclick="window.history.back();">Go back</a> or <a target="_blank" href=\'/impactportal/account/login.jsp\'>Go to the main login page.</a></i></div>');
 
 function c4i_checkiframe(fr) {
@@ -377,7 +383,12 @@ function c4i_checkiframe(fr) {
 	  if (!fr.contentDocument.location) throw(1);
 	}catch(e){
 		
-		c4i_logindialog_dialog.dialog().html("<div style=\"height:300px;\"><h1>Sorry, an error occured</h1>Unable to open iframe!<br/><br/>Showing the login window is probably denied by X-Frame-Options from the identity provider.<br/><br/><br/>Please  <a target=\"_blank\" href=\"/impactportal/account/login.jsp\">Go to the main login page.</a>, and try there. After signing in you can close this window.</div>").append(c4i_login_dialog_footer);
+		c4i_logindialog_dialog.dialog().html(
+				"<div style=\"height:300px;\"><h1>Sorry, an error occured</h1>"+
+				"<br/><br/><br/>The identity provider does not allow to show the login dialog in this page."+
+				"<br/><br/><br/>Please click here to <a target=\"_blank\" href=\"/impactportal/account/login.jsp\">go to the login page</a>. "+
+				"<br/><br/><br/>You can click <a href=\"#\" onclick=\"javascript:c4i_logindialog_dialog_reload()\">continue</a> after logging in and closing that window.</div>"
+				).append(c4i_login_dialog_footer);
 	}
 };
 	

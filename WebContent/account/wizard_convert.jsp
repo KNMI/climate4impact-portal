@@ -141,7 +141,7 @@
               <tr><td><div class="coverage"><select class="coveragecombo"><option>---</option></select></div></td></tr>
             </table>
             <table class="wpsinput">
-              <tr><th><b>Projection</b></th><th></th></tr>
+              <tr><th><b>Geographic projection</b></th><th></th></tr>
               <tr><td><div class="projectionselector"><select name="projectioncombo"><option>---</option></select></div></td></tr>
             </table>
             <table class="wpsinput">
@@ -159,7 +159,7 @@
               <tr><th><b>Dates</b></th><th></th></tr>
               <tr><td>Start date:</td><td><input class="startdate" style="width:150px;" type="text" value="2014-01-01T00:00:00Z"/></td></tr>
               <tr><td>Stop date:</td><td><input class="stopdate" style="width:150px;" type="text" value="2015-01-01T00:00:00Z"/></td></tr>
-              <tr><td>Time resolution:</td><td><input class="timeresolution" style="width:150px;" type="text" value="P1D"/></td></tr>
+              <!-- <tr><td>Time resolution:</td><td><input class="timeresolution" style="width:150px;" type="text" value="P1D"/></td></tr>-->
             </table>
             <table class="wpsinput">
               <tr><th><b>Format</b></th><th></th></tr>

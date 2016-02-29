@@ -152,7 +152,7 @@ public class HTTPTools extends HttpServlet {
     }
 
     public String getMessage() {
-      return result;
+      return ""+statusCode;
     }
   }
 

@@ -83,7 +83,7 @@ public class ProcessRunner{
 	      }
 	      
 	      /*for(int j=0;j<environmentVars.length;j++){
-          DebugConsole.println(environmentVars[j]);
+          Debug.println(environmentVars[j]);
         }
 	      */
 	      File workingDir = null;
