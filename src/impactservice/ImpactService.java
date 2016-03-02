@@ -939,60 +939,12 @@ public class ImpactService extends HttpServlet {
 			handleBasketRequest(request,response,errorResponder);
 		}
 		
-    if(serviceStr.equals("account")){
-      handleAccountRequests(request,response);
-    }
-    
+
 		
 
 	}
   
-	/**
-	 * Handles account service requests, like generating/revoking access_tokens.
-	 * Service needs to be "account"
-	 * Possible requests are: 
-	 *  - "generatetoken": generates a new token
-	 *  - "listtokens": provides a list with all published accesstokens for this user
-	 * @param request
-	 * @param response
-	 */
-	private void handleAccountRequests(HttpServletRequest request,
-      HttpServletResponse response) {
-
-    Debug.println("Service \"account\"");
-    JSONResponse jsonResponse = new JSONResponse(request);
-    try {
-      String requestStr=HTTPTools.getHTTPParam(request, "request");
-      ImpactUser user = null;
-      user = LoginManager.getUser(request,response);
-      if(requestStr.equals("generatetoken")){
-        jsonResponse.setMessage(AccessTokenStore.generateAccessToken(user).toString());
-      }
-      if(requestStr.equals("listtokens")){
-        
-        JSONArray a = new JSONArray();
-        Vector<String> accessTokens = AccessTokenStore.listtokens(user);
-        for(int j=0;j<accessTokens.size();j++){
-          a.put((JSONObject) new JSONTokener(accessTokens.get(j)).nextValue());
-        }
-        jsonResponse.setMessage(a.toString());
-        a = null;
-      }
-    } catch(Exception e){
-      e.printStackTrace();
-      jsonResponse.setException("Service account failed",e);
-    }
-    
-    try {
-      jsonResponse.print(response);
-    } catch (Exception e1) {
-    
-    }
-
-    
-  }
-
-
+	
 
   private void handleSessionRequests(HttpServletRequest request,HttpServletResponse response) {
     HttpSession session = request.getSession();
