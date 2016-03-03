@@ -44,8 +44,8 @@ public class CLIPCTokenAPI extends HttpServlet {
     // TODO Auto-generated method stub
     JSONResponse jsonResponse = new JSONResponse(request);
 
-    String expectedIssuerDN   = "CN=clipctokenapi, OU=RDWDTCA, O=KNMICA";
-    String expectedSubjectDN  = "CN=clipctokenapiformaris, OU=MARIS, O=MARIS";
+    String expectedIssuerDN   = "CN=knmi_clipc_ca_tokenapi, OU=RDWDT, O=KNMICLIPCCA";
+    String expectedSubjectDN  = "CN=clipctokenapiformaris_20160303, OU=MARIS, O=MARIS";
     String issuerDN=null;
     String subjectDN=null;
     // org.apache.catalina.authenticator.SSLAuthenticator
