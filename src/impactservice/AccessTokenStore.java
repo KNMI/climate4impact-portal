@@ -1,6 +1,7 @@
 package impactservice;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,11 +21,12 @@ public class AccessTokenStore {
   /**
    * Map of access_tokens, key is the access_token, value is the stringified JSONObject.
    */
-  private static Map<String,String> access_tokens= new TreeMap<String,String>();
+  private static Map<String, String> access_tokens = Collections.synchronizedMap(new TreeMap<String,String>());
+  
   /**
    * Determines wether the store is already loaded from a file.
    */
-  private static boolean isTokenStoreLoaded = false;
+  private static long isTokenStoreLoaded = -1;//Time at which store was loaded
   
   public static class AccessTokenHasExpired extends Exception {
 
@@ -45,9 +47,15 @@ public class AccessTokenStore {
   }
   
   public static void loadAccessTokens() throws  JSONException{
-    if(isTokenStoreLoaded == true)return;
+    long currentDateMillis = tools.DateFunctions.getCurrentDateInMillis();
+    
+   if((currentDateMillis-isTokenStoreLoaded)/1000<10 && isTokenStoreLoaded!=-1){
+      //Debug.println("Skipping loadAccessTokens, mssec: "+(currentDateMillis-isTokenStoreLoaded));
+      return;
+    }
+    
     String fileName = Configuration.getImpactWorkspace()+"tokens.json";
-    Debug.print("loadAccessTokens:"+fileName);
+    Debug.println("loadAccessTokens:"+fileName);
     String accessTokenData = null;
     try{
       accessTokenData = tools.Tools.readFile(fileName);
@@ -59,24 +67,44 @@ public class AccessTokenStore {
     Iterator<String> b = a.keys();
     while( b.hasNext()){
       String c = (String) b.next();
-      Debug.println(c);
-      Debug.println(a.get(c).toString());
+      //Debug.println(c);
+      //Debug.println(a.get(c).toString());
       JSONObject d = a.getJSONObject(c);
       access_tokens.put(c, d.toString());
     }
-    //isTokenStoreLoaded = true;
+
+    isTokenStoreLoaded = currentDateMillis;
   }
   
   public static void saveAccessTokens() throws JSONException, IOException{
-    loadAccessTokens();
+    if(access_tokens.size()==0)return;
     String fileName = Configuration.getImpactWorkspace()+"tokens.json";
-    Debug.print("saveAccessTokens:"+fileName);
+    Debug.print("saveAccessTokens:"+fileName+" found nr of tokens: "+access_tokens.size());
       JSONObject a = new JSONObject();
       for (Entry<String, String> param : access_tokens.entrySet()) {
         a.put(param.getKey(),(JSONObject) new JSONTokener(param.getValue()).nextValue());
       }
       tools.Tools.writeFile(fileName, a.toString());
       a = null;
+  }
+  
+  public static JSONObject getAccessToken(ImpactUser user,long ageValidInSeconds) throws JSONException, IOException{
+    Vector<String> tokens = listtokens(user); 
+    for(int j=0;j<tokens.size();j++){
+      JSONObject a = (JSONObject) new JSONTokener(tokens.get(j)).nextValue();
+      String notafter = a.getString("notafter");
+      try {
+        long notAfterMillis = tools.DateFunctions.getMillisFromISO8601Date(notafter);
+        long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
+        if(notAfterMillis-currentMillis>ageValidInSeconds*1000){
+          return a;
+        }
+      } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    return generateAccessToken(user);
   }
   
   public static JSONObject generateAccessToken(ImpactUser user){
@@ -86,11 +114,15 @@ public class AccessTokenStore {
     try {
       jsonObject.put("token", ""+idOne);
       jsonObject.put("userid", ""+user.getId());
+      if(user.getOpenId()!=null){
+        jsonObject.put("openid", ""+user.getOpenId());
+      }
       String currentDate = tools.DateFunctions.getCurrentDateInISO8601();
       jsonObject.put("creationdate", currentDate);
       jsonObject.put("notbefore", currentDate);
       try {
-        jsonObject.put("notafter", tools.DateFunctions.dateAddStepInStringFormat(currentDate, "week"));
+        //jsonObject.put("notafter", tools.DateFunctions.dateAddStepInStringFormat(currentDate, "week"));
+        jsonObject.put("notafter", tools.DateFunctions.dateAddStepInStringFormat(currentDate, "hour",10));
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
@@ -110,32 +142,58 @@ public class AccessTokenStore {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+    
+    try {
+      LoginManager.getCredential(user);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
     return jsonObject;
   }
 
-  public static Vector<String> listtokens(ImpactUser user) throws JSONException, IOException, AccessTokenIsNotYetValid, AccessTokenHasExpired {
+  public static Vector<String> listtokens(ImpactUser user) throws JSONException, IOException{
     loadAccessTokens();
     Vector<String> tokenList = new Vector<String>();
+    Vector<String> tokensToRemove = new Vector<String>();
     for (Entry<String, String> param : access_tokens.entrySet()) {
       JSONObject o = (JSONObject) new JSONTokener(param.getValue()).nextValue();
       try{
-        String userid = o.getString("userid");
-        if(userid.equals(user.getId())){
-          if(checkIfTokenIsValid(param.getKey())!=null){
+        
+        String token = null;
+      
+        token = checkIfTokenIsValid(param.getKey());
+      
+        if(token!=null){
+          String userid = o.getString("userid");
+          if(userid.equals(user.getId())){
             tokenList.add(o.toString());
-          }else{
-            Debug.println("Should remove this token!");
           }
+        }else{
+          tokensToRemove.add(param.getKey());
         }
       }catch(JSONException e){
-        MessagePrinters.emailFatalErrorException("Access token store is corrupt", e);
+        try {
+          MessagePrinters.emailFatalErrorException("Access token store is corrupt", e);
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
         e.printStackTrace();
       }
+    }
+    //Remove tokens:
+    for(int j=0;j<tokensToRemove.size();j++){
+      Debug.println("Removing token "+tokensToRemove.get(j)+" for user "+user.getId());
+      access_tokens.remove(tokensToRemove.get(j));
+    }
+    if(tokensToRemove.size()>0){
+      saveAccessTokens();
     }
     return tokenList;
   }
   
-  public static String checkIfTokenIsValid(String token) throws AccessTokenIsNotYetValid, AccessTokenHasExpired{
+  public static String checkIfTokenIsValid(String token){
     try {
       loadAccessTokens();
     } catch (JSONException e1) {
@@ -146,17 +204,14 @@ public class AccessTokenStore {
     if(v!=null){
       JSONObject a;
       try {
-        Debug.println(v);
+        //Debug.println(v);
         a = (JSONObject) new JSONTokener(v).nextValue();
-        Debug.println(a.toString());
+        //Debug.println(a.toString());
         String notbefore = a.getString("notbefore");
         String notafter = a.getString("notafter");
         long notbeforeMillis = tools.DateFunctions.getMillisFromISO8601Date(notbefore);
         long notafterMillis = tools.DateFunctions.getMillisFromISO8601Date(notafter);
         long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
-        Debug.println("notbeforeMillis: "+notbeforeMillis);
-        Debug.println("currentMillis: "+currentMillis);
-        Debug.println("notafterMillis: "+notafterMillis);
         if(notbeforeMillis>currentMillis){
           throw new AccessTokenIsNotYetValid();
         }
@@ -166,7 +221,7 @@ public class AccessTokenStore {
         return v;
       } catch (Exception e) {
         // TODO Auto-generated catch block
-        e.printStackTrace();
+        //e.printStackTrace();
       }
       
       
@@ -192,15 +247,14 @@ public class AccessTokenStore {
       }
       path = path.replaceAll("/", "");
       Debug.println("getPathInfo: "+path);
-      try{
+    
+      try {
         return (JSONObject) new JSONTokener(AccessTokenStore.checkIfTokenIsValid(path)).nextValue();
-      }catch(AccessTokenIsNotYetValid e){
-        throw e;
-      }catch(AccessTokenHasExpired e){
-        throw e;
-      }catch(Exception e){
-        //e.printStackTrace();
+      } catch (JSONException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
       }
+      
     }
     return null;
   }

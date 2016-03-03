@@ -1,5 +1,8 @@
 package tokenapi;
 
+import impactservice.AccessTokenStore;
+import impactservice.ImpactUser;
+import impactservice.LoginManager;
 import impactservice.MessagePrinters;
 
 import java.io.IOException;
@@ -14,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import tools.Debug;
+import tools.HTTPTools;
 import tools.JSONResponse;
 
 /**
@@ -39,6 +43,7 @@ public class CLIPCTokenAPI extends HttpServlet {
 
   /**
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+   * https://localhost/impactportal/clipctokenapi?service=account&request=generatetoken&client_id=ceda.ac.uk%2Fopenid%2FMaarten.Plieger"
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // TODO Auto-generated method stub
@@ -60,12 +65,41 @@ public class CLIPCTokenAPI extends HttpServlet {
     boolean authenticationOK = false;
     if(issuerDN!=null && subjectDN!=null){
       Debug.println("CLIPCTokenAPI request received");
-      Debug.println("issuerDN : ["+issuerDN+"]");
-      Debug.println("subjectDN: ["+subjectDN+"]");
+//      Debug.println("issuerDN : ["+issuerDN+"]");
+//      Debug.println("subjectDN: ["+subjectDN+"]");
       authenticationOK = true;
       if(issuerDN.equals(expectedIssuerDN)){
         if(subjectDN.equals(expectedSubjectDN)){
           authorizationOK = true;
+          try {
+            String serviceStr=HTTPTools.getHTTPParam(request, "service");
+            if(serviceStr.equals("account")){
+              try {
+                String requestStr=HTTPTools.getHTTPParam(request, "request");
+                if(requestStr.equals("generatetoken")){
+                  try {
+                    String userID=HTTPTools.getHTTPParam(request, "client_id");
+                    Debug.println("Found generatetoken request for user "+userID);
+                    int status = getAccessToken(userID,request,jsonResponse);
+                    if(status != 0){
+                      errorMessage="Unable to find user id";
+                    }
+                  }catch (Exception e) {
+                    errorMessage="parameter userID is missing or wrong";
+                  }
+                }else{
+                  errorMessage="parameter request is or wrong";
+                }
+                  
+              }catch (Exception e) {
+                errorMessage="parameter request is missing or wrong";
+              }
+            }else{
+              errorMessage="parameter service is wrong";
+            }
+          } catch (Exception e) {
+            errorMessage="parameter service is missing or wrong";
+          }
         }else{
           errorMessage="subjectDN Mismatch!";
         }
@@ -80,6 +114,9 @@ public class CLIPCTokenAPI extends HttpServlet {
 
     JSONObject jsonobj = new JSONObject();
 
+    if(errorMessage!=null){
+      jsonResponse.setErrorMessage(errorMessage, 400);
+    }
     if(authenticationOK==false&&authorizationOK==false){
       jsonResponse.setErrorMessage(errorMessage, 401, null, null, null);
       MessagePrinters.emailFatalErrorMessage("clipctokenapi 401", errorMessage);
@@ -88,22 +125,51 @@ public class CLIPCTokenAPI extends HttpServlet {
       jsonResponse.setErrorMessage(errorMessage, 403, null, null, null);  
       MessagePrinters.emailFatalErrorMessage("clipctokenapi 403", errorMessage);
     }
+    
+    
 
-    if(jsonResponse.hasError()==false){
-      try {
-        if(authenticationOK && authorizationOK){
-          //Now generate a key for maris for a specfic user
-          jsonobj.put("status", "ok");
-        }
-      } catch (JSONException e) {
-      }
-      jsonResponse.setMessage(jsonobj);
-    }
+//    if(jsonResponse.hasError()==false){
+//      try {
+//        if(authenticationOK && authorizationOK){
+//          //Now generate a key for maris for a specfic user
+//          jsonobj.put("status", "ok");
+//        }
+//      } catch (JSONException e) {
+//      }
+//      jsonResponse.setMessage(jsonobj);
+//    }
     try {
       jsonResponse.print(response);
     } catch (Exception e1) {
 
     }
+  }
+
+  /**
+   * Obtains an access token from the tokenstore. A token will be re-used if the token is at least 8 hours valid. Otherwise a new token is returned.
+   * @param userId
+   * @param request
+   * @param jsonResponse
+   * @return
+   */
+  private int getAccessToken(String userId,HttpServletRequest request,JSONResponse jsonResponse) {
+    ImpactUser user = null;
+    user = LoginManager.getUser(userId, request);
+    if(user == null){
+      Debug.errprintln("Unable to find user in store ["+userId+"]");
+      return -1; 
+    }
+    Debug.println("Found user "+user.getInternalName());
+    try {
+      jsonResponse.setMessage(AccessTokenStore.getAccessToken(user,60*60*8).toString());
+    } catch (JSONException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return 0;
   }
 
   /**

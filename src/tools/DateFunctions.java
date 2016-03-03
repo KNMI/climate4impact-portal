@@ -10,6 +10,9 @@ public class DateFunctions {
 	public static SimpleDateFormat ISO8601DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	//Todo: convert the dateResolutionString to ISO format
 	public static String dateAddStepInStringFormat(String stringDate,String dateResolutionString) throws Exception{
+	  return dateAddStepInStringFormat(stringDate,dateResolutionString,1);
+	}
+	public static String dateAddStepInStringFormat(String stringDate,String dateResolutionString, int amount) throws Exception{
 		Date dateStartTime = null;
 		try {
 			dateStartTime = ISO8601DateTimeFormat.parse(stringDate);
@@ -25,23 +28,23 @@ public class DateFunctions {
 		date.setTime(time);
 		cal.setTime(date);
 		//Add second
-		if(dateResolutionString.equalsIgnoreCase("second"))cal.add(Calendar.SECOND, 1);
+		if(dateResolutionString.equalsIgnoreCase("second"))cal.add(Calendar.SECOND, amount);
 		//Add minute
-		if(dateResolutionString.equalsIgnoreCase("minute"))cal.add(Calendar.MINUTE, 1);
+		if(dateResolutionString.equalsIgnoreCase("minute"))cal.add(Calendar.MINUTE, amount);
 		//Add hour
-		if(dateResolutionString.equalsIgnoreCase("hour"))cal.add(Calendar.HOUR, 1);
+		if(dateResolutionString.equalsIgnoreCase("hour"))cal.add(Calendar.HOUR, amount);
 		//Add days
-		if(dateResolutionString.equalsIgnoreCase("day"))cal.add(Calendar.DATE, 1);
+		if(dateResolutionString.equalsIgnoreCase("day"))cal.add(Calendar.DATE, amount);
 		//Add week
-		if(dateResolutionString.equalsIgnoreCase("week"))cal.add(Calendar.DATE, 7);
+		if(dateResolutionString.equalsIgnoreCase("week"))cal.add(Calendar.DATE, amount*7);
     //Add decade
-		if(dateResolutionString.equalsIgnoreCase("decade"))cal.add(Calendar.DATE, 10);
+		if(dateResolutionString.equalsIgnoreCase("decade"))cal.add(Calendar.DATE, 10*amount);
 		//Add months
-		if(dateResolutionString.equalsIgnoreCase("month"))cal.add(Calendar.MONTH, 1);
+		if(dateResolutionString.equalsIgnoreCase("month"))cal.add(Calendar.MONTH, amount);
 		//Add season
-		if(dateResolutionString.equalsIgnoreCase("season"))cal.add(Calendar.MONTH, 3);
+		if(dateResolutionString.equalsIgnoreCase("season"))cal.add(Calendar.MONTH, amount*3);
 		//Add years
-		if(dateResolutionString.equalsIgnoreCase("year"))cal.add(Calendar.YEAR, 1);
+		if(dateResolutionString.equalsIgnoreCase("year"))cal.add(Calendar.YEAR, amount);
 		// Check whether we really added something
 		if(cal.getTimeInMillis()==time){
 			throw new Exception("dateResolutionString is invalid in dateAddStepInStringFormat: "+dateResolutionString);

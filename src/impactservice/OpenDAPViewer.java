@@ -60,12 +60,12 @@ public class OpenDAPViewer {
    
       try{
         user=LoginManager.getUser(request,response);
-        
+        Debug.println("INFO: User logged in: "+user.getInternalName());
 //        if(user == null){
 //          jsonResponse.setErrorMessage("Unable to get user from LoginManager",500);
 //        }
       }catch(Exception e){
-        Debug.println("INFO: User not logged in");
+        Debug.println("INFO: User NOT logged in");
       }
       
 

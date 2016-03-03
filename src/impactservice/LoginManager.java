@@ -115,7 +115,7 @@ public class LoginManager {
    *          User object with identifier and home directory set
    * @throws Exception
    */
-  private synchronized static void getCredential(ImpactUser user)
+  synchronized static void getCredential(ImpactUser user)
       throws Exception {
 
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
@@ -353,6 +353,12 @@ public class LoginManager {
     // Lookup the user in the vector list
     if (userId == null)
       return null;
+    
+    userId = userId.replace("http://", "");
+    userId = userId.replace("https://", "");
+    userId = userId.replaceAll("/", ".");
+ 
+    
     for (int j = 0; j < users.size(); j++) {
       if (users.get(j).getId().equals(userId)) {
         ImpactUser user = users.get(j);
@@ -432,10 +438,10 @@ public class LoginManager {
           Debug.println("Email: " + emailAddress);
         }
       }
-      if (!foundEmail) {
-        MessagePrinters.emailFatalErrorMessage("User email is not found",
-            "User email is not found for " + user.getId());
-      }
+//      if (!foundEmail) {
+//        MessagePrinters.emailFatalErrorMessage("User email is not found",
+//            "User email is not found for " + user.getId());
+//      }
     } catch (Exception e) {
       e.printStackTrace();
     }

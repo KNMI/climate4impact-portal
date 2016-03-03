@@ -689,8 +689,9 @@ public class OpenDAP {
     filePath = filePath.substring(0,filePath.lastIndexOf("/"));
     Debug.println("filePath        : "+filePath);
     try {
+      Debug.println("user:");
       ImpactUser user =  LoginManager.getUser(request,response);
-      
+      Debug.println("user:"+user);
       
       
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
