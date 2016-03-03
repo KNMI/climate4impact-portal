@@ -8,7 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -542,6 +544,11 @@ public class GenericCart {
 
     private static int putFiles(JSONArray userStorageChilds, String path,File dataDirFile,int j,ImpactUser impactUser) throws JSONException {
       File[] fileEntry = dataDirFile.listFiles();
+      Arrays.sort(fileEntry, new Comparator<File>(){
+        public int compare(File f1, File f2)
+        {
+            return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+        } });
       for(int f=0;f<fileEntry.length;f++){
         if(fileEntry[f].isDirectory()){
           JSONObject childrenObject = new JSONObject();
@@ -552,6 +559,7 @@ public class GenericCart {
           childrenObject.put("expanded",false);
           childrenObject.put("type","folder");
           childrenObject.put("iconCls", "typeFolder");
+          childrenObject.put("date",tools.DateFunctions.getTimeStampInMillisToISO8601(fileEntry[f].lastModified()));
           JSONArray childArray = new JSONArray();
           childrenObject.put("children",childArray);
           userStorageChilds.put(childrenObject);
