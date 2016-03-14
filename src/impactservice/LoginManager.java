@@ -230,7 +230,7 @@ public class LoginManager {
         try{
           JSONObject token = AccessTokenStore.checkIfTokenIsValid(request);
           if(token!=null){
-            Debug.println("Valid token "+token.toString()+" obtained");
+            //Debug.println("Valid token "+token.toString()+" obtained");
             id = token.getString("userid");
           }
         }catch(Exception e){

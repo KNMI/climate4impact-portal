@@ -134,7 +134,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		} else {
 
 			String identifier = req.getParameter("openid_identifier");
-			String referrer = req.getHeader("referer"); 
+			String referrer = getValidReferrer(req);//req.getHeader("referer"); 
 			if (identifier != null) {
 				
 				identifier=identifier.trim();
@@ -152,7 +152,6 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			} else {
 			  Debug.println("No OpenID given: directing to login page");
 			  Debug.println("INPUT ERROR: User came from path "+referrer);
-			  //TODO Remove first http:// part, URL needs to start with a / token, not http://cli
 				this.getServletContext().getRequestDispatcher(referrer)
 						.forward(req, resp); 
 			}

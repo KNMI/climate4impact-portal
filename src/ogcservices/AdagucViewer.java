@@ -273,19 +273,19 @@ public class AdagucViewer extends HttpServlet {
             String statusLocation = request.getParameter("request");
             
             String jsonData = "";
-            int maximumTries = 6;
+            int maximumTries = 20;
             boolean success = false;
             try{
               MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
               do{
                 maximumTries--;
-                Debug.println("Attempts remaining: "+maximumTries+" for get status location: "+statusLocation);
+                //Debug.println("Attempts remaining: "+maximumTries+" for get status location: "+statusLocation);
                 try{
                   b.parse(new URL(statusLocation));
                   success = true;
                 }catch(SAXException s){
                   Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
-                  Thread.sleep(800);
+                  Thread.sleep(6000);
                   if(maximumTries == 0){
                     GenericCart jobList;
                     try {

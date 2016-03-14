@@ -646,31 +646,41 @@ public class OpenDAP {
     
 
     //Retrieve user ID from path
+
+    boolean skipTokenFirst=false;
+    if(token!=null){
+      Debug.println("Found token in URL");
+      //Debug.println(token.toString());
+      skipTokenFirst = true;//token is the first piece of the part.
+    }
     String userIdFromPath = "";
     String cleanPath = "";//Complete string
     String[] pathParts = path.split("/");
+    //Debug.println("Found parts in path:"+pathParts.length);
     int pathPartsIndex = 0;
-    boolean skipTokenFirst=false;
-    if(token!=null){
-      Debug.println("Found token.");
-      skipTokenFirst = true;//token is the first piece of the part.
-    }
     while(pathPartsIndex<pathParts.length){
       String pathParth = pathParts[pathPartsIndex];
-      if(skipTokenFirst){
-        try {
-          if(pathParth.equals(token.getString("token"))){
-            skipTokenFirst = false;
+      //Debug.println("Checking pathParth "+pathPartsIndex+"  = ["+pathParth +"]");
+      if(pathParth.length()>0){
+        if(skipTokenFirst){
+          try {
+            //Debug.println("pathParth   = ["+pathParth +"]");
+            String tokenString = token.getString("token");
+            //Debug.println("tokenString = ["+tokenString +"]");
+            if(pathParth.equals(tokenString)){
+              skipTokenFirst = false;
+            }
+          } catch (JSONException e) {
+            e.printStackTrace();
           }
-        } catch (JSONException e) {
         }
-      }
-      else{
-        if(pathParth.length()>0){
-          if(userIdFromPath.length()==0){
-            userIdFromPath = pathParth;
+        else{
+          if(pathParth.length()>0){
+            if(userIdFromPath.length()==0){
+              userIdFromPath = pathParth;
+            }
+            cleanPath+="/"+pathParth;
           }
-          cleanPath+="/"+pathParth;
         }
       }
       pathPartsIndex++;
@@ -678,20 +688,20 @@ public class OpenDAP {
     
     token = null;
     
-    String fileNameFromPath = cleanPath.substring(cleanPath.lastIndexOf("/")+1); 
+    //Debug.println("cleanPath: "+cleanPath);
+    String fileNameFromPath = cleanPath.substring(cleanPath.lastIndexOf("/")+1);
+    //Debug.println("fileNameFromPath:    "+fileNameFromPath);
     String opendapNameFromPath = fileNameFromPath.substring(0,fileNameFromPath.lastIndexOf("."));
-  
-    Debug.println("cleanPath: "+cleanPath);
-    Debug.println("opendapNameFromPath: "+opendapNameFromPath);
-    Debug.println("fileNameFromPath:    "+fileNameFromPath);
-    Debug.println("userIdFromPath:      "+userIdFromPath);
+    //Debug.println("opendapNameFromPath: "+opendapNameFromPath);
+    
+    //Debug.println("userIdFromPath:      "+userIdFromPath);
     String filePath = cleanPath.substring(userIdFromPath.length()+1);
     filePath = filePath.substring(0,filePath.lastIndexOf("/"));
-    Debug.println("filePath        : "+filePath);
+    //Debug.println("filePath        : "+filePath);
     try {
       Debug.println("user:");
       ImpactUser user =  LoginManager.getUser(request,response);
-      Debug.println("user:"+user);
+      //Debug.println("user:"+user);
       
       
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;

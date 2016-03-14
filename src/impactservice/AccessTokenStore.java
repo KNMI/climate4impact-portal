@@ -221,7 +221,7 @@ public class AccessTokenStore {
         return v;
       } catch (Exception e) {
         // TODO Auto-generated catch block
-        //e.printStackTrace();
+        e.printStackTrace();
       }
       
       
@@ -247,12 +247,16 @@ public class AccessTokenStore {
       }
       path = path.replaceAll("/", "");
       Debug.println("getPathInfo: "+path);
+      if(path.indexOf(".")!=-1){
+        return null;
+      }
+      
     
       try {
-        return (JSONObject) new JSONTokener(AccessTokenStore.checkIfTokenIsValid(path)).nextValue();
-      } catch (JSONException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        String a = AccessTokenStore.checkIfTokenIsValid(path);
+        if(a==null)return null;
+        return (JSONObject) new JSONTokener(a).nextValue();
+      } catch (Exception e) {
       }
       
     }
