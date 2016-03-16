@@ -221,9 +221,9 @@ var FileViewerInterface = function(options){
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>';
     if(!options.dialog){
-      html+='<button class="c4i-fileviewer-downloadbutton"></button>'+
-        '<button class="c4i-fileviewer-addtobasketbutton"></button>'+
-        '<button class="c4i-fileviewer-reloadbutton"></button>';
+      html+='<button class="c4i-fileviewer-downloadbutton">Download</button>'+
+        '<button class="c4i-fileviewer-addtobasketbutton">Add to basket</button>'+
+        '<button class="c4i-fileviewer-reloadbutton">Reload</button>';
     }
     html+=    '</div>';
 
@@ -233,9 +233,9 @@ var FileViewerInterface = function(options){
       var b= [downloadbutton,addtobasketbutton,reloadbutton]
       options.element.dialog("option","buttons",b);
     }else{
-      rootElement.find(".c4i-fileviewer-downloadbutton").button(downloadbutton);
-      rootElement.find(".c4i-fileviewer-addtobasketbutton").button(addobasketbutton);
-      rootElement.find(".c4i-fileviewer-reloadbutton").button(reloadbutton);   
+      rootElement.find(".c4i-fileviewer-downloadbutton").button(downloadbutton).click(downloadbutton.click);
+      rootElement.find(".c4i-fileviewer-addtobasketbutton").button(addtobasketbutton).click(addtobasketbutton.click);
+      rootElement.find(".c4i-fileviewer-reloadbutton").button(reloadbutton).click(reloadbutton.click);   
     }
    /* var html="<table class=\"c4i-fileviewer-table\">";
 

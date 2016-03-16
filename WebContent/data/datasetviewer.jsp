@@ -45,40 +45,44 @@
 	  	  		}
 	  %>
   
-    <jsp:include page="../includes-ext.jsp" />
+    <jsp:include page="../includes.jsp" />
        <script type="text/javascript">
     	var serviceURL='/impactportal/ImpactService?';
     	var dataset=undefined;;
     	var openid="<%=openid%>";
     	dataset='<%= dapURL %>';
     </script>
+    <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
     <link rel="stylesheet" href="/impactportal/account/login.css" type="text/css" />
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script>
-    <script type="text/javascript" src="../js/components/search/searchmenus.js"></script>
-    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
+
+    <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <link rel="stylesheet" href="fileviewer/fileviewer.css" />
+    <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
+    
     <script type="text/javascript">
-  
-	
-                     
-    Ext.onReady(function(){
-    	Ext.override(Ext.data.proxy.Ajax,{ timeout:240000});
-    	setSearchServiceURL('<%="/"+impactservice.Configuration.getHomeURLPrefix()%>/ImpactService?'); 
-    	var fileViewer = new ExtFileViewer();
-		var container = Ext.create('Ext.container.Container', {
-	      layout:'fit',
-		  renderTo:'container',
-		  height:550,
-		  scripts:true,
-		  border:false,
-		  frame:false,
-	
-		  autoScroll:false, 
-		  items:fileViewer.getViewer(),
-		  loader: {} 
-		});
-		fileViewer.load(dataset);
-    });
+
+	  var c4iconfigjs = {
+	            searchservice:"/impactportal/esgfsearch?",
+	            impactservice:"/impactportal/ImpactService?",
+	            adagucservice:"/impactportal/adagucserver?",
+	            adagucviewer:"/impactportal/adagucviewer/",
+	            howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
+	            contactexpertlink:"/impactportal/help/contactexpert.jsp",
+	          }; 
+	  $( document ).ready(function() {
+	  var el = $("#fileviewercontainer");
+      renderFileViewerInterface({element:el,
+        service:c4iconfigjs.impactservice,
+        adagucservice:c4iconfigjs.adagucservice,
+        adagucviewer:c4iconfigjs.adagucviewer,
+        query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+        //query:dataset,
+        dialog:false
+      });   
+	  });
+
     </script>
     <style type="text/css">
      .x-form-field{
@@ -94,14 +98,14 @@
 	<div class="impactcontent">
 		<div class="cmscontent"> 
 			<h1>File information</h1>
-			<div class="bodycontent">    
+			<div class="bodycontent">
+			  <div id="fileviewercontainer" ></div>   
 		<!--<table>
 		 <tr><td>File: </td><td> <a target="_blank" href="<%= dataset%>"><%= dataset %></a></td></tr>
 		<tr><td>Description: </td><td><a target="_blank" href="<%= dataset+".dds"%>">Show opendap descriptor</a></td></tr>
 		</table>-->
 			<div id="datasetinfo"/>
 			<div id="container" style="border:1px solid lightgray;border-radius:4px;"></div>
-
 			</div>
 		</div>
 	</div>

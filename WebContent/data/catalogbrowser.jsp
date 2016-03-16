@@ -3,18 +3,28 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
   <head>
-    <jsp:include page="../includes-ext.jsp" />
+    <jsp:include page="../includes.jsp" />
     <script type="text/javascript" src="/impactportal/js/jqueryextensions/jquery.collapsible.min.js"></script>
     <link href="/impactportal/js/es-doc/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
     
     <link href="/impactportal/data/esgfsearch/esgfsearch.css" media="screen" rel="stylesheet" type="text/css" />
     <script src="/impactportal/js/es-doc/esdoc-min.js" type="text/javascript"></script>
-      <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
-        <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
-          <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
+    <script type="text/javascript" src="../js/jquery.blockUI.js"></script>    
+    <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <link rel="stylesheet" href="fileviewer/fileviewer.css" />
+    <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
+    <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
 
     <script type="text/javascript">
+  		  var c4iconfigjs = {
+            searchservice:"/impactportal/esgfsearch?",
+            impactservice:"/impactportal/ImpactService?",
+            adagucservice:"/impactportal/adagucserver?",
+            adagucviewer:"/impactportal/adagucviewer/",
+            howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
+            contactexpertlink:"/impactportal/help/contactexpert.jsp",
+          }; 
         var catalogURL = '';
         var errorMessage = '';
         <% 
