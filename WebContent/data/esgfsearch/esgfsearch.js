@@ -359,7 +359,8 @@ var SearchInterface = function(options){
       
       html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\"></span>";
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
-       html+= data.response.results[r].id.replaceAll("."," ");
+       var id = ""+data.response.results[r].id;
+       html+= id.replaceAll("."," ");
        html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span><br/>";
 //        html+="<span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span>";
        html+="</span>";

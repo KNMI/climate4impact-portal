@@ -7,10 +7,14 @@ var makeconsole = function(){
 	};
 };
 
-if(!console){
-	makeconsole();
-}
-if(!console.log){
+try{
+	if(!console){
+		makeconsole();
+	}
+	if(!console.log){
+		makeconsole();
+	}
+}catch(e){
 	makeconsole();
 }
 

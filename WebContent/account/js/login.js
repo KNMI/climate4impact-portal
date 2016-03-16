@@ -74,6 +74,9 @@ var checkOpenIdCookie = function(a) {
 
 $( document ).ready(function() {
 	var currentRedir=getUrlVar("c4i_redir");
+	if(!currentRedir){
+		currentRedir="";
+	}
 	 $.ajax('/impactportal/oauth?makeform').done(function(data){
 		 
 		 var html ="";
