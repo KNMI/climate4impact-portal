@@ -57,8 +57,8 @@ var CatalogBrowser = function(options){
     var loadCatalog = function(options,variableFilter,textFilter){
       options.element.empty().html('<div class="ajaxloader"></div>');
       
-      var httpCallback = function(data){
-        
+      var httpCallback = function(_data){
+        var data = _data.html;
         options.element.empty().html(data);
         
         options.element.find(".varFilter").keypress(preventSubmit);
@@ -69,8 +69,9 @@ var CatalogBrowser = function(options){
         //options.element.find(".varFilter").find('input[type="checkbox"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});1
         options.element.find('a').attr('target','_blank');
       };
-      
-      var url = "/impactportal/ImpactService?service=catalogbrowser&format=text/html&node="+encodeURIComponent(options.url);
+      var service = "/impactportal/ImpactService?";
+      if(options.service)service=options.service;
+      var url = service+"service=catalogbrowser&format=application/json&node="+encodeURIComponent(options.url);
       if(variableFilter==undefined){
         if(options.variables && options.variablesSet!==true){
           if(variableFilter==undefined)variableFilter="";
@@ -83,16 +84,20 @@ var CatalogBrowser = function(options){
       if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}
       if(variableFilter!=undefined){filters+="&variables="+encodeURIComponent(variableFilter);}
       url+=filters;
-      //console.log(url);
+     
       $.ajax({
-        url:  url
-        //crossDomain:true,
-        //dataType:"jsonp"
+        url:  url,
+        crossDomain:true,
+        dataType:"jsonp"
       }).done(function(d) {
+      
         httpCallback(d)
-      }).fail(function() {
-        httpCallback("Failed");
+      }).fail(function(e) {
+        console.log("fail");
+        httpCallback({html:"Failed "+e});
+     
       }).always(function(){
+     
       });
     }
     loadCatalog(options);

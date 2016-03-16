@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://climate4impact.eu/impactportal/js/jquery-ui-1.10.3/themes/base/jquery-ui.css" />
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery-1.9.0.js"></script>
+
+
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script> 
+<!--
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/ext-4.2.1.883/ext-all.js"></script>
+  <link rel="stylesheet" href="https://climate4impact.eu/impactportal/js/ext-4.2.1.883/resources/css/ext-all-neptune-rtl.css"/>-->
+
+  <script type="text/javascript" src="../fileviewer/fileviewer.js"></script>
+  <link rel="stylesheet" href="../fileviewer/fileviewer.css" />
+
+ <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery.blockUI.js"></script>
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/ImpactJS.js"></script>
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/account/js/login.js"></script>
+  <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/components/basket/basket.js"></script> 
+  <link rel="stylesheet" href="../esgfsearch/simplecomponent.css" />
+  <link rel="stylesheet" href="../body.css" />
+<!--<meta charset="UTF-8">-->
+<title>ESGF View</title>
+      <script type="text/javascript">
+     
+    
+
+      var c4iconfigjs = {
+        searchservice:"https://climate4impact.eu/impactportal/esgfsearch?",
+        impactservice:"https://climate4impact.eu//impactportal/ImpactService?",
+        adagucservice:"https://climate4impact.eu/impactportal/adagucserver?",
+        adagucviewer:"https://climate4impact.eu//impactportal/adagucviewer/",
+        howtologinlink:"http://localhost/impactportal/help/howto.jsp?q=create_esgf_account",
+        contactexpertlink:"https://climate4impact.eu/impactportal/help/contactexpert.jsp",
+      }; 
+      
+      $( document ).ready(function() {
+        var el = $("#fileviewercontainer");
+        renderFileViewerInterface({element:el,
+          service:"http://climate4impact.eu//impactportal/ImpactService?",
+          adagucservice:"http://climate4impact.eu/impactportal/adagucserver?",
+          adagucviewer:"http://climate4impact.eu//impactportal/adagucviewer/",
+          //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+          query:"http://aims3.llnl.gov/thredds/dodsC/cmip5_css01_data/cmip5/output1/IPSL/IPSL-CM5B-LR/rcp85/yr/ocnBgchem/Oyr/r1i1p1/v20120430/co3satcalc/co3satcalc_Oyr_IPSL-CM5B-LR_rcp85_r1i1p1_2006-2100.nc#",
+          dialog:true
+        });
+        
+   
+      });
+    </script>
+</head>
+<body>
+
+<div id="fileviewercontainer" ></div> 
+
+</body>
+</html>

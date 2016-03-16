@@ -740,103 +740,8 @@ div.viewcode-block:target {
 	font: normal 12px courier new;
 }
 
-.variable-results a {
-	color: #00F;
-	font: bold 14px tahoma, arial, helvetica, sans-serif;
-	text-decoration: none;
-	font-weight: normal;
-	cursor: pointer
-}
 
-.variable-results img {
-	vertical-align: middle;
-}
 
-.variable-results a:hover {
-	text-decoration: underline;
-	/*font-weight: bold;*/
-	cursor: pointer
-}
-
-.variable-results p {
-	margin: 3px !important;
-}
-
-.variable-item {
-	font: normal 12px tahoma, arial, helvetica, sans-serif;
-	/*padding:3px 10px 3px 10px;*/
-	margin: 0px 5px;;
-	padding: 2px;
-	border: 1px solid #fff;
-	border-bottom: 1px solid #eeeeee;
-	white-space: normal;
-	color: #555;
-	background-color: #FFF;
-	line-height: 15px;
-}
-
-.variable-item div {
-	vertical-align: middle;
-}
-
-.variable-item a {
-	color: #00F;
-	font: bold 14px tahoma, arial, helvetica, sans-serif;
-	text-decoration: none;
-	font-weight: normal;
-	cursor: pointer
-}
-
-.variable-item h3 {
-	display: block;
-	font: inherit;
-	font-weight: bold;
-	color: #222;
-}
-
-.variable-item h3 span {
-	float: right;
-	font-weight: normal;
-	margin: 0 0 5px 5px;
-	width: 100px;
-	display: block;
-	clear: none;
-}
-
-.variable-item li {
-	line-height: 12px;
-	font-size: 12px;
-}
-
-.variable-attributes {
-	display: none;
-}
-
-.variable-error{
-	margin:0px;
-	padding:10px;
-	border:5px solid white;
-	/*background-color: #DEEBFF;*/
-	background-color: #F0F0F0;
-	/*font-family: "Open Sans", "Helvetica Neue", sans-serif;
-	font-size: 14px;
-	line-height: 20px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: normal;
-	-webkit-font-smoothing: antialiased;
-	color: black;*/
-}
-
-.x-form-clear-trigger {
-	background-image:
-		url("../../resources/themes/images/default/form/clear-trigger.gif");
-}
-
-.x-form-variable-trigger {
-	background-image:
-		url("../../resources/themes/images/default/form/variable-trigger.gif");
-}
 
 /*    
 
@@ -1594,25 +1499,6 @@ div.tnimagetext {
 	background-image: url("images/text_icon.png") !important;
 }
 
-.attribute-icon-closed {
-	background-image: url("images/elbow-plus-nl.gif") !important;
-	width: 16px;
-	height: 16px;
-	display: block;
-	clear: both;
-	float: left;
-	vertical-align: middle;
-}
-
-.attribute-icon-open {
-	background-image: url("images/elbow-end-minus-nl.gif") !important;
-	width: 16px;
-	height: 16px;
-	display: block;
-	clear: both;
-	float: left;
-	vertical-align: middle;
-}
 
 .center p,img {
 	text-align: center;
@@ -2534,14 +2420,6 @@ a img {
    background:#E2EFF8 !important;
 }
 
-.previewstyle{
-	margin:4px;padding:4px;
-	border:1px solid gray;
-	background-color:#DDD;
-	width:400px;
-	cursor: pointer;
-	
-}
 
 .link {
 	color: #0071ff;
@@ -2551,5 +2429,15 @@ a img {
 	cursor: pointer
 	text-align:center;
 	cursor: pointer
+}
+
+
+.c4-login-popupdialog, .c4-login-popupdialog iframe{
+	width:850px;
+	height:600px;
+	overflow:none;
+	display:block;
+	border:4px solid red;
+
 }
 

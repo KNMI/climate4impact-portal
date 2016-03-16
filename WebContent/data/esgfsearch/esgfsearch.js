@@ -59,6 +59,7 @@ var SearchInterface = function(options){
   var _this = this;
   //var impactESGFSearchEndPoint = "http://bhw485.knmi.nl:8280/impactportal/esgfsearch?";
   var impactESGFSearchEndPoint = "esgfsearch?";
+  var impactCatalogBrowserEndPoint;
   
   var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access"];
   var facetNameMapping = {
@@ -176,6 +177,10 @@ var SearchInterface = function(options){
       impactESGFSearchEndPoint = options.service;
     }
     
+    
+    if(options.catalogbrowserservice){
+      impactCatalogBrowserEndPoint = options.catalogbrowserservice;
+    }
  
     
     $(".headerhelpbutton").button({
@@ -426,7 +431,9 @@ var SearchInterface = function(options){
               variableFilter+=selectedPropertiesForFacet[j];
             }
           }
-          renderCatalogBrowser({element:el,url:catalogObject.url,variables:variableFilter});
+          var service = impactCatalogBrowserEndPoint;
+          
+          renderCatalogBrowser({element:el,url:catalogObject.url,variables:variableFilter,service:service});
         }
       }else{
         $(this).removeClass("c4i-esgfsearch-dataset-imgexpand");

@@ -3,10 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
    
-    <jsp:include page="../includes-ext.jsp" />
-      <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
-              <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
+    <jsp:include page="../includes.jsp" />
     <script type="text/javascript" src="catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <script type="text/javascript" src="esgfsearch/property_descriptions.js"></script>
     <script type="text/javascript" src="esgfsearch/esgfsearch-propertychooserconf.js"></script>
     <script type="text/javascript" src="esgfsearch/esgfsearch-propertychoosers.js"></script>
@@ -14,9 +14,9 @@
     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
-  <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
-	 <link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
-	 <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
+    <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
+	<link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
+	<link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
 	 <%
 			ImpactUser user = null;
 				try{
@@ -35,7 +35,14 @@
       <script type="text/javascript">
      
     
-      var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>';
+      var c4iconfigjs = {
+          searchservice:"/impactportal/esgfsearch?",
+          impactservice:"/impactportal/ImpactService?",
+          adagucservice:"/impactportal/adagucserver?",
+          adagucviewer:"/impactportal/adagucviewer/",
+          howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
+          contactexpertlink:"/impactportal/help/contactexpert.jsp",
+        }; 
       $( document ).ready(function() {
         var el = $("#searchcontainer");
         renderSearchInterface({element:el,service:"/impactportal/esgfsearch?",query:""});

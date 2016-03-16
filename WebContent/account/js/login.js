@@ -398,7 +398,7 @@ var _generateLoginDialog = function(doReload){
 
 
 //  console.log(generateLoginDialog);
-  var iframe = $('<iframe onload="c4i_checkiframe(this)" style="height:600px;width: 900px;" frameborder="0" marginwidth="0" marginheight="0"  scrolling="no"  ></iframe>');
+  var iframe = $('<iframe class="c4-login-popupdialog"  frameborder="0" marginwidth="0" marginheight="0"  scrolling="no"  ></iframe>');
   //var footer = $('<div class="logindialogfooter" ><a onclick="window.open(\'/impactportal/account/login_embed.jsp?doreload=true\',\'targetWindow\',\'toolbar=no,location=no,status=no,directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=800,height=500\')" >Do you encounter an untrusted connection? Click here.</a></div>');
  
   
@@ -421,7 +421,7 @@ var _generateLoginDialog = function(doReload){
 	  
 		
   var src = "/impactportal/account/login_embed.jsp?";
-  src+="&c4i_redir="+URLEncode(window.location.href) ;
+  //src+="&c4i_redir="+URLEncode(window.location.href) ;
 	  if(doReload === true){
 	    src+="&doreload=true";
 	  }

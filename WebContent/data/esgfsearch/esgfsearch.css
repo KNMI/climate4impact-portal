@@ -1,5 +1,4 @@
 
-
 .c4i-esgfsearch-selectfacet{
   margin:0px 3px 0px 3px;
   padding:2px  !important;
@@ -48,7 +47,7 @@
   padding:1px 6px 1px 6px;
   margin:2px;
   border:1px solid black;
-  cursor: pointer; cursor: hand;
+  cursor: pointer; 
   line-height:25px;
   background-color: #444;
   color:white;
@@ -93,7 +92,7 @@
   padding:0px 16px 0px 16px;
   margin:0px;
   overflow:hidden;
-  cursor: pointer; cursor: hand;
+  cursor: pointer; 
   line-height:25px;
   background-color: #FFF;
   color:black;
@@ -253,7 +252,7 @@ margin:6px 0px 0px 6px;
 
 
 .c4i-esgfsearch-loader{
-  background-image:url("ajax-loader.gif") !important;
+  background-image:url("../images/ajax-loader.gif") !important;
   width:32px;
   height:32px;
 }
@@ -293,7 +292,7 @@ padding:5px;
     height: 21px;
     padding: 0px;
     margin: 2px 0px 2px 0px;
-    cursor: hand;
+    
     overflow:visible;
     vertical-align:middle;
 
@@ -316,7 +315,7 @@ text-align:center;
   height:170px;
   display:inline-block;
    overflow:hidden;
-    cursor: pointer; cursor: hand;
+    cursor: pointer; 
     margin:6px;
     padding:0px;
     border:none;
@@ -347,7 +346,7 @@ text-align:center;
 
   text-align:center;
   border-bottom:1px solid white;
- cursor: pointer; cursor: hand;
+ cursor: pointer; 
  vertical-align:middle;
 }
 
@@ -436,7 +435,7 @@ line-height:16px;
   height:32px;
   line-height:0px;
   display:inline-block;
-  cursor: pointer; cursor: hand;
+  cursor: pointer; 
   margin:1px 0px 1px 2px;
   padding:0px;
   float:left;
@@ -513,11 +512,15 @@ line-height:16px;
   text-align: left;
     text-align: left;
     padding: 8px;
+    vertical-align: middle;
 }
 
 
 
+
 .c4i-catalogbrowser-table tr:nth-child(even){background-color: #f5f5f5}
+
+
 
 /*.c4i-catalogbrowser-table tr:hover {background-color: #f0f0f0 !important}*/
 
