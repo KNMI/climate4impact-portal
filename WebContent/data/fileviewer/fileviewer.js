@@ -319,12 +319,16 @@ var FileViewerInterface = function(options){
         
         var adagucViewerAddLayer = $('<span />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
         var WMS = $('<span />').addClass('c4i-fileviewer-wms').html(
-          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WMS&request=GetCapabilities">WMS link</a>');
+          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WMS&request=GetCapabilities">WMS</a>');
         
         serviceOptions.append(WMS);
         var WCS = $('<span />').addClass('c4i-fileviewer-wcs').html(
-          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WCS&request=GetCapabilities">WCS link</a>');
+          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WCS&request=GetCapabilities">WCS</a>');
         serviceOptions.append(WCS);
+        
+        var OpenDAP = $('<span />').addClass('c4i-fileviewer-opendap').html(
+            '<a target="_blank" href="'+options.query+'.das">OpenDAP</a>');
+        serviceOptions.append(OpenDAP);
         
         var variable = data[v].variable;
         

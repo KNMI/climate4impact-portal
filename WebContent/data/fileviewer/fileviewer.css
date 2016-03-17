@@ -181,13 +181,13 @@
 
 
 
-.c4i-fileviewer-adagucview, .c4i-fileviewer-wms, .c4i-fileviewer-wcs, .c4i-fileviewer-wms a, .c4i-fileviewer-wcs a{
+.c4i-fileviewer-adagucview, .c4i-fileviewer-wms, .c4i-fileviewer-wcs, .c4i-fileviewer-opendap, .c4i-fileviewer-wms a, .c4i-fileviewer-wcs a, .c4i-fileviewer-opendap a{
   padding:3px; 
   color:white;
   font-weight:bold;
 }
 
-.c4i-fileviewer-adagucview:hover, .c4i-fileviewer-wms:hover, .c4i-fileviewer-wcs:hover, .c4i-fileviewer-wms:hover a, .c4i-fileviewer-wcs:hover a  {
+.c4i-fileviewer-adagucview:hover, .c4i-fileviewer-wms:hover, .c4i-fileviewer-wcs:hover, .c4i-fileviewer-opendap:hover, .c4i-fileviewer-wms:hover a, .c4i-fileviewer-wcs:hover a, .c4i-fileviewer-opendap:hover a  {
     background-color: #E8F8FF;
   color:black;
   font-weight:bold;

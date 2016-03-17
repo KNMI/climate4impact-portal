@@ -121,6 +121,20 @@ var BasketWidget = function() {
   
     var getButtons = function(){
       var buttons =[{
+        text : 'Search',
+        handler : function() {
+          var el=jQuery('<div/>');
+          renderSearchInterface({
+            element:el,
+            service:c4iconfigjs.searchservice,
+            query:"",
+            catalogbrowserservice:c4iconfigjs.impactservice,
+            dialog:true
+          });
+          
+        }
+         
+      },{
         text : 'View/Browse file',
         handler : function() {
           if (tree.getSelectionModel().hasSelection()) {
@@ -454,6 +468,9 @@ var BasketWidget = function() {
     });
   }
 
+  this.reload = function(){
+    store.reload();
+  };
 };
 
 var basketWidget = new BasketWidget();

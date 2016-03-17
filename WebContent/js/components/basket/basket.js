@@ -110,6 +110,7 @@ var Basket = function(){
 	};
 	
 	this.postIdentifiersToBasket = function(options){
+	  console.log("postIdentifiersToBasket");
 		var doneFunction = function(json){
 			if(json.error){
 				if(json.statuscode){
@@ -122,7 +123,15 @@ var Basket = function(){
 				
 			}
 			adjustNumberOfDataSetsDisplayedInMenuBar(json);
-		}
+			console.log("postIdentifiersToBasket Done");
+	    try{
+        if(basketWidget){
+          basketWidget.reload();
+        }
+      }catch(e){
+        console.log(e);
+      }
+		};
 		 //alert(dump(options));
 		$.ajax({
 			type: "POST",

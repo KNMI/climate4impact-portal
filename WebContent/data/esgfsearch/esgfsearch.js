@@ -147,6 +147,18 @@ var SearchInterface = function(options){
     $.blockUI.defaults.message='<div class="c4i-esgfsearch-loader"></div>';
     $.blockUI.defaults.css.border='none';
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
+    
+    if(options.dialog){
+      options.element.dialog({
+        title:'Search',
+        width:975,
+        height:600,
+        dialogClass:'c4i-esgfsearch-containerdialog'
+      });
+    }else{
+      options.element.addClass("c4i-esgfsearch-container");
+    }
+    
     rootElement = options.element;
     options.element.html('<div class="simplecomponent-container">'+
     '  <div class="simplecomponent c4i-esgfsearch-selectedelements">'+
@@ -305,32 +317,39 @@ var SearchInterface = function(options){
     }
   };
   
-  var addToBasket = function(){
-    var el = jQuery('<div></div>', {
-        title: 'Dataset',
-      }).dialog({
-        width:450,
-        height:400
-      });
-      el.html('<div class="c4i-esgfsearch-loader"></div>');
-    var callback = function(data){
-      
-      //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
-        el.html("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
-    }
-    $.ajax({
-      url: impactESGFSearchEndPoint+"service=search&request=addtobasket&query="+encodeURIComponent(query),
-          crossDomain:true,
-          dataType:"jsonp"
-    }).done(function(d) {
-      callback(d);
-    }).fail(function() {
-      alert("fail 474");
-    }).always(function(){
-    
-      //ready();
-    });
-  }
+//  var addToBasket = function(){
+////    var el = jQuery('<div></div>', {
+////        title: 'Dataset',
+////      }).dialog({
+////        width:450,
+////        height:400
+////      });
+////      el.html('<div class="c4i-esgfsearch-loader"></div>');
+////    var callback = function(data){
+////      
+////      //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
+////        el.html("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
+////       
+////        try{
+////          if(basketWidget){
+////            basketWidget.reload();
+////          }
+////        }catch(e){
+////        }
+////    }
+////    $.ajax({
+////      url: impactESGFSearchEndPoint+"service=search&request=addtobasket&query="+encodeURIComponent(query),
+////          crossDomain:true,
+////          dataType:"jsonp"
+////    }).done(function(d) {
+////      callback(d);
+////    }).fail(function() {
+////      alert("fail 474");
+////    }).always(function(){
+////    
+////      //ready();
+////    });
+//  };
   
   /*
    * Callback for ajax query, both facets and results are included.
@@ -375,13 +394,13 @@ var SearchInterface = function(options){
        html+="</span>";
     }
     html+="</div>";
-    var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
+//    var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
     //html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
     rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").first().html(html);
     
-    rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
-      addToBasket();
-    });
+//    rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
+//      addToBasket();
+//    });
    
     rootElement.find(".c4i-esgfsearch-dataset-expandedarea").hide();
     
@@ -425,7 +444,7 @@ var SearchInterface = function(options){
           var selectedPropertiesForFacet = selectedFacets["variable"];
           var variableFilter='';
           if(selectedPropertiesForFacet){
-            console.log(selectedPropertiesForFacet);
+            //console.log(selectedPropertiesForFacet);
         
             for(var j=0;j<selectedPropertiesForFacet.length;j++){
               if(variableFilter.length>0)variableFilter+="|";

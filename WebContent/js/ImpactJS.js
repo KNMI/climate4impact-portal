@@ -1,3 +1,12 @@
+var c4iconfigjs = {
+  searchservice:"/impactportal/esgfsearch?",
+  impactservice:"/impactportal/ImpactService?",
+  adagucservice:"/impactportal/adagucserver?",
+  adagucviewer:"/impactportal/adagucviewer/",
+  howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
+  contactexpertlink:"/impactportal/help/contactexpert.jsp",
+}; 
+
 var mouseXPosition;
 var mouseYPosition; 
 

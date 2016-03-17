@@ -33,7 +33,8 @@
     
       $( document ).ready(function() {
         var el = $("#searchcontainer");
-        renderSearchInterface({element:el,
+        renderSearchInterface({
+          element:el,
           service:c4iconfigjs.searchservice,
           query:"project=clipc&variable=tas",
           catalogbrowserservice:"http://localhost/impactportal/ImpactService?"

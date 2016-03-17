@@ -10,9 +10,19 @@
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
-    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
+    
+    <script type="text/javascript" src="/impactportal/data/catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="/impactportal/data/fileviewer/fileviewer.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/property_descriptions.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychooserconf.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychoosers.js"></script>
+   	<script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch.js"></script>
+   	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/esgfsearch.css" />
+	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
+    <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
+    
     <script type="text/javascript">
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
