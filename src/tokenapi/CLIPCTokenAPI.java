@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -112,7 +111,7 @@ public class CLIPCTokenAPI extends HttpServlet {
     
     
 
-    JSONObject jsonobj = new JSONObject();
+   
 
     if(errorMessage!=null){
       jsonResponse.setErrorMessage(errorMessage, 400);
@@ -128,16 +127,7 @@ public class CLIPCTokenAPI extends HttpServlet {
     
     
 
-//    if(jsonResponse.hasError()==false){
-//      try {
-//        if(authenticationOK && authorizationOK){
-//          //Now generate a key for maris for a specfic user
-//          jsonobj.put("status", "ok");
-//        }
-//      } catch (JSONException e) {
-//      }
-//      jsonResponse.setMessage(jsonobj);
-//    }
+
     try {
       jsonResponse.print(response);
     } catch (Exception e1) {

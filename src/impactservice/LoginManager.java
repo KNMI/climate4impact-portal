@@ -1,8 +1,5 @@
 package impactservice;
 
-import impactservice.AccessTokenStore.AccessTokenHasExpired;
-import impactservice.AccessTokenStore.AccessTokenIsNotYetValid;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,11 +13,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.UUID;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,10 +25,7 @@ import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -430,18 +419,15 @@ public class LoginManager {
     try {
       String emailAddress = (String) request.getSession().getAttribute(
           "emailaddress");
-      boolean foundEmail = false;
+      
       if (emailAddress != null) {
         if (emailAddress.length() > 0) {
           user.setEmailAddress(emailAddress);
-          foundEmail = true;
+      
           Debug.println("Email: " + emailAddress);
         }
       }
-//      if (!foundEmail) {
-//        MessagePrinters.emailFatalErrorMessage("User email is not found",
-//            "User email is not found for " + user.getId());
-//      }
+
     } catch (Exception e) {
       e.printStackTrace();
     }

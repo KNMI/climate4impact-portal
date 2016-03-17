@@ -42,7 +42,6 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -62,9 +61,6 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -262,7 +258,7 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     cleanStateObjects();
     
     String stateID = UUID.randomUUID().toString();
-    long currentTimeMillis = tools.DateFunctions.getCurrentDateInMillis();
+    
     states.put(stateID, new StateObject(c4i_redir));
     
     String provider = null;

@@ -5,7 +5,6 @@ import impactservice.LoginManager;
 import impactservice.THREDDSCatalogBrowser;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,9 +16,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,12 +29,12 @@ import org.json.JSONTokener;
 import tools.Debug;
 import tools.DiskCache;
 import tools.HTTPTools;
-import tools.LockOnQuery;
 import tools.HTTPTools.WebRequestBadStatusException;
+import tools.JSONResponse;
 import tools.KVPKey;
+import tools.LockOnQuery;
 import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
-import tools.JSONResponse;
 import tools.Tools;
 
 public class Search {

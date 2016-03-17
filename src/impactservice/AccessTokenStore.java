@@ -64,6 +64,7 @@ public class AccessTokenStore {
     }
     
     JSONObject a = (JSONObject) new JSONTokener(accessTokenData).nextValue();
+    @SuppressWarnings("unchecked")
     Iterator<String> b = a.keys();
     while( b.hasNext()){
       String c = (String) b.next();

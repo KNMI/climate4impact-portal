@@ -7,7 +7,6 @@ import impactservice.MessagePrinters;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,10 +38,6 @@ import org.openid4java.message.ax.FetchResponse;
 import org.openid4java.message.sreg.SRegMessage;
 import org.openid4java.message.sreg.SRegRequest;
 import org.openid4java.message.sreg.SRegResponse;
-
-
-
-
 
 import tools.Debug;
 

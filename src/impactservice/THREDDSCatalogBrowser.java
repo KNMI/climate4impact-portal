@@ -280,12 +280,12 @@ public class THREDDSCatalogBrowser {
                 if(variableList.length() == 0){
                   put = true;
                 }else{
-                  boolean foundSomething=false;
+//                  boolean foundSomething=false;
                   for(int v=0;v<variableList.length();v++){
                     try{
                       if(variableList.getJSONObject(v).getString("name").matches(variableFilter)){
                         put=true;
-                        foundSomething=true;
+//                        foundSomething=true;
                         break;
                       }
                     }catch(Exception e){
