@@ -183,6 +183,7 @@ var FileViewerInterface = function(options){
       '<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
       '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a>.</li>'+
       '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>'+
+      '<li>The list of available groups can be found here: <a class="c4i-fileviewer-spanlink" target="_blank" href="https://esgf-node.jpl.nasa.gov/ac/list/">List of ESGF groups</a></li>'+
       '<li>Open this file directly in your browser  <span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >here</span>, you might get a hint on what is going wrong.</li>'+
       '</ul>'+
    '</div>'
