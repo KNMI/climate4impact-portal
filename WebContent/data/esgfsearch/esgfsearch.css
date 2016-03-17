@@ -284,7 +284,7 @@ padding:5px;
 
 .c4i-esgfsearch-checkbox, .c4i-esgfsearch-checkboxclear
 {
-    background-image: url('esgfsearch-checkbox.png');
+    background-image: url('../images/esgfsearch-checkbox.png');
     background-repeat: no-repeat;
     display: inline-block;
     float: left;
@@ -445,30 +445,30 @@ line-height:16px;
 }
 .c4i-esgfsearch-dataset-baseimage:hover{
     opacity: 0.4;
-    filter: alpha(opacity=40); /* For IE8 and earlier */
+    /*filter: k(opacity=40); *//* For IE8 and earlier */
 }
 
 
 .c4i-esgfsearch-dataset-imgcollapsed{
-    background-image:url("icon_right.png") !important;
+    background-image:url("../images/icon_right.png") !important;
 }
 .c4i-esgfsearch-dataset-imgexpand{
-    background-image:url("icon_down.png") !important;
+    background-image:url("../images/icon_down.png") !important;
 }
 
 .c4i-esgfsearch-dataset-imgchecked{
-    background-image:url("icon_checkboxchecked.png") !important;
+    background-image:url("../images/icon_checkboxchecked.png") !important;
 }
 .c4i-esgfsearch-dataset-imgunchecked{
-    background-image:url("icon_checkboxunchecked.png") !important;
+    background-image:url("../images/icon_checkboxunchecked.png") !important;
 }
 
 .c4i-esgfsearch-dataset-process{
-    background-image:url("icon_calculator.png") !important;
+    background-image:url("../images/icon_calculator.png") !important;
 }
 
 .c4i-esgfsearch-dataset-download{
-    background-image:url("icon_download.png") !important;
+    background-image:url("../images/icon_download.png") !important;
 }
 
 .c4i-esgfsearch-dataset-expandedarea{
