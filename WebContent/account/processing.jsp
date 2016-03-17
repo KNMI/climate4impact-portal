@@ -23,18 +23,19 @@
   });
 
   Ext.QuickTips.init();
+  jQuery(document).ready(function($) {
     Ext.onReady(function(){
+      var wpsOverViewItems = wpsOverView();
     	var container = Ext.create('Ext.container.Container', {
  	        layout: 'fit',
  			renderTo:'container',
  		   	//minHeight:500,
  		    scripts:true,
  		    autoScroll:false, 
- 		    items:[wpsOverView],
- 		
- 		    loader: {} 
+ 		    items:[wpsOverViewItems]
     	});
     });
+  });
     </script>
     <% } %>
      <script type="text/javascript">

@@ -247,8 +247,8 @@ a:link {
 }
 
 a:visited {
-	font-weight: normal;
-	text-decoration: none;
+/*	font-weight: normal;
+	text-decoration: none;*/
 	color: #0071FF;
 }
 

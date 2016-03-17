@@ -41,80 +41,82 @@ var selectProcessor = function() {
   //alert(selectedProcessor.get('id'));
 };
 
-var wpsOverView = {
-  xtype : 'panel',
-  frame:false,
-  border:false,
-  layout : 'border',
-  height :400,
-  items : [{
-    region : 'center',
-    xtype : 'grid',
-    frame:true,
+var wpsOverView = function(){
+  return {
+    xtype : 'panel',
+    frame:false,
     border:false,
-    //title : 'Processing overview',
-    store : new Ext.data.Store({
-      autoLoad : true,
-      fields : [{
-        name : 'id',
-        type : 'string'
-      },{
-        name : 'name',
-        type : 'string'
-      },{
-        name : 'abstract',
-        type : 'string'
-      }],
-      proxy : {
-        type : 'ajax',
-        url : impactWPSURL + 'service=processor&request=getProcessorList',
-        reader : {
-          type : 'json',
-          root : 'processors'
+    layout : 'border',
+    height :400,
+    items : [{
+      region : 'center',
+      xtype : 'grid',
+      frame:true,
+      border:false,
+      //title : 'Processing overview',
+      store : new Ext.data.Store({
+        autoLoad : true,
+        fields : [{
+          name : 'id',
+          type : 'string'
+        },{
+          name : 'name',
+          type : 'string'
+        },{
+          name : 'abstract',
+          type : 'string'
+        }],
+        proxy : {
+          type : 'ajax',
+          url : impactWPSURL + 'service=processor&request=getProcessorList',
+          reader : {
+            type : 'json',
+            root : 'processors'
+          }
         }
+      }),
+      columns : [{
+        text : "Name",
+        flex : 1,
+        dataIndex : 'name',
+        sortable : true
+      },{
+        text : "Abstract",
+        flex : 2,
+        dataIndex : 'abstract',
+        sortable : true,
+        renderer : columnWrap
+      },{
+        text : "WPS identifier",
+        flex : 1,
+        dataIndex : 'id',
+        sortable : true,
+        hidden:true
       }
-    }),
-    columns : [{
-      text : "Name",
-      flex : 1,
-      dataIndex : 'name',
-      sortable : true
-    },{
-      text : "Abstract",
-      flex : 2,
-      dataIndex : 'abstract',
-      sortable : true,
-      renderer : columnWrap
-    },{
-      text : "WPS identifier",
-      flex : 1,
-      dataIndex : 'id',
-      sortable : true,
-      hidden:true
-    }
-
-    ],
-   
-    listeners : {
-      itemclick : function(i, record) {
-        this.itemClicked(i, record);
-        selectProcessor();
+  
+      ],
+     
+      listeners : {
+        itemclick : function(i, record) {
+          this.itemClicked(i, record);
+          selectProcessor();
+        },
+        itemdblclick : function(i, record) {
+          this.itemClicked(i, record);
+          selectProcessor();
+        }
       },
-      itemdblclick : function(i, record) {
-        this.itemClicked(i, record);
-        selectProcessor();
-      }
-    },
-    itemClicked : function(i, record, item, index) {
-      selectedProcessor = record;
-    },
-    buttons : [{
-      xtype : 'button',
-      text : 'use',
-      handler : function() {
-        selectProcessor();
-      }
+      itemClicked : function(i, record, item, index) {
+        selectedProcessor = record;
+      },
+      buttons : [{
+        xtype : 'button',
+        text : 'use',
+        handler : function() {
+          selectProcessor();
+        }
+      }]
     }]
-  }]
-};
+  }
 
+};

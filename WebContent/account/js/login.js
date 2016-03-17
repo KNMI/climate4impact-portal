@@ -176,6 +176,7 @@ $(function() {
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
     var username = name.val();
     var openid = "";
+    
     var dataCentreOpenIdProvider = OpenIDProviders[dataCentreName].openidprefix;
   
     
