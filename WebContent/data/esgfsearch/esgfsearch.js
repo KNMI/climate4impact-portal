@@ -391,9 +391,14 @@ var SearchInterface = function(options){
        
        if(data.response.results[r].id.indexOf("cmip5")==0){
          html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
-         html+="<a target=\"_blank\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
+         html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
          html+="</span>";
        }
+//       if(data.response.results[r].id.indexOf("cordex")==0){
+//         html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
+//         html+="<a target=\"_blank\" href=\""+esdocurl+"renderMethod=datasetid&project=cordex&id="+data.response.results[r].id+"\"></a>";
+//         html+="</span>";
+//       }
        //html+= "<span style=\"float:right;\">";
 //        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-download\"></span>";
 //        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-process\"></span>";
