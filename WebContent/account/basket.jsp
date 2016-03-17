@@ -14,13 +14,24 @@
      <script type="text/javascript" src="../data/catalogbrowser/catalogbrowser.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
-    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
+     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
     <script type="text/javascript" src="/impactportal/data/fileviewer/fileviewer.js"></script>
+    <link rel="stylesheet" href="/impactportal/data/fileviewer/fileviewer.css"></link>
+    <link rel="stylesheet" href="/impactportal/data/esgfsearch/esgfsearch.css" />
+	<link rel="stylesheet" href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript">
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
+    var c4iconfigjs = {
+        searchservice:"/impactportal/esgfsearch?",
+        impactservice:"/impactportal/ImpactService?",
+        adagucservice:"/impactportal/adagucserver?",
+        adagucviewer:"/impactportal/adagucviewer/",
+        howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
+        contactexpertlink:"/impactportal/help/contactexpert.jsp",
+      }; 
     var task;
     var openid = "";
     var serverurl = "";

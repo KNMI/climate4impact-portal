@@ -294,21 +294,31 @@ var BasketWidget = function() {
         return;
       }
       if(record.get('dapurl')){
-        var fileViewer = new ExtFileViewer();
-        var w = Ext.create('Ext.Window', {
-          width : 900,
-          height : 680,
-          autoScroll : true,
-          autoDestroy : true,
-          closeAction : 'destroy',
-          frame : false,
-          title : 'NetCDF metadata',
-          layout : 'fit',
-          items : fileViewer.getViewer()
-        });
-        w.show();
-        openedWindows.push(w);
-        fileViewer.load(record.get('dapurl'));
+//        var fileViewer = new ExtFileViewer();
+//        var w = Ext.create('Ext.Window', {
+//          width : 900,
+//          height : 680,
+//          autoScroll : true,
+//          autoDestroy : true,
+//          closeAction : 'destroy',
+//          frame : false,
+//          title : 'NetCDF metadata',
+//          layout : 'fit',
+//          items : fileViewer.getViewer()
+//        });
+//        w.show();
+//        openedWindows.push(w);
+//        fileViewer.load(record.get('dapurl'));
+        
+        var el=jQuery('<div/>');
+        renderFileViewerInterface({element:el,
+          service:c4iconfigjs.impactservice,
+          adagucservice:c4iconfigjs.adagucservice,
+          adagucviewer:c4iconfigjs.adagucviewer,
+          //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+          query:record.get('dapurl'),
+          dialog:true
+        });   
       }else if(record.get('catalogurl')){
         var el = jQuery('<div></div>', {
             title: record.get("id"),

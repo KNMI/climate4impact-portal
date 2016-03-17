@@ -77,8 +77,8 @@
         service:c4iconfigjs.impactservice,
         adagucservice:c4iconfigjs.adagucservice,
         adagucviewer:c4iconfigjs.adagucviewer,
-        query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
-        //query:dataset,
+        //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+        query:dataset,
         dialog:false
       });   
 	  });
