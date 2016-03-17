@@ -11,6 +11,7 @@
     <script src="/impactportal/js/es-doc/esdoc-min.js" type="text/javascript"></script>
     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>    
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
