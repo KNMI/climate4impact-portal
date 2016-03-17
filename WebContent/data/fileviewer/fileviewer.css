@@ -24,25 +24,25 @@
 }
 
 .c4i-fileviewer-dataset-imgcollapsed{
-    background-image:url("../esgfsearch/icon_right.png") !important;
+    background-image:url("../images/icon_right.png") !important;
 }
 .c4i-fileviewer-dataset-imgexpand{
-    background-image:url("../esgfsearch/icon_down.png") !important;
+    background-image:url("../images/icon_down.png") !important;
 }
 
 .c4i-fileviewer-dataset-imgchecked{
-    background-image:url("../esgfsearch/icon_checkboxchecked.png") !important;
+    background-image:url("../images/icon_checkboxchecked.png") !important;
 }
 .c4i-fileviewer-dataset-imgunchecked{
-    background-image:url("../esgfsearch/icon_checkboxunchecked.png") !important;
+    background-image:url("../images/icon_checkboxunchecked.png") !important;
 }
 
 .c4i-fileviewer-dataset-process{
-    background-image:url("../esgfsearch/icon_calculator.png") !important;
+    background-image:url("../images/icon_calculator.png") !important;
 }
 
 .c4i-fileviewer-dataset-download{
-    background-image:url("../esgfsearch/icon_download.png") !important;
+    background-image:url("../images/icon_download.png") !important;
 }
 
 .c4i-fileviewer-dataset-expandedarea{

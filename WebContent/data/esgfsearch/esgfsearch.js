@@ -56,6 +56,9 @@ function ESGFSearch_KVP(query){
 
 
 var SearchInterface = function(options){
+  
+  var esdocurl="http://view.es-doc.org/?client_id=climate4impact_esgfsearch&";
+  
   var _this = this;
   //var impactESGFSearchEndPoint = "http://bhw485.knmi.nl:8280/impactportal/esgfsearch?";
   var impactESGFSearchEndPoint = "esgfsearch?";
@@ -380,9 +383,17 @@ var SearchInterface = function(options){
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
        var id = ""+data.response.results[r].id;
        html+= id.replaceAll("."," ");
-       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span><br/>";
+       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span>";
 //        html+="<span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span>";
+       
+     
        html+="</span>";
+       
+       if(data.response.results[r].id.indexOf("cmip5")==0){
+         html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
+         html+="<a target=\"_blank\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
+         html+="</span>";
+       }
        //html+= "<span style=\"float:right;\">";
 //        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-download\"></span>";
 //        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-process\"></span>";
@@ -413,6 +424,12 @@ var SearchInterface = function(options){
         $(this).addClass("c4i-esgfsearch-dataset-imgchecked");
       }
     });
+//    
+//    rootElement.find(".c4i-esgfsearch-resultitem-esdoc").attr('onclick','').click(function(t){
+//      console.log($(this).parent().attr("name"));
+//      http://view.es-doc.org/?renderMethod=datasetid&project=tamip&id=tamip.output1.CNRM-CERFACS.CNRM-CM5.tamip200907.subhr.atmos.sites.r7i1p1.v20111114
+//    });
+//    
     
     rootElement.find(".c4i-esgfsearch-dataset-collapsible").attr('onclick','').click(function(t){
    
