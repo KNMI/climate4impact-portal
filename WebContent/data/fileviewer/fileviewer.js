@@ -130,7 +130,7 @@ var FileViewerInterface = function(options){
 
  
     
-    $(".headerhelpbutton").button({
+    $(".c4i_fileviewer_help").button({
       
       icons: {
         primary: "ui-icon-help"
@@ -159,7 +159,7 @@ var FileViewerInterface = function(options){
       if(variable.variable == "lat"){return "";}
       if(variable.variable == "x"){return "";}
       if(variable.variable == "y"){return "";}
-      if(variable.dimensions){
+      if(variable.dimensions&&variable.isViewable==1){
       if(variable.dimensions.length>1){
         for(var d=0;d<variable.dimensions.length;d++){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
@@ -282,7 +282,6 @@ var FileViewerInterface = function(options){
         html+=  "<span class=\"c4i-fileviewer-vardimension\">dimension "+data[v].variable+" of length "+data[v].isDimension[0].length+"</span>";
       }if(preview.length>0)
       {
-       // <a onclick="{visualizeVariable(&quot;tasmax&quot;,&quot;http://esg-dn1.nsc.liu.se/thredds/dodsC/esg_dataroot1/clipcdata/clipc/RegRean/EUR-05/SMHI/SMHI-HIRLAM/v1d1-v1d2/SMHI-MESAN/v1/day/tasmax/v20150601/tasmax_EUR-05_SMHI-HIRLAM_RegRean_v1d1-v1d2_SMHI-MESAN_v1_day_20090101-20091231.nc&quot;);}">Add to viewer</a>
         html+=  "<span class=\"c4i-fileviewer-adagucviewershow\"></span>";
       }
       
@@ -337,6 +336,19 @@ var FileViewerInterface = function(options){
           _this.visualizeVariable(variable,options.query);
           return false;
         });
+        
+        WMS.attr('onclick','').click(function(event){
+          event.stopPropagation();
+        });
+        
+        WCS.attr('onclick','').click(function(event){
+          event.stopPropagation();
+        });
+        
+        OpenDAP.attr('onclick','').click(function(event){
+          event.stopPropagation();
+        });
+        
         var previewImage = el.parent().find(".c4i-fileviewer-previewstyle");
         previewImage.attr('onclick','').click(function(event){
           event.preventDefault();          

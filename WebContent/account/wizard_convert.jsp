@@ -120,7 +120,7 @@
 		<div class="impactcontent">
 		<div class="breadcrumb"><a href="login.jsp">Account</a> » <a href="processing.jsp">Processing</a> » Wizard convert and subset </div>
 		
-		<table class="headertable" ><tr><td><h1>Convert and subset</h1></td><td class="headerhelptd"><button class="headerhelpbutton">Help</button></td></tr></table>
+		<table class="headertable" ><tr><td><h1>Convert and subset</h1></td><td class="headerhelptd"><button class="c4i_wizard_convert_helpbutton">Help</button></td></tr></table>
 		<%
 			ImpactUser user = null;
 				try{

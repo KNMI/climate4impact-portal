@@ -135,7 +135,7 @@ var BasketWidget = function() {
         }
          
       },{
-        text : 'View/Browse file',
+        text : 'View file',
         handler : function() {
           if (tree.getSelectionModel().hasSelection()) {
             var selectedNode = tree.getSelectionModel().getSelection();

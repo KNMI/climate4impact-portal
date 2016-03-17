@@ -477,7 +477,7 @@
       
       setNewResource();
       
-      $(".headerhelpbutton").button({
+      $(".c4i_wizard_convert_helpbutton").button({
           
           icons: {
             primary: "ui-icon-help"

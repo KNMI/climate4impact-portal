@@ -534,3 +534,18 @@ line-height:16px;
   
   
 }
+
+.c4i_esgfsearch_help{
+	float:right;
+	margin:20px;
+	height:25px;
+	line-height:25px;
+}
+
+.c4i-esgfsearch-containerdialog, .c4i-esgfsearch-containerdialog .ui-dialog-content{
+
+  margin:0px;
+  padding:0px;
+}
+
+

@@ -150,7 +150,7 @@ var SearchInterface = function(options){
     
     if(options.dialog){
       options.element.dialog({
-        title:'Search',
+        //title:'Search',
         width:975,
         height:600,
         dialogClass:'c4i-esgfsearch-containerdialog'
@@ -195,7 +195,7 @@ var SearchInterface = function(options){
     }
  
     
-    $(".headerhelpbutton").button({
+    $(".c4i_esgfsearch_help").button({
       
       icons: {
         primary: "ui-icon-help"

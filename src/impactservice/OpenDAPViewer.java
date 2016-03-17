@@ -98,7 +98,7 @@ public class OpenDAPViewer {
 
       String varName= "nc_global";
       jsonVariable.put("variable",varName);//.getName());
-      jsonVariable.put("longname","Global attributes");//.getName());
+      jsonVariable.put("longname","File metadata");//.getName());
 
       List<XMLElement>attributes = rootElement.get("netcdf").getList("attribute");
       if(attributes.size()>0){
@@ -119,91 +119,91 @@ public class OpenDAPViewer {
 
 
     
-      
-      for(int j=0;j<variables.size();j++){
-
-        
-        JSONObject jsonVariable1 = new JSONObject();
-
-        String varName1= variables.get(j).getAttrValue("name");
-        jsonVariable1.put("variable",varName1);//.getName());
-        String longName=varName1;
-        jsonVariable1.put("variabletype", variables.get(j).getAttrValue("type"));
-        jsonVariable1.put("service", requestStr);
-
-
-        /*if(variables.get(j).isCoordinateVariable()){
-        JSONArray length = new JSONArray();
-        length.put((new JSONObject()).put("length",variables.get(j).getSize()));
-        jsonVariable.put("isDimension",length);
-      }*/
-        try{
-
-          String[] varDimensions = variables.get(j).getAttrValue("shape").split(" ");
-          if(varDimensions.length>=2){
-            if(variables.get(j).getAttrValue("name").indexOf("bnds")==-1){
-              
-              boolean show = true;
-              for(String dim : varDimensions){
-                if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
-                  show=false;break;
+        for(int iterateOption=0;iterateOption<2;iterateOption++){
+        for(int j=0;j<variables.size();j++){
+          boolean isDimension = false;
+          
+          JSONObject jsonVariable1 = new JSONObject();
+  
+          String varName1= variables.get(j).getAttrValue("name");
+          jsonVariable1.put("variable",varName1);//.getName());
+          String longName=varName1;
+          jsonVariable1.put("variabletype", variables.get(j).getAttrValue("type"));
+          jsonVariable1.put("service", requestStr);
+  
+  
+          /*if(variables.get(j).isCoordinateVariable()){
+          JSONArray length = new JSONArray();
+          length.put((new JSONObject()).put("length",variables.get(j).getSize()));
+          jsonVariable.put("isDimension",length);
+        }*/
+          try{
+  
+            String[] varDimensions = variables.get(j).getAttrValue("shape").split(" ");
+            if(varDimensions.length>=2){
+              if(variables.get(j).getAttrValue("name").indexOf("bnds")==-1){
+                
+                boolean show = true;
+                for(String dim : varDimensions){
+                  if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
+                    show=false;break;
+                  }
+                  boolean foundDim = false;
+                  for(int i=0;i<variables.size();i++){
+                    if(variables.get(i).getAttrValue("name").equals(dim)){
+                      foundDim=true;break;
+                    }
+                  }
+                  if(foundDim==false){show=false;break;}
                 }
-                boolean foundDim = false;
-                for(int i=0;i<variables.size();i++){
-                  if(variables.get(i).getAttrValue("name").equals(dim)){
-                    foundDim=true;break;
+                if(show){
+                  if(variables.get(j).getAttrValue("name").equals("lon")==false&&
+                      variables.get(j).getAttrValue("name").equals("lat")==false&&
+                      variables.get(j).getAttrValue("name").equals("Actual_latitude")==false&&
+                      variables.get(j).getAttrValue("name").equals("Actual_longitude")==false
+                      ){
+                    jsonVariable1.put("isViewable",1);
                   }
                 }
-                if(foundDim==false){show=false;break;}
-              }
-              if(show){
-                if(variables.get(j).getAttrValue("name").equals("lon")==false&&
-                    variables.get(j).getAttrValue("name").equals("lat")==false&&
-                    variables.get(j).getAttrValue("name").equals("Actual_latitude")==false&&
-                    variables.get(j).getAttrValue("name").equals("Actual_longitude")==false
-                    ){
-                  jsonVariable1.put("isViewable",1);
-                }
               }
             }
-          }
-
+  
+           
+            JSONArray jsonDimensionArray = new JSONArray();
+            for(int d=0;d<varDimensions.length;d++){
+              JSONObject dimension = new JSONObject();
+              String dimName=varDimensions[d];
+              for(int rd=0;rd<dimensions.size();rd++){
+                if(dimensions.get(rd).getAttrValue("name").equals(dimName)){
+                  String dimname=dimName;
+                  if(d<varDimensions.length-1)dimname+=", ";
+                  dimension.put("name",dimname);
+                  dimension.put("length",dimensions.get(d).getAttrValue("length"));
+                  jsonDimensionArray.put(dimension);
+                  
+                  if(dimName.equals(varName1)){
+                    JSONArray length = new JSONArray();
+                    length.put((new JSONObject()).put("length",dimensions.get(rd).getAttrValue("length")));
+                    jsonVariable1.put("isDimension",length);
+                    isDimension = true;
+                  }
+                  
+                  break;
+                }
+              }
+              //dimension.put("name",dimName);
+            }
+            jsonVariable1.put("dimensions",jsonDimensionArray);
+            //DebugConsole.println("dimensionArray: "+jsonDimensionArray.toString());
+          }catch(Exception e){
          
-          JSONArray jsonDimensionArray = new JSONArray();
-          for(int d=0;d<varDimensions.length;d++){
-            JSONObject dimension = new JSONObject();
-            String dimName=varDimensions[d];
-            for(int rd=0;rd<dimensions.size();rd++){
-              if(dimensions.get(rd).getAttrValue("name").equals(dimName)){
-                String dimname=dimName;
-                if(d<varDimensions.length-1)dimname+=", ";
-                dimension.put("name",dimname);
-                dimension.put("length",dimensions.get(d).getAttrValue("length"));
-                jsonDimensionArray.put(dimension);
-                
-                if(dimName.equals(varName1)){
-                  JSONArray length = new JSONArray();
-                  length.put((new JSONObject()).put("length",dimensions.get(rd).getAttrValue("length")));
-                  jsonVariable1.put("isDimension",length);
-                }
-                
-                break;
-              }
-            }
-            //dimension.put("name",dimName);
           }
-          jsonVariable1.put("dimensions",jsonDimensionArray);
-          //DebugConsole.println("dimensionArray: "+jsonDimensionArray.toString());
-        }catch(Exception e){
-       
-        }
-      
-
-        List<XMLElement>attributes1 = variables.get(j).getList("attribute");
-        if(attributes1.size()>0){
+        
+  
+          List<XMLElement>attributes1 = variables.get(j).getList("attribute");
           JSONArray jsonattributeArray = new JSONArray();
+          
           for(int a=0;a<attributes1.size();a++){
-
             JSONObject attribute = new JSONObject();
             String attrName=attributes1.get(a).getAttrValue("name");
             String attrValue=attributes1.get(a).getAttrValue("value");
@@ -212,15 +212,19 @@ public class OpenDAPViewer {
             if(attrName.equals("long_name"))longName=attrValue;
             jsonattributeArray.put(attribute);
           }
+        
           jsonVariable1.put("attributes",jsonattributeArray);
+          jsonVariable1.put("longname",longName);
+          
+          //if(attributes1.size()>0){
+          if(isDimension&&iterateOption==0){
+            variableInfo.put(jsonVariable1);
+          }else if(!isDimension&&iterateOption==1){
+            variableInfo.put(jsonVariable1);
+          }
+          //}
+          
         }
-        
-        jsonVariable1.put("longname",longName);
-        
-        if(attributes1.size()>0){
-          variableInfo.put(jsonVariable1);
-        }
-        
       }
       
       
