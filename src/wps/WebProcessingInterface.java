@@ -2,6 +2,7 @@ package wps;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Vector;
@@ -265,28 +266,11 @@ public class WebProcessingInterface {
     return data;*/
 	}
 	
-	public static String addLiteralData(String identifier,String value){
-	  String data="";
-	  
-	  if(value!=null){
-      String [] values = value.split(",");
-      for(int j=0;j<values.length;j++){
-    	  data+=  "        <wps:Input>\n";
-        data+=  "          <ows:Identifier>"+identifier+"</ows:Identifier>\n";
-        data+=  "          <wps:Data>\n";
-        data+=  "            <wps:LiteralData>"+values[j]+"</wps:LiteralData>\n";
-        data+=  "          </wps:Data>\n";
-        data+=  "        </wps:Input>\n";
-      }
-	  }else{
-	    data+=  "        <wps:Input>\n";
-      data+=  "          <ows:Identifier>"+identifier+"</ows:Identifier>\n";
-      data+=  "          <wps:Data>\n";
-      data+=  "          </wps:Data>\n";
-      data+=  "        </wps:Input>\n";
-	  }
-    return data;
-	}
+
+	
+	
+	
+	
 	
 	/**
 	 * Executes a WPS command based on processor identifier and datainputs. Datainputs should be in the form of how KVP datainputs would normally be encoded in a GET URL.
@@ -303,111 +287,43 @@ public class WebProcessingInterface {
     if(user == null){
       return null;
     }
-    //http://bhw222.knmi.nl:8080/cgi-bin/wps.cgi?version=1.0.0&service=WPS&request=execute&identifier=Rint&datainputs=[startIndex=1;stopIndex=100]
     Debug.println("executeprocess "+procId+" datainput="+dataInputs);
-    //String getcaprequest=WPSURL+"service=WPS&version=1.0.0&request=execute&identifier="+procId+"&datainputs=[startIndex=1;stopIndex=100]";
-    
-    String postData="";
     try{
-      
-     
-      postData+=URLEncoder.encode("service","UTF-8")+"="+URLEncoder.encode("WPS","UTF-8");
-      postData+="&"+URLEncoder.encode("version","UTF-8")+"="+URLEncoder.encode("3.5","UTF-8");
-      //URLEncoder.encode("service=WPS&version=1.0.0&request=execute&identifier="+procId+"&datainputs=[startIndex=1;stopIndex=100]","UTF-8")
-      
-      postData
-         ="<wps:Execute service=\"WPS\" version=\"1.0.0\" xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">\n"
-         +"      <ows:Identifier>"+procId+"</ows:Identifier>\n"
-         +"      <wps:ResponseForm>\n"
-         +"        <wps:ResponseDocument storeExecuteResponse=\"true\" status=\"true\">\n"
-         //+"          <wps:Output asReference=\"false\">\n"
-         //+"            <ows:Identifier>"+procId+"</ows:Identifier>\n"
-         //+"          </wps:Output>\n"
-         +"        </wps:ResponseDocument>\n"
-         +"      </wps:ResponseForm>\n";
-
-      String trimmedInput=dataInputs.trim();
-      Debug.println("DataInputs="+trimmedInput);
-      if(!trimmedInput.equals("[]")){
-        postData   +=   "      <wps:DataInputs>\n";
-        //postData+=addLiteralData("startIndex","1");
-        //postData+=addLiteralData("stopIndex","4");
-        
-        //DebugConsole.println(dataInputs);
-        
-      
-        //Remove [] and split on ","
-        String [] dataInputArray=trimmedInput.substring(1,trimmedInput.length()-1).split(";");
-        for(int j=0;j<dataInputArray.length;j++){
-          //KVP key=value
-          
-          
-          dataInputArray[j] = dataInputArray[j].split("#")[0];
-          Debug.println(dataInputArray[j]);
-          try{
-          String[] kvp=dataInputArray[j].split("=");
-          if(kvp.length<2){
-            postData+=addLiteralData(kvp[0],"");
-          }else{
-            postData+=addLiteralData(kvp[0],kvp[1]);
-          }
-          }catch(Exception e){
-            e.printStackTrace();
-            Debug.errprintln("error");
-            return returnErrorMessage("Invalid values given for '"+dataInputArray[j]+"' \nCause: "+e.toString());  
-          }
-        }
-        
-        postData     +=  "      </wps:DataInputs>\n";
-      }
-      
-      postData     +=  "    </wps:Execute>\n";
-      
-      MyXMLParser.XMLElement  a = new MyXMLParser.XMLElement();
-      Debug.println(postData);
-     
-      
+      String postData=PyWPSServer.convertQueryStringToPost(dataInputs, procId);  
+      MyXMLParser.XMLElement  wpsExecuteResponseDocument = new MyXMLParser.XMLElement();
       if(isLocal() == false){
-        
-        a.parse(new URL(getWPSURL()),postData);
-    
+        wpsExecuteResponseDocument.parse(new URL(getWPSURL()),postData);
       }
       if(isLocal() == true){
         //We have composed the data to post, now post it to our internal CGI.
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        
         PyWPSServer.runPyWPS(request,null,out,null,postData);
-        //a.parse(new URL(WPSURL),postData);
-        //Debug.println(getWPSURL()+" for "+user.id);
-        
-        //Debug.println("Process has been started with the following command:.");
-        //DebugConsole.println(postData+"\nThe result is:\n"+a.toString());
         Debug.println("Process has been started.");
-      
-      
-       
-        a.parseString(out.toString());
+        wpsExecuteResponseDocument.parseString(out.toString());
         out = null;
       }
-      
       //Track this job
-      JSONObject data = trackJobForUser(user,a,postData);
-      //monitorProcess(statusLocation,request);
+      JSONObject data = trackJobForUser(user,wpsExecuteResponseDocument,postData);
       return data;
-    
     } catch (Exception e) {
       Debug.errprintln("error");
       return returnErrorMessage(e.toString());  
     }
-   
- 
   }
   
-  
-  public static JSONObject trackJobForUser(ImpactUser user, XMLElement a,String postData) throws Exception {
+ 
+  /**
+   * Stores the job in the users basket for monitoring.
+   * @param user
+   * @param wpsExecuteResponseDocument
+   * @param xmlInputPostData
+   * @return
+   * @throws Exception
+   */
+  public static JSONObject trackJobForUser(ImpactUser user, XMLElement wpsExecuteResponseDocument,String xmlInputPostData) throws Exception {
     Debug.println("TrackJob For user");
     //Check if an Exception has been thrown:
-    JSONObject exception = checkException(a,postData+"\n\n"+a.toString());
+    JSONObject exception = checkException(wpsExecuteResponseDocument,xmlInputPostData+"\n\n"+wpsExecuteResponseDocument.toString());
     if(exception!=null)return exception;
     
     //Get the reference to the started process (statuslocation)
@@ -415,29 +331,28 @@ public class WebProcessingInterface {
     String creationTime = null;
     JSONObject data = new JSONObject();
    
-    statusLocation=a.get("wps:ExecuteResponse").getAttrValue("statusLocation");
+    statusLocation=wpsExecuteResponseDocument.get("wps:ExecuteResponse").getAttrValue("statusLocation");
     
-    a.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessAccepted");
-    creationTime = a.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");
-    String procId = a.get("wps:ExecuteResponse").get("wps:Process").get("ows:Identifier").getValue();
+    wpsExecuteResponseDocument.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessAccepted");
+    creationTime = wpsExecuteResponseDocument.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");
+    String procId = wpsExecuteResponseDocument.get("wps:ExecuteResponse").get("wps:Process").get("ows:Identifier").getValue();
   
     Debug.println("WPS statusLocation = '"+statusLocation+"'");
     Debug.println("WPS creationTime = '"+creationTime+"'");
   
  
-    data.put("wpsurl", statusLocation);
+    data.put("statuslocation", statusLocation);
     data.put("status", "accepted");
-    data.put("statusLocation", statusLocation);
     data.put("creationTime", creationTime);
     //String id = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
     data.put("id", procId);
     
     MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-    if(postData!=null){
-      b.parseString(postData);
+    if(xmlInputPostData!=null){
+      b.parseString(xmlInputPostData);
       JSONObject inputDataAsJSON = b.toJSONObject(Options.STRIPNAMESPACES);
         
-      data.put("postData", inputDataAsJSON);
+      data.put("wpspostdata", inputDataAsJSON);
     }
     String uniqueID=statusLocation.substring(statusLocation.lastIndexOf("/")+1);
     data.put("uniqueid", uniqueID);
@@ -468,7 +383,7 @@ public class WebProcessingInterface {
        * It seems that the statuslocation XML file is sometimes not completely written by PyWPS, or not immediately available after the process has been executed.
        * Solution: Retry to read the XML file a couple of times until we have a good result.       * 
        */
-      int maximumTries = 2;
+      int maximumTries = 3;
       boolean success = false;
       do{
         maximumTries--;
@@ -477,7 +392,7 @@ public class WebProcessingInterface {
           success = true;
         }catch(SAXException s){
           Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
-          Thread.sleep(100);
+          Thread.sleep(500);
           if(maximumTries == 0){
             GenericCart jobList;
             try {
@@ -506,6 +421,7 @@ public class WebProcessingInterface {
       try{
         //DebugConsole.println(status.get("wps:ProcessStarted").getAttr("percentCompleted")+"% - "+status.get("wps:ProcessStarted").getValue());
         data.put("wpsurl",statusLocation);
+        data.put("statuslocation",statusLocation);
         data.put("progress",status.get("wps:ProcessStarted").getAttrValue("percentCompleted"));//Progress in percentage
         String statusString=status.get("wps:ProcessStarted").getValue();
         int a= statusString.indexOf("processstarted");

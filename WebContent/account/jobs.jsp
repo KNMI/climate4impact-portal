@@ -8,138 +8,169 @@
    %>
     <jsp:include page="../includes-ext.jsp" />
     
-   <!--  <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" /> -->
-     
     <script type="text/javascript" src="../js/components/processors/useProcessor.js"></script>
     <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
-    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
+    
+    <style>
+		.c4i-joblist-loader{
+		  background-image:url("../images/ajax-loader.gif") !important;
+  		width:32px;
+  		height:32px;
+		}
+			.c4i-joblist-table  {
+			    border-collapse: collapse;
+			    width: 100%;
+			
+			    border-spacing: 0;
+			}
+			
+			.c4i-joblist-table th, .c4i-joblist-table td {
+			  border: 1px solid #ddd;
+			  padding: 3px 8px 3px 8px;
+			  text-align: left;
+			    text-align: left;
+			    padding: 8px;
+			}
+			.c4i-joblist-table tr:nth-child(even){background-color: #f5f5f5}
+			
+			/*.c4i-joblist-table tr:hover {background-color: #f0f0f0 !important}*/
+			
+      .c4i-joblist-table th{
+        background: none repeat scroll 0 0 #428bca;
+		    color: white;
+		    font-size: 16px;
+		    font-weight: bold;
+			}
+	 </style>
+	 
     <script type="text/javascript">
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
-    var task;
-    var removeId = function(id){
+
+    $( document ).ready(function() {
     	
-    	var passFn = function(e){
-    		var json= Ext.JSON.decode(e.responseText);
-   		    if(json.error){
-  		    	alert(json.error);
-   		    }else{
-   				adjustNumberOfJobsDisplayedInMenuBar(json);
-   		    }
-    		populateJobList();
+    	var element = $("#joblist");
+    	
+    	/* Set loading gif */
+    	element.html('<div class="c4i-joblist-loader"></div>');
+    	
+    	/* Generate table based on json data callback */
+    	var httpCallback = function(data){
+    	  if(data.error){
+    	    var html="An error occured";
+    	    html+="<hr>"+data.error+"</hr>";
+    	    if(data.exception){
+    	     html+="<hr>"+data.exception+"</hr>";
+    	    }
+    	    element.html(html);
+    	    return;
+    	  }
+    	  
+    	  if(data.jobs.length==0){
+    	    element.html("No jobs available");
+    	    return ;
+    	  }
+    	  
+    	  var html="<table class=\"c4i-joblist-table\"><tr><th>Created at</th><th>Name</th><th>Status location</th><th>Progress</th><th>View</th><th>X</th></tr>";
+    	  for(var j=0;j<data.jobs.length;j++){
+    	    html+="<tr>";
+    	    html+="<td>"+data.jobs[j].creationdate+"</td>";
+    	    html+="<td>"+data.jobs[j].wpsid+"</td>";
+    	    html+="<td><a href=\""+data.jobs[j].statuslocation+"\">"+data.jobs[j].processid+"</a></td>";
+    	    html+="<td>"+data.jobs[j].progress+"</td>";
+    	    html+="<td><button class=\"c4i-joblist-viewbutton\" name=\""+data.jobs[j].processid+"\">"+"view"+"</button></td>";
+    	    html+="<td><button class=\"c4i-joblist-deletebutton\" name=\""+data.jobs[j].processid+"\">"+"X"+"</button></td>";
+    	    html+="</tr>";
+    	  }
+    	  html+="</table>";
+    	  element.html(html);
+    	  
+    	  /* View Job details buttons */
+    	  element.find(".c4i-joblist-viewbutton").button().attr('onclick','').click(function(t){
+    	    var found = false;
+    	    for(var j=0;j<data.jobs.length;j++){
+    	      if(data.jobs[j].processid == this.name){
+    	        found = data.jobs[j];
+    	      }
+    	    }
+    	    if(found!==false){
+            showStatusReport(found);
+    	    }else{
+    	      alert("Process ID "+this.name+" not found");
+    	    }
+        });
+    	  
+    	  /* Remove Job from list buttons */
+        element.find(".c4i-joblist-deletebutton").button().attr('onclick','').click(function(t){
+          var removeJobDoneCallback = function(d){
+            adjustNumberOfJobsDisplayedInMenuBar(d);//Located in ImpactJS.js
+          };
+          
+          $.ajax({
+            url: impactService+"service=processor&request=removeFromList&id="+this.name,
+            crossDomain:true,
+            dataType:"jsonp"
+          }).done(function(d) {
+            removeJobDoneCallback(d)
+          }).fail(function() {
+            alert("Failed for "+arg);
+          }).always(function(){
+            getJobListFromServer();
+          });
+        });
+    	
     	};
-    	Ext.Ajax.request({
-   		    url: impactService,
-   		    success: passFn,   
-   		    failure: passFn,
-   		    timeout:5000,
-   		 	method:'GET',
-   		    params: { service:'processor',request:'removeFromList',id:id }  
-   		 });
-    }
-    
-    var populateJobList = function(){
-   	
-   		var passFn = function(data){
-    		Ext.fly('joblist').dom.innerHTML=data.responseText;
 
-   	      task.stop();
-   	      task.start();
-   		}
-   		var failFn = function(msg){
-   			var data = {};
-   			data.responseText='Unable to retrieve processing list from server';
-   			passFn(data);
-   		}
-   	 	Ext.Ajax.request({
-   		    url: impactService,
-   		    success: passFn,   
-   		    failure: failFn,
-   		    timeout:10000,
-   		 	method:'GET',
-   		    params: { service:'processor',request:'getProcessorStatusOverview' }  
-   		  });
-    }
-    
-    
-    Ext.Loader.setConfig({
-        enabled: true
+    	
+    	var getJobListFromServer = function(){
+    	 /* Make the AJAX call to obtain the joblist */
+		   	$.ajax({
+	   	    url: impactService+"service=processor&request=getProcessorStatusOverview",
+		      crossDomain:true,
+	   	    dataType:"jsonp"
+	   	  }).done(function(d) {
+	   	    try{
+	   	      httpCallback(d)
+	   	    }catch(e){
+	   	      element.html("Error obtaining joblist: "+e);
+	   	    };
+	 	    }).fail(function() {
+	 	      alert("Failed for "+arg);
+	 	    }).always(function(){
+	 	      setTimeout(function(){getJobListFromServer();},10000);
+	 	    });
+    	};
+    	
+    	getJobListFromServer();
     });
-    Ext.Loader.setPath('Ext.ux', '../js/ux');
-
-  /* Ext.require([
-        'Ext.selection.CellModel',
-        'Ext.grid.*',
-        'Ext.data.*',
-        'Ext.util.*',
-        'Ext.state.*',
-        'Ext.form.*',
-        'Ext.ux.CheckColumn',
-        'Ext.ux.ButtonColumn'
-    ]);*/
-    Ext.QuickTips.init();
-
-
-    Ext.onReady(function(){
-    	//basketWidget.show();
-    	//datasetviewer.show('http://opendap.nmdc.eu/knmi/thredds/dodsC/IS-ENES/CERFACS/CERFACS-SCRATCH2010/ncar_ccsm3_0/annual/uvas_1d_2099_annual.nc');
-		var runner = new Ext.util.TaskRunner();
-      	task = runner.newTask({
-        	run: function () {
-        	  try{
-        		populateJobList();
-        	  }catch(e){
-        	    alert(e);
-        	    task.stop();
-       	      	task.start();
-        	  }
-       		},
-        	repeat: 1,
-        	interval:5000
-       });
-       task.start();
-       populateJobList();
-    });
+    
     </script>
   </head>
+  
   <body>
 		<jsp:include page="../header.jsp" />
-		<!-- Contents -->
-
 		<jsp:include page="loginmenu.jsp" />
- 
 		<div class="impactcontent">
 		<div class="breadcrumb"><a href="login.jsp">Account</a> » Monitor jobs </div>
 		<h1>Submitted processing jobs</h1>
 		<%
 			ImpactUser user = null;
-				try{
-			user = LoginManager.getUser(request);
-				}catch(Exception e){
-			
-				}
+			try{
+				  user = LoginManager.getUser(request);
+			}catch(Exception e){
+			}
 				
-				 if (user==null){
+			if (user==null){
 		%>
 			<p>You are not logged in, please go to the <a href="/impactportal/account/login.jsp">login page</a> and log in</p>
-			<%
+		<%
 		}else{
-			
-			
-			out.println("<div id='joblist'></div>");
-			
-			
-			
-			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
+			out.println("<div id='joblist'>loading...</div>");
 		}
 		%>
-
-  		</div>
-		
-	 
-  <!-- /Contents -->
+	</div>
 	<jsp:include page="../footer.jsp" />
   </body>
 </html>

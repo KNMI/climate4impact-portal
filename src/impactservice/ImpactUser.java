@@ -49,12 +49,9 @@ public class ImpactUser {
 
   synchronized public GenericCart getProcessingJobList(){
     GenericCart processingJobsList = null;
-    Debug.println("getProcessingJobList");
+    Debug.println("getProcessingJobList for "+this.getInternalName());
     try{
-      if(processingJobsList==null){
-        processingJobsList = new GenericCart("processingJobsList",this);
-      }
-      Debug.println("Loading processing list from store");
+      processingJobsList = new GenericCart("processingJobsList",this);
       processingJobsList.loadFromStore();
     }catch(Throwable e){
       try {

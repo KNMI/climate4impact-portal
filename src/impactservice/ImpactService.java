@@ -2,6 +2,7 @@ package impactservice;
 
 import impactservice.SessionManager.SearchSession;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -56,46 +57,49 @@ public class ImpactService extends HttpServlet {
     String requestStr=request.getParameter("request");
     if(requestStr!=null){requestStr=URLDecoder.decode(requestStr,"UTF-8");}else{errorResponder.printexception("urlStr="+requestStr);return;}
 
-    Debug.println("PROCESSOR REQUEST="+requestStr);
+    //Debug.println("PROCESSOR REQUEST="+requestStr);
 
+  
+    
+    
     /**
-     * Remove processor from status list
+     * Remove statuslocation from status list
      */
-    if(requestStr.equals("removeFromList")){
-
+    if(requestStr.equalsIgnoreCase("removeFromList")){
+      JSONResponse jsonResponse = new JSONResponse(request);
       GenericCart jobList = null;
       try{
-        response.setContentType("text/plain");
         String procId=request.getParameter("id");
         if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
         jobList = LoginManager.getUser(request,response).getProcessingJobList();
         jobList.removeDataLocator(procId);
-        response.getWriter().println("{\"numproducts\":\""+(jobList.getNumProducts())+"\"}");
+        jsonResponse.setMessage("{\"numproducts\":\""+(jobList.getNumProducts())+"\"}");
       }catch(Exception e){
-        response.getWriter().println(e.getMessage());
+        jsonResponse.setException("Processor: removefromlist failed", e);
       }
-
+      jsonResponse.printNE(response);
     }
 
     /**
-     *  getprocessor status list as HTML
+     *  getprocessor status list as JSON
      */
-    if(requestStr.equals("getProcessorStatusOverview")){
+    if(requestStr.equalsIgnoreCase("getProcessorStatusOverview")){
+      JSONResponse jsonResponse = new JSONResponse(request);
       GenericCart jobList = null;
       try{
-        response.setContentType("text/html");
         jobList = LoginManager.getUser(request,response).getProcessingJobList();
-        String html = GenericCart.CartPrinters.showJobList(jobList,request);
-        response.getWriter().println(html);
+        JSONObject json = GenericCart.CartPrinters.showJobList(jobList,request);
+        jsonResponse.setMessage(json);
       }catch(Exception e){
-        response.getWriter().println(e.getMessage());
+        jsonResponse.setException("Processor: getProcessorStatusOverview failed", e);
       }
+      jsonResponse.printNE(response);
     }
 
     /**
      * Get processor list as JSON
      */
-    if(requestStr.equals("getProcessorList")){
+    if(requestStr.equalsIgnoreCase("getProcessorList")){
       PrintWriter out1 = null;
       response.setContentType("application/json");
       try {
@@ -136,7 +140,7 @@ public class ImpactService extends HttpServlet {
     /**
      * Describe processor
      */
-    if(requestStr.equals("describeProcessor")){
+    if(requestStr.equalsIgnoreCase("describeProcessor")){
       String procId=request.getParameter("id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
       try {
@@ -151,7 +155,10 @@ public class ImpactService extends HttpServlet {
     /**
      * Execute processor
      */
-    if(requestStr.equals("executeProcessor")){
+    if(requestStr.equalsIgnoreCase("executeProcessor")){
+    
+      
+      
       String procId=request.getParameter("id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
       String dataInputs=request.getParameter("dataInputs");
@@ -175,7 +182,7 @@ public class ImpactService extends HttpServlet {
     /**
      * Monitor processor
      */
-    if(requestStr.equals("monitorProcessor")){
+    if(requestStr.equalsIgnoreCase("monitorProcessor")){
       String procId=request.getParameter("id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
       String statusLocation=request.getParameter("statusLocation");
@@ -191,7 +198,7 @@ public class ImpactService extends HttpServlet {
     /**
      * Get Image from statuslocation
      */
-    if(requestStr.equals("getimage")){
+    if(requestStr.equalsIgnoreCase("getimage")){
 
       String statusLocation=request.getParameter("statusLocation");
       if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
@@ -869,8 +876,9 @@ public class ImpactService extends HttpServlet {
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     if(request.getQueryString()!=null){
-      Debug.println("Request received query string "+request.getQueryString());
+      Debug.println("Query string:["+request.getQueryString()+"]");
     }
+    
     JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
     String serviceStr = null;
 

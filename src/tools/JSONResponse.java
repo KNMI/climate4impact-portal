@@ -135,5 +135,11 @@ public class JSONResponse {
     response.setContentType(getMimeType());
     response.getOutputStream().print(getMessage());
   }
-  
+  public void printNE(HttpServletResponse response) throws IOException{
+    try {
+      print(response);
+    } catch (Exception e1) {
+    
+    }
+  }
 }

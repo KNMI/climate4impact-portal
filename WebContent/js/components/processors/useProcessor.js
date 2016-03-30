@@ -62,7 +62,7 @@ var showStatusReport = function(json) {
 															.request({
 																url : impactWPSURL
 																		+ 'service=processor&request=GetStatusReport&statusLocation='
-																		+ json.wpsurl,
+																		+ json.statuslocation,
 																success : passFn,
 																failure : failFn
 															});
@@ -103,7 +103,7 @@ var showStatusReport = function(json) {
 											fn : function(t) {
 												var c = results.getComponent(1);
 												// try{
-												var v = json.postData;// .Execute.DataInputs;
+												var v = json.wpspostdata;// .Execute.DataInputs;
 												// console.log("Creating input
 												// settings list");
 												// console.log(dump(json));
@@ -114,7 +114,7 @@ var showStatusReport = function(json) {
 												if (v) {
 													// console.log("getting
 													// id");
-													var id = json.postData.Execute.Identifier.value;
+													var id = json.wpspostdata.Execute.Identifier.value;
 													// console.log("id==" + id);
 													var url = impactWPSURL
 															+ 'service=processor&request=describeProcessor&id='
@@ -145,7 +145,7 @@ var showStatusReport = function(json) {
 																.getComponent(0);
 														// cmp =
 														// Ext.getCmp('wpsparams2');
-														// alert(dump(wpsInputList)+dump(json.postData));
+														// alert(dump(wpsInputList)+dump(json.wpspostdata));
 														buildWPSInterface(
 																cmp,
 																wpsInputList,
@@ -220,8 +220,8 @@ var processProgressMonitoring = function(status) {
 	var url = {
 		xtype : 'panel',
 		height : 25,
-		html : 'Location: <a target="_blank" href="' + status.wpsurl + '">'
-				+ status.wpsurl + '</a>',
+		html : 'Location: <a target="_blank" href="' + status.statuslocation + '">'
+				+ status.statuslocation + '</a>',
 		region : 'south',
 		frame : true,
 		border : false,
@@ -275,7 +275,7 @@ var processProgressMonitoring = function(status) {
 		service : 'processor',
 		request : 'monitorProcessor',
 		id : status.id,
-		statusLocation : status.statusLocation
+		statusLocation : status.statuslocation
 	};
 
 	var makeMonitorRequest = function() {

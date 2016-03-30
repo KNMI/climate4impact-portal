@@ -1,10 +1,11 @@
 package tools;
 
-import impactservice.Configuration;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -56,6 +57,8 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+
+import impactservice.Configuration;
 
 
 
@@ -134,7 +137,11 @@ public class HTTPTools extends HttpServlet {
     }
 
     public String getMessage() {
-      return ""+statusCode;
+      
+      //if(statusCode == 401){
+        return statusCode+": "+ org.apache.commons.httpclient.HttpStatus.getStatusText(statusCode); 
+      //}
+      //return ""+statusCode;
     }
   }
 
@@ -362,12 +369,12 @@ public class HTTPTools extends HttpServlet {
     String[] kvpparts = queryString.split("&");
     for (int j = 0; j < kvpparts.length; j++) {
       // System.out.println("*********KV"+kvpparts[j]);
-      String kvp[] = kvpparts[j].split("=");
-
-      if (kvp.length == 2) {
-
-        if (kvp[0].equalsIgnoreCase(key)){
-          String valueChecked = validateInputTokens(kvp[1]);
+      int firstEqualsSign = kvpparts[j].indexOf("=");
+      if(firstEqualsSign>=0){
+        String foundKey = kvpparts[j].substring(0, firstEqualsSign);
+        String foundValue = kvpparts[j].substring(firstEqualsSign+1);
+        if (foundKey.equalsIgnoreCase(key)){
+          String valueChecked = validateInputTokens(foundValue);
           values.add(valueChecked);
         }
       }
@@ -506,6 +513,13 @@ public class HTTPTools extends HttpServlet {
     return httpclient;
   }
 
+  /**
+   * Finds a KVP from the querystring. Returns null if not found.
+   * @param queryString
+   * @param string
+   * @return
+   * @throws Exception
+   */
   public static String getKVPItem(String queryString, String string) throws Exception {
     List<String> items = getKVPList(queryString, string);
     if (items.size() == 0)
@@ -644,4 +658,42 @@ public class HTTPTools extends HttpServlet {
     HttpResponse httpResponse=httpclient.execute(httpPost);
     return EntityUtils.toString(httpResponse.getEntity(),"utf-8");
   }
+  
+  /*
+   * Gets the posted data from the request
+   */
+  public static String getPostBody(HttpServletRequest request) throws IOException {
+
+    String body = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    BufferedReader bufferedReader = null;
+
+    try {
+        InputStream inputStream = request.getInputStream();
+        if (inputStream != null) {
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            char[] charBuffer = new char[128];
+            int bytesRead = -1;
+            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+                stringBuilder.append(charBuffer, 0, bytesRead);
+            }
+        } else {
+            stringBuilder.append("");
+        }
+    } catch (IOException ex) {
+        throw ex;
+    } finally {
+        if (bufferedReader != null) {
+            try {
+                bufferedReader.close();
+            } catch (IOException ex) {
+                throw ex;
+            }
+        }
+    }
+
+    body = stringBuilder.toString();
+    return body;
+  }
+  
 }

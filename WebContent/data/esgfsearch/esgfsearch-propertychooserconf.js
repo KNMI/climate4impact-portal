@@ -11,12 +11,12 @@ var esgfsearch_pc_project={
       "longname":"Coordinated Regional Climate Downscaling Experiment<br/>Long term regional climate change runs",
       "shortname":"CORDEX",
       "color":"#f58d00"
-    },{
-      "name":"SPECS",
+    },/*{
+      "name":"specs",
       "longname":"Seasonal-to-decadal climate Prediction for the improvement of European Climate Services",
       "shortname":"SPECS",
       "color":"#d32c2c"
-    },{
+    },*/{
         "name":"clipc",
         "longname":"Climate Information Platform for Copernicus",
         "shortname":"CLIPC",

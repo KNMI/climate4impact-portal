@@ -1,6 +1,18 @@
     var mainWebmapJS ;
     setBaseURL("../adagucviewer/webmapjs");
     
+    var visualizeVariable = function(layer,resource){
+    	var el=jQuery('<div/>');
+        renderFileViewerInterface({element:el,
+          service:c4iconfigjs.impactservice,
+          adagucservice:c4iconfigjs.adagucservice,
+          adagucviewer:c4iconfigjs.adagucviewer,
+          //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+          query:resource,
+          dialog:true
+        });   
+    };
+    
     //var defaultProjection = {srs:'EPSG:3857',bbox:'13238.944477686076,6372693.810359594,1163089.5564179858,7299992.69095661'};
     //var defaultProjection = {srs:'EPSG:28992',bbox:'-11207.614738397242,269926.44380811695,318293.5111561029,665327.7948815171'};
     var defaultProjection = {srs:'EPSG:4326',bbox:'-180,-90,180,90'};
