@@ -180,4 +180,7 @@
     <servlet-name>TokenAPI</servlet-name>
     <servlet-class>tokenapi.TokenAPI</servlet-class>
   </servlet>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
 </web-app>

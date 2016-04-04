@@ -50,7 +50,7 @@
     var impactService=impactBase+'ImpactService?';
 
     $( document ).ready(function() {
-    	
+      console.log("ready");
     	var element = $("#joblist");
     	
     	/* Set loading gif */
@@ -125,6 +125,7 @@
 
     	
     	var getJobListFromServer = function(){
+    	  console.log("getJobListFromServer");
     	 /* Make the AJAX call to obtain the joblist */
 		   	$.ajax({
 	   	    url: impactService+"service=processor&request=getProcessorStatusOverview",
@@ -139,6 +140,7 @@
 	 	    }).fail(function() {
 	 	      alert("Failed for "+arg);
 	 	    }).always(function(){
+	 	      console.log("Always");
 	 	      setTimeout(function(){getJobListFromServer();},10000);
 	 	    });
     	};
