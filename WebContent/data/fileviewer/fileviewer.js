@@ -11,6 +11,9 @@ var renderFileViewerInterface = function(options){
   return new FileViewerInterface(options);
 };
 
+/**
+ * Support for backward compatibility. Other components call renderFileViewer instead
+ */
 var renderFileViewer = function(options){
   var newoptions = [];
   
@@ -29,6 +32,9 @@ var renderFileViewer = function(options){
 
 var FileViewerInterface = function(options){
   var _this = this;
+  
+  options.prettyquery=options.query.split("#")[0];
+  
   //var impactFileViewerEndPoint = "http://bhw485.knmi.nl:8280/impactportal/fileviewer?";
   var impactFileViewerEndPoint = "fileviewer?";
  
@@ -47,7 +53,7 @@ var FileViewerInterface = function(options){
   var downloadWin;
   
   this.openDownloadWindow = function(){
-    var request = options.query;
+    var request = options.prettyquery;
     if (request.indexOf('aggregation') > 0) {
       alert('Aggregations cannot be downloaded directly.');
       return;
@@ -83,7 +89,7 @@ var FileViewerInterface = function(options){
     icons: { primary: "icon-shoppingbasket"},
     click: function( event ) {
       event.preventDefault();
-      var url = options.query;
+      var url = options.prettyquery;
       var id = url.substring(url.lastIndexOf("/") + 1);
 
       basket.postIdentifiersToBasket({
@@ -122,8 +128,8 @@ var FileViewerInterface = function(options){
 
     //rootElement.html("");
     rootElement.block();
-    if(options.query){
-      query = options.query;
+    if(options.prettyquery){
+      query = options.prettyquery;
     }
  
 
@@ -164,7 +170,7 @@ var FileViewerInterface = function(options){
         for(var d=0;d<variable.dimensions.length;d++){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
         }
-        var url=options.adagucservice+"source="+URLEncode(options.query)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay,grid10&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
+        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay,grid10&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
         var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
       }
@@ -248,7 +254,7 @@ var FileViewerInterface = function(options){
     
     html+="</table>";*/
     
-   var html=options.query;
+   var html=options.prettyquery;
    rootElement.find(".c4i-fileviewer-globalmetadata").find(".simplecomponent-body").html(html);
       
     var html="";
@@ -319,22 +325,22 @@ var FileViewerInterface = function(options){
         
         var adagucViewerAddLayer = $('<span />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
         var WMS = $('<span />').addClass('c4i-fileviewer-wms').html(
-          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WMS&request=GetCapabilities">WMS</a>');
+          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.prettyquery)+'&service=WMS&request=GetCapabilities">WMS</a>');
         
         serviceOptions.append(WMS);
         var WCS = $('<span />').addClass('c4i-fileviewer-wcs').html(
-          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.query)+'&service=WCS&request=GetCapabilities">WCS</a>');
+          '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.prettyquery)+'&service=WCS&request=GetCapabilities">WCS</a>');
         serviceOptions.append(WCS);
         
         var OpenDAP = $('<span />').addClass('c4i-fileviewer-opendap').html(
-            '<a target="_blank" href="'+options.query+'.das">OpenDAP</a>');
+            '<a target="_blank" href="'+options.prettyquery+'.das">OpenDAP</a>');
         serviceOptions.append(OpenDAP);
         
         var variable = data[v].variable;
         
         adagucViewerAddLayer.attr('onclick','').click(function(event){
           event.preventDefault();          
-          _this.visualizeVariable(variable,options.query);
+          _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });
         
@@ -353,7 +359,7 @@ var FileViewerInterface = function(options){
         var previewImage = el.parent().find(".c4i-fileviewer-previewstyle");
         previewImage.attr('onclick','').click(function(event){
           event.preventDefault();          
-          _this.visualizeVariable(variable,options.query);
+          _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });
       }
@@ -382,7 +388,7 @@ var FileViewerInterface = function(options){
   };
   
   function getVariableInfoFromServer(){
-    var url = options.service+"service=getvariables&request="+URLEncode(options.query);
+    var url = options.service+"service=getvariables&request="+URLEncode(options.prettyquery);
 //    console.log(url);
     $.ajax({
       url: url,

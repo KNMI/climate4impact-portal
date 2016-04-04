@@ -13,7 +13,7 @@
       },'SMHI-NSC-LIU':{
           name:'SMHI-NSC-LIU',
           openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
-          createaccount:'https://esg-dn1.nsc.liu.se/esgf-web-fe/createAccount',
+          createaccount:'https://esg-dn1.nsc.liu.se/user/add/?next=https://esg-dn1.nsc.liu.se/projects/esgf-liu/',
           accountinfo:'http://esg-dn1.nsc.liu.se/esgf-web-fe/accountsview',
           logocls:'logo_Sweden',
           logo:'/impactportal/images/nsclogo.png',
@@ -170,7 +170,7 @@ $(function() {
     var bValid = true;
     //bValid = bValid && checkLength(name, "username", 0, 50,showtips);
     if(name.val().length>0){
-    	bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _.]*$/i,  "*Username may consist of a-z, 0-9, underscores and '.' .",showtips);
+    	bValid = bValid && checkRegexp(name, /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _.@]*$/i,  "*Username may consist of a-z, 0-9, underscores, '@' and '.' .",showtips);
     }
    
     var dataCentreName = $('#dialog-form').dialog("option")["datacentre"];
