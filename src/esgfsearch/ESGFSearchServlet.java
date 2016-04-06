@@ -69,10 +69,29 @@ public class ESGFSearchServlet extends HttpServlet {
       }catch (Exception e) {
       }
       
+
+      int pageLimit = 25;
+      try{
+        String pageLimitStr=HTTPTools.getHTTPParam(request,"pagelimit");
+        if(pageLimitStr!=null){
+          pageLimit=Integer.parseInt(pageLimitStr);
+        }
+      }catch (Exception e) {
+      }
+      
+      int pageNr = 0;
+      try{
+        String pageNrStr=HTTPTools.getHTTPParam(request,"pagenumber");
+        if(pageNrStr!=null){
+          pageNr=Integer.parseInt(pageNrStr);
+        }
+      }catch (Exception e) {
+      }
+      
       if(service.equalsIgnoreCase("search")){
         //Thread.sleep(100);
         if(mode.equalsIgnoreCase("getfacets")){
-          JSONResponse jsonresponse = esgfSearch.getFacets(facets,query);
+          JSONResponse jsonresponse = esgfSearch.getFacets(facets,query,pageNr,pageLimit);
           jsonresponse.setJSONP(jsonp);
           response.setContentType(jsonresponse.getMimeType());
           response.getOutputStream().print(jsonresponse.getMessage());

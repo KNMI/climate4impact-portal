@@ -85,7 +85,7 @@ var SearchInterface = function(options){
   var currentSelectedFacet = undefined;
   var rootElement = null;
   
-  
+  var currentPage = 1;
  
   
   var propertyChooser = [];
@@ -320,39 +320,6 @@ var SearchInterface = function(options){
     }
   };
   
-//  var addToBasket = function(){
-////    var el = jQuery('<div></div>', {
-////        title: 'Dataset',
-////      }).dialog({
-////        width:450,
-////        height:400
-////      });
-////      el.html('<div class="c4i-esgfsearch-loader"></div>');
-////    var callback = function(data){
-////      
-////      //renderCatalogBrowser({element:el,url:"https://localhost/impactportal/DAP/pcmdi9.llnl.gov.esgf-idp.openid.c4m/test.catalog"});
-////        el.html("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
-////       
-////        try{
-////          if(basketWidget){
-////            basketWidget.reload();
-////          }
-////        }catch(e){
-////        }
-////    }
-////    $.ajax({
-////      url: impactESGFSearchEndPoint+"service=search&request=addtobasket&query="+encodeURIComponent(query),
-////          crossDomain:true,
-////          dataType:"jsonp"
-////    }).done(function(d) {
-////      callback(d);
-////    }).fail(function() {
-////      alert("fail 474");
-////    }).always(function(){
-////    
-////      //ready();
-////    });
-//  };
   
   /*
    * Callback for ajax query, both facets and results are included.
@@ -366,7 +333,7 @@ var SearchInterface = function(options){
     var limit = data.response.limit;
     if(limit>data.response.numfound)limit = data.response.numfound;
     var html="";
-    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying "+limit+" of "+ data.response.numfound+" results.");
+    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying page "+currentPage+". "+limit+" of "+ data.response.numfound+" results.");
     function getPageName(url) {
       var index = url.lastIndexOf("/") + 1;
       var extensionIndex = url.lastIndexOf(".")-index;
@@ -384,9 +351,6 @@ var SearchInterface = function(options){
        var id = ""+data.response.results[r].id;
        html+= id.replaceAll("."," ");
        html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span>";
-//        html+="<span style=\"margin-left:0px;\">Url: "+data.response.results[r].url+"</span>";
-       
-     
        html+="</span>";
        
        if(data.response.results[r].id.indexOf("cmip5")==0){
@@ -394,30 +358,91 @@ var SearchInterface = function(options){
          html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
          html+="</span>";
        }
-//       if(data.response.results[r].id.indexOf("cordex")==0){
-//         html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
-//         html+="<a target=\"_blank\" href=\""+esdocurl+"renderMethod=datasetid&project=cordex&id="+data.response.results[r].id+"\"></a>";
-//         html+="</span>";
-//       }
-       //html+= "<span style=\"float:right;\">";
-//        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-download\"></span>";
-//        html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-process\"></span>";
-      // html+="<span style=\"float:right;\" class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-selectable c4i-esgfsearch-dataset-imgunchecked\"></span>";
+
        html+="<span class=\"c4i-esgfsearch-dataset-expandedarea\">";
        html+="<span class=\"c4i-esgfsearch-dataset-catalogurl\"></span>";
        html+="<span class=\"c4i-esgfsearch-dataset-catalogdetails\"></span>";
-      html+="</span>";
+       html+="</span>";
        html+="</span>";
     }
     html+="</div>";
-//    var addToBasketButton = "<button class=\"button_addtobasket\">Add results to basket</button>";
-    //html+="<div style=\"clear: both;\">"+addToBasketButton+"<br/></div>";
+    
+//    console.log("currentPage "+currentPage);
+    
+    /* Handle pagination  */
+    var numPages = parseInt((data.response.numfound/data.response.limit)+0.5)+1;
+    var startPage = currentPage-4;
+    if(startPage < 1)startPage  = 1;
+    var stopPage = startPage+10;
+    while(startPage>1&&stopPage>numPages-1){
+      startPage--;
+      stopPage--;
+    }
+    if(stopPage>numPages){
+      stopPage = numPages;
+    }
+    if(currentPage>numPages){
+      currentPage = numPages;
+    }
+    
+//     console.log("currentPage "+currentPage);
+//     console.log("numPages "+numPages);
+//     console.log("startPage "+startPage);
+//     console.log("stopPage "+stopPage);
+
+    var pagination = "";
+    pagination = "<span class=\"c4i-esgfsearch-paginator\">";
+    pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"previous\">&laquo; Previous</span>";
+    
+    
+    pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"1\">"+1+"</span>";
+    if(startPage>2){
+      pagination +="<span class=\"c4i-esgfsearch-paginator-pagenrsplitter c4i-esgfsearch-noselect\">...</span>";
+    }
+    for(var j=startPage+1;j<stopPage+1;j++){
+      pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr\" name=\""+j+"\">"+j+"</span>";
+    }
+    if(stopPage<numPages){
+      //if(stopPage<numPages-2){
+        pagination +="<span class=\"c4i-esgfsearch-paginator-pagenrsplitter c4i-esgfsearch-noselect\">...</span>";
+      //}
+      pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\""+(numPages)+"\">"+(numPages)+"</span>";
+    }
+    pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"next\">Next &raquo;</span>";
+    pagination += "</span>";
+    html+=pagination;
+    
+    
+    /* Set HTML */
     rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").first().html(html);
     
-//    rootElement.find(".button_addtobasket").button().attr('onclick','').click(function(t){
-//      addToBasket();
-//    });
-   
+    
+    /* Pagination handler */
+    var selectPage = function(pageNr){
+      rootElement.find(".c4i-esgfsearch-results").find(".c4i-esgfsearch-paginator").find(".c4i-esgfsearch-paginator-pagenr").removeClass("c4i-esgfsearch-paginator-pagenr-selected");
+      rootElement.find(".c4i-esgfsearch-results").find(".c4i-esgfsearch-paginator").find("[name='"+pageNr+"']").addClass("c4i-esgfsearch-paginator-pagenr-selected");
+    }
+    
+    selectPage(currentPage);
+    
+    rootElement.find(".c4i-esgfsearch-results").find(".c4i-esgfsearch-paginator").find(".c4i-esgfsearch-paginator-pagenr").attr('onclick','').click(function(t){
+      var name = $(this).attr("name");
+      if(name == "previous"){
+        currentPage--;
+        if(currentPage<1) currentPage =1;
+      }else if(name == "next"){
+        currentPage++;
+        if(currentPage>numPages) currentPage =numPages;
+      }else{
+        currentPage = name;
+        
+      }
+      rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").block();
+        //rootElement.find(".c4i-esgfsearch-results").find(".c4i-esgfsearch-paginator").block();
+      getAllFacets();
+    });
+    
+    /* Dataset row handler */
     rootElement.find(".c4i-esgfsearch-dataset-expandedarea").hide();
     
     rootElement.find(".c4i-esgfsearch-dataset-selectable").attr('onclick','').click(function(t){
@@ -429,12 +454,6 @@ var SearchInterface = function(options){
         $(this).addClass("c4i-esgfsearch-dataset-imgchecked");
       }
     });
-//    
-//    rootElement.find(".c4i-esgfsearch-resultitem-esdoc").attr('onclick','').click(function(t){
-//      console.log($(this).parent().attr("name"));
-//      http://view.es-doc.org/?renderMethod=datasetid&project=tamip&id=tamip.output1.CNRM-CERFACS.CNRM-CM5.tamip200907.subhr.atmos.sites.r7i1p1.v20111114
-//    });
-//    
     
     rootElement.find(".c4i-esgfsearch-dataset-collapsible").attr('onclick','').click(function(t){
    
@@ -483,11 +502,6 @@ var SearchInterface = function(options){
         $(this).parent().find(".c4i-esgfsearch-dataset-expandedarea").hide();
 
       }
-//     });
-// 
-//     
-//     rootElement.find(".c4i-esgfsearch-resultitem").attr('onclick','').click(function(t){
-
     });
     
     checkResponses(data);
@@ -734,6 +748,7 @@ var SearchInterface = function(options){
   };
   
   this.addFilterProperty = function(facet,property){
+    currentPage = 1;
     var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
     query = "";
@@ -755,7 +770,7 @@ var SearchInterface = function(options){
     }
   };
   var removeFilterProperty = function(facet,property){
-    
+    currentPage = 1;
     //console.log("Remove");
     var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
@@ -920,9 +935,9 @@ var SearchInterface = function(options){
     };
     
     $.ajax({
-      url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query),
-          crossDomain:true,
-          dataType:"jsonp"
+      url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1),
+      crossDomain:true,
+      dataType:"jsonp"
     }).done(function(d) {
       callback(d);
     }).fail(function() {

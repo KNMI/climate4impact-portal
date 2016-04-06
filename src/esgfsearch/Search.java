@@ -48,11 +48,11 @@ public class Search {
     this.getCatalogExecutor =getCatalogExecutor;
   }
 
-  public JSONResponse getFacets(String facets, String query) {
-    int searchLimit = 25;
+  public JSONResponse getFacets(String facets, String query,int pageNumber,int pageLimit) {
+    
     try{
       LockOnQuery.lock(facets+query,0);
-      JSONResponse r = _getFacetsImp(facets,query,searchLimit);
+      JSONResponse r = _getFacetsImp(facets,query,pageNumber,pageLimit);
       LockOnQuery.release(facets+query);
       return r;
     }catch(Exception e){
@@ -65,11 +65,11 @@ public class Search {
     
   }
   
-  private JSONResponse _getFacetsImp(String facets,String query, int searchLimit) throws JSONException {
+  private JSONResponse _getFacetsImp(String facets,String query, int pageNumer,int searchLimit) throws JSONException {
   
     JSONResponse r = new JSONResponse();
     
-    String esgfQuery = "facets=*&limit="+searchLimit+"&sort=true&";
+    String esgfQuery = "facets=*&offset="+(pageNumer*searchLimit)+"&limit="+searchLimit+"&sort=true&";
     
     if(facets!=null){
       esgfQuery = "facets="+facets+"&limit="+searchLimit+"&sort=true&";
@@ -511,7 +511,7 @@ public class Search {
       //DOSTUFF
       int searchLimit = 200;
       LockOnQuery.lock(query,0);
-      JSONResponse r = _getFacetsImp(null,query,searchLimit);
+      JSONResponse r = _getFacetsImp(null,query,0,searchLimit);
       LockOnQuery.release(query);
 
       JSONObject searchResults =  (JSONObject) new JSONTokener(r.getMessage()).nextValue();
