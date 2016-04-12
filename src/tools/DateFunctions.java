@@ -119,8 +119,9 @@ public class DateFunctions {
     }
 
     public static long getCurrentDateInMillis() {
-      Calendar cal = Calendar.getInstance();
-      return cal.getTimeInMillis();
+      long m = System.currentTimeMillis();
+      //Debug.println(""+m);
+      return m ;//cal.getTimeInMillis();
       
     }
 }

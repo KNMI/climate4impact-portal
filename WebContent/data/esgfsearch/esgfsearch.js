@@ -325,15 +325,16 @@ var SearchInterface = function(options){
    * Callback for ajax query, both facets and results are included.
    */
   var showResponse = function(data){
-   
+    rootElement.find(".c4i-esgfsearch-results").parent().unblock();
     if(data.response == undefined){
       checkResponses(data);
       return;
     }
     var limit = data.response.limit;
     if(limit>data.response.numfound)limit = data.response.numfound;
+    var numPages = parseInt((data.response.numfound/data.response.limit))+1;
     var html="";
-    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-header").html("Datasets: Found "+data.response.numfound+", displaying page "+currentPage+". "+limit+" of "+ data.response.numfound+" results.");
+    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-header").html("Found "+data.response.numfound+" datasets. Displaying page "+currentPage+" of "+numPages+".");//+");// with "+limit+" results");
     function getPageName(url) {
       var index = url.lastIndexOf("/") + 1;
       var extensionIndex = url.lastIndexOf(".")-index;
@@ -370,7 +371,7 @@ var SearchInterface = function(options){
 //    console.log("currentPage "+currentPage);
     
     /* Handle pagination  */
-    var numPages = parseInt((data.response.numfound/data.response.limit)+0.5)+1;
+    
     var startPage = currentPage-4;
     if(startPage < 1)startPage  = 1;
     var stopPage = startPage+10;
@@ -406,11 +407,12 @@ var SearchInterface = function(options){
       //if(stopPage<numPages-2){
         pagination +="<span class=\"c4i-esgfsearch-paginator-pagenrsplitter c4i-esgfsearch-noselect\">...</span>";
       //}
-      pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\""+(numPages)+"\">"+(numPages)+"</span>";
+      pagination +="<span class=\"c4i-esgfsearch-paginator-pagenrsplitter c4i-esgfsearch-noselect\" name=\""+(numPages)+"\">"+(numPages)+"</span>";
     }
     pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"next\">Next &raquo;</span>";
     pagination += "</span>";
-    html+=pagination;
+    
+    html=pagination+html+pagination;
     
     
     /* Set HTML */
@@ -437,8 +439,7 @@ var SearchInterface = function(options){
         currentPage = name;
         
       }
-      rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").block();
-        //rootElement.find(".c4i-esgfsearch-results").find(".c4i-esgfsearch-paginator").block();
+
       getAllFacets();
     });
     
@@ -838,7 +839,9 @@ var SearchInterface = function(options){
 
   var _getAllFacets = function(args,ready){
     showFilters();
-    rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").first().block();
+//    rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").block();
+//    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").block();
+    rootElement.find(".c4i-esgfsearch-results").parent().block();//find(".simplecomponent-body").block();
     var callback = function(result){
       
       if(result == undefined)return;

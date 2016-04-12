@@ -50,8 +50,10 @@ public class WebProcessingInterface {
   }
   
   private static boolean isLocal(){
-    return true;
+    return false;
   }
+  
+  
    private static WebProcessingInterface instance = null;
    protected WebProcessingInterface() {
       // Exists only to defeat instantiation.

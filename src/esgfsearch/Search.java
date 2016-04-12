@@ -76,11 +76,11 @@ public class Search {
     }
     
     if(query!=null){
-      Debug.println("QUERY is "+query);
+      //Debug.println("QUERY is "+query);
        KVPKey kvp = HTTPTools.parseQueryString(query);
        SortedSet<String> kvpKeys = kvp.getKeys();
        for(String k : kvpKeys){
-         Debug.println("KEY "+k+" = "+kvp.getValue(k));
+         //Debug.println("KEY "+k+" = "+kvp.getValue(k));
          for(String value : kvp.getValue(k)){
            try {
             esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
@@ -95,7 +95,7 @@ public class Search {
     
     String identifier = "ESGFSearch.getFacets"+esgfQuery;
     
-    String XML = DiskCache.get(cacheLocation, identifier+".xml", 200000);
+    String XML = DiskCache.get(cacheLocation, identifier+".xml", 5*60);
     if(XML == null){
       try {
         XML = HTTPTools.makeHTTPGetRequest(new URL(searchEndPoint+esgfQuery));
@@ -333,7 +333,7 @@ public class Search {
         r.setMessage("{\"message\":\"start checking\",\"ok\":\"busy\"}");
       }else{
         URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
-        if(urlBeingChecked.getCreationDate()+1000*60*5<tools.DateFunctions.getCurrentDateInMillis()){
+        if(urlBeingChecked.getCreationDate()+(1000*60*5)<tools.DateFunctions.getCurrentDateInMillis()){
           urlsBeingChecked.remove(query);
           urlBeingChecked.response.cancel(true);
           Debug.println("Refiring "+query);
