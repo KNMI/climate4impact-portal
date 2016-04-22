@@ -389,7 +389,7 @@ line-height:16px;
   border-radius: 5px 5px 0px 0px;
   background:#C8C8CF;
   font-weight:normal;
-  width:210px;
+  width:250px;
   height:24px;
   text-align:center;
   line-height:24px;
@@ -651,6 +651,52 @@ line-height:16px;
 }
 
 
+.c4i-esgfsearch-tss{
+  /* tss = time_start_stop for time facet */
+  padding:10px;
+}
+
+.c4i-esgfsearch-tss-input{
+  text-align:center;
+  width:50px;
+}
+
+.c4i-esgfsearch-tss-searchbutton{
+  margin-left:10px;
+}
+
+
+
+.c4i-esgfsearch-bbox{
+  /* bbox = geobox */
+  padding:10px;
+}
+
+.c4i-esgfsearch-bbox-input{
+  text-align:center;
+  width:50px;
+}
+
+.c4i-esgfsearch-bbox-searchbutton{
+  margin-left:40px;
+  
+}
+
+
+
+.c4i-esgfsearch-ftq{
+  /* ftq = query for freetextquery facet */
+  padding:10px;
+}
+
+.c4i-esgfsearch-ftq-input{
+  text-align:center;
+  width:150px;
+}
+
+.c4i-esgfsearch-ftq-searchbutton{
+  margin-left:10px;
+  
 
 
 

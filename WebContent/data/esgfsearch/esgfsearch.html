@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="https://climate4impact.eu/impactportal/js/jquery-ui-1.10.3/themes/base/jquery-ui.css" />
-    <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery-1.9.0.js"></script>
-    <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/ImpactJS.js"></script>
-    <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://bhw485.knmi.nl:8281/impactportal/js/jquery-ui-1.10.3/themes/base/jquery-ui.css" />
+    <script type="text/javascript" src="https://bhw485.knmi.nl:8281/impactportal/js/jquery-1.9.0.js"></script>
+    <script type="text/javascript" src="https://bhw485.knmi.nl:8281/impactportal/js/ImpactJS.js"></script>
+    <script type="text/javascript" src="https://bhw485.knmi.nl:8281/impactportal/js/jquery-ui-1.10.3/ui/minified/jquery-ui.min.js"></script>
     
     <script type="text/javascript" src="../fileviewer/fileviewer.js"></script>
     <link rel="stylesheet" href="../fileviewer/fileviewer.css" />
     <script type="text/javascript" src="../catalogbrowser/catalogbrowser.js"></script>
-    <script type="text/javascript" src="https://climate4impact.eu/impactportal/js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="https://bhw485.knmi.nl:8281/impactportal/js/jquery.blockUI.js"></script>
     <script type="text/javascript" src="property_descriptions.js"></script>
     <script type="text/javascript" src="esgfsearch-propertychooserconf.js"></script>
     <script type="text/javascript" src="esgfsearch-propertychoosers.js"></script>
@@ -25,7 +25,7 @@
         postIdentifiersToBasket:function(dataToAdd){
           /*
            * See reference implementation:
-           * https://climate4impact.eu/impactportal/js/components/basket/basket.js
+           * https://bhw485.knmi.nl:8281/impactportal/js/components/basket/basket.js
            */
           console.log(dataToAdd);
           alert("basket.postIdentifiersToBasket called");
@@ -41,7 +41,7 @@
       var generateLoginDialog = function(callback){
         /*
          * See reference implementation 
-         * https://climate4impact.eu/impactportal/account/js/login.js
+         * https://bhw485.knmi.nl:8281/impactportal/account/js/login.js
          */
         alert("generateLoginDialog called");
         callback();
@@ -49,12 +49,12 @@
       
       /* Configuration options */
       var c4iconfigjs = {
-        searchservice:"https://climate4impact.eu/impactportal/esgfsearch?",
-        impactservice:"https://climate4impact.eu//impactportal/ImpactService?",
-        adagucservice:"https://climate4impact.eu/impactportal/adagucserver?",
-        adagucviewer:"https://climate4impact.eu//impactportal/adagucviewer/",
+        searchservice:"https://bhw485.knmi.nl:8281/impactportal/esgfsearch?",
+        impactservice:"https://bhw485.knmi.nl:8281//impactportal/ImpactService?",
+        adagucservice:"https://bhw485.knmi.nl:8281/impactportal/adagucserver?",
+        adagucviewer:"https://bhw485.knmi.nl:8281//impactportal/adagucviewer/",
         howtologinlink:"http://localhost/impactportal/help/howto.jsp?q=create_esgf_account",
-        contactexpertlink:"https://climate4impact.eu/impactportal/help/contactexpert.jsp",
+        contactexpertlink:"https://bhw485.knmi.nl:8281/impactportal/help/contactexpert.jsp",
       }; 
     
       $( document ).ready(function() {

@@ -64,7 +64,7 @@ var SearchInterface = function(options){
   var impactESGFSearchEndPoint = "esgfsearch?";
   var impactCatalogBrowserEndPoint;
   
-  var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access"];
+  var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access","time_start_stop","bbox","query"];
   var facetNameMapping = {
     "project":"Project",
     "variable":"Parameter",
@@ -74,7 +74,10 @@ var SearchInterface = function(options){
     "cmor_table":"CMOR table",   
     "data_node":"Data node",
     "experiment_family":"Experiment family",
-    "variable_long_name":"Variable long name"
+    "variable_long_name":"Variable long name",
+    "time_start_stop":"Date",
+    "bbox":"Geobox",
+    "query":"Text"
   };
   
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
@@ -226,6 +229,9 @@ var SearchInterface = function(options){
     propertyChooser["variable"] = new NestedPropertyChooser(esgfsearch_pc_variables);
     propertyChooser["experiment"] = new NestedPropertyChooser(esgfsearch_pc_experiments);
     propertyChooser["time_frequency"] = new PropertyChooser(esgfsearch_pc_time_frequency);
+    propertyChooser["time_start_stop"] = new TimeChooser(esgfsearch_pc_time_start_stop);
+    propertyChooser["bbox"] = new AreaChooser(esgfsearch_pc_bbox);
+    propertyChooser["query"] = new FreeTextQueryChooser(esgfsearch_pc_query);
   };
   
  
@@ -275,6 +281,9 @@ var SearchInterface = function(options){
     }
     
     var httpCallback = function(a){
+//       if(checkForErrors(result)!=0){
+//         return;
+//       }
       recentlyCheckedResponses[arg.id]=a;
       setResult(arg,recentlyCheckedResponses[arg.id]);
  
@@ -287,7 +296,7 @@ var SearchInterface = function(options){
       ready();
       return;
     }
-    
+  
     var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
     $.ajax({
       url: url,
@@ -517,6 +526,10 @@ var SearchInterface = function(options){
     
     
     var httpCallback = function(result){
+      if(checkForErrors(result)!=0){
+        return;
+      }
+
       showResponse(result);
       var data = result.facets;
       var facet = data[name];
@@ -524,7 +537,6 @@ var SearchInterface = function(options){
       callback(facet);
       
     };
-    
     $.ajax({
       url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query),
           crossDomain:true,
@@ -620,20 +632,35 @@ var SearchInterface = function(options){
           );
           var numprops = propertyChooser[facetName].init(rootElement,facetName,facetList,query,_this.addFilterProperty);
           
-        
+          var onlyquickselect = false;
+          if(propertyChooser[facetName].config.onlyquickselect===true){
+            onlyquickselect  = true;
+          }
           
-          rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
-            "<div class=\"c4i-esgfsearch-tabmain\">"+
-            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu\">Quick select</div>"+
-            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties\">All "+facetName+" properties ("+facetList.length+")</div>"+
-            "</div>"
-          );
-          if(numprops >0){
-            rootElement.find(".c4i-esgfsearch-property-container").hide();
-            rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+          if(onlyquickselect == true){
+            rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+              "<div class=\"c4i-esgfsearch-tabmain\">"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+"</div>"+
+              "</div>"
+            );
+             rootElement.find(".c4i-esgfsearch-property-container").hide();
+             rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+             propertyTabMenu = "quickmenu";
+             
           }else{
-            rootElement.find(".c4i-esgfsearch-property-menu").hide();
-            rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
+            rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+              "<div class=\"c4i-esgfsearch-tabmain\">"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu\">Quick select</div>"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+facetList.length+")</div>"+
+              "</div>"
+            );
+            if(numprops >0){
+              rootElement.find(".c4i-esgfsearch-property-container").hide();
+              rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+            }else{
+              rootElement.find(".c4i-esgfsearch-property-menu").hide();
+              rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
+            }
           }
         }
       }
@@ -753,15 +780,24 @@ var SearchInterface = function(options){
     var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
     query = "";
+    
     for(var kvp in kvps){
       for(var vkey in kvps[kvp]){
         var v= kvps[kvp][vkey];
         //if(!(kvp==facet&&property==v)){
-          query+=kvp+"="+encodeURIComponent(v)+"&";
+        if(facet=="time_start_stop"||facet=="bbox"||facet=="query"){
+          if(kvp!=facet){          
+            query+=kvp+"="+(v)+"&";
+          }
+        }else{
+          query+=kvp+"="+(v)+"&";
+        }
         //}
       }
     }
-     query+=facet+"="+encodeURIComponent(property)+"&";
+    if(property){
+      query+=facet+"="+(property)+"&";
+    }
      
      window.location.hash = query;
      
@@ -837,13 +873,28 @@ var SearchInterface = function(options){
   
   var listAllFacets = false;
 
+  var checkForErrors = function(data){
+    if(data.exception){
+      alert(data.exception);
+      return;
+    }
+    if(data.error){
+      alert(data.error);
+      return;
+    }
+    return 0;
+  };
+  
   var _getAllFacets = function(args,ready){
     showFilters();
 //    rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").block();
 //    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").block();
     rootElement.find(".c4i-esgfsearch-results").parent().block();//find(".simplecomponent-body").block();
     var callback = function(result){
-      
+      if(checkForErrors(result)!=0){
+        rootElement.find(".c4i-esgfsearch-results").parent().unblock()
+        return;
+      }
       if(result == undefined)return;
       if(result.response == undefined){
         checkResponses(result);
@@ -889,6 +940,9 @@ var SearchInterface = function(options){
         for(var property in facets[facetkey]){
           count++;
         }
+        if(facetkey=="time_start_stop"||facetkey=="bbox"||facetkey=="query"){
+          count=-1;
+        }
         var facet = "<span name=\""+facetkey+"\" class=\"c4i-esgfsearch-clickablefacet c4i-esgfsearch-facets c4i-esgfsearch-roundedborder";
         
         
@@ -900,10 +954,12 @@ var SearchInterface = function(options){
             facet+=" c4i-esgfsearch-facetdisabled";
           }
         }
-        facet+="\">"+_getFacetName(facetkey)+" ("+count+")</span>";
+        facet+="\">"+_getFacetName(facetkey);
+        if(count>0)facet+=" ("+count+")";
+        facet+="</span>";
         
         //if(!selectedFacets[facetkey]){
-          if(count>0){
+          if(count>0||count==-1){
             html+=facet;
           }
         //}
@@ -936,7 +992,7 @@ var SearchInterface = function(options){
       });
       generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };
-    
+
     $.ajax({
       url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1),
       crossDomain:true,
@@ -962,7 +1018,8 @@ var SearchInterface = function(options){
   var isCtrl = false;
   $(document).keydown(function(e) {
     if(e.ctrlKey === true) {
-      if(e.keyCode==67 || e.keyCode==88){
+   
+      if(e.keyCode!=17){
         isCtrl = false;
         return;
       }

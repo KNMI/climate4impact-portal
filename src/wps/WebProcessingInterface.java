@@ -50,7 +50,7 @@ public class WebProcessingInterface {
   }
   
   private static boolean isLocal(){
-    return false;
+    return true;
   }
   
   

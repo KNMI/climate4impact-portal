@@ -80,13 +80,53 @@ public class Search {
        KVPKey kvp = HTTPTools.parseQueryString(query);
        SortedSet<String> kvpKeys = kvp.getKeys();
        for(String k : kvpKeys){
-         //Debug.println("KEY "+k+" = "+kvp.getValue(k));
-         for(String value : kvp.getValue(k)){
-           try {
-            esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
-          } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-          }
+         if(!k.equalsIgnoreCase("time_start_stop")&&!k.equalsIgnoreCase("bbox")&&!k.equalsIgnoreCase("query")){
+           //Debug.println("KEY "+k+" = "+kvp.getValue(k));
+           for(String value : kvp.getValue(k)){
+             try {
+              esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
+            } catch (UnsupportedEncodingException e) {
+              e.printStackTrace();
+            }
+           }
+         }else{
+           if(k.equalsIgnoreCase("time_start_stop")){
+             String timeStartStopValue = kvp.getValue(k).firstElement();
+             if(timeStartStopValue.length()==9){
+               String [] timeStartStopValues = timeStartStopValue.split("/");
+               if(timeStartStopValues.length==2){
+                 int yearStart = Integer.parseInt(timeStartStopValues[0]);
+                 int yearStop = Integer.parseInt(timeStartStopValues[1]);
+                 if(yearStart>=0&&yearStart<=9999&&yearStop>=0&&yearStop<=9999){
+                   esgfQuery += "start="+String.format("%04d", yearStart)+"-01-01T00:00:00Z&";
+                   esgfQuery += "end="+String.format("%04d", yearStop)+"-01-01T00:00:00Z&";
+                   
+                 }
+               }
+             }
+           }
+         }
+         if(k.equalsIgnoreCase("bbox")){
+           String bboxValue = kvp.getValue(k).firstElement();
+           if(bboxValue.length()>3){
+             String[] bboxValueItems =bboxValue.split(",");
+             if(bboxValueItems.length == 4){
+               esgfQuery += "bbox=%5B"+bboxValue+"%5D&";
+             }
+           }
+         
+         }
+         if(k.equalsIgnoreCase("query")){
+           String freeTextValue = kvp.getValue(k).firstElement();
+           if(freeTextValue.length()>0){
+             try {
+              esgfQuery += "query="+URLEncoder.encode(freeTextValue,"UTF-8")+"&";
+            } catch (UnsupportedEncodingException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+           }
+         
          }
        }
     }
@@ -166,9 +206,15 @@ public class Search {
         }
       }
       
+      
+      facetsObj.put("time_start_stop",new JSONArray("[1850%2F1950]"));
+      facetsObj.put("bbox",new JSONArray("[0]"));
+      facetsObj.put("query",new JSONArray("[0]"));
     } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    
     
     JSONObject result = new JSONObject();
     JSONObject responseObj = new JSONObject();
