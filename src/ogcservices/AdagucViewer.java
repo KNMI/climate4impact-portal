@@ -89,15 +89,7 @@ public class AdagucViewer extends HttpServlet {
 	
 	private void MakeKML(HttpServletRequest request, OutputStream out1,     HttpServletResponse response) throws IOException {
     Debug.println("MakeKML "+request.getQueryString());
-    /*
-     * srs=EPSG%3A4326&
-     * bbox=-180,-138.79746835443038,180,138.79746835443038&
-     * service=%252Fimpactportal%252FImpactService%253Fsource%253Dhttp%253A%252F%252Fopendap.nmdc.eu%252Fknmi%252Fthredds%252FdodsC%252FIS-ENES%252FCERFACS%252FCERFACS-SCRATCH2010%252Farpege1%252Fannual%252Farpege1_annual.nc&
-     * layer=evapn%2524image%252Fpng%2524true%2524auto%252Fnearest%25241%25240&
-     * selected=0&
-     * dims=time$2099-01-01T12:00:00Z&
-     * baselayers=world_raster$nl_world_line
-     */
+   
     //String srs = getKVP(request,out1,"srs");
     String bbox = getKVP(request,out1,"bbox");
     

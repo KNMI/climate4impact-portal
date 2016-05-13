@@ -26,7 +26,7 @@ public class DapServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	  OpenDAP.doGet( request,  response);
+	  Opendap.doGet( request,  response);
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class DapServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	  Debug.println("DOGET");
-	  OpenDAP.doGet( request,  response);
+	  Opendap.doGet( request,  response);
 	}
 
 }

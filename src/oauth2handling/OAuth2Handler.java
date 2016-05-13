@@ -441,6 +441,10 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
 //            userInfo.user_openid =  userInfo.user_openid.replaceAll("\\.", "_");
 //            userInfo.user_openid = "https://climate4impact.eu/"+userInfo.user_openid ;
 //            Debug.println("Setting openid to ["+ userInfo.user_openid+"]");
+            if(userInfo == null){
+              impactservice.MessagePrinters.emailFatalErrorMessage("Error in OAuth2 service", "userInfo == null, getIdentifierFromJWTPayload failed. Check logs!!!");
+              return ;
+            }
             setSessionInfo(request, userInfo);
 
             String accessToken = oauth2Response.getAccessToken();
@@ -825,18 +829,42 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     } catch (JSONException e) {
     }
 
-    if (aud == null)
+    if (aud == null){
+      Debug.errprintln("Error: aud == null");
       return null;
-    if (userSubject == null)
+    }
+    if (userSubject == null){
+      Debug.errprintln("Error: userSubject == null");
       return null;
-    String user_identifier = aud + "/" + userSubject;
+    }
+    
+    //Get ID based on aud (client id)
+    String clientId = null;
+    
+    Vector<String> providernames = Configuration.Oauth2Config.getProviders();
+
+    for (int j = 0; j < providernames.size(); j++) {
+      Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config
+          .getOAuthSettings(providernames.get(j));
+      if(settings.OAuthClientId.equals(aud)){
+        clientId = settings.id;
+      }
+    }
+    
+    if(clientId == null){
+      Debug.errprintln("Error: could not match OAuthClientId to aud");
+      return null;
+      
+    }
+    
+    String user_identifier = clientId + "/" + userSubject;
     String user_openid = null;
     UserInfo userInfo = new UserInfo();
     userInfo.user_identifier = user_identifier;
     userInfo.user_openid = user_openid;
     userInfo.user_email = email;
 
-    Debug.println("getIdentifierFromJWTPayload: Found unique ID"
+    Debug.println("getIdentifierFromJWTPayload (id_token): Found unique ID "
         + user_identifier);
 
     return userInfo;

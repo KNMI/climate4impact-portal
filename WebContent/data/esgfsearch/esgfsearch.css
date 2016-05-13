@@ -250,11 +250,31 @@ margin:6px 0px 0px 6px;
   margin:0px;
 }
 
-
-.c4i-esgfsearch-loader{
+.c4i-esgfsearch-loader-box{
+  width:360px;
+  height:40px;
+  box-shadow: 0px 0px 5px #888888;
+  line-height:40px;
+  vertical-align:middle;
+  padding:10px;
+  margin:0px;
+  display:block;
+  background:white;
+}
+.c4i-esgfsearch-loader-animation{
   background-image:url("../images/ajax-loader.gif") !important;
   width:32px;
   height:32px;
+  vertical-align:middle;
+  display:inline-block;
+}
+
+.c4i-esgfsearch-loader-message{
+  margin:20px;
+  font-weight:bold;
+  font-size:15px;
+  display:inline;
+  vertical-align:middle;
 }
 
 
@@ -471,6 +491,11 @@ line-height:16px;
     background-image:url("../images/icon_download.png") !important;
 }
 
+
+.c4i-esgfsearch-dataset-addtobasket{
+   background-image:url("../images/basket_32.png") !important;
+}
+
 .c4i-esgfsearch-dataset-expandedarea{
   margin:0px 0px 1px 17px;
   padding:5px;
@@ -553,15 +578,15 @@ line-height:16px;
 	line-height:32px;
 	display:inline-block;
 	cursor: pointer;
-	margin:0px 0px 0px 2px;
-	padding:2px 6px 2px 4px;
-	width:84px;
-	height:30px;
+	margin:1px 0px 0px 0px;
+	padding:0px;
+	width:97px;
+	height:32px;
 	overflow: hidden;
-	background-size: 80px 20px;
+	
 	background-repeat:no-repeat;
-	background-position: 4px 7px;
-	background-image:url("../images/es-doc-logo.png") !important;
+	
+	background-image:url("../images/es-doc-logo_32.png") !important;
 
 }
 
@@ -613,7 +638,7 @@ line-height:16px;
  
   
   text-align:center;
-  
+  font-size:13px;
   border: 1px solid #aaaadd;
   color: #0061de;
   margin-right: 3px;
@@ -625,15 +650,15 @@ line-height:16px;
 .c4i-esgfsearch-paginator-pagenr-selected{
   
     color:white;
-    background-color: red;
+    background-color: #8888ee;
   
   
 }
 
-.c4i-esgfsearch-paginator-pagenr-selected:hover{
+/*.c4i-esgfsearch-paginator-pagenr-selected:hover{
     color:white!important;
-    background-color: red !important;
-}
+    background-color: #88aaee !important;
+}*/
 .c4i-esgfsearch-paginator-pagenr:hover{
     color:white;
     background-color: #0061de;
@@ -696,7 +721,47 @@ line-height:16px;
 
 .c4i-esgfsearch-ftq-searchbutton{
   margin-left:10px;
+}  
+
+
+.c4i-esgfsearch-resultitem-addtobasket-content{
+ margin-left:2px;
+ margin-right:2px;
   
+}
 
+.c4i-esgfsearch-exception{
+	color:red;
+  margin:16px;
+  font-size:16px;
+  font-weight:bold;
+  margin:5px;
+  padding:5px;
+}
 
+.c4i-esgfsearch-subject{
+	color:black;
+  font-size:14px;
+  font-weight:normal;
+  margin:5px;
+  padding:5px;
+  line-height:16px;
+}
+.c4i-esgfsearch-url{
+	color:black;
+  font-size:14px;
+  font-weight:normal;
+  margin:5px;
+  padding:5px;
+  line-height:16px;
+}
+
+.c4i-esgfsearch-helpcontact{
+  color:black;
+  font-size:14px;
+  font-weight:normal;
+  margin:5px;
+  padding:5px;
+  line-height:16px;
+}
 

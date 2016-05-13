@@ -82,7 +82,7 @@ var SearchInterface = function(options){
   
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
   query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
-  
+  query = query.replaceAll("&amp;","&");
  //query="variable=tas";
   var currentFacetList = undefined;
   var currentSelectedFacet = undefined;
@@ -150,7 +150,7 @@ var SearchInterface = function(options){
 
   
   this.renderSearchInterface = function(options){
-    $.blockUI.defaults.message='<div class="c4i-esgfsearch-loader"></div>';
+    $.blockUI.defaults.message='<div class="c4i-esgfsearch-loader-box"><div class="c4i-esgfsearch-loader-animation"></div><div class="c4i-esgfsearch-loader-message">Searching ...</div></div>';
     $.blockUI.defaults.css.border='none';
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
     
@@ -281,9 +281,6 @@ var SearchInterface = function(options){
     }
     
     var httpCallback = function(a){
-//       if(checkForErrors(result)!=0){
-//         return;
-//       }
       recentlyCheckedResponses[arg.id]=a;
       setResult(arg,recentlyCheckedResponses[arg.id]);
  
@@ -356,23 +353,34 @@ var SearchInterface = function(options){
      // html+="<span  name=\""+data.response.results[r].id+"\">";
       html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">";
       
-      html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\"></span>";
+      html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\" title=\"Expands this dataset and show its contents.\"></span>";
+      
+      //Add catalog to Basket
+      html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
+      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogURL:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
+      html+="  </span>";
+      
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
        var id = ""+data.response.results[r].id;
        html+= id.replaceAll("."," ");
        html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span>";
        html+="</span>";
-       
+       //ESDOC
        if(data.response.results[r].id.indexOf("cmip5")==0){
          html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
          html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
          html+="</span>";
        }
 
+
+       
        html+="<span class=\"c4i-esgfsearch-dataset-expandedarea\">";
        html+="<span class=\"c4i-esgfsearch-dataset-catalogurl\"></span>";
        html+="<span class=\"c4i-esgfsearch-dataset-catalogdetails\"></span>";
        html+="</span>";
+       
+
+       
        html+="</span>";
     }
     html+="</div>";
@@ -525,20 +533,20 @@ var SearchInterface = function(options){
     
     
     
+    
     var httpCallback = function(result){
-      if(checkForErrors(result)!=0){
+      if(checkForErrors(result,"GetPropertiesForFacetName")!=0){
         return;
       }
-
       showResponse(result);
       var data = result.facets;
       var facet = data[name];
-
       callback(facet);
-      
     };
+    
+    var url = impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query);
     $.ajax({
-      url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query),
+      url: url,
           crossDomain:true,
           dataType:"jsonp"
     }).done(function(d) {
@@ -873,9 +881,15 @@ var SearchInterface = function(options){
   
   var listAllFacets = false;
 
-  var checkForErrors = function(data){
+  var checkForErrors = function(data,subject){
+  
     if(data.exception){
-      alert(data.exception);
+      var message ="";
+      if(data.exception)message    +="\n\n<div class=\"c4i-esgfsearch-exception\">Error "+data.exception+"</div>";
+      if(subject)message    +="\n\n<div class=\"c4i-esgfsearch-subject\">Trying to do: "+subject+"</div>";
+      if(data.url)message    +="\n\n<div class=\"c4i-esgfsearch-url\">URL: <a href=\""+data.url+"\">"+data.url+"</a></div>";
+      message    +="\n\n<div class=\"c4i-esgfsearch-helpcontact\">If the problem persists, please use the contact form to indicate that the search is broken.</div>";
+      alert(message);
       return;
     }
     if(data.error){
@@ -887,12 +901,14 @@ var SearchInterface = function(options){
   
   var _getAllFacets = function(args,ready){
     showFilters();
-//    rootElement.find(".c4i-esgfsearch-facetoverview").find(".simplecomponent-body").block();
-//    rootElement.find(".c4i-esgfsearch-results").find(".simplecomponent-body").block();
-    rootElement.find(".c4i-esgfsearch-results").parent().block();//find(".simplecomponent-body").block();
+
+    rootElement.find(".c4i-esgfsearch-results").parent().block();
+    
+    
+    
     var callback = function(result){
-      if(checkForErrors(result)!=0){
-        rootElement.find(".c4i-esgfsearch-results").parent().unblock()
+      if(checkForErrors(result,"GetAllFacets")!=0){
+        rootElement.find(".c4i-esgfsearch-results").parent().unblock();
         return;
       }
       if(result == undefined)return;
@@ -993,8 +1009,9 @@ var SearchInterface = function(options){
       generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };
 
+    var url=impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1);
     $.ajax({
-      url: impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1),
+      url: url,
       crossDomain:true,
       dataType:"jsonp"
     }).done(function(d) {

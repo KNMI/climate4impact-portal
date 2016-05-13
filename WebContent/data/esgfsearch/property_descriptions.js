@@ -2,7 +2,10 @@ var property_descriptions = {
   "access": {
     "HTTPServer":"Enables data download via HTTP",
     "LAS":"Live Access Service",
-    "OPENDAP":"OPeNDAP Enables visualization and processing on this portal - (Open-source Project for a Network Data Access Protocol)"
+    "OPENDAP":"OPeNDAP Enables visualization and processing on this portal - (Open-source Project for a Network Data Access Protocol)",
+    "httpserver":"Enables data download via HTTP",
+    "las":"Live Access Service",
+    "opendap":"OPeNDAP Enables visualization and processing on this portal - (Open-source Project for a Network Data Access Protocol)"
   },
   "experiment": {
     "1pctCO2": "1 percent per year CO2",

@@ -28,9 +28,55 @@
     <!-- <link rel="stylesheet" type="text/css" href="../js/ux/css/CheckHeader.css" /> -->
      
     <script type="text/javascript" src="../js/components/processors/useProcessor.js"></script>
-    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="../js/components/basket/basketwidget.js"></script>
-    <script type="text/javascript" src="../js/components/catalogbrowser/fileviewer.js"></script>
+    <script type="text/javascript" src="../js/components/basket/basket.js"></script> 
+    
+    <script type="text/javascript" src="../js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="../js/ImpactJS.js"></script>
+    
+    <script type="text/javascript" src="/impactportal/data/catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="/impactportal/data/fileviewer/fileviewer.js"></script>    
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/property_descriptions.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychooserconf.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychoosers.js"></script>
+    <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch.js"></script>
+    <link rel="stylesheet"        href="/impactportal/data/esgfsearch/esgfsearch.css" />
+  <link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
+    <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
+    
+    <style>
+     .x-toolbar-footer{
+     background:none;
+     }
+      .c4i-wpsuseprocessor-table  {
+          border-collapse: collapse;
+          width: 100%;
+      
+          border-spacing: 0;
+      }
+      
+      .c4i-wpsuseprocessor-table th, .c4i-wpsuseprocessor-table td {
+        border: 1px solid #ddd;
+        padding: 3px 8px 3px 8px;
+        text-align: left;
+          text-align: left;
+          padding: 8px;
+      }
+      .c4i-wpsuseprocessor-table tr:nth-child(even){background-color: #f5f5f5}
+      
+      /*.c4i-wpsuseprocessor-table tr:hover {background-color: #f0f0f0 !important}*/
+      
+      .c4i-wpsuseprocessor-table th{
+        background: none repeat scroll 0 0 #428bca;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      
+      .x-panel-default-framed{
+        border-radius: 0px !important;
+      }
+     </style>  
         
     <script type="text/javascript">
     var impactService = '/impactportal/ImpactService?';
@@ -66,41 +112,41 @@
   				region:'center',
   				xtype:'panel',
   				layout:'form',
-  				minHeight:800,
+  				//minHeight:800,
   				border:false,
-  				padding:'4 4 4 4',
-  				margin:'4 4 4 4',
+  				//padding:'4 4 4 4',
+  				//margin:'4 4 4 4',
   				items:[{
   			   		
   			   			xtype:'panel',
-  			   			title:'Processing details and options' ,
+  			   			//title:'Processor '+processorIding details and options' ,
   			   			id:'wpsstart',
-  			   			height:220, 
-  			   			frame:true,border:false,
-  			   			padding:4,
-  			  			margin:'0 0 4 0',
+  			   			//height:220, 
+  			   			frame:false,
+  			   			border:false,
+  			   			//padding:2,
+  			  			margin:'0 0 14 0',
   			   			buttons:[{iconCls:'codejobsicon',text:'Start processing',handler:function(){startProcessing(configuredWPSItems,currentWPSId);}}],
   			   		
   			   			
-  			   				html:'<div id="wpsdivdescription" >Loading Web Processing Service description...</div><div id="wpsdivresult"/>'
+  			   				html:'<div id="wpsdivdescription" ><h2>... Loading Web Processing Service description...</h2></div><div id="wpsdivresult"/>'
   			   				
   			   		
   		    		},{
-  		    			xtype:'panel',
+  		    		//	xtype:'panel',
   		    
   		    		
-  						title:'Options',
+  						//title:'Settings',
   						id:'wpsparams',
   						layout: {
   						    type: 'vbox',
   						    align : 'stretch'
   						},
-  						frame:true,border:false//,  						buttons:[{text:'Load preset',handler:function(){alert("not yet implemented");}},{text:'Save preset',handler:function(){alert("not yet implemented");}}]
+  						frame:false,border:false//,  						buttons:[{text:'Load preset',handler:function(){alert("not yet implemented");}},{text:'Save preset',handler:function(){alert("not yet implemented");}}]
   					}			
   				]
   	            
-  	   		}],
-  		    padding:'10 10 10 10'
+  	   		}]//,  		    padding:'10 10 10 10'
        	});
     	
         
@@ -119,7 +165,7 @@
 	
 		<div class="breadcrumb"><a href="login.jsp">Account</a> » <a href="processing.jsp">Processing </a> » Use a processor » <%=processorId %></div>
 		
-		<h1>Use a processor</h1>
+	
 		
 		 
 		 <%

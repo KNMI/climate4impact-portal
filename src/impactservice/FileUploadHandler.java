@@ -142,7 +142,7 @@ public class FileUploadHandler extends HttpServlet {
                             if(supportedExtensions.length()>0)supportedExtensions+=", ";
                             supportedExtensions += allowedExtensions[j];
                           }
-                          Debug.errprintln("User "+user.internalName+" tried to upload invalid extension '"+name+"'");
+                          Debug.errprintln("User "+user.getInternalName()+" tried to upload invalid extension '"+name+"'");
                           jsonFile.put("error", "invalid extension, supported are: "+supportedExtensions);;
                         }
                         
@@ -162,7 +162,7 @@ public class FileUploadHandler extends HttpServlet {
               try {
                 jsonFile.put("name",  ex.getMessage());
                 jsonFile.put("error",  ex.getMessage());
-                Debug.errprintln("User "+user.internalName+" tried to upload: exception: "+ex.getMessage());
+                Debug.errprintln("User "+user.getInternalName()+" tried to upload: exception: "+ex.getMessage());
                 ex.printStackTrace();
               } catch (JSONException e) {
               }

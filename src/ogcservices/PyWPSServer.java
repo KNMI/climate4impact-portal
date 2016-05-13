@@ -66,7 +66,7 @@ public class PyWPSServer extends HttpServlet {
     String userDataDir = user.getDataDir();
     environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir);
     
-    String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.internalName+"/";
+    String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/";
     pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
     pofOutputURL = pofOutputURL.replace("?", "");
     environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);

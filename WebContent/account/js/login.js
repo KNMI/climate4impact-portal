@@ -177,6 +177,7 @@ $(function() {
     var username = name.val();
     var openid = "";
     
+    if(!dataCentreName)return undefined;
     var dataCentreOpenIdProvider = OpenIDProviders[dataCentreName].openidprefix;
   
     

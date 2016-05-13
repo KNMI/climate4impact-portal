@@ -137,17 +137,18 @@ public class Search {
     
     String XML = DiskCache.get(cacheLocation, identifier+".xml", 5*60);
     if(XML == null){
+      String url = searchEndPoint+esgfQuery;
       try {
-        XML = HTTPTools.makeHTTPGetRequest(new URL(searchEndPoint+esgfQuery));
+        XML = HTTPTools.makeHTTPGetRequest(new URL(url));
         DiskCache.set_2(cacheLocation,identifier+".xml",XML);
       } catch (MalformedURLException e2) {
-        r.setException("MalformedURLException",e2);
+        r.setException("MalformedURLException",e2,url);
         return r;
       } catch (WebRequestBadStatusException e2) {
-        r.setException("WebRequestBadStatusException",e2);
+        r.setException("WebRequestBadStatusException",e2,url);
         return r;
       } catch (IOException e2) {
-        r.setException("IOException",e2);
+        r.setException("IOException",e2,url);
         return r;
       }
     }
@@ -516,40 +517,7 @@ public class Search {
   
   
 
-  private class MakeFlat{
-    JSONArray result = null;
-   
-    JSONArray makeFlat(JSONArray catalog) throws JSONException{
-      result = new JSONArray();
-    
-      _rec(catalog);
-      return result;
-      
-    }
 
-    void _rec(JSONArray catalog) throws JSONException{
-      for(int i=0;i<catalog.length();i++){
-        JSONObject a=catalog.getJSONObject(i);
-        JSONObject b = new  JSONObject();
-        JSONArray names = a.names();
-        for (int j=0;j<names.length();j++){
-          String key = names.getString(j);
-          if(key.equals("children")==false){
-            b.put(key, a.get(key));
-            //Debug.println(a.getString(key));
-          }
-         
-        }
-        result.put(b);
-        
-        try{
-          _rec(a.getJSONArray("children"));
-        } catch (JSONException e) {
-         
-        }
-      }
-    }
-  }
   public JSONResponse addtobasket(String query,HttpServletRequest request) {
     JSONResponse result = new JSONResponse(request);
     JSONObject jsonresult = new JSONObject();
@@ -594,11 +562,7 @@ public class Search {
             JSONArray files = THREDDSCatalogBrowser.browseThreddsCatalog(request,url, variableFilter,null);
             //Debug.println(files.toString());
             catalogAggregation.put(files.getJSONObject(0));
-            
-           
-            
-            
-            MakeFlat b = new MakeFlat();
+            THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
             JSONArray flat = b.makeFlat(files);
             
             Debug.println("Found "+flat.length());
@@ -609,8 +573,8 @@ public class Search {
               String fileSize = "";
               JSONObject a=flat.getJSONObject(i);
   
-              try{openDAPURL = a.getString("OPENDAP");}catch (JSONException e) {}
-              try{httpURL = a.getString("HTTPServer");}catch (JSONException e) {}
+              try{openDAPURL = a.getString("opendap");}catch (JSONException e) {}
+              try{httpURL = a.getString("httpserver");}catch (JSONException e) {}
   
               try{fileSize = a.getString("fileSize");   totalFileSize=totalFileSize + Long.parseLong(fileSize);}catch (Exception e) {}
              

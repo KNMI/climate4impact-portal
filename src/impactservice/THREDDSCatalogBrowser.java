@@ -21,6 +21,42 @@ import esgfsearch.ESGFSearchServlet;
 import esgfsearch.Search;
 
 public class THREDDSCatalogBrowser {
+  
+  static public class MakeFlat{
+    JSONArray result = null;
+   
+    public JSONArray makeFlat(JSONArray catalog) throws JSONException{
+      result = new JSONArray();
+    
+      _rec(catalog);
+      return result;
+      
+    }
+
+    void _rec(JSONArray catalog) throws JSONException{
+      for(int i=0;i<catalog.length();i++){
+        JSONObject a=catalog.getJSONObject(i);
+        JSONObject b = new  JSONObject();
+        JSONArray names = a.names();
+        for (int j=0;j<names.length();j++){
+          String key = names.getString(j);
+          if(key.equals("children")==false){
+            b.put(key, a.get(key));
+            //Debug.println(a.getString(key));
+          }
+         
+        }
+        result.put(b);
+        
+        try{
+          _rec(a.getJSONArray("children"));
+        } catch (JSONException e) {
+         
+        }
+      }
+    }
+  }
+  
   static class Service{
     String name;
     Vector<AccesType>accesTypes = new Vector<AccesType>();
@@ -29,6 +65,7 @@ public class THREDDSCatalogBrowser {
       String base;
     }
     void addAccessType(String serviceType,String base){
+      serviceType = serviceType.toLowerCase();
       AccesType accesType = new AccesType();
       accesType.serviceType=serviceType;
       accesType.base=base;

@@ -141,8 +141,8 @@ function IsNumeric(sText){
 		  customAlertDiv.dialog({
 			  //modal: true,
 			  title:'Message',
-			  width:500,
-			  height:300,
+			  width:550,
+			  height:350,
 			  buttons: {
 			  'Ok': function() {
 			  $( this ).dialog( "close" );
@@ -255,12 +255,13 @@ function IsNumeric(sText){
     	 hide: {
         	 effect: "fade",
         	 duration: 100
-    	 },
-    	 position:[mouseXPosition-360,mouseYPosition-40]
+    	 }
+    	 //,    	 position:[mouseXPosition-360,mouseYPosition-40]
     	 
 	 });
 
 	 itemAddedToolTip.dialog("open");
+	 itemAddedToolTip.dialog('option', 'position', [mouseXPosition-360,mouseYPosition-40]);
     	 
      itemAddedToolTip.html(msgHTML);
      setTimeout(function(){itemAddedToolTip.dialog("close")},1000);

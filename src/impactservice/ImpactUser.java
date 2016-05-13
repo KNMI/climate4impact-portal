@@ -16,7 +16,7 @@ import tools.Tools;
 public class ImpactUser {
 
   private String id = null; // The unique ID of the user object
-  public String internalName = null;
+  private String internalName = null;
   private String usersDir = null;
   private String loginInfo = null;
   
@@ -96,11 +96,14 @@ public class ImpactUser {
   
   
   public String getInternalName() {
-    return internalName;
+//    String internalName= getId().replace("http://", "");
+//    internalName = internalName.replace("https://", "");
+//    internalName = internalName.replaceAll("/", ".");
+    return getId();//internalName;
   }
-  public void _setInternalName(String internalName) {
-    this.internalName = internalName;
-  }
+//  public void _setInternalName(String internalName) {
+//    this.internalName = internalName;
+//  }
   public String getId(){
     return id;
   }

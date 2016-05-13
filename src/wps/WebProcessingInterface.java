@@ -535,8 +535,9 @@ public class WebProcessingInterface {
           //Literaldata are integers and strings
           try{
             String literalDataValue = dataEl.get("wps:LiteralData").getValue();
+            String literalDataValueLowerCase = literalDataValue.toLowerCase();
             //Check if this output is an OPENDAP URL, in that case we can make a link to our file viewer
-            if(literalDataValue.indexOf("DAP")!=-1&&literalDataValue.indexOf("http")!=-1&&literalDataValue.indexOf(".nc")!=-1){
+            if(literalDataValueLowerCase.indexOf("dap")!=-1&&literalDataValueLowerCase.indexOf("http")!=-1&&literalDataValueLowerCase.indexOf(".nc")!=-1){
               //This is an OPENDAP URL
               String datasetViewerLocation = "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?dataset=";
               data+="<a target=\"_blank\" href=\""+datasetViewerLocation+URLEncoder.encode(literalDataValue,"UTF-8")+"\">"+literalDataValue+"</a>";
@@ -573,7 +574,6 @@ public class WebProcessingInterface {
           Debug.errprintln("Process failed: "+exceptionMessage);
           html+="<h2>An error occured while executing the process:</h2>"+exceptionMessage;
         }catch(Exception e2){
-          e2.printStackTrace();
         }
         return html;
       }

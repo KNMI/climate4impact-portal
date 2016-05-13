@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
@@ -224,22 +225,39 @@ public class GenericCart {
     public static JSONObject showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
       Debug.println("Show joblist");
       
-      Iterator<DataLocator> itr = genericCart.dataLocatorList.iterator();
+      DataLocator[] dataLocatorListArray = (DataLocator[]) genericCart.dataLocatorList.toArray(new DataLocator[genericCart.dataLocatorList.size()]);
+      
+      Arrays.sort(dataLocatorListArray, new Comparator<DataLocator>(){
+        public int compare(DataLocator o1, DataLocator o2) {
+          return Long.valueOf(o2.addDateMilli).compareTo(o1.addDateMilli);
+        }
+      });
+      
+      
+      
+  
       JSONObject jobListObject = new JSONObject();
       JSONArray jobArray = new JSONArray();
       jobListObject.put("jobs", jobArray);
       
-      while(itr.hasNext()) {
+      
+     
+      
+      
+      for(int j=0;j<dataLocatorListArray.length;j++){
+        DataLocator element = dataLocatorListArray[j];
+       
         JSONObject job = new JSONObject();
         jobArray.put(job);
         
         boolean readFromWPSStatusLocation = true;//By default, read from the WPS status location
         boolean hasError = false;
         boolean isCompleted = false;
+        boolean isSaxException = false;
         String progress= "-";
         
-        DataLocator element = itr.next(); 
-        job.put("creationdate",element.addDate);
+      
+        
 
         try {
           JSONObject elementProps =  element.getCartData();
@@ -258,11 +276,108 @@ public class GenericCart {
             if(finished.equals("true")){
               readFromWPSStatusLocation = false;
               isCompleted = true;
-              progress="ready";
             }
           }catch(Exception e){
           }
           
+          /*Check for errors */
+          try{
+            String error = elementProps.getString("error");
+            if(error!=null){
+              if(!error.equals("false")){
+                Debug.errprintln(error);
+                hasError = true;
+                try{
+                  if(error.indexOf("SAXException")!=-1){
+                    isSaxException = true;
+                    readFromWPSStatusLocation = true;
+                  }
+                }catch(Exception e){
+                }
+              }
+            }
+          }catch(Exception e){
+          }
+          
+          //readFromWPSStatusLocation=true;
+          if(readFromWPSStatusLocation){
+            Debug.println("Read "+statusLocation);
+            JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
+           
+            if(progressObject != null){
+              try{
+                progress= progressObject.getString("progress");
+              }catch(Exception e){
+              }
+              
+              String error = null;
+              try{
+                error= progressObject.getString("error");
+                if(error.indexOf("SAXException")!=-1){
+                  isSaxException = true;
+                }
+              }catch(Exception e){
+              }
+              
+              if(progress.equals("100")){
+                //Now set that this process is completed, we do not need to read the WPS statuslocation again.
+                Debug.errprintln("WPS All Good");
+                error = null;
+                hasError = false;
+                elementProps.put("finished", "true");
+                elementProps.put("error",false);
+                element.setCartData(elementProps);
+                genericCart.saveToStore();
+                isCompleted = true;
+              }
+              
+              if(error!=null && isSaxException == false){
+                Debug.errprintln("WPS Error, not SAX Exception");
+                elementProps.put("error",error);
+                hasError = true;
+                elementProps.put("finished", "true");
+                element.setCartData(elementProps);
+                genericCart.saveToStore();
+                isCompleted = true;
+              }
+              
+              
+              if(error!=null && isSaxException == true){
+                Debug.errprintln("SAX Exception");
+                elementProps.put("error",error);
+                hasError = true;
+              }
+              
+              if(error==null && progress.equals("100")==false){
+                Debug.println("Still calculating:" +statusLocation);
+              }
+            
+              
+            }else{
+              Debug.errprintln("Unable to get progressObject");
+              hasError = true;
+            }
+          }
+          
+          if(hasError){
+            try{
+              job.put("error",elementProps.get("error"));
+              hasError = true;
+            }catch(Exception e){
+              job.put("error",false);
+            }
+          }
+          
+          
+//          Debug.println("readFromWPSStatusLocation: "+readFromWPSStatusLocation+" for "+id);
+//          Debug.println("progress: "+progress);
+//          Debug.println("isCompleted: "+isCompleted);
+//          Debug.println("hasError: "+hasError);
+//          
+
+       
+          job.put("creationdate",element.addDate);
+
           job.put("wpsid",id);
           job.put("processid",element.id);
           job.put("statuslocation",statusLocation);
@@ -273,48 +388,6 @@ public class GenericCart {
             job.put("wpspostdata",false);
           }
       
-          try{
-            job.put("error",elementProps.get("error"));
-            hasError = true;
-          }catch(Exception e){
-            job.put("error",false);
-          }
-          
-
-          
-    
-
-          if(readFromWPSStatusLocation){
-            JSONObject progressObject = (JSONObject) WebProcessingInterface.monitorProcess(statusLocation,request);
-            if(progressObject != null){
-              try{
-                progress= progressObject.getString("progress");
-              }catch(Exception e){
-                
-              }
-              
-              String error = null;
-              try{
-                error= progressObject.getString("error");
-              }catch(Exception e){
-                
-              }
-              
-              if(progress.equals("100") || error !=null){
-                isCompleted = true;
-                //Now set that this process is completed, we do not need to read the WPS statuslocation again.
-                elementProps.put("finished", "true");
-                if(error!=null){
-                  elementProps.put("error",error);
-                  hasError = true;
-                }
-                element.setCartData(elementProps);
-                genericCart.saveToStore();
-              }
-            }else{
-              hasError = true;
-            }
-          }
           
           try{
             if(hasError == false){
@@ -334,7 +407,7 @@ public class GenericCart {
             job.put("status","failed");
           }
         } catch (Exception e) {
-          Debug.println(e.getMessage());
+          Debug.errprintln(e.getMessage());
           job.put("progress","failed");
           job.put("status","crashed");
         }
@@ -382,8 +455,15 @@ public class GenericCart {
           String fileSize = "-";
           try {
             elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
+            try{dapURL =elementProps.getString("opendap");}catch(Exception e){}
+            try{httpURL =elementProps.getString("httpserver");}catch(Exception e){}
+            
+            //For deprecated baskets:
+            try{dapURL =elementProps.getString("OpenDAP");}catch(Exception e){}
+            try{httpURL =elementProps.getString("httpServer");}catch(Exception e){}
             try{dapURL =elementProps.getString("OPENDAP");}catch(Exception e){}
             try{httpURL =elementProps.getString("HTTPServer");}catch(Exception e){}
+            
             try{catalogURL =elementProps.getString("catalogURL");}catch(Exception e){}
             try{fileSize =elementProps.getString("filesize");}catch(Exception e){}
           } catch (Exception e) {
@@ -511,7 +591,7 @@ public class GenericCart {
           String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
 
           if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
-            dataset.put("dapurl",dapLocationHTTPS+impactUser.internalName+"/"+path+fileEntry[f].getName());
+            dataset.put("dapurl",dapLocationHTTPS+impactUser.getInternalName()+"/"+path+fileEntry[f].getName());
             dataset.put("hasdap",true);
             dataset.put("iconCls", "typeOF");
           }
@@ -519,7 +599,7 @@ public class GenericCart {
             dataset.put("catalogurl",impactUser.getDataURL()+fileEntry[f].getName());
             dataset.put("catalog",true);
           }
-          dataset.put("httpurl",dapLocationHTTPS+impactUser.internalName+"/"+path+fileEntry[f].getName());
+          dataset.put("httpurl",dapLocationHTTPS+impactUser.getInternalName()+"/"+path+fileEntry[f].getName());
           dataset.put("hashttp",true);
           dataset.put("id",path+fileEntry[f].getName());
           dataset.put("type","file");

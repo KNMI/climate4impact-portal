@@ -91,29 +91,91 @@ var BasketWidget = function() {
       
     });
     
+    function endsWith(str, suffix) {
+      return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+    
     var getSelectedFilesForUsage = function(){
 	      if (tree.getSelectionModel().hasSelection()) {
-	        var selectedNode = tree.getSelectionModel().getSelection();
-	  
-	            // alert(selectedNode[0].data.dapurl + ' was selected');
-	        if (_callbackFunction) {
-	          var doClose = _callbackFunction(selectedNode);
-	          if (doClose === true) {
-	            for(w in openedWindows){
-	          	  w = openedWindows[w];
-	          	  try{
-	          		  w.close();
-	          		  w.destroy();
-	          	  }catch(e){
-	          	  }
-	            }
-	            openedWindows = [];
-	          	
-	            basketWindow.close();
+	        var pendingRequests = 0;
+	        var allFilesAssembled = function(selectedNode){
+	          if(pendingRequests!=0){
+	            console.log("Still some requests open");
+	            return;
+	          }else{
+	            console.log("OK continue!");
 	          }
-	        }else{
-	          Ext.MessageBox.alert('Error','Nothing to apply to.');
+	          
+	          if (_callbackFunction) {
+	            if(selectedNode.length == 0){
+	              Ext.MessageBox.alert('Error','No valid nodes selected.');
+	            }
+	            var doClose = _callbackFunction(selectedNode);
+	            if (doClose === true) {
+	              for(w in openedWindows){
+	                w = openedWindows[w];
+	                try{
+	                  w.close();
+	                  w.destroy();
+	                }catch(e){
+	                }
+	              }
+	              openedWindows = [];
+	              
+	              basketWindow.close();
+	            }
+	          }else{
+	            Ext.MessageBox.alert('Error','Nothing to apply to.');
+	          }
+	        };
+	        
+	        
+	        var selectedNodesMixed = tree.getSelectionModel().getSelection();
+	        
+	        var selectedNode = [];
+	        
+	       
+	        //console.log(selectedNodesMixed);
+	        
+	        for ( var j = 0; j < selectedNodesMixed.length || j < 1; j++) {
+	          if(selectedNodesMixed[j].data.dapurl){
+	            selectedNode.push({dapurl:selectedNodesMixed[j].data.dapurl});
+	          }
+	          if(selectedNodesMixed[j].data.catalogurl){
+	            pendingRequests++;
+	            var urlRequest = c4iconfigjs.impactservice+"service=catalogbrowser&mode=flat&format=application/json&node="+ URLEncode(selectedNodesMixed[j].data.catalogurl);
+	            console.log(urlRequest);
+	            $.ajax({
+	              url: urlRequest,
+	            }).done(function(data) {
+	            
+	              for(var j=0;j<data.files.length;j++){
+	                if(data.files[j].opendap){
+	                  if(endsWith(data.files[j].opendap,"aggregation")){
+	                    console.log("Skipping (aggregation) "+data.files[j].opendap);
+	                  }else{
+	                    console.log("Pushing "+data.files[j].opendap);
+	                    selectedNode.push({dapurl:data.files[j].opendap});
+	                  }
+	                  
+	                }
+	              }
+	              pendingRequests--;
+	              allFilesAssembled(selectedNode);
+	            }).fail(function() {
+              
+              }).always(function() {
+              
+              });
+	            //selectedNode.push({dapurl:selectedNodes[j].data.dapurl});
+	          }
 	        }
+	        allFilesAssembled(selectedNode);
+	      
+	        
+	        //
+	            // alert(selectedNode[0].data.dapurl + ' was selected');
+	  
 	      } else {
 	        Ext.MessageBox.alert('Error','No selected files.');
 	      }
@@ -384,7 +446,7 @@ var BasketWidget = function() {
             dataIndex : 'filesize'
           },{
             text : 'Date',
-            width : 100,
+            width : 200,
             dataIndex : 'date',
             hidden:false
           }/*,{

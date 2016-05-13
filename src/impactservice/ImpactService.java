@@ -248,16 +248,16 @@ public class ImpactService extends HttpServlet {
 
       for(int j=0;j<array.length();j++){
         rn++;
-        String openDAPURL=null;
-        String httpURL=null;
+        String opendapURL=null;
+        String httpserverURL=null;
         String hrefURL=null;
         String catalogURL=null;
         String nodeText = null;
         String fileSize = "";
         JSONObject a=array.getJSONObject(j);
         nodeText = a.getString("text");
-        try{openDAPURL = a.getString("OPENDAP");}catch (JSONException e) {}
-        try{httpURL = a.getString("HTTPServer");}catch (JSONException e) {}
+        try{opendapURL = a.getString("opendap");}catch (JSONException e) {}
+        try{httpserverURL = a.getString("httpserver");}catch (JSONException e) {}
         try{catalogURL = a.getString("catalogURL");}catch (JSONException e) {}
         try{hrefURL = a.getString("href");}catch (JSONException e) {}
         try{fileSize = a.getString("dataSize");}catch (JSONException e) {}
@@ -287,30 +287,29 @@ public class ImpactService extends HttpServlet {
 
         /*
          * Only show opendap when it is really advertised by the server.
-         */ if(openDAPURL == null && httpURL !=null){
-           openDAPURL = httpURL.replace("fileServer", "dodsC")+"#";
+         */ if(opendapURL == null && httpserverURL !=null){
+           opendapURL = httpserverURL.replace("fileServer", "dodsC")+"#";
          }
 
-         if(openDAPURL!=null){
-           dapLink="<span class=\"link\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</span>";
+         if(opendapURL!=null){
+           dapLink="<span class=\"link\" onclick=\"renderFileViewer({url:'"+opendapURL+"'});\">view</span>";
            //dapLink="<a href=\"#\" onclick=\"renderFileViewer({url:'"+openDAPURL+"'});\">view</a>";
          }
-         if(httpURL!=null){
+         if(httpserverURL!=null){
            if(openid!=null){
-             httpLink="<a href=\""+httpURL+"?openid="+openid+"\" target=\"_blank\"\">download</a>";
+             httpLink="<a href=\""+httpserverURL+"?openid="+openid+"\" target=\"_blank\"\">download</a>";
            }else{
-             httpLink="<a href=\""+httpURL+"\">download</a>";
+             httpLink="<a href=\""+httpserverURL+"\">download</a>";
            }
          }
          //html+="</td><td>"+dapLink+"</td><td>"+httpLink;
          html.append("</td><td>");html.append(dapLink);html.append("</td><td>");html.append(httpLink);
          html.append("</td>");
-         if(httpURL == null && openDAPURL == null && catalogURL == null){
+         if(httpserverURL == null && opendapURL == null && catalogURL == null){
            //html+="</td><td>-";  
            html.append("<td></td>");
          }else{
-           //html+="</td><td><span onclick=\"postIdentifierToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"'});\" class=\"shoppingbasketicon\"/>";
-           html.append("<td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',HTTPServer:'"+httpURL+"',OPENDAP:'"+openDAPURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/></td>\n");
+           html.append("<td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',httpserver:'"+httpserverURL+"',opendap:'"+opendapURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/></td>\n");
          }
 
 
@@ -341,6 +340,7 @@ public class ImpactService extends HttpServlet {
     String format= request.getParameter("format");
     JSONResponse jsonResponse = new JSONResponse(request);
     if(format==null)format="";
+    boolean flat = false;
     try{
       String variableFilter="",textFilter = "";
       try{
@@ -352,7 +352,13 @@ public class ImpactService extends HttpServlet {
         textFilter = HTTPTools.getHTTPParam(request, "filter");
       }catch(Exception e){
       }
-
+      try{
+        String mode= HTTPTools.getHTTPParam(request, "mode");
+        if(mode.equals("flat")){
+          flat=true;
+        }
+      }catch(Exception e){
+      }
 
 
 
@@ -378,93 +384,111 @@ public class ImpactService extends HttpServlet {
         response.getWriter().print("Unable to read catalog");
         return;
       }
+      
+      if(flat == false){
 
-
-      String html="";
-      /*for(int j=0;j<treeElements.getJSONObject(0).getJSONArray("children").length();j++){
-            html+="j="+treeElements.getJSONObject(0).getString("text")+"<br/>"; 
-          } */
-
-      try{
-        Vector<String> availableVars = new Vector<String>();
+  
+        String html="";
+        /*for(int j=0;j<treeElements.getJSONObject(0).getJSONArray("children").length();j++){
+              html+="j="+treeElements.getJSONObject(0).getString("text")+"<br/>"; 
+            } */
+  
         try{
-          JSONArray variablesToChoose = treeElements.getJSONObject(0).getJSONArray("variables");
-          for(int j=0;j<variablesToChoose.length();j++){
-            availableVars.add(variablesToChoose.getJSONObject(j).getString("name"));
-            //DebugConsole.println("a "+variablesToChoose.getJSONObject(j).getString("name"));
-          }
-        }catch(Exception e){
-
-        }
-
-
-        Debug.println("variableFilter: '"+variableFilter+"'");
-        Debug.println("textFilter: '"+textFilter+"'");
-        html+="<div class=\"c4i-catalogbrowser-variableandtextfilter\"><form  class=\"varFilter\">";
-        if(availableVars.size()>0){
-          html+="<b>Variables:</b>";
-          for(int j=0;j<availableVars.size();j++){
-            if(j!=0)html+="&nbsp;";
-            String checked="";//checked=\"yes\"";
-            if(variableFilter.length()>0){
-              checked="";
-              if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
+          Vector<String> availableVars = new Vector<String>();
+          try{
+            JSONArray variablesToChoose = treeElements.getJSONObject(0).getJSONArray("variables");
+            for(int j=0;j<variablesToChoose.length();j++){
+              availableVars.add(variablesToChoose.getJSONObject(j).getString("name"));
+              //DebugConsole.println("a "+variablesToChoose.getJSONObject(j).getString("name"));
             }
-            html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
+          }catch(Exception e){
+  
           }
-          html+="<br/><br/>";
+  
+  
+          Debug.println("variableFilter: '"+variableFilter+"'");
+          Debug.println("textFilter: '"+textFilter+"'");
+          html+="<div class=\"c4i-catalogbrowser-variableandtextfilter\"><form  class=\"varFilter\">";
+          if(availableVars.size()>0){
+            html+="<b>Variables:</b>";
+            for(int j=0;j<availableVars.size();j++){
+              if(j!=0)html+="&nbsp;";
+              String checked="";//checked=\"yes\"";
+              if(variableFilter.length()>0){
+                checked="";
+                if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
+              }
+              html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
+            }
+            html+="<br/><br/>";
+          }
+          html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
+          html+="<br/>";
+          //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
+  
+          html+="</form></div>";
+        }catch(Exception e){
+          e.printStackTrace();
         }
-        html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
-        html+="<br/>";
-        //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
-
-        html+="</form></div>";
-      }catch(Exception e){
-        e.printStackTrace();
-      }
-
-      html+="<div id=\"datasetfilelist\"><table class=\"c4i-catalogbrowser-table\">";
-      html+="<tr>";
-      html+="<th>#</th>";
-      html+="<th width=\"100%\" class=\"c4i-catalogbrowser-th\">Resource title</th>";
-      html+="<th class=\"c4i-catalogbrowser-th\"><b>Size</b></th>";
-      html+="<th class=\"c4i-catalogbrowser-th\"><b>Opendap</b></th>";
-      html+="<th class=\"c4i-catalogbrowser-th\"><b>Download</b></th>";
-      html+="<th class=\"c4i-catalogbrowser-th\"><b>Basket</b></th>";
-      html+="</tr>";
-
-      long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
-
-      String openid = null;
-      try{
-        openid= LoginManager.getUser(request).getOpenId();
-      }catch(Exception e){            
-      }
-      html+=buildHTML(treeElements,"",0,openid,0).result+"</table></div>";
-      long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
-      Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
-      if(format.equals("text/html")){
-        response.setContentType("text/html");
-        response.getWriter().print(html);
-      }else if(format.equals("application/json")){
-        JSONObject a = new JSONObject();
-        a.put("html", html);
+  
+        html+="<div id=\"datasetfilelist\"><table class=\"c4i-catalogbrowser-table\">";
+        html+="<tr>";
+        html+="<th>#</th>";
+        html+="<th width=\"100%\" class=\"c4i-catalogbrowser-th\">Resource title</th>";
+        html+="<th class=\"c4i-catalogbrowser-th\"><b>Size</b></th>";
+        html+="<th class=\"c4i-catalogbrowser-th\"><b>Opendap</b></th>";
+        html+="<th class=\"c4i-catalogbrowser-th\"><b>Download</b></th>";
+        html+="<th class=\"c4i-catalogbrowser-th\"><b>Basket</b></th>";
+        html+="</tr>";
+  
+        long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
+  
+        String openid = null;
         try{
-          jsonResponse.setMessage(a);
-        } catch(Exception e){
-          jsonResponse.setException("Catalogbrowser error:",e);
+          openid= LoginManager.getUser(request).getOpenId();
+        }catch(Exception e){            
         }
-        try {
-          jsonResponse.print(response);
-        } catch (Exception e1) {
+        html+=buildHTML(treeElements,"",0,openid,0).result+"</table></div>";
+        long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
+        Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
+        if(format.equals("text/html")){
+          response.setContentType("text/html");
+          response.getWriter().print(html);
+        }else if(format.equals("application/json")){
+          JSONObject a = new JSONObject();
+          a.put("html", html);
+          try{
+            jsonResponse.setMessage(a);
+          } catch(Exception e){
+            jsonResponse.setException("Catalogbrowser error:",e);
+          }
+          try {
+            jsonResponse.print(response);
+          } catch (Exception e1) {
+  
+          }
+        }else{
+          try{
+            jsonResponse.setMessage(treeElements.toString());
+          } catch(Exception e){
+            jsonResponse.setException("Catalogbrowser error:",e);
+          }
+          try {
+            jsonResponse.print(response);
+          } catch (Exception e1) {
+  
+          }
+        }
+      }
+      
+      if(flat == true){
+        THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
+        JSONArray allFilesFlat = b.makeFlat(treeElements);
+        JSONObject data = new JSONObject();
+        data.put("files",allFilesFlat);
+        jsonResponse.setMessage(data);
+        Debug.println("Found "+allFilesFlat.length());
 
-        }
-      }else{
-        try{
-          jsonResponse.setMessage(treeElements.toString());
-        } catch(Exception e){
-          jsonResponse.setException("Catalogbrowser error:",e);
-        }
         try {
           jsonResponse.print(response);
         } catch (Exception e1) {
@@ -772,8 +796,8 @@ public class ImpactService extends HttpServlet {
           if(request.getParameter("id")!=null){
             JSONObject el=new JSONObject();
             el.put("id", request.getParameter("id"));
-            el.put("OPENDAP", request.getParameter("OPENDAP"));
-            el.put("HTTPServer", request.getParameter("HTTPServer"));
+            el.put("opendap", request.getParameter("opendap"));
+            el.put("httpserver", request.getParameter("httpserver"));
             el.put("catalogURL", request.getParameter("catalogURL"));
             el.put("filesize", request.getParameter("filesize"));
             addFileToBasket(shoppingCart,el);
@@ -833,15 +857,15 @@ public class ImpactService extends HttpServlet {
     Debug.println("Adding dataset "+el.getString("id")+" with date "+addDate);
     JSONObject fileInfo = new JSONObject();
     try{
-      String str=el.getString("OPENDAP");
+      String str=el.getString("opendap");
       if(str.length()>0){
-        fileInfo.put("OPENDAP",str);
+        fileInfo.put("opendap",str);
       }
     }catch(Exception e){}
     try{
-      String str=el.getString("HTTPServer");
+      String str=el.getString("httpserver");
       if(str.length()>0){
-        fileInfo.put("HTTPServer",str);
+        fileInfo.put("httpserver",str);
       }
     }catch(Exception e){}
     try{
@@ -948,7 +972,7 @@ public class ImpactService extends HttpServlet {
      * Handle getvariables request for the variable browser.
      */
     if(serviceStr.equals("getvariables")){
-      OpenDAPViewer viewer = new OpenDAPViewer(Configuration.getImpactWorkspace()+"/diskCache/");
+      OpendapViewer viewer = new OpendapViewer(Configuration.getImpactWorkspace()+"/diskCache/");
       viewer.doGet(request, response);
       //handleVariablesRequest(request,response,errorResponder);
     }

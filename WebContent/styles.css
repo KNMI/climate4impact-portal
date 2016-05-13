@@ -1542,7 +1542,7 @@ div.tnimagetext {
 }
 
 .wps tr {
-	background: #EEF;
+	/*background: #EEF;*/
 }
 
 .wps table ul.links {
@@ -1562,7 +1562,7 @@ table.wps {
 	border: 0;
 	border-spacing: 0;
 	font-size: 0.857em;
-	margin: 10px 0;
+	/*margin: 10px 0;*/
 }
 
 
