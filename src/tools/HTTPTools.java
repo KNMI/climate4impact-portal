@@ -259,7 +259,7 @@ public class HTTPTools extends HttpServlet {
           entity.getContent().close();
         } catch (Exception e) {
         }
-        // DebugConsole.errprintln("HTTPCode "+response.getStatusLine().getStatusCode()+" for '"+connectToURL+"'"+" "+result);
+        Debug.errprintln("HTTPCode "+response.getStatusLine().getStatusCode()+" for '"+connectToURL);
 
         throw new WebRequestBadStatusException(response.getStatusLine()
             .getStatusCode(), result);

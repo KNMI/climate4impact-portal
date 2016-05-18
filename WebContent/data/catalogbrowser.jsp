@@ -5,15 +5,14 @@
   <head>
     <jsp:include page="../includes.jsp" />
     <script type="text/javascript" src="/impactportal/js/jqueryextensions/jquery.collapsible.min.js"></script>
-    <link href="/impactportal/js/es-doc/esdoc-min.css" media="screen" rel="stylesheet" type="text/css" /> 
+     
     
     <link href="/impactportal/data/esgfsearch/esgfsearch.css" media="screen" rel="stylesheet" type="text/css" />
-    <script src="/impactportal/js/es-doc/esdoc-min.js" type="text/javascript"></script>
+    
     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>    
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
     <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
-    <script type="text/javascript" src="/impactportal/js/components/catalogbrowser/fileviewer.js"></script>
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
 
@@ -113,22 +112,7 @@
   		}
   		
 
-  		var onViewDataset = function(datasetId){
-  			var project = "CMIP5";
-  		
-  			
-/*   			if(datasetId.split(".")[0] == 'cordex'){
-  				project = "CORDEX";
-  			}
- */  		
-    		ESDOC.viewer.renderFromDatasetID({
-    		    id : datasetId,
-    		    project : project
-    		});
-    	};
-    	
-    	var ESDOCMetadataIsLoaded = false;
-    	
+  
   		$(document).ready(function(){
   		  	var varFilter = window.location.hash.substring(1).split("#");
   		  
@@ -139,25 +123,7 @@
             	defaultOpen: 'datasetcontainer'
             });
             
-  		  	ESDOC.viewer.setOptions({
-	    		//dialogWidthInPixels:600,
-	    		showNullFields:false,
-	    		showFooter:true,
-	    		uiContainer:'.es-doc-info',
-	    		uiMode:'tabbed'//tabbed or linear
-   			});
-  	  		$('#buttonmetadataopen').click(function(){
-  	  			var b = $('#buttonmetadataopen');
-  	  			if(b.attr("class") == 'collapse-open'){
-  	  				if(ESDOCMetadataIsLoaded !== true){
-  	  					ESDOCMetadataIsLoaded = true;
-  	  					//alert($('#buttonmetadataopen').attr("class"));
-  	  					onViewDataset(baseName);
-  	  				}
-  	  			}
-  	  		})
-  			
-  		  
+ 		  
   		});
 	</script>
 	<style type="text/css">
@@ -168,13 +134,7 @@
 	  .catalogbrowser tr{
 	  	border-bottom:1px dashed #DDD;
 	  }
-	  .es-doc-container{
-	  	margin:4px;
-	  	padding:4px;
-		background-color: #DEEBFF;
-
-	  }
-	
+	  
 	  #variableandtextfilter{
 		margin:4px;
 		padding:6px;
@@ -232,32 +192,7 @@
         	</div>
 			<!-- /Dataset container -->
 			
-			
-   		 	<!--  Metadata container -->
-			<!--  Overview  -->
-   		 	<div class="collapsible" style="padding:0px;height:30px;" > 
-		        <table width="100%" >
-		       		<tr> 
-				        <td class="collapsibletitle" style="width:300px;">
-				        	ES-DOC Metadata 
-				        </td>
-				        <td style="padding:2px;"><span id="buttonmetadataopen" class="collapse-close"></span></td>
-			        </tr>
-		        </table>
-	        </div>
-   		 	
-   		 	<!-- Details -->
-	        <div class="collapsiblecontainer">
-		        <div class="collapsiblecontent">
-		        	<div class="es-doc-container">
-		            <b>Metadata for dataset:</b><br/><i><%=baseName%></i><br/><br/>
-		  					<div class="es-doc-info"></div>
-		  		</div>
-	        	</div>
-        	</div>
-        
-        	<!--  /Metadata container -->
-        	
+		
 		</div>
 	</div></div>
 

@@ -394,13 +394,11 @@ public class LoginManager {
     ImpactUser user = getUser(userId, request);
 
     Debug.println("Check login " + user.getId());
-    user.internalName = user.getId().replace("http://", "");
-    user.internalName = user.internalName.replace("https://", "");
-    user.internalName = user.internalName.replaceAll("/", ".");
-    Debug.println("internalName = " + user.internalName);
+
+    Debug.println("internalName = " + user.getInternalName());
     String workspace = Configuration.getImpactWorkspace();
     Debug.println("Base workspace = " + workspace);
-    user.setWorkspace(workspace + user.internalName + "/");
+    user.setWorkspace(workspace + user.getInternalName() + "/");
     Debug.println("User workspace = " + user.getWorkspace());
     try {
       Debug.println("Making dir " + user.getWorkspace());

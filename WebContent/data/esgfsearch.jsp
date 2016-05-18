@@ -15,6 +15,7 @@
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
+    
 	<link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
 	<link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
 	 <%

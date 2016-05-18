@@ -34,7 +34,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 class Debugger{
-  static boolean DebugOpenDAP = false;
+  static boolean DebugOpendap = false;
 }
 
 class DimInfo{
@@ -75,7 +75,6 @@ class DimInfo{
     if(dodsSubsetQueries != null){
       for(int j=0;j<dodsSubsetQueries .length && j<dims.size();j++){
         useStartStopStride = true;
-        //if(Debug.DebugOpenDAP)DebugConsole.println("dods subset: "+dims.get(j).getName()+ " = "+ dodsSubsetQueries[j]);
 
         //Is start+cout given or only count?
 
@@ -88,7 +87,7 @@ class DimInfo{
           start[j] = Integer.parseInt(startCount[0]);
           count[j]= (Integer.parseInt(startCount[1])-start[j])+1;
         }
-        if(Debugger.DebugOpenDAP)Debug.println("dods subset for dim "+dims.get(j).getFullName()+" start: "+start[j]+" count "+count[j]);
+        if(Debugger.DebugOpendap)Debug.println("dods subset for dim "+dims.get(j).getFullName()+" start: "+start[j]+" count "+count[j]);
       }
     }
 
@@ -100,7 +99,7 @@ class DimInfo{
 
 };
 
-public class OpenDAP {
+public class Opendap {
 
   enum CDMTypes {String,Byte,UInt16,Int16,UInt32,Int32,Float32,Float64 };
 
@@ -114,14 +113,14 @@ public class OpenDAP {
     if(CDMType.equals("int"))return CDMTypes.Int32;
     if(CDMType.equals("float"))return CDMTypes.Float32;
     if(CDMType.equals("double"))return CDMTypes.Float64;
-    if(Debugger.DebugOpenDAP){
+    if(Debugger.DebugOpendap){
       System.out.println(CDMType);
     }
     return null;
   }
 
   public static String CDMTypeToString(CDMTypes cdmType){
-    if(Debugger.DebugOpenDAP){
+    if(Debugger.DebugOpendap){
       System.out.println(cdmType);
     }
     if(cdmType == CDMTypes.String)return "String";
@@ -135,23 +134,6 @@ public class OpenDAP {
     if(cdmType == CDMTypes.Float64)return "Float64";
     return null;
   }
-
-//  public static String getDDSFromNetCDFFile(NetcdfFile ncfile,String fileName){
-//    List<Variable> var = ncfile.getVariables();
-//
-//    StringBuilder ddsResult = new StringBuilder();
-//    ddsResult.append("Dataset {\n");
-//    for(int j=0;j<var.size();j++){
-//      if(var.get(j).getDataType().toString().equals("String")==false){
-//        ddsResult.append(getDDSForVariable(var.get(j),ncfile,""));
-//      }else{
-//        Debug.errprintln("Warning: OpenDAP tries to read STRING variable type for variable with name "+var.get(j).getFullName());
-//      }
-//
-//    }
-//    ddsResult.append("} "+fileName+";\n");
-//    return ddsResult.toString();
-//  }
 
   private static StringBuilder getDDSForVariable(Variable variable,NetcdfFile ncfile,String variableDodsQuery) {
 
@@ -209,33 +191,6 @@ public class OpenDAP {
             ddsResult.append("["+dimInfo.dims.get(i).getFullName()+" = "+dimInfo.count[i]+"]");
           }
 
-          //ddsResult.append(";\n");
-        //}
-
-        //ddsResult.append(";\n");
-     /* }
-      if(variableDodsQuery.length()>0){
-        if(Debugger.DebugOpenDAP)Debug.println("dods query: "+variableDodsQuery);
-
-        DimInfo dimInfo = new DimInfo();
-
-        dimInfo.parse(variable,variableDodsQuery);
-
-
-
-
-        ddsResult.append("    Structure {\n");
-        ddsResult.append("        "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
-
-        for(int i=0;i<dimInfo.dims.size();i++){
-          ddsResult.append("["+dimInfo.dims.get(i).getName()+" = "+dimInfo.count[i]+"]");
-        }
-
-        ddsResult.append(";\n");
-
-
-        ddsResult.append("    } "+variable.getFullName());
-      }*/
     }
 
     ddsResult.append(";\n");
@@ -249,15 +204,8 @@ public class OpenDAP {
     if(queryString.equals("null")) queryString = "";
     
     StringBuilder ddsResult = new StringBuilder();
-    
-//    if(Debugger.DebugOpenDAP)Debug.println("getDatasetDDSFromNetCDFFile: "+queryString);
-//    ddsResult.append(getDDSFromNetCDFFile(ncfile,fileName));
-//  
-//    if(queryString.length() == 0){
-//      return ddsResult.toString().getBytes();
-//    }
-
-    if(Debugger.DebugOpenDAP)Debug.println("getDatasetDODSFromNetCDFFile: ["+queryString+"]");
+ 
+    if(Debugger.DebugOpendap)Debug.println("getDatasetDODSFromNetCDFFile: ["+queryString+"]");
     
     
     String[] varNames = null;
@@ -349,7 +297,7 @@ public class OpenDAP {
       }
       int varSize = dimInfo[j].size;
       
-      if(Debugger.DebugOpenDAP){
+      if(Debugger.DebugOpendap){
       //  DebugConsole.println(j+"): name: "+varName+" size: "+varSize+ " all: " + (int) variable.getSize()+" type: "+variable.getDataType().toString()+" scalar:"+variable.isScalar());
       }
 
@@ -393,7 +341,7 @@ public class OpenDAP {
 //            Debug.println(i+"="+a.getByte(i));
 //          }
 //          
-          if(Debugger.DebugOpenDAP)Debug.println("Normal read "+varName+" start:"+dimInfo[j].start[0] +" count:"+ dimInfo[j].count[0]);
+          if(Debugger.DebugOpendap)Debug.println("Normal read "+varName+" start:"+dimInfo[j].start[0] +" count:"+ dimInfo[j].count[0]);
           ByteBuffer byteBuffer = variable.read(dimInfo[j].start, dimInfo[j].count).getDataAsByteBuffer();
           
          
@@ -408,7 +356,7 @@ public class OpenDAP {
           if(type == CDMTypes.Int32)elsize=4;
           if(type == CDMTypes.Float32)elsize=4;
           if(type == CDMTypes.Float64)elsize=8;
-          if(Debugger.DebugOpenDAP){
+          if(Debugger.DebugOpendap){
             Debug.println("ElSize = "+elsize);
           }
           //if(b.length!=varSize){
@@ -437,16 +385,16 @@ public class OpenDAP {
           e.printStackTrace();
         }
         int dapLength = ((int)((b.length/4.0+0.9)))*4;
-        if(Debugger.DebugOpenDAP)Debug.println(varName+" numbytes: "+b.length+ " dapLength "+dapLength);
+        if(Debugger.DebugOpendap)Debug.println(varName+" numbytes: "+b.length+ " dapLength "+dapLength);
 
        
         for(int i=b.length;i<dapLength;i++){
           dos.writeByte(0);
-          if(Debugger.DebugOpenDAP)Debug.println("X");
+          if(Debugger.DebugOpendap)Debug.println("X");
         }
      //  wasScalar = false;
       }else{
-        if(Debugger.DebugOpenDAP)Debug.println("Scalar");
+        if(Debugger.DebugOpendap)Debug.println("Scalar");
         //Debug.println("Scalar size: "+variable.getSize());
         DataOutputStream dos = new DataOutputStream(bos);
         CDMTypes type = ncTypeToCDMType(variable.getDataType().toString());
@@ -464,7 +412,7 @@ public class OpenDAP {
             dos.writeInt(variable.readScalarShort());
           }
           if(type == CDMTypes.Int32||type == CDMTypes.UInt32){
-            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar int32");
+            if(Debugger.DebugOpendap)Debug.println("Writing scalar int32");
             //dos.writeDouble(variable.readScalarInt());
             dos.writeInt(variable.readScalarInt());
 //            bos.write(0xFF);
@@ -473,13 +421,13 @@ public class OpenDAP {
 //            bos.write(0x01);
           }
           if(type == CDMTypes.Float32){
-            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar float32");
+            if(Debugger.DebugOpendap)Debug.println("Writing scalar float32");
             dos.writeFloat(variable.readScalarFloat());
             
           }
           if(type == CDMTypes.Float64){
             
-            if(Debugger.DebugOpenDAP)Debug.println("Writing scalar double");
+            if(Debugger.DebugOpendap)Debug.println("Writing scalar double");
             dos.writeDouble(variable.readScalarDouble());
           }
           
@@ -587,7 +535,7 @@ public class OpenDAP {
   }
 
   public static String getDASFromNetCDFFile(NetcdfFile ncfile) {
-    if(Debugger.DebugOpenDAP)Debug.println("getDatasetDASFromNetCDFFile: ");
+    if(Debugger.DebugOpendap)Debug.println("getDatasetDASFromNetCDFFile: ");
     List<Variable> var = ncfile.getVariables();
 
     StringBuilder ddsResult = new StringBuilder();
@@ -713,14 +661,14 @@ public class OpenDAP {
       //Debug.println("Local file name is "+filename);
       
       
-      if(!userIdFromPath.startsWith(user.internalName)){
-        Debug.println("Comparing "+user.internalName + "==" + userIdFromPath+ " UNEQUAL");
-        Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.internalName);
+      if(!userIdFromPath.startsWith(user.getInternalName())){
+        Debug.println("Comparing "+user.getInternalName() + "==" + userIdFromPath+ " UNEQUAL");
+        Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.getInternalName());
         response.setStatus(403);
         response.getOutputStream().print("403 Forbidden (Wrong user id)");
         return;
       }
-      Debug.println("Comparing "+user.internalName + "==" + userIdFromPath+ " OK");
+      Debug.println("Comparing "+user.getInternalName() + "==" + userIdFromPath+ " OK");
     } catch (Exception e) {
       String message = "401 No user information provided: "+e.getMessage();
       response.setStatus(401);
@@ -738,9 +686,7 @@ public class OpenDAP {
 
     NetcdfFile ncFile = null;
     try {
-      if(queryString!=null){
-        //if(Debugger.DebugOpenDAP)Debug.println("Path: "+path+" QueryString: ["+queryString+"]");
-      }
+
       
       if(path.endsWith(".dds")){
         response.setContentType("text/plain");

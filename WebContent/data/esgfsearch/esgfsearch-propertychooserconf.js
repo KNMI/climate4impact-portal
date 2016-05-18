@@ -282,3 +282,17 @@ var esgfsearch_pc_variables={
     }
   ]
 };
+
+
+
+var esgfsearch_pc_time_start_stop={
+  "onlyquickselect":true
+};
+
+var esgfsearch_pc_bbox={
+  "onlyquickselect":true
+};
+
+var esgfsearch_pc_query={
+  "onlyquickselect":true
+};

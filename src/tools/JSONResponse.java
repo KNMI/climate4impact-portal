@@ -85,6 +85,9 @@ public class JSONResponse {
   }
 
   public void setException(String string, Exception e2) {
+    setException(string,e2,null);
+  }
+  public void setException(String string, Exception e2, String url) {
     if(e2.getClass() == tools.HTTPTools.WebRequestBadStatusException.class){
       this.statusCode = ((tools.HTTPTools.WebRequestBadStatusException)e2).getStatusCode();
     }
@@ -93,6 +96,9 @@ public class JSONResponse {
       error.put("error", string);
       error.put("statuscode", this.statusCode);
       error.put("exception", e2.getMessage());
+      if(url!=null){
+        error.put("url", url);
+      }
     } catch (JSONException e) {
       e.printStackTrace();
     }

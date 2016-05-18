@@ -23,10 +23,10 @@ import tools.MyXMLParser;
 import tools.MyXMLParser.XMLElement;
 
 
-public class OpenDAPViewer {
+public class OpendapViewer {
  
   String cacheLocation = null;
-  public OpenDAPViewer(String cacheLocation) {
+  public OpendapViewer(String cacheLocation) {
 
     this.cacheLocation = cacheLocation;
   }
@@ -39,7 +39,7 @@ public class OpenDAPViewer {
     /* Check if we really have an URL here and not a localfile */
     String prefixCheck = requestStr.toLowerCase();
     if(prefixCheck.startsWith("http")==false&&prefixCheck.startsWith("dods")==false){
-      jsonResponse.setErrorMessage("Invalid OpenDAP URL given, no HTTP or DODS prefix",500);
+      jsonResponse.setErrorMessage("Invalid opendap URL given, no HTTP or DODS prefix",500);
       return jsonResponse;
     }
     HttpSession session = request.getSession();

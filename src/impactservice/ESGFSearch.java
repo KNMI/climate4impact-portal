@@ -667,7 +667,7 @@ public class ESGFSearch {
                 if(arrName.equals("url")){
                   product.put("url",arrValue);
                   boolean opendapFound = false;
-                  String HTTPServer = null;
+                  String httpserver = null;
                   for(int l=0;l<arr.get(k).getElements().size();l++){
                     String arrValue2=arr.get(k).getElements().get(l).getValue();
                     String dapURL = arrValue2.split("\\|")[0];
@@ -678,14 +678,14 @@ public class ESGFSearch {
                     
                     
                     if(arrValue2.toLowerCase().indexOf("application/xml")>0){product.put("catalogURL",arrValue2.split("\\|")[0]);}
-                    if(arrValue2.toLowerCase().indexOf("|opendap")>0){product.put("OPENDAP",dapURL);opendapFound = true;}
-                    if(arrValue2.toLowerCase().indexOf("|gridftp")>0){product.put("GridFTP",arrValue2.split("\\|")[0]);}
-                    if(arrValue2.toLowerCase().indexOf("|httpserver")>0){HTTPServer = arrValue2.split("\\|")[0]; product.put("HTTPServer",HTTPServer);}
+                    if(arrValue2.toLowerCase().indexOf("|opendap")>0){product.put("opendap",dapURL);opendapFound = true;}
+                    if(arrValue2.toLowerCase().indexOf("|gridftp")>0){product.put("gridftp",arrValue2.split("\\|")[0]);}
+                    if(arrValue2.toLowerCase().indexOf("|httpserver")>0){httpserver = arrValue2.split("\\|")[0]; product.put("httpserver",httpserver);}
                     
                   }
                   if(!opendapFound){
-                    if(HTTPServer!=null){
-                      product.put("OPENDAP",HTTPServer.replace("/fileserver/","/dodsC/")+"#derivedfromhttpserver");
+                    if(httpserver!=null){
+                      product.put("opendap",httpserver.replace("/fileserver/","/dodsC/")+"#derivedfromhttpserver");
                     }
                   }
                 }

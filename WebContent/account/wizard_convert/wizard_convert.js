@@ -7,7 +7,6 @@
           service:c4iconfigjs.impactservice,
           adagucservice:c4iconfigjs.adagucservice,
           adagucviewer:c4iconfigjs.adagucviewer,
-          //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
           query:resource,
           dialog:true
         });   
@@ -20,7 +19,7 @@
     
     
     //var WPSURL = "http://bhw485.knmi.nl:8080/cgi-bin/wps.cgi?";
-    var resource = "Please select a file...";//'http://opendap.knmi.nl/knmi/thredds/dodsC/e-obs_0.25regular/tg_0.25deg_reg_v11.0.nc';
+    var resource = "Please select a file...";
     
     var urlvars = getUrlVars();
     if(urlvars.resource){
@@ -30,8 +29,6 @@
     
     
     var activeLayer = "";
-    //resource = 'http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/storyline_urbanheat/clipcstorylinedata/test/RADNL_OPER_R___25PCPRR_L3__20120827T171000_20120827T171500_0001.nc';
-    //resource = 'http://msgcpp-ogc-realtime.knmi.nl/thredds-rt/dodsC/REALTIME_SEVIR_OPER_R___MSGCPP__L2/SEVIR_OPER_R___MSGCPP__L2__20150520T120000_20150520T121500_0001.nc';
     var rootElementId = "first";
     var coordinateRounder = function(original){
       return Math.round(original*1000)/1000;
@@ -252,7 +249,7 @@
                     $("#"+rootElementId).find(".stopdate").first().val() +"/"+
                     $("#"+rootElementId).find(".timeresolution").first().val();
                     
-      //service=processor&request=executeProcessor&id=WCS_subsetting&dataInputs=[crs=EPSG:4326;dates=2076-01-01T12:00:00Z/2076-02-01T12:00:00Z/P1D;resy=1;resource=http://opendap.knmi.nl/knmi/thredds/dodsC/IS-ENES/TESTSETS/tasmax_day_EC-EARTH_rcp26_r8i1p1_20760101-21001231.nc;outputFormat=netcdf;resx=1;outputFileName=wcs.nc;bbox=-180,-90,180,90;coverage=tasmax]
+
         wps.execute('WCS_subsetting',
                     {'dates':dates,
                       'resx':$("#"+rootElementId).find(".resolutionx").val(),
@@ -538,8 +535,9 @@
     var showBasketWidget= function(){
 	  console.log("showBasketWidget");
       basketWidget.show(function(selectedNodes) {
+        //console.log(selectedNodes);
 	    for ( var j = 0; j < selectedNodes.length && j<1; j++) {
-          setNewResource(selectedNodes[j].data.dapurl);
+          setNewResource(selectedNodes[j].dapurl);
 	    }
 	    return true;
 	  });

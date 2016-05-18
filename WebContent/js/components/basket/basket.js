@@ -129,7 +129,7 @@ var Basket = function(){
           basketWidget.reload();
         }
       }catch(e){
-        console.log(e);
+       //console.log(e);
       }
 		};
 		 //alert(dump(options));

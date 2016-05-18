@@ -29,7 +29,7 @@ public class HandleAdminRequests {
     }
     
     if(user != null){
-      Debug.println("User: "+user.internalName);
+      Debug.println("User: "+user.getInternalName());
       if(user.hasRole("admin")==false){
         jsonResponse.setErrorMessage("Unauthorized", 403);
       }

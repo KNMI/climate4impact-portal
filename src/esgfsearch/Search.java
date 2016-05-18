@@ -80,13 +80,53 @@ public class Search {
        KVPKey kvp = HTTPTools.parseQueryString(query);
        SortedSet<String> kvpKeys = kvp.getKeys();
        for(String k : kvpKeys){
-         //Debug.println("KEY "+k+" = "+kvp.getValue(k));
-         for(String value : kvp.getValue(k)){
-           try {
-            esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
-          } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-          }
+         if(!k.equalsIgnoreCase("time_start_stop")&&!k.equalsIgnoreCase("bbox")&&!k.equalsIgnoreCase("query")){
+           //Debug.println("KEY "+k+" = "+kvp.getValue(k));
+           for(String value : kvp.getValue(k)){
+             try {
+              esgfQuery = esgfQuery+k+"="+URLEncoder.encode(value,"UTF-8")+"&";
+            } catch (UnsupportedEncodingException e) {
+              e.printStackTrace();
+            }
+           }
+         }else{
+           if(k.equalsIgnoreCase("time_start_stop")){
+             String timeStartStopValue = kvp.getValue(k).firstElement();
+             if(timeStartStopValue.length()==9){
+               String [] timeStartStopValues = timeStartStopValue.split("/");
+               if(timeStartStopValues.length==2){
+                 int yearStart = Integer.parseInt(timeStartStopValues[0]);
+                 int yearStop = Integer.parseInt(timeStartStopValues[1]);
+                 if(yearStart>=0&&yearStart<=9999&&yearStop>=0&&yearStop<=9999){
+                   esgfQuery += "start="+String.format("%04d", yearStart)+"-01-01T00:00:00Z&";
+                   esgfQuery += "end="+String.format("%04d", yearStop)+"-01-01T00:00:00Z&";
+                   
+                 }
+               }
+             }
+           }
+         }
+         if(k.equalsIgnoreCase("bbox")){
+           String bboxValue = kvp.getValue(k).firstElement();
+           if(bboxValue.length()>3){
+             String[] bboxValueItems =bboxValue.split(",");
+             if(bboxValueItems.length == 4){
+               esgfQuery += "bbox=%5B"+bboxValue+"%5D&";
+             }
+           }
+         
+         }
+         if(k.equalsIgnoreCase("query")){
+           String freeTextValue = kvp.getValue(k).firstElement();
+           if(freeTextValue.length()>0){
+             try {
+              esgfQuery += "query="+URLEncoder.encode(freeTextValue,"UTF-8")+"&";
+            } catch (UnsupportedEncodingException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+           }
+         
          }
        }
     }
@@ -97,17 +137,18 @@ public class Search {
     
     String XML = DiskCache.get(cacheLocation, identifier+".xml", 5*60);
     if(XML == null){
+      String url = searchEndPoint+esgfQuery;
       try {
-        XML = HTTPTools.makeHTTPGetRequest(new URL(searchEndPoint+esgfQuery));
+        XML = HTTPTools.makeHTTPGetRequest(new URL(url));
         DiskCache.set_2(cacheLocation,identifier+".xml",XML);
       } catch (MalformedURLException e2) {
-        r.setException("MalformedURLException",e2);
+        r.setException("MalformedURLException",e2,url);
         return r;
       } catch (WebRequestBadStatusException e2) {
-        r.setException("WebRequestBadStatusException",e2);
+        r.setException("WebRequestBadStatusException",e2,url);
         return r;
       } catch (IOException e2) {
-        r.setException("IOException",e2);
+        r.setException("IOException",e2,url);
         return r;
       }
     }
@@ -166,9 +207,15 @@ public class Search {
         }
       }
       
+      
+      facetsObj.put("time_start_stop",new JSONArray("[1850%2F1950]"));
+      facetsObj.put("bbox",new JSONArray("[0]"));
+      facetsObj.put("query",new JSONArray("[0]"));
     } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    
     
     JSONObject result = new JSONObject();
     JSONObject responseObj = new JSONObject();
@@ -470,40 +517,7 @@ public class Search {
   
   
 
-  private class MakeFlat{
-    JSONArray result = null;
-   
-    JSONArray makeFlat(JSONArray catalog) throws JSONException{
-      result = new JSONArray();
-    
-      _rec(catalog);
-      return result;
-      
-    }
 
-    void _rec(JSONArray catalog) throws JSONException{
-      for(int i=0;i<catalog.length();i++){
-        JSONObject a=catalog.getJSONObject(i);
-        JSONObject b = new  JSONObject();
-        JSONArray names = a.names();
-        for (int j=0;j<names.length();j++){
-          String key = names.getString(j);
-          if(key.equals("children")==false){
-            b.put(key, a.get(key));
-            //Debug.println(a.getString(key));
-          }
-         
-        }
-        result.put(b);
-        
-        try{
-          _rec(a.getJSONArray("children"));
-        } catch (JSONException e) {
-         
-        }
-      }
-    }
-  }
   public JSONResponse addtobasket(String query,HttpServletRequest request) {
     JSONResponse result = new JSONResponse(request);
     JSONObject jsonresult = new JSONObject();
@@ -548,11 +562,7 @@ public class Search {
             JSONArray files = THREDDSCatalogBrowser.browseThreddsCatalog(request,url, variableFilter,null);
             //Debug.println(files.toString());
             catalogAggregation.put(files.getJSONObject(0));
-            
-           
-            
-            
-            MakeFlat b = new MakeFlat();
+            THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
             JSONArray flat = b.makeFlat(files);
             
             Debug.println("Found "+flat.length());
@@ -563,8 +573,8 @@ public class Search {
               String fileSize = "";
               JSONObject a=flat.getJSONObject(i);
   
-              try{openDAPURL = a.getString("OPENDAP");}catch (JSONException e) {}
-              try{httpURL = a.getString("HTTPServer");}catch (JSONException e) {}
+              try{openDAPURL = a.getString("opendap");}catch (JSONException e) {}
+              try{httpURL = a.getString("httpserver");}catch (JSONException e) {}
   
               try{fileSize = a.getString("fileSize");   totalFileSize=totalFileSize + Long.parseLong(fileSize);}catch (Exception e) {}
              

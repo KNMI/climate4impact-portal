@@ -94,7 +94,7 @@ var FileViewerInterface = function(options){
 
       basket.postIdentifiersToBasket({
         id : id,
-        OPENDAP : url
+        opendap : url
       });
     }
   };
@@ -332,9 +332,9 @@ var FileViewerInterface = function(options){
           '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.prettyquery)+'&service=WCS&request=GetCapabilities">WCS</a>');
         serviceOptions.append(WCS);
         
-        var OpenDAP = $('<span />').addClass('c4i-fileviewer-opendap').html(
-            '<a target="_blank" href="'+options.prettyquery+'.das">OpenDAP</a>');
-        serviceOptions.append(OpenDAP);
+        var opendap = $('<span />').addClass('c4i-fileviewer-opendap').html(
+            '<a target="_blank" href="'+options.prettyquery+'.das">opendap</a>');
+        serviceOptions.append(opendap);
         
         var variable = data[v].variable;
         
@@ -352,7 +352,7 @@ var FileViewerInterface = function(options){
           event.stopPropagation();
         });
         
-        OpenDAP.attr('onclick','').click(function(event){
+        opendap.attr('onclick','').click(function(event){
           event.stopPropagation();
         });
         

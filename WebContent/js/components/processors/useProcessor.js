@@ -524,11 +524,12 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 			//layout : 'fit',
 			frame : true,
 			width : 'auto',
-			margin : 4,
+			padding:4,
+			margin : '0 0 6 0',
 			autoScroll : false,
 			height : 'auto',
 			border : false,
-			collapsible : true,
+			//collapsible : true,
 			collapsed : false,
 			hideHeaders : true,
 			items:[combo]
@@ -603,14 +604,20 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 					iconCls : 'button_basket',
 					tooltip : 'Use an item from your basket...',
 					handler : function(grid, rowIndex, colIndex) {
+					  
 						basketWidget.show(function(selectedNodes) {
+						  if(selectedNodes.length == 0){
+						    alert("No files with opendap enabled found.");
+						    return;
+						  }
+						  console.log(selectedNodes);
 							var first = true;
 							for ( var j = 0; j < selectedNodes.length || j < 1; j++) {
 								if(first == true){
 									first = false;
-									grid.getStore().getAt(rowIndex).set('value',selectedNodes[j].data.dapurl);
+									grid.getStore().getAt(rowIndex).set('value',selectedNodes[j].dapurl);
 								}else{
-									grid.getStore().insert(grid.getStore().getCount()-1,{'value':selectedNodes[j].data.dapurl,'enabled':true});
+									grid.getStore().insert(grid.getStore().getCount()-1,{'value':selectedNodes[j].dapurl,'enabled':true});
 								}
 							}
 							return true;
@@ -644,11 +651,11 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 			xtype : 'grid',
 			frame : true,
 			width : 'auto',
-			margin : 4,
+			margin : '0 0 6 0',
 			autoScroll : false,
 			height : 'auto',
 			border : false,
-			collapsible : true,
+			//collapsible : true,
 			collapsed : false,// ,id:id,
 			hideHeaders : true,
 			store : store,
@@ -677,7 +684,7 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 											|| j < 1; j++) {
 										if (list.length > 0)
 											list += ",";
-										list += selectedNodes[j].data.dapurl;
+										list += selectedNodes[j].dapurl;
 									}
 									grid.getStore().getAt(rowIndex).set('value',
 											list);
@@ -805,7 +812,7 @@ var createComplexDataGrid = function(input, preConfiguredInput) {
 		autoScroll : false,
 		height : 'auto',
 		border : false,
-		collapsible : true,
+		//collapsible : true,
 		collapsed : false,// ,id:id,
 		hideHeaders : true,
 		store : store,
@@ -842,7 +849,7 @@ var createComplexDataGrid = function(input, preConfiguredInput) {
 										|| j < 1; j++) {
 									if (list.length > 0)
 										list += ",";
-									list += selectedNodes[j].data.dapurl;
+									list += selectedNodes[j].dapurl;
 								}
 								grid.getStore().getAt(rowIndex).set('value',
 										list);
@@ -925,7 +932,7 @@ var createBoundingBoxGrid = function(input, preConfiguredInput){
 			autoScroll : false,
 			height : 'auto',
 			border : false,
-			collapsible : true,
+			//collapsible : true,
 			collapsed : false,// ,id:id,
 			hideHeaders : true,
 			items:[{
@@ -1083,7 +1090,9 @@ var wpsProcessorDetails = function(id) {
 
 		var wpsstart = Ext.getCmp('wpsstart');
 		;
-		var html = '<table class="wps">';
+		var html ='<h1>Processor '+json.ProcessDescriptions.ProcessDescription.Title.value+'</h1>';
+		  
+		html+='<table class="c4i-wpsuseprocessor-table">';
 		html += '<tr><td>Title:</td><td>'
 				+ json.ProcessDescriptions.ProcessDescription.Title.value
 				+ '</td></tr>';

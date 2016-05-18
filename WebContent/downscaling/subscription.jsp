@@ -15,7 +15,7 @@
 	  	out.print("<p> Dear user,</p>");
 	  	out.print("<p> You are not subscribed to the Downscaling Service. By Clicking the following button you accept the <a href=''>Terms of Use</a> of this service");
    		out.print("<form name='subscription-form' action='../DownscalingService/subscribe' method='post'>");
- 		out.print("<input type='text' name='username' value='"+user.internalName+"' hidden></input>");
+ 		out.print("<input type='text' name='username' value='"+user.getInternalName()+"' hidden></input>");
    		out.print("<input type='text' name='openID' value='"+user.getOpenId()+"' hidden></input>");
 	  	out.print("<input type='text' name='email'value='"+user.getEmailAddress()+"' hidden></input>");
 	  	out.print("<button name='submit' type='submit'>Subscribe</button>");

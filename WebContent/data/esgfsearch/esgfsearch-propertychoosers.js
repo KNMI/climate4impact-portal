@@ -151,3 +151,244 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
 
 
 
+
+var TimeChooser = function(config){
+  this.config = config;
+}
+
+TimeChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
+
+TimeChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+  var config = this.config;
+  var k = new ESGFSearch_KVP(query);
+  var selectedFacets = k.getKeyValues();
+  var selectedPropertiesForFacet = selectedFacets[facetName];
+  var foundProperties = 0;
+
+  var html='<div class="c4i-esgfsearch-tss">'+
+  '<table>'+
+  '<tr>'+
+  '  <td><span class="c4i-esgfsearch-tss-text">Year from </span></td>'+
+  '  <td><input  class="c4i-esgfsearch-tss-timestart c4i-esgfsearch-tss-input" type="text" placeholder="YYYY"/></td>'+
+//   '</tr>'+
+//   '<tr>'+
+  '  <td><span class="c4i-esgfsearch-tss-text"> till</span></td>'+
+  '  <td><input  class="c4i-esgfsearch-tss-timestop c4i-esgfsearch-tss-input" type="text" placeholder="YYYY"/></td>'+
+  '<td>'+
+  '<button class="c4i-esgfsearch-tss-searchbutton">Search</button>'+
+  '<button class="c4i-esgfsearch-tss-clearbutton">X</button>'+
+  '</td>'+
+  '</tr>'+
+  '</table>'+
+  
+  '</div>';
+
+  parentEl.find(".esgfsearch-ppc").html(html);
+  
+  var searchStartStop = function (){
+    var valStart = parentEl.find(".c4i-esgfsearch-tss-timestart").val();
+    var valStop = parentEl.find(".c4i-esgfsearch-tss-timestop").val();
+    var dateQuery= valStart+"/"+valStop;
+    if(dateQuery.length==9&&valStart.length==4&&valStop.length==4){
+      selectPropertyCallback("time_start_stop",dateQuery);  
+    }else{
+      alert("Please enter Years in the format YYYY.<br/><br/>For example 1950 till 2150.");
+    }
+  };
+  
+  /* Search dates */
+  parentEl.find(".c4i-esgfsearch-tss-searchbutton").button().click(searchStartStop);
+  
+  /* Clear dates */
+  parentEl.find(".c4i-esgfsearch-tss-clearbutton").button().click(function(){
+    selectPropertyCallback("time_start_stop");  
+  });
+  
+  /* OnEnter behaviour */
+  parentEl.find(".c4i-esgfsearch-tss-input").keypress(function(event) {
+    if (event.keyCode == 13) {
+        searchStartStop();
+    }
+  });
+  
+  
+  /* Filling inputs based on query */
+  var startStopValue;
+  var start="";
+  var stop="";
+  if(selectedFacets["time_start_stop"]){
+    var input = selectedFacets["time_start_stop"][0];
+    startStopValue = (decodeURIComponent(input));
+  }
+  if(startStopValue){
+    if(startStopValue.length==9){
+      if(startStopValue.split("/").length==2){
+        start=startStopValue.split("/")[0];
+        stop=startStopValue.split("/")[1];
+      }else{
+      }
+    }
+  }
+  parentEl.find(".c4i-esgfsearch-tss-timestart").val(start);
+  parentEl.find(".c4i-esgfsearch-tss-timestop").val(stop);
+  return foundProperties;
+};
+
+
+var AreaChooser = function(config){
+  this.config = config;
+}
+
+AreaChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
+
+AreaChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+  var config = this.config;
+  var k = new ESGFSearch_KVP(query);
+  var selectedFacets = k.getKeyValues();
+  var selectedPropertiesForFacet = selectedFacets[facetName];
+  var foundProperties = 0;
+
+  var html='<div class="c4i-esgfsearch-bbox">'+
+  'Search box in degrees. Searches for data overlapping the box.<br/><br/>'+
+  '<table>'+
+  '<tr>'+
+  '  <td></td>'+
+  '  <td><input  class="c4i-esgfsearch-bbox-north c4i-esgfsearch-bbox-input" type="text" placeholder="North"/></td>'+
+  '  <td></td>'+
+  '</tr>'+
+  '<tr>'+
+  '  <td><input  class="c4i-esgfsearch-bbox-west c4i-esgfsearch-bbox-input" type="text" placeholder="West"/></td>'+
+  '  <td></td>'+
+  '  <td><input  class="c4i-esgfsearch-bbox-east c4i-esgfsearch-bbox-input" type="text" placeholder="East"/></td>'+
+  '</tr>'+
+  '<tr>'+
+  '  <td></td>'+
+  '  <td><input  class="c4i-esgfsearch-bbox-south c4i-esgfsearch-bbox-input" type="text" placeholder="South"/></td>'+
+  '  <td></td>'+
+  '</tr>'+
+  '</table><br/>'+
+  '<button class="c4i-esgfsearch-bbox-searchbutton">Search</button>'+
+  '<button class="c4i-esgfsearch-bbox-clearbutton">X</button>'+
+  '</div>';
+
+  parentEl.find(".esgfsearch-ppc").html(html);
+  
+  var searchGeoBox = function (){
+    var north = parentEl.find(".c4i-esgfsearch-bbox-north").val();
+    var west  = parentEl.find(".c4i-esgfsearch-bbox-west").val();
+    var east  = parentEl.find(".c4i-esgfsearch-bbox-east").val();
+    var south = parentEl.find(".c4i-esgfsearch-bbox-south").val();
+     if(north&&west&&east&&south){
+      selectPropertyCallback("bbox",west+","+south+","+east+","+north);  
+    }else{
+      alert("Please enter numbers for the geobox in degrees.");
+    }
+    
+  };
+  
+  /* Search geobox */
+  parentEl.find(".c4i-esgfsearch-bbox-searchbutton").button().click(searchGeoBox);
+  
+  /* Clear */
+  parentEl.find(".c4i-esgfsearch-bbox-clearbutton").button().click(function(){
+    selectPropertyCallback("bbox");  
+  });
+  
+  /* OnEnter behaviour */
+  parentEl.find(".c4i-esgfsearch-bbox-input").keypress(function(event) {
+    if (event.keyCode == 13) {
+        searchGeoBox();
+    }
+  });
+  
+  /* Filling inputs based on query */
+  
+  var north="";
+  var west="";
+  var east="";
+  var south="";
+  var bboxValue;
+  if(selectedFacets["bbox"]){
+    var input = selectedFacets["bbox"][0];
+    bboxValue = (decodeURIComponent(input));
+  }
+  if(bboxValue){
+      if(bboxValue.split(",").length==4){
+        west=bboxValue.split(",")[0];
+        south=bboxValue.split(",")[1];
+        east=bboxValue.split(",")[2];
+        north=bboxValue.split(",")[3];
+      }else{
+      }
+  }
+  parentEl.find(".c4i-esgfsearch-bbox-north").val(north);
+  parentEl.find(".c4i-esgfsearch-bbox-west").val(west);
+  parentEl.find(".c4i-esgfsearch-bbox-east").val(east);
+  parentEl.find(".c4i-esgfsearch-bbox-south").val(south);
+  
+  return foundProperties;
+};
+
+
+
+var FreeTextQueryChooser = function(config){
+  this.config = config;
+}
+
+FreeTextQueryChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
+
+FreeTextQueryChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
+  var config = this.config;
+  var k = new ESGFSearch_KVP(query);
+  var selectedFacets = k.getKeyValues();
+  var selectedPropertiesForFacet = selectedFacets[facetName];
+  var foundProperties = 0;
+
+  var html='<div class="c4i-esgfsearch-ftq">'+
+  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>'+
+  '<input  class="c4i-esgfsearch-ftq-freetext c4i-esgfsearch-ftq-input" type="text"/>'+
+  '<button class="c4i-esgfsearch-ftq-searchbutton">Search</button>'+
+  '<button class="c4i-esgfsearch-ftq-clearbutton">X</button>'+
+  '</div>';
+
+  parentEl.find(".esgfsearch-ppc").html(html);
+  
+  var searchFreeTextQuery = function (){
+     console.log("searchFreeTextQuery triggered");
+    var freeTextQuery = parentEl.find(".c4i-esgfsearch-ftq-freetext").val();
+    selectPropertyCallback("query",freeTextQuery);  
+  };
+  
+  /* Search free text */
+  parentEl.find(".c4i-esgfsearch-ftq-searchbutton").button().click(searchFreeTextQuery);
+  
+  /* Clear */
+  parentEl.find(".c4i-esgfsearch-ftq-clearbutton").button().click(function(){
+    selectPropertyCallback("query");  
+  });
+  
+  /* OnEnter behaviour */
+  parentEl.find(".c4i-esgfsearch-ftq-input").keypress(function(event) {
+    if (event.keyCode == 13) {
+      console.log("Enter triggered");
+        searchFreeTextQuery();
+    }
+  });
+ 
+  
+  /* Filling inputs based on query */
+  var freeTextQuery = "";
+
+  if(selectedFacets["query"]){
+    var input = selectedFacets["query"][0];
+    freeTextQuery = (decodeURIComponent(input));
+  }
+  if(freeTextQuery){
+    if(freeTextQuery.length<1){
+      freeTextQuery = "";
+    }
+  }
+  parentEl.find(".c4i-esgfsearch-ftq-input").val(freeTextQuery);
+  
+  return foundProperties;
+};
