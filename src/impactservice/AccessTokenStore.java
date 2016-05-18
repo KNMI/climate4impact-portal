@@ -118,6 +118,9 @@ public class AccessTokenStore {
       if(user.getOpenId()!=null){
         jsonObject.put("openid", ""+user.getOpenId());
       }
+      if(user.getEmailAddress()!=null){
+        jsonObject.put("email", ""+user.getEmailAddress());
+      }
       String currentDate = tools.DateFunctions.getCurrentDateInISO8601();
       jsonObject.put("creationdate", currentDate);
       jsonObject.put("notbefore", currentDate);
