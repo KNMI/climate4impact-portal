@@ -97,6 +97,8 @@ public class AccessTokenStore {
       try {
         long notAfterMillis = tools.DateFunctions.getMillisFromISO8601Date(notafter);
         long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
+        Debug.println("notAfterMillis-currentMillis:["+(notAfterMillis-currentMillis)+"]");
+        Debug.println("ageValidInSeconds           :["+ageValidInSeconds*1000+"]");
         if(notAfterMillis-currentMillis>ageValidInSeconds*1000){
           return a;
         }
