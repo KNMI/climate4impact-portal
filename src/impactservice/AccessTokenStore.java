@@ -120,6 +120,9 @@ public class AccessTokenStore {
       if(user.getOpenId()!=null){
         jsonObject.put("openid", ""+user.getOpenId());
       }
+      if(user.getEmailAddress()!=null){
+        jsonObject.put("email", ""+user.getEmailAddress());
+      }
       String currentDate = tools.DateFunctions.getCurrentDateInISO8601();
       jsonObject.put("creationdate", currentDate);
       jsonObject.put("notbefore", currentDate);
@@ -145,14 +148,6 @@ public class AccessTokenStore {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
-    try {
-      LoginManager.getCredential(user);
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
     return jsonObject;
   }
 
@@ -166,7 +161,7 @@ public class AccessTokenStore {
         
         String token = null;
       
-        token = checkIfTokenIsValid(param.getKey());
+        token = _checkIfTokenIsValid(param.getKey());
       
         if(token!=null){
           String userid = o.getString("userid");
@@ -196,7 +191,7 @@ public class AccessTokenStore {
     return tokenList;
   }
   
-  public static String checkIfTokenIsValid(String token){
+  private static String _checkIfTokenIsValid(String token){
     try {
       loadAccessTokens();
     } catch (JSONException e1) {
@@ -221,6 +216,11 @@ public class AccessTokenStore {
         if(notafterMillis<currentMillis){
           throw new AccessTokenHasExpired();
         }
+        //
+//        Debug.println("Token is valid, now check cert");
+//        ImpactUser user = LoginManager.getUser(a.getString("userid"), null);
+//        LoginManager.checkLogin(user);
+        
         return v;
       } catch (Exception e) {
         // TODO Auto-generated catch block
@@ -235,6 +235,7 @@ public class AccessTokenStore {
   }
 
   public static JSONObject checkIfTokenIsValid(HttpServletRequest request) throws AccessTokenIsNotYetValid, AccessTokenHasExpired {
+    Debug.println("Check if token is Valid");
     String pathInfo = request.getPathInfo();
     if(pathInfo!=null){
       String[] paths = pathInfo.split("/");
@@ -256,10 +257,20 @@ public class AccessTokenStore {
       
     
       try {
-        String a = AccessTokenStore.checkIfTokenIsValid(path);
-        if(a==null)return null;
-        return (JSONObject) new JSONTokener(a).nextValue();
+        String a = AccessTokenStore._checkIfTokenIsValid(path);
+        if(a==null){
+          Debug.println("[NOPE] Token is not Valid");
+          return null;
+        }
+        
+        JSONObject props = (JSONObject) new JSONTokener(a).nextValue();
+        String userID = props.getString("userid");
+        Debug.println("[OK] Token is Valid for user "+userID);
+        ImpactUser user = LoginManager.getUser(userID, null);
+        LoginManager.checkLogin(user);
+        return props;
       } catch (Exception e) {
+        Debug.println("[NOPE:EXECPTION] Token is not Valid");
       }
       
     }

@@ -104,9 +104,8 @@ public class LoginManager {
    *          User object with identifier and home directory set
    * @throws Exception
    */
-  synchronized static void getCredential(ImpactUser user)
-      throws Exception {
-
+  private synchronized static void _getCredential(ImpactUser user) throws Exception {
+    Debug.println("GetCredential");
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
       Debug.println("offline mode");
       return;
@@ -351,22 +350,22 @@ public class LoginManager {
     for (int j = 0; j < users.size(); j++) {
       if (users.get(j).getId().equals(userId)) {
         ImpactUser user = users.get(j);
-        user.setSessionInfo(request);
+        //user.setSessionInfo(request);
         // Debug.println("Found existing user "+userId);
         return user;
       }
     }
+    
     // The user was not found, so create a new user
     Debug.println("Creating new user object for " + userId);
     ImpactUser user = new ImpactUser(userId);
-    if(user.getOpenId()==null){
-      user.setOpenId((String) request.getSession().getAttribute(
-          "openid_identifier"));
-    }
+   
     users.add(user);
-    user.setSessionInfo(request);
+    
+    user.setAttributesFromHTTPRequestSession(request);
+    
     try {
-      checkLogin(userId, request);
+      checkLogin(user);
     } catch (Exception e) {
     }
 
@@ -379,20 +378,12 @@ public class LoginManager {
   }
 
   /**
-   * Called upon succesfull login, handles and checks user ID
+   * Called upon successful login, handles and checks user ID, reads settings into the user object from the users file.
    * 
    * @param session
    * @throws Exception
    */
-  public synchronized static void checkLogin(String userId,
-      HttpServletRequest request) throws Exception {
-
-    Debug.println("checkLogin " + userId);
-    if (userId == null) {
-      Debug.errprintln("No openIdIdentifier given");
-    }
-    ImpactUser user = getUser(userId, request);
-
+  public synchronized static void checkLogin(ImpactUser user) throws Exception {
     Debug.println("Check login " + user.getId());
 
     Debug.println("internalName = " + user.getInternalName());
@@ -412,55 +403,68 @@ public class LoginManager {
           "Unable to create credential for user, server misconfiguration:"
               + user.getId() + "\n" + e.getMessage());
     }
-
-    // Get email
-    try {
-      String emailAddress = (String) request.getSession().getAttribute(
-          "emailaddress");
+    
+    user.loadProperties();
+    
+    String certificate = user.getCertificate();
+    String loginMethod = user.getLoginMethod();
+    
+    if (certificate == null) {
+      /* Certificate is not set in user object: obtain from local proxy server */
+      boolean certNeedsRefresh = true;
       
-      if (emailAddress != null) {
-        if (emailAddress.length() > 0) {
-          user.setEmailAddress(emailAddress);
+      try{
+        _checkCertificate(user);
+        if(user.certificateValidityNotAfter!=-1){
+          Debug.println("GetCredential: checking validity notafter: "+user.certificateValidityNotAfter);
+          long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
+          long minValidityPeriodAfterMillis = 8*60*60*1000;
+//          Debug.println("currentMillis                     :["+currentMillis+"]");
+//          Debug.println("certificateValidityNotAfter       :["+user.certificateValidityNotAfter+"]");
+//          Debug.println("certificateValidityNotAfter min 8 :["+(user.certificateValidityNotAfter-(minValidityPeriodAfterMillis))+"]");
+          Debug.println("remaining H                       :["+(((user.certificateValidityNotAfter-minValidityPeriodAfterMillis)-currentMillis)/(1000*60*60))+"]");
+          if(user.certificateValidityNotAfter-minValidityPeriodAfterMillis>currentMillis){
+            Debug.println("Certificate is still valid");
+            certNeedsRefresh = false;
+          }
+        }
+      }catch(Exception e){
+        
+      }
       
-          Debug.println("Email: " + emailAddress);
+      user.setLoginInfo("Using " + loginMethod + ", credential retrieved via impactportal MyProxy.");
+      if(certNeedsRefresh){
+        Debug.println("Certificate not set, retrieving from MyProxy");
+        try {
+          _getCredential(user);
+          
+        } catch (Exception e) {
+          user.credentialError = true;
+          // e.printStackTrace();
+          user.setLoginInfo("Using " + loginMethod + ", unable to retrieve credential via impactportal MyProxy");
+          throw new Exception("Unable to get credential for user " + user.getId() + "\n" + e.getMessage());
         }
       }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    // Get Certificate
-    String certificate = (String) request.getSession().getAttribute(
-        "certificate");
-    String loginMethod = (String) request.getSession().getAttribute(
-        "login_method");
-    if (certificate == null) {
-
-      // Obtain from local proxy server
-      Debug.println("Certificate not set, retrieving from MyProxy");
-      try {
-        getCredential(user);
-        user.setLoginInfo("Using " + loginMethod
-            + ", credential retrieved via impactportal MyProxy.");
-      } catch (Exception e) {
-        user.credentialError = true;
-        // e.printStackTrace();
-        user.setLoginInfo("Using " + loginMethod
-            + ", unable to retrieve credential via impactportal MyProxy");
-        throw new Exception("Unable to get credential for user " + user.getId()
-            + "\n" + e.getMessage());
-      }
     } else {
+      /* Certificate file is set in user object, probably by OAuth2 login session: write it to the right place */
       Debug.println("Certificate set, writing to " + user.certificateFile);
       FileOutputStream out = new FileOutputStream(user.certificateFile);
       out.write(certificate.getBytes());
       out.close();
-      user.setLoginInfo("Using " + loginMethod
-          + ", credential retrieved via remote SLCS.");
+      user.setLoginInfo("Using " + loginMethod + ", credential retrieved via remote SLCS.");
     }
 
-    // Check certificate
+    // Check certificate and report CN and validity period
+    _checkCertificate(user);
+
+    createNCResourceFile(user);
+
+    user.saveProperties();
+    // createFontConfigFile(user);
+    user.configured = true;
+  }
+
+  private static void _checkCertificate(ImpactUser user) throws Exception {
     String SLCSX509Certificate = tools.Tools.readFile(user.certificateFile);
 
     X509Certificate cert = null;
@@ -469,18 +473,12 @@ public class LoginManager {
       cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
           SLCSX509Certificate.getBytes(StandardCharsets.UTF_8)));
       Date date = cert.getNotAfter();
-      user.setLoginInfo(" - " + user.getLoginInfo() + "\n - Valid till "
-          + date.toString() + ".\n - " + cert.getSubjectDN().toString());
-
+      user.setCertInfo("Valid till "+ date.toString() + ".\n - " + cert.getSubjectDN().toString());
+      user.certificateValidityNotAfter = date.getTime();
     } catch (CertificateException e) {
       throw new Exception("Unable to validate credential for user "
           + user.getId() + "\n" + e.getMessage());
     }
-
-    createNCResourceFile(user);
-
-    // createFontConfigFile(user);
-    user.configured = true;
   }
 
   /**
@@ -491,7 +489,7 @@ public class LoginManager {
    *          The user object
    * @throws IOException
    */
-  public synchronized static void createNCResourceFile(ImpactUser user)
+  private synchronized static void createNCResourceFile(ImpactUser user)
       throws IOException {
     // DebugConsole.println("createNCResourceFile for user "+user.id);
     /*

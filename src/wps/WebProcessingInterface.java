@@ -333,7 +333,12 @@ public class WebProcessingInterface {
     String creationTime = null;
     JSONObject data = new JSONObject();
    
+    try{
     statusLocation=wpsExecuteResponseDocument.get("wps:ExecuteResponse").getAttrValue("statusLocation");
+    }catch(Exception e){
+      Debug.errprintln("Unable to track job for user: statuslocation not set! Is this really started asynchronousely?");
+      return null;
+    }
     
     wpsExecuteResponseDocument.get("wps:ExecuteResponse").get("wps:Status").get("wps:ProcessAccepted");
     creationTime = wpsExecuteResponseDocument.get("wps:ExecuteResponse").get("wps:Status").getAttrValue("creationTime");

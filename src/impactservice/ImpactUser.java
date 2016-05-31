@@ -6,6 +6,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import tools.Debug;
 import tools.HTTPTools;
 import tools.Tools;
@@ -18,8 +22,11 @@ public class ImpactUser {
   private String id = null; // The unique ID of the user object
   private String internalName = null;
   private String usersDir = null;
-  private String loginInfo = null;
-  
+  private String loginInfo = null; /* String composed by checklogin function based on login params */
+  private String certInfo = null;
+  private String certificate = null;/* String is retrieved from a session set during OAuth2 login */
+  private String loginMethod = null;/* Set by the login method in the session */
+  public long certificateValidityNotAfter = -1;
   public String certificateFile = null;
   public boolean credentialError = false;
   public boolean configured = false;
@@ -42,8 +49,12 @@ public class ImpactUser {
     usersDir = _usersDir;
   }
   
-  public String getLoginInfo(){
-    return loginInfo;
+  public String getLoginAndCredentialInfo(){
+    if(loginInfo != null){
+      return loginInfo+"\n"+certInfo;
+    }else{
+      return "Cert info:"+"\n"+certInfo;
+    }
   }
 
 
@@ -166,6 +177,7 @@ public class ImpactUser {
 
   Map<Integer,UserSessionInfo> sessions = java.util.Collections.synchronizedMap(new HashMap<Integer, UserSessionInfo>());
   
+
   private void _addSessionId(int id, long creationTime,long accessTime) {
     UserSessionInfo i = sessions.get(id);
     if(i == null){i=new UserSessionInfo();sessions.put(id, i);}
@@ -182,17 +194,123 @@ public class ImpactUser {
   }
   
   
-  public void setSessionInfo(HttpServletRequest request){
-    try{
-      _addSessionId(request.getSession().hashCode(),request.getSession().getCreationTime(),request.getSession().getLastAccessedTime());
-    }catch(Exception e){
-      e.printStackTrace();
-    }
-  }
+//  public void setSessionInfo(HttpServletRequest request){
+//    try{
+//      _addSessionId(request.getSession().hashCode(),request.getSession().getCreationTime(),request.getSession().getLastAccessedTime());
+//    }catch(Exception e){
+//      e.printStackTrace();
+//    }
+//  }
   public void setLoginInfo(String loginMethod) {
     this.loginInfo = loginMethod;
   }
+  public void setCertInfo(String certInfo) {
+    this.certInfo = certInfo;
+    
+  }
   
+  public void setAttributesFromHTTPRequestSession(HttpServletRequest request) {
+    if(request == null){
+      return;
+    }
+    if(request.getSession()==null){
+      return;
+    }
+    if(getOpenId()==null){
+      String openid = (String) request.getSession().getAttribute("openid_identifier");
+      if(openid != null){
+        setOpenId(openid);
+      }
+    }
+  
+    certificate = (String) request.getSession().getAttribute("certificate");
+    loginMethod = (String) request.getSession().getAttribute("login_method");
+    
+    try {
+      String emailAddress = (String) request.getSession().getAttribute(
+          "emailaddress");
+      
+      if (emailAddress != null) {
+        if (emailAddress.length() > 0) {
+          setEmailAddress(emailAddress);
+      
+          Debug.println("Email: " + emailAddress);
+        }
+      }
+  
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  /* Returns The X509 credential is stored as string, not as file location */
+  public String getCertificate() {
+    return certificate;
+  } 
+  public String getLoginMethod() {
+    return loginMethod;
+  }
+  
+
+  /*Properties in a json file on disk can be loaded*/
+  public void loadProperties() {
+    Debug.println("loadProperties");
+    String userPropertiesFile = this.getWorkspace()+"/userprops.json";
+    try {
+      String data = tools.Tools.readFile(userPropertiesFile);
+      JSONObject searchResults =  (JSONObject) new JSONTokener(data).nextValue();
+      try {
+        this.openid = searchResults.getString("openid");
+      } catch (JSONException e) {
+      }
+      try {
+        this.emailAddress = searchResults.getString("email");
+      } catch (JSONException e) {
+      }
+      try {
+        this.certificateValidityNotAfter = searchResults.getLong("certificateValidityNotAfter");
+      } catch (JSONException e) {
+      }
+      
+    } catch (IOException e) {
+    } catch (JSONException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    } 
+    
+  }  
+  
+  /* Properties currently set in the user object can be written to a JSON file on disk 
+   * It saves currently:
+   * - email
+   * - openid
+   * - certificateValidityNotAfter
+   * */
+  
+  public void saveProperties() {
+    Debug.println("saveProperties");
+    String userPropertiesFile = this.getWorkspace()+"/userprops.json";
+    JSONObject userProps = new JSONObject();
+    
+    
+    try {
+      userProps.put("openid", this.openid);
+      userProps.put("email", this.emailAddress);
+      userProps.put("certificateValidityNotAfter", this.certificateValidityNotAfter);
+    } catch (JSONException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+    
+    try {
+      //Debug.println("Writing properties to " +userPropertiesFile);
+      tools.Tools.writeFile(userPropertiesFile, userProps.toString());
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   
   
  
