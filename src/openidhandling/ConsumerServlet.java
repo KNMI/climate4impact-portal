@@ -317,6 +317,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			//fetch.addAttribute("Email", "http://schema.openid.net/contact/email", true);
 			/* According to BADC openid this should be http://openid.net/schema/contact/internet/email instead of http://schema.openid.net/contact/email" */
 			fetch.addAttribute("email", "http://openid.net/schema/contact/internet/email", true);
+//			fetch.addAttribute("firstname", "http://openid.net/schema/namePerson/first", true);
+//			fetch.addAttribute("lastname", "http://openid.net/schema/namePerson/last", true);
+//			fetch.addAttribute("blabla2", "http://openid.net/schema/namePerson/middle", true);
 			
 
 			//sregReq.addAttribute("urn:esg:email:address",true);
@@ -333,6 +336,10 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 				fetch.addAttribute("email","http://openid.net/schema/contact/internet/email", false);
 				sregReq.addAttribute("email", false);
 			}
+//if ("1".equals(httpReq.getParameter("username"))) {
+//  fetch.addAttribute("username","http://openid.net/schema/namePerson/friendly", false);
+//  sregReq.addAttribute("username", false);
+//}
 //			if ("1".equals(httpReq.getParameter("fullname"))) {
 //				fetch.addAttribute("fullname",
 //						"http://schema.openid.net/contact/fullname", false);
