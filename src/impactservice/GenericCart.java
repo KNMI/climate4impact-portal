@@ -128,6 +128,7 @@ public class GenericCart {
       removeDataLocator(id[j]);
     }
   }
+  
   public synchronized void removeDataLocator(String id) {
     Debug.println("Removing "+id);
     try {
@@ -137,8 +138,10 @@ public class GenericCart {
       return;
     }
     Debug.println("Checking "+user.getDataDir()+"/"+id);
+    boolean isLocalFile = false;
     File file = new File(user.getDataDir()+"/"+id);
     if(file.exists()){
+      isLocalFile = true;
       if(file.isFile()){
         Debug.println("Deleting file "+file.getAbsolutePath());
         file.delete();
@@ -149,14 +152,32 @@ public class GenericCart {
         }
       }
     }
-    Iterator<DataLocator> itr = dataLocatorList.iterator();
-    while(itr.hasNext()) {
-      DataLocator element = itr.next(); 
-      if(element.id.equals(id)){
-        itr.remove();
+    if(isLocalFile == false){
+      boolean fileWasRemoved = false;
+     
+      Iterator<DataLocator> itr = dataLocatorList.iterator();
+      Debug.println("There are "+dataLocatorList.size() +" files");
+      while(itr.hasNext()) {
+        
+        DataLocator element = itr.next();
+        Debug.println("Checking "+element.id);
+        if(element.id.equals(id)){
+          Debug.println("Removing "+element.id);
+          try {
+            Debug.println("Checking "+element.getCartData().toString());
+          } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          itr.remove();
+          fileWasRemoved = true;
+        }
+      }
+      Debug.println("There are "+dataLocatorList.size() +" files");
+      if(fileWasRemoved && dataLocatorList.size()!=0){
+        saveToStore();
       }
     }
-    saveToStore();
   }
 
   public int getNumProducts(){
@@ -166,7 +187,7 @@ public class GenericCart {
   }
 
 
-  public void loadFromStore() throws Exception {
+  public synchronized void  loadFromStore() throws Exception {
     //Debug.println("Loading from store");
     String file=user.getWorkspace()+"/"+genericId+".xml";
     XMLElement catalogElement = new XMLElement();
@@ -191,7 +212,7 @@ public class GenericCart {
 
 
   }
-  public synchronized void saveToStore(){
+  private synchronized void saveToStore(){
     Debug.println("Saving to store");
     String file=user.getWorkspace()+"/"+genericId+".xml";
     String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
