@@ -40,10 +40,17 @@
 		if (user != null) {
 			String userNamePrompt="User name (OpenID):";
 			String autoCompleteAttr="";
-			if (user.getUserMyProxyService().contains("ceda.ac.uk")) {
-				userNamePrompt="CEDA User name:";
-				userNamePrefill="";
-				autoCompleteAttr="autocomplete=\"off\"";
+			Debug.println("user.getUserMyProxyService() = "+user.getUserMyProxyService());
+			if(user.getUserMyProxyService() == null){
+				session.setAttribute("message","Sorry! Fetching the url from the myproxyservice from the OpenID XML document has failed.");
+				response.sendRedirect(Home+"exception.jsp");
+				return;
+			}else{
+				if (user.getUserMyProxyService().contains("ceda.ac.uk")) {
+					userNamePrompt="CEDA User name:";
+					userNamePrefill="";
+					autoCompleteAttr="autocomplete=\"off\"";
+				}
 			}
 %>
   <jsp:include page="loginmenu.jsp" />

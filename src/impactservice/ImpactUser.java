@@ -272,6 +272,11 @@ public class ImpactUser {
       } catch (JSONException e) {
       }
       
+      try {
+        this.userMyProxyService = searchResults.getString("userMyProxyService");
+      } catch (JSONException e) {
+      }
+      
     } catch (IOException e) {
     } catch (JSONException e1) {
       // TODO Auto-generated catch block
@@ -297,6 +302,7 @@ public class ImpactUser {
       userProps.put("openid", this.openid);
       userProps.put("email", this.emailAddress);
       userProps.put("certificateValidityNotAfter", this.certificateValidityNotAfter);
+      userProps.put("userMyProxyService", this.userMyProxyService);
     } catch (JSONException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();

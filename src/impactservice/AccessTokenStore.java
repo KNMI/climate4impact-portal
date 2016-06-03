@@ -235,7 +235,7 @@ public class AccessTokenStore {
   }
 
   public static JSONObject checkIfTokenIsValid(HttpServletRequest request) throws AccessTokenIsNotYetValid, AccessTokenHasExpired {
-    Debug.println("Check if token is Valid");
+    //Debug.println("Check if token is Valid");
     String pathInfo = request.getPathInfo();
     if(pathInfo!=null){
       String[] paths = pathInfo.split("/");

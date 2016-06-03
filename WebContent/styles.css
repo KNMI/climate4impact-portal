@@ -1508,7 +1508,7 @@ div.tnimagetext {
 .alert-box {
 	color:#555;
 	border-radius:10px;
-	font-family:Tahoma,Geneva,Arial,sans-serif;font-size:11px;
+	font-family:Tahoma,Geneva,Arial,sans-serif;font-size:14px;
 	padding:10px 36px;
 	margin:15px 0px 15px 0px;
 	text-align: left;
@@ -1518,6 +1518,7 @@ div.tnimagetext {
 	text-transform:uppercase;
 }
 .error {
+	padding: 10px 10px 10px 60px;
 	background:#ffecec url('images/error.png') no-repeat 10px 50%;
 	border:1px solid #f5aca6;
 }
