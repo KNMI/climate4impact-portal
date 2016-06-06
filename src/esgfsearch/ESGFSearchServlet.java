@@ -108,6 +108,19 @@ public class ESGFSearchServlet extends HttpServlet {
           response.setContentType(jsonresponse.getMimeType());
           response.getOutputStream().print(jsonresponse.getMessage());
         }
+        if(mode.equalsIgnoreCase("getSearchResultAsJSON")){
+          JSONResponse jsonresponse = esgfSearch.getSearchResultAsJSON(query,request);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
+        if(mode.equalsIgnoreCase("getSearchResultAsCSV")){
+          String responseString = esgfSearch.getSearchResultAsCSV(query,request);
+          
+          response.setContentType("text/plain");
+          response.getOutputStream().print(responseString);
+        }
+        
       }
       
     } catch (Exception e) {

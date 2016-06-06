@@ -1,3 +1,40 @@
+var esgfsearch_colorscheme_multicolor = {
+  "background":"#000000",
+  "color1":"#00a8ec",
+  "color2":"#f58d00",
+  "color3":"#d32c2c",
+  "color4":"#dda606",
+  "color5":"#6b6b6b",
+  "color6":"#ffc808",
+  "color7":"#640f6c"
+  
+};
+
+var esgfsearch_colorscheme_gray = {
+  "background":"#C5C6CD",
+  "color1":"#6C6D6C",
+  "color2":"#6C6D6C",
+  "color3":"#6C6D6C",
+  "color4":"#6C6D6C",
+  "color5":"#6C6D6C",
+  "color6":"#6C6D6C",
+  "color7":"#6C6D6C"
+};
+
+
+var esgfsearch_colorscheme_blueblackwhite = {
+  "background":"#B5B6BD",
+  "color1":"#00a8ec",
+  "color2":"#f58d00",
+  "color3":"#c33c3c",
+  "color4":"#dda606",
+  "color5":"#6b6b6b",
+  "color6":"#cf9808",
+  "color7":"#540f7c"
+};
+
+var esgfsearch_currentcolorscheme = esgfsearch_colorscheme_blueblackwhite;
+
 var esgfsearch_pc_project={
    "tilewidth":"200px",
   "properties":[
@@ -5,22 +42,22 @@ var esgfsearch_pc_project={
       "name":"CMIP5",
       "longname":"Coupled Model Intercomparison Project Phase 5<br/>Long term global climate change runs",
       "shortname":"CMIP5",
-      "color":"#00a8ec"
+      "color":esgfsearch_currentcolorscheme.color1
     },{
       "name":"CORDEX",
       "longname":"Coordinated Regional Climate Downscaling Experiment<br/>Long term regional climate change runs",
       "shortname":"CORDEX",
-      "color":"#f58d00"
+      "color":esgfsearch_currentcolorscheme.color2
     },/*{
       "name":"specs",
       "longname":"Seasonal-to-decadal climate Prediction for the improvement of European Climate Services",
       "shortname":"SPECS",
-      "color":"#d32c2c"
+      "color":esgfsearch_currentcolorscheme.color3
     },*/{
         "name":"clipc",
         "longname":"Climate Information Platform for Copernicus",
         "shortname":"CLIPC",
-        "color":"#dda606"
+        "color":esgfsearch_currentcolorscheme.color4
       }
   ]
 };
@@ -32,27 +69,27 @@ var esgfsearch_pc_time_frequency={
       "name":"3hr",
       "longname":"Sampling frequency every 3 hours",
       "shortname":"3hr",
-      "color":"#00a8ec"
+      "color":esgfsearch_currentcolorscheme.color1
     },{
       "name":"6hr",
       "longname":"Sampling frequency every 6 hours",
       "shortname":"6hr",
-      "color":"#f58d00"
+      "color":esgfsearch_currentcolorscheme.color2
     },{
       "name":"day",
       "longname":"Daily sampling frequency",
       "shortname":"daily",
-      "color":"#d32c2c"
+      "color":esgfsearch_currentcolorscheme.color3
     },{
       "name":"mon",
       "longname":"Monthly sampling frequency",
       "shortname":"monthly",
-      "color":"#6b6b6b"
+      "color":esgfsearch_currentcolorscheme.color5
     },{
       "name":"year",
       "longname":"Yearly sampling frequency",
       "shortname":"yearly",
-      "color":"#ffc808"
+      "color":esgfsearch_currentcolorscheme.color6
     }
   ]
 };
@@ -65,7 +102,7 @@ var esgfsearch_pc_experiments={
     {
       "longname": "Historical",
       "shortname": "Historical",
-      "color":"#f58d00",
+      "color":esgfsearch_currentcolorscheme.color2,
       "children": [
         {
           "name": "historical",
@@ -76,7 +113,7 @@ var esgfsearch_pc_experiments={
     },{
       "longname": "Representative concentration pathway",
       "shortname": "RCP",
-      "color":"#00a8ec",
+      "color":esgfsearch_currentcolorscheme.color1,
       "children": [
         {
           "name": "rcp26",
@@ -108,7 +145,7 @@ var esgfsearch_pc_variables={
     {
       "longname": "Air Temperature",
       "shortname": "Temperature",
-      "color":"#00a8ec",
+      "color":esgfsearch_currentcolorscheme.color1,
       "children": [
         {
           "name": "tas",
@@ -135,7 +172,7 @@ var esgfsearch_pc_variables={
       "name": "pr",
       "longname": "Total Precipitation",
       "shortname": "Precipitation",
-      "color":"#f58d00",
+      "color":esgfsearch_currentcolorscheme.color2,
       "children": [ 
         {
           "name": "pr",
@@ -157,7 +194,7 @@ var esgfsearch_pc_variables={
     {
     
       "shortname": "Humidity",
-      "color":"#d32c2c",
+      "color":esgfsearch_currentcolorscheme.color3,
       "children": [
         {
           "name": "huss",
@@ -197,7 +234,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Wind",
-      "color":"#6b6b6b",
+      "color":esgfsearch_currentcolorscheme.color5,
       "children": [
         {
           "name": "sfcWind",
@@ -222,7 +259,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Radiation",
-      "color":"#ffc808",
+      "color":esgfsearch_currentcolorscheme.color6,
       "children":[
         {
           "name": "rsds",
@@ -257,7 +294,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Pressure",
-      "color":"#640f6c",
+      "color":esgfsearch_currentcolorscheme.color7,
       "children": [
         {
           "name": "ps",

@@ -159,19 +159,19 @@ public class HTTPTools extends HttpServlet {
   }
 
   
-  public static String makeHTTPGetRequest(String url)
+  public static String makeHTTPGetRequest(String url, int timeOutMs)
       throws WebRequestBadStatusException, IOException {
-    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,null);
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,null,timeOutMs);
   }
   
-  public static String makeHTTPGetRequestBasicAuth(String url,String basicAuthUserName,String basicAuthPassword)
+  public static String makeHTTPGetRequestBasicAuth(String url,String basicAuthUserName,String basicAuthPassword, int timeOutMs)
       throws WebRequestBadStatusException, IOException {
-    return _makeHTTPGetWithHeaderRequest(url,null,null,null,basicAuthUserName,basicAuthPassword,null);
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,basicAuthUserName,basicAuthPassword,null,timeOutMs);
   }
 
   
-  public static String makeHTTPGetRequestWithHeaders(String url,KVPKey key)throws WebRequestBadStatusException, IOException{
-    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,key);
+  public static String makeHTTPGetRequestWithHeaders(String url,KVPKey key, int timeOutMs)throws WebRequestBadStatusException, IOException{
+    return _makeHTTPGetWithHeaderRequest(url,null,null,null,null,null,key,timeOutMs);
   }
   
 //  public static String makeHTTPGetRequestWithHeadersX509(String url, String pemFile,
@@ -180,11 +180,11 @@ public class HTTPTools extends HttpServlet {
 //  }
   
   public static String makeHTTPGetRequestX509ClientAuthentication(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword)throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException{
-    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null,null,null);
+      String trustRootsFile, String trustRootsPassword, int timeOutMs)throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException{
+    return _makeHTTPGetWithHeaderRequest(url,pemFile,trustRootsFile,trustRootsPassword,null,null,null, timeOutMs);
   }
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
-      String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers)
+      String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers, int timeOutMs)
       throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException {
     String connectToURL = makeCleanURL(url);
     Debug.println("  Making GET: " + connectToURL);
@@ -240,10 +240,12 @@ public class HTTPTools extends HttpServlet {
         
       }
       
-      int timeout = 5; // seconds
+      if(timeOutMs <=0){
+        timeOutMs = 15000;
+      }
       HttpParams httpParams = httpclient.getParams();
-      HttpConnectionParams.setConnectionTimeout(httpParams, timeout * 1000); // http.connection.timeout
-      HttpConnectionParams.setSoTimeout(httpParams, timeout * 1000); // http.socket.timeout
+      HttpConnectionParams.setConnectionTimeout(httpParams, timeOutMs); // http.connection.timeout
+      HttpConnectionParams.setSoTimeout(httpParams, timeOutMs); // http.socket.timeout
       
       
       response = httpclient.execute(httpget);
@@ -534,8 +536,8 @@ public class HTTPTools extends HttpServlet {
     return items.get(0);
   }
 
-  public static String makeHTTPGetRequest(URL url) throws WebRequestBadStatusException, IOException {
-    return makeHTTPGetRequest(url.toString());
+  public static String makeHTTPGetRequest(URL url,int timeOutMs) throws WebRequestBadStatusException, IOException {
+    return makeHTTPGetRequest(url.toString(),timeOutMs);
     
   }
 

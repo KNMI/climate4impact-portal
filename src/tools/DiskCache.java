@@ -49,6 +49,7 @@ public class DiskCache  {
 //          Debug.println(fileCacheId.toString()+"("+createdHowManySecondsAgo+"<"+mustbeYoungerThanNSeconds+")");
 //        }
       }
+      Debug.println("Found "+diskCacheLocation+"/"+uniqueId);
       return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId);
     } catch (IOException e) {
     }
@@ -60,7 +61,7 @@ public class DiskCache  {
    * @param data The data to store
    * @param identifier The identifier of this string
    */
-  public static void set_2(String diskCacheLocation ,String identifier, String data){
+  public static void set(String diskCacheLocation ,String identifier, String data){
     identifier = identifier.replaceAll("\\?", "_");
     identifier = identifier.replaceAll("&", "_");
     identifier = identifier.replaceAll(":", "_");

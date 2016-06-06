@@ -31,6 +31,7 @@ import tools.DiskCache;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONResponse;
+import tools.JSONResponse.JSONResponseException;
 import tools.KVPKey;
 import tools.LockOnQuery;
 import tools.MyXMLParser;
@@ -38,6 +39,13 @@ import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
 public class Search {
+  private int maxAmountOfDataSetsInJSON = 250;
+  private int searchCacheTimeValiditySec = 10*60;
+  private int catalogContentsTimeValiditySec = 10*60;
+  private int catalogCheckerTimeValiditySec = 60*5;
+  private int catalogCheckerTimeOutMS = 2000;
+  private int searchGetTimeOutMS = 15000;
+  
   private String searchEndPoint = null;
   private String cacheLocation = null;
   private ExecutorService getCatalogExecutor = null;
@@ -135,12 +143,12 @@ public class Search {
     
     String identifier = "ESGFSearch.getFacets"+esgfQuery;
     
-    String XML = DiskCache.get(cacheLocation, identifier+".xml", 5*60);
+    String XML = DiskCache.get(cacheLocation, identifier+".xml",searchCacheTimeValiditySec);
     if(XML == null){
       String url = searchEndPoint+esgfQuery;
       try {
-        XML = HTTPTools.makeHTTPGetRequest(new URL(url));
-        DiskCache.set_2(cacheLocation,identifier+".xml",XML);
+        XML = HTTPTools.makeHTTPGetRequest(new URL(url),searchGetTimeOutMS);
+        DiskCache.set(cacheLocation,identifier+".xml",XML);
       } catch (MalformedURLException e2) {
         r.setException("MalformedURLException",e2,url);
         return r;
@@ -380,7 +388,8 @@ public class Search {
         r.setMessage("{\"message\":\"start checking\",\"ok\":\"busy\"}");
       }else{
         URLBeingChecked urlBeingChecked =  urlsBeingChecked.get((String)query);
-        if(urlBeingChecked.getCreationDate()+(1000*60*5)<tools.DateFunctions.getCurrentDateInMillis()){
+        
+        if(urlBeingChecked.getCreationDate()+(catalogCheckerTimeValiditySec*1000)<tools.DateFunctions.getCurrentDateInMillis()){
           urlsBeingChecked.remove(query);
           urlBeingChecked.response.cancel(true);
           Debug.println("Refiring "+query);
@@ -448,7 +457,8 @@ public class Search {
   
   public String getCatalog(String catalogURL,HttpServletRequest request) throws Exception{
   
-    String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, 5*60);
+
+    String response = DiskCache.get(cacheLocation, "dataset_"+catalogURL, catalogContentsTimeValiditySec);
     if(response!=null){
       //Debug.println("CATALOG FROM CACHE "+catalogURL);
       return response;
@@ -488,7 +498,7 @@ public class Search {
       
       
       
-      response = HTTPTools.makeHTTPGetRequest(catalogURL);
+      response = HTTPTools.makeHTTPGetRequest(catalogURL,catalogCheckerTimeOutMS);
       ISOK = true;
 //    } catch (WebRequestBadStatusException e) {
 //      Debug.println("CATALOG GET WebRequestBadStatusException");
@@ -510,7 +520,7 @@ public class Search {
       throw new Exception("Unable to GET catalog "+catalogURL+" : "+errorMessage);
     }
     //Debug.println("CATALOG GET SET");
-    DiskCache.set_2(cacheLocation, "dataset_"+catalogURL, response);
+    DiskCache.set(cacheLocation, "dataset_"+catalogURL, response);
     //Debug.println("CATALOG GET SET DONE");
     return response;
   }
@@ -518,24 +528,27 @@ public class Search {
   
 
 
-  public JSONResponse addtobasket(String query,HttpServletRequest request) {
-    JSONResponse result = new JSONResponse(request);
+  private JSONObject makeJSONFromSearchQuery(String query,HttpServletRequest request) throws JSONResponse.JSONResponseException {
+    
     JSONObject jsonresult = new JSONObject();
     try{
       //DOSTUFF
-      int searchLimit = 200;
+      
       LockOnQuery.lock(query,0);
-      JSONResponse r = _getFacetsImp(null,query,0,searchLimit);
+      JSONResponse r = _getFacetsImp(null,query,0,maxAmountOfDataSetsInJSON);
       LockOnQuery.release(query);
 
+      if(r.hasError()){
+       throw new JSONResponse.JSONResponseException(r);
+      }
       JSONObject searchResults =  (JSONObject) new JSONTokener(r.getMessage()).nextValue();
       long numFound = searchResults.getJSONObject("response").getLong("numfound");
       
-      if(numFound>searchLimit){
-        result.setErrorMessage("Too many results, maximum of "+searchLimit+" datasets allowed.", 200);
+      if(numFound>maxAmountOfDataSetsInJSON){
+        throw new JSONResponse.JSONResponseException("Too many results, maximum of "+maxAmountOfDataSetsInJSON+" datasets allowed.",200);
       }else{
         jsonresult.put("numDatasets", searchResults.getJSONObject("response").getLong("numfound"));
-        jsonresult.put("ok", "ok");
+        jsonresult.put("ok", "ok");//For client to check whether its all OK.
       
         
         KVPKey kvp = HTTPTools.parseQueryString(query);
@@ -555,9 +568,10 @@ public class Search {
         long totalFileSize = 0;
         JSONArray catalogAggregation = new JSONArray();
         for(int j=0;j<results.length();j++){
+          //Debug.println("---------- Converting catalog to json nr "+j+" ----------");
           try{
             String url = results.getJSONObject(j).getString("url");
-           
+        
        
             JSONArray files = THREDDSCatalogBrowser.browseThreddsCatalog(request,url, variableFilter,null);
             //Debug.println(files.toString());
@@ -565,7 +579,6 @@ public class Search {
             THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
             JSONArray flat = b.makeFlat(files);
             
-            Debug.println("Found "+flat.length());
             for(int i=0;i<flat.length();i++){
               
               String openDAPURL=null;
@@ -584,8 +597,18 @@ public class Search {
               
             }
           }catch(Exception e){
-            Debug.errprintln(j+"): "+results.getJSONObject(j).getString("id"));
-            Debug.printStackTrace(e);
+            Debug.errprintln("CATALOG Error for nr "+j+"): "+results.getJSONObject(j).getString("id"));
+            try{
+              JSONObject b = new JSONObject();
+              b.put("catalogurl", results.getJSONObject(j).getString("url"));
+              JSONArray childs = new JSONArray();
+              b.put("children", childs);
+              b.put("text", "undefined");
+              
+              catalogAggregation.put(b);
+            }catch(Exception e2){
+              Debug.printStackTrace(e2);
+            }
           }
         }
         jsonresult.put("query", query);
@@ -595,25 +618,147 @@ public class Search {
         jsonresult.put("cls", "folder");
         jsonresult.put("fileSize", totalFileSize);
         jsonresult.put("children", catalogAggregation);
+       
       }
       
      
-    }catch(Exception e){
-       result.setException("Unable to query", e);
+    }catch(JSONException e){
+      Debug.printStackTrace(e);
+      throw new JSONResponse.JSONResponseException("Unable to query",200);
     }
-    String message = jsonresult.toString();
-    
-    try {
-      ImpactUser user = LoginManager.getUser(request);
-      String dataDir = user.getDataDir();
-      tools.Tools.writeFile(dataDir+"/test.catalog", message);
+    return jsonresult;
+  }
+  
+  
+  public JSONResponse getSearchResultAsJSON(String query,HttpServletRequest request) {
+    JSONResponse result = new JSONResponse(request);
+    JSONObject jsonresult;
+  
+      try {
+        jsonresult = makeJSONFromSearchQuery(query,request);
+        result.setMessage(jsonresult);
+      } catch (JSONResponseException e) {
+        result.setException(e);
+      }
+     
+
+    return result;
+  }
+  
+  public String getSearchResultAsCSV(String query,HttpServletRequest request){
+    StringBuffer result = new StringBuffer();
+    int numdatasets = 0;
+    int numcatalogsfailed = 0;
+    int numopendap = 0;
+    int numgridftp=0;
+    int numhttpserver=0;
+    JSONObject jsonresult;
       
-    } catch (Exception e) {
-      e.printStackTrace();
+      try {
+        jsonresult = makeJSONFromSearchQuery(query,request);
+        
+        JSONArray catalogs = jsonresult.getJSONArray("children");
+        Debug.println("NR of catalogs:"+catalogs.length());
+        for(int j=0;j<catalogs.length();j++){
+          String catalogURL = null;
+          try{
+            catalogURL = catalogs.getJSONObject(j).getString("catalogurl");
+            for(int mode=0;mode<3;mode++){
+              String text = catalogs.getJSONObject(j).getString("text");
+              JSONArray files = catalogs.getJSONObject(j).getJSONArray("children");
+              
+              if(mode == 0){
+                if(files.length()>0){
+                  numdatasets++;
+                  result.append("catalog;");result.append(text);result.append(";");result.append(catalogURL);result.append("\n");
+                }else{
+                  throw new Exception("No records for this set.");
+                }
+              }
+              for(int i=0;i<files.length();i++){
+                
+                if(mode==0){
+                  //httpserver
+                  try{
+                    String file = files.getJSONObject(i).getString("httpserver");
+                    result.append("httpserver;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    numhttpserver++;
+                  }catch(Exception e){
+                  }
+                }else if(mode ==1){
+                
+                  //opendap
+                  try{
+                    String file = files.getJSONObject(i).getString("opendap");
+                    result.append("opendap;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    numopendap++;
+                  }catch(Exception e){
+                  }
+                }else if(mode==2){
+                  //gridftp
+                  try{
+                    String file = files.getJSONObject(i).getString("gridftp");
+                    result.append("gridftp;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    numgridftp++;
+                  }catch(Exception e){
+                    
+                  }
+                }
+              } 
+            }
+          }catch(Exception e){
+            Debug.errprintln(e.getMessage());
+            //Debug.printStackTrace(e);
+            numcatalogsfailed++;
+            if(catalogURL == null){
+              catalogURL = "undefined";
+            }
+            result.append("catalog_failed;");result.append("undefined");result.append(";");result.append(catalogURL);result.append("\n");
+          }
+        }
+        
+      } catch (JSONException e) {
+        return e.getMessage();
+      } catch (JSONResponseException e) {
+        return e.getMessage();
+      }
+     
+      
+    String header = "type;dataset;link\n";
+    header += "info;numdataset;"+numdatasets+"\n";
+    header += "info;numhttpserver;"+numhttpserver+"\n";
+    header += "info;numopendap;"+numopendap+"\n";
+    header += "info;numgridftp;"+numgridftp+"\n";
+    header += "info;numcatalogsfailed;"+numcatalogsfailed+"\n";
+    header += "info;query;"+query+"\n";
+    result.insert(0,header);
+    return result.toString();
+  }
+  
+  public JSONResponse addtobasket(String query,HttpServletRequest request) {
+    JSONResponse result = new JSONResponse(request);
+    
+    JSONObject jsonresult;
+    try {
+      jsonresult = makeJSONFromSearchQuery(query,request);
+      String message = jsonresult.toString();
+      
+      try {
+        ImpactUser user = LoginManager.getUser(request);
+        String dataDir = user.getDataDir();
+        tools.Tools.writeFile(dataDir+"/test.catalog", message);
+        
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      
+      
+      result.setMessage(message);
+    } catch (Exception e1) {
+      result.setException("Unable to make a file list from the search query.",e1);
     }
-    
-    
-    result.setMessage(message);
+
+
     return result;
   }
 

@@ -98,7 +98,7 @@ public class DrupalEditor {
 		    
 		String password = Configuration.DrupalConfig.getDrupalPassword();
 		String username = Configuration.DrupalConfig.getDrupalUserName();
-		String message=HTTPTools.makeHTTPGetRequestBasicAuth(contentsURL,username,password);
+		String message=HTTPTools.makeHTTPGetRequestBasicAuth(contentsURL,username,password,0);
 		
 		HttpragmentCache.put(contentsURL, new HttpFragmentObject(message,  Calendar.getInstance().getTimeInMillis()));
 		

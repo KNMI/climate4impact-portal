@@ -59,6 +59,9 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
   
   
   var main=$("<div class=\"esgfsearch-ppc-main\" ></div>");
+  main.css('background-color', esgfsearch_currentcolorscheme.background);
+
+
   for(var j=0;j<this.config.properties.length;j++){
     var enable = true;
     if(facetList){
@@ -110,6 +113,9 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
   var selectedPropertiesForFacet = selectedFacets[facetName];
   
   var main=$("<div class=\"esgfsearch-ppc-main\"></div>");
+  main.css('background-color', esgfsearch_currentcolorscheme.background);
+  
+  
   var foundProperties = 0;
   for(var j=0;j<this.config.properties.length;j++){
     
@@ -345,7 +351,7 @@ FreeTextQueryChooser.prototype.init = function(parentEl, facetName,facetList,que
   var foundProperties = 0;
 
   var html='<div class="c4i-esgfsearch-ftq">'+
-  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>'+
+  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>If you happen to know a property in the Solr metadata that gives an exact match, then you can search for it using "name:value" and just get the results of interest.<br/><br/>For example "drs_id:cmip5.output1.MPI-M.MPI-ESM-LR.abrupt4xCO2.day.atmos.cfDay.r1i1p1" will return results matching the drs_id.<br/><br/>'+
   '<input  class="c4i-esgfsearch-ftq-freetext c4i-esgfsearch-ftq-input" type="text"/>'+
   '<button class="c4i-esgfsearch-ftq-searchbutton">Search</button>'+
   '<button class="c4i-esgfsearch-ftq-clearbutton">X</button>'+

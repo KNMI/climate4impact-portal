@@ -77,7 +77,7 @@ var SearchInterface = function(options){
     "variable_long_name":"Variable long name",
     "time_start_stop":"Date",
     "bbox":"Geobox",
-    "query":"Text"
+    "query":"Free text"
   };
   
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
@@ -92,7 +92,7 @@ var SearchInterface = function(options){
  
   
   var propertyChooser = [];
-  var propertyTabMenu = "";
+  var propertyTabMenu = "quickmenu";
   
   /**
   * Class to make Ajax Calls which will complete in the same order as called; e.g. it blocks calls.
@@ -241,7 +241,7 @@ var SearchInterface = function(options){
   var _checkResponse = function(arg,ready){
   
     var setResult = function(arg,a){    
-      var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
+      var el = rootElement.find("span[name=\""+arg.id+"\"]");//.first();
       
       if(a.ok=="ok"){
     	  el.removeClass("c4i-esgfsearch-resultitem-checking");
@@ -353,7 +353,7 @@ var SearchInterface = function(options){
      // html+="<span  name=\""+data.response.results[r].id+"\">";
       html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">";
       
-      html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\" title=\"Expands this dataset and show its contents.\"></span>";
+      html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\" title=\"Expand this dataset and show its content.\"></span>";
       
       //Add catalog to Basket
       html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
@@ -427,6 +427,9 @@ var SearchInterface = function(options){
       pagination +="<span class=\"c4i-esgfsearch-paginator-pagenrsplitter c4i-esgfsearch-noselect\" name=\""+(numPages)+"\">"+(numPages)+"</span>";
     }
     pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"next\">Next &raquo;</span>";
+    pagination += "<span class=\"c4i-esgfsearch-paginator-export\">";
+    pagination +="<span class=\"c4i-esgfsearch-paginator-pagenr c4i-esgfsearch-noselect\" name=\"export\" title=\"Export the search query as CSV. All files within datasets are expanded.\">Export to CSV</span>";
+    pagination += "</span>";
     pagination += "</span>";
     
     html=pagination+html+pagination;
@@ -452,6 +455,21 @@ var SearchInterface = function(options){
       }else if(name == "next"){
         currentPage++;
         if(currentPage>numPages) currentPage =numPages;
+      }else if(name == "export"){
+        if(data.response.numfound>200){
+          alert("<h2>Please reduce the amount of results</h2>At most 200 datasets are allowed for exporting. <br/></br>Please drill down your search and try again");
+          return;
+        }
+        
+        var url = impactESGFSearchEndPoint+"service=search&request=getSearchResultAsCSV&query="+encodeURIComponent(query);
+        var win = window.open(url, '_blank');
+        if (win) {
+            //Browser has allowed it to be opened
+            win.focus();
+        } else {
+            //Browser has blocked it
+            alert('Please allow popups for this website');
+        }
       }else{
         currentPage = name;
         
@@ -575,6 +593,8 @@ var SearchInterface = function(options){
     showFilters();
   };
   
+  
+  
   /* Generate the propertylist for selected facet */
   var generatePropertyListSelector = function(facetList,facetName){
     if(!isDefined(facetList)){
@@ -625,7 +645,7 @@ var SearchInterface = function(options){
        "<div class=\"c4i-esgfsearch-autocomplete\"><input class=\"c4i-esgfsearch-searchautocomplete\" ></input></div>";
 
     rootElement.find(".c4i-esgfsearch-selectfacet-container").html(tabPropertySelector);
-    
+    rootElement.find(".c4i-esgfsearch-autocomplete").hide();
     rootElement.find(".c4i-esgfsearch-property-container").show();
     var noPropertyChooser = true;
     //if(!selectedPropertiesForFacet)
@@ -658,8 +678,9 @@ var SearchInterface = function(options){
           }else{
             rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
               "<div class=\"c4i-esgfsearch-tabmain\">"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu\">Quick select</div>"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+facetList.length+")</div>"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-menu\">"+_getFacetName(facetName)+"</div>"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+facetList.length+")</div>"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
               "</div>"
             );
             if(numprops >0){
@@ -676,7 +697,7 @@ var SearchInterface = function(options){
       if(noPropertyChooser){
          rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
             "<div class=\"c4i-esgfsearch-tabmain\">"+
-            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties c4i-esgfsearch-tab-selected\">"+facetName+" ("+facetList.length+")</div>"+
+            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+" ("+facetList.length+")</div>"+
             "</div>"
           );
       }
@@ -685,10 +706,27 @@ var SearchInterface = function(options){
     var showPropertyTab = function(){
       rootElement.find(".c4i-esgfsearch-property-menu").hide();
       rootElement.find(".c4i-esgfsearch-tab-menu").removeClass("c4i-esgfsearch-tab-selected");
+      rootElement.find(".c4i-esgfsearch-tab-collapse").html("^");
       
+      
+      
+      rootElement.find(".c4i-esgfsearch-autocomplete").show();
       rootElement.find(".c4i-esgfsearch-property-container").show();
       rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
       propertyTabMenu = "allproperties";
+    };
+    
+    var showQuickSelect = function(){
+      rootElement.find(".c4i-esgfsearch-property-container").hide();
+      rootElement.find(".c4i-esgfsearch-tab-properties").removeClass("c4i-esgfsearch-tab-selected");
+      rootElement.find(".c4i-esgfsearch-tab-collapse").html("^");
+      
+      
+      
+      rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+      rootElement.find(".c4i-esgfsearch-property-menu").show();
+      rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+      propertyTabMenu = "quickmenu";
     };
     
     if(propertyTabMenu == "allproperties"){
@@ -698,12 +736,25 @@ var SearchInterface = function(options){
     rootElement.find(".c4i-esgfsearch-tab-properties").attr('onclick','').click(function(evt){showPropertyTab();});
     
     rootElement.find(".c4i-esgfsearch-tab-menu").attr('onclick','').click(function(evt){
-      rootElement.find(".c4i-esgfsearch-property-container").hide();
-      rootElement.find(".c4i-esgfsearch-tab-properties").removeClass("c4i-esgfsearch-tab-selected");
-      
-      rootElement.find(".c4i-esgfsearch-property-menu").show();
-      rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
-      propertyTabMenu = "quickmenu";
+      showQuickSelect();
+    });
+    
+    rootElement.find(".c4i-esgfsearch-tab-collapse").attr('onclick','').click(function(evt){
+      if(rootElement.find(".c4i-esgfsearch-tab-collapse").html() == "+"){
+        if(propertyTabMenu == "allproperties"){
+          showPropertyTab();
+        }else if(propertyTabMenu == "quickmenu"){
+          showQuickSelect();
+        }
+      }else{
+        rootElement.find(".c4i-esgfsearch-property-container").hide();
+        rootElement.find(".c4i-esgfsearch-property-menu").hide();
+        /*rootElement.find(".c4i-esgfsearch-tab-properties").removeClass("c4i-esgfsearch-tab-selected");
+        rootElement.find(".c4i-esgfsearch-tab-menu").removeClass("c4i-esgfsearch-tab-selected");*/
+        rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+        rootElement.find(".c4i-esgfsearch-tab-collapse").html("+");
+//         rootElement.find(".c4i-esgfsearch-tab-collapse").addClass("c4i-esgfsearch-tab-selected");
+      }
     });
     
 

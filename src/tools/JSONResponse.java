@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import tools.JSONResponse.JSONResponseException;
+
 /**
  *  @author plieger
  *  
@@ -137,6 +139,7 @@ public class JSONResponse {
   public boolean hasError(){
     return hasError;
   }
+  
   public void print(HttpServletResponse response) throws IOException{
     response.setContentType(getMimeType());
     response.getOutputStream().print(getMessage());
@@ -147,5 +150,39 @@ public class JSONResponse {
     } catch (Exception e1) {
     
     }
+  }
+  
+  public static class JSONResponseException extends Exception {
+    private static final long serialVersionUID = 1L;
+
+    String result = null;
+
+    public JSONResponseException(JSONResponse r) {
+
+      this.result = r.getMessage();
+    }
+
+ 
+
+
+
+    public JSONResponseException(String errorMessage,int statusCode) {
+      JSONResponse r = new JSONResponse();
+      r.setErrorMessage(errorMessage, statusCode);
+      result = r.getMessage();
+    }
+
+    public String getResult() {
+      return result;
+    }
+
+    public String getMessage() {
+      return result;
+    }
+  }
+
+  public void setException(JSONResponseException e) {
+    this.hasError = true;
+    this.message = e.getMessage();    
   }
 }

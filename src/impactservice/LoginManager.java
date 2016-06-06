@@ -549,7 +549,7 @@ public class LoginManager {
       // try {
       HTTPTools.makeHTTPGetRequestX509ClientAuthentication(requestStr,
           certificateLocation, Configuration.LoginConfig.getTrustStoreFile(),
-          Configuration.LoginConfig.getTrustStorePassword());
+          Configuration.LoginConfig.getTrustStorePassword(),0);
       // } catch (IOException e) {
       // throw e;
       // }
