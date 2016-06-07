@@ -641,11 +641,11 @@ var SearchInterface = function(options){
       
     }
     
-    var tabPropertySelector = "<div class=\"c4i-esgfsearch-property-container c4i-esgfsearch-tabcontainer\">"+html+"</div>"+
-       "<div class=\"c4i-esgfsearch-autocomplete\"><input class=\"c4i-esgfsearch-searchautocomplete\" ></input></div>";
+    var tabPropertySelector = "<div class=\"c4i-esgfsearch-tabcontainer c4i-esgfsearch-property-container\"><div class=\"c4i-esgfsearch-property-container-properties\">"+html+
+       "</div><div class=\"c4i-esgfsearch-autocomplete\">Filter: <input class=\"c4i-esgfsearch-searchautocomplete\" ></input></div></div>";
 
     rootElement.find(".c4i-esgfsearch-selectfacet-container").html(tabPropertySelector);
-    rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+    
     rootElement.find(".c4i-esgfsearch-property-container").show();
     var noPropertyChooser = true;
     //if(!selectedPropertiesForFacet)
@@ -672,13 +672,13 @@ var SearchInterface = function(options){
               "</div>"
             );
              rootElement.find(".c4i-esgfsearch-property-container").hide();
-             rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+             
              propertyTabMenu = "quickmenu";
              
           }else{
             rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
               "<div class=\"c4i-esgfsearch-tabmain\">"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-menu\">"+_getFacetName(facetName)+"</div>"+
+              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-menu\">Quick select "+_getFacetName(facetName)+"</div>"+
               "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+facetList.length+")</div>"+
               "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
               "</div>"
@@ -710,7 +710,7 @@ var SearchInterface = function(options){
       
       
       
-      rootElement.find(".c4i-esgfsearch-autocomplete").show();
+      
       rootElement.find(".c4i-esgfsearch-property-container").show();
       rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
       propertyTabMenu = "allproperties";
@@ -723,7 +723,7 @@ var SearchInterface = function(options){
       
       
       
-      rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+      
       rootElement.find(".c4i-esgfsearch-property-menu").show();
       rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
       propertyTabMenu = "quickmenu";
@@ -751,7 +751,7 @@ var SearchInterface = function(options){
         rootElement.find(".c4i-esgfsearch-property-menu").hide();
         /*rootElement.find(".c4i-esgfsearch-tab-properties").removeClass("c4i-esgfsearch-tab-selected");
         rootElement.find(".c4i-esgfsearch-tab-menu").removeClass("c4i-esgfsearch-tab-selected");*/
-        rootElement.find(".c4i-esgfsearch-autocomplete").hide();
+        
         rootElement.find(".c4i-esgfsearch-tab-collapse").html("+");
 //         rootElement.find(".c4i-esgfsearch-tab-collapse").addClass("c4i-esgfsearch-tab-selected");
       }

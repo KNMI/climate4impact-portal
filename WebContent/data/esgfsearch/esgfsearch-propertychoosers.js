@@ -59,7 +59,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
   
   
   var main=$("<div class=\"esgfsearch-ppc-main\" ></div>");
-  main.css('background-color', esgfsearch_currentcolorscheme.background);
+//  main.css('background-color', esgfsearch_currentcolorscheme.background);
 
 
   for(var j=0;j<this.config.properties.length;j++){
