@@ -35,7 +35,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
       }
     }
     
-    var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\" style=\"background-color:"+color+";\"/>");
+    var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\"/>");
     d.attr('name',name);
     var title = name;
     if(tileobj.shortname)name=tileobj.shortname;
@@ -43,17 +43,17 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
       d.css({"width":config.tilewidth});
     }
     d.html(
-      "<div class=\"esgfsearch-ppc-tileheader\">"+ "<div class=\""+cbcls+"\" style=\"float:none;\"></div>&nbsp;<span>"+name+""+
+      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+ "<div class=\""+cbcls+"\" style=\"float:none;\"></div>&nbsp;<span>"+name+""+
       "</span></div>"+
       "<div class=\"esgfsearch-ppc-tilebody\" style=\"padding:5px 15px 5px 15px;\">"+description+
       "</div>"
     );
     
-    if(enabled){
-      var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.25);
-      d.mouseenter(function(){d.css("background-color",colorsel);});
-      d.mouseleave(function(){d.css("background-color",color);});
-    }
+//    if(enabled){
+//      var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.25);
+//      d.mouseenter(function(){d.css("background-color",colorsel);});
+//      d.mouseleave(function(){d.css("background-color",color);});
+//    }
     return d;
   };
   
@@ -88,13 +88,13 @@ NestedPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
   var config = this.config;
   var createTile = function(color,name,description){
-    var d= $("<div class=\"esgfsearch-ppc-tile\" style=\"background-color:"+color+";\"/>");
+    var d= $("<div class=\"esgfsearch-ppc-tile\" />");
     if(config.tilewidth){
       d.css({"width":config.tilewidth});
     }
     d.attr('name',name);
     d.html(
-      "<div class=\"esgfsearch-ppc-tileheader\">"+name+""+
+      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+name+""+
       "</div>"+
       "<div class=\"esgfsearch-ppc-tilebody\">"+description+
       "</div>"
@@ -103,8 +103,8 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
 
     var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.1);
     
-    d.mouseenter(function(){d.css("background-color",colorsel);});
-    d.mouseleave(function(){d.css("background-color",color);});
+//    d.mouseenter(function(){d.css("background-color",colorsel);});
+//    d.mouseleave(function(){d.css("background-color",color);});
     return d;
   };
   

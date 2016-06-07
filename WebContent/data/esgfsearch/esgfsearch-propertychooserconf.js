@@ -24,13 +24,13 @@ var esgfsearch_colorscheme_gray = {
 
 var esgfsearch_colorscheme_blueblackwhite = {
   "background":"#B5B6BD",
-  "color1":"#00a8ec",
-  "color2":"#f58d00",
-  "color3":"#c33c3c",
+  "color1":"#f58d00",
+  "color2":"#00a8ec",
+  "color6":"#c33c3c",
   "color4":"#dda606",
-  "color5":"#6b6b6b",
-  "color6":"#cf9808",
-  "color7":"#540f7c"
+  "color5":"#AEB404",
+  "color3":"#4CAF50",
+  "color7":"#8258FA"
 };
 
 var esgfsearch_currentcolorscheme = esgfsearch_colorscheme_blueblackwhite;
