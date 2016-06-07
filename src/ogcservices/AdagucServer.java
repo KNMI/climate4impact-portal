@@ -48,7 +48,9 @@ public class AdagucServer extends HttpServlet{
       userHomeDir=user.getWorkspace();
       Debug.println("WMS for user: "+user.getId());
     }catch(Exception e){    
-      Debug.println("Warning: Anonymous user: '"+e.getMessage()+"'");
+        /* This checks when a resource needs authentication and there is no user is signed in, 
+         * the user is redirected to the login screen.
+         */
    
         String source = HTTPTools.getKVPItemDecoded(URLDecoder.decode(queryString,"UTF-8"), "source");
         if(source != null){

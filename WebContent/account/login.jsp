@@ -94,14 +94,14 @@
 				
 	
 		<%
-			//Print warning when retrieving SLCS has failed.
-						try {
-							impactservice.LoginManager.checkLogin(user.getId(),request);
-							out.println("<br /> <strong>Installed credential info:</strong><br/>"+tools.HTMLParser.textToHTML(user.getLoginInfo())+"<br/><br/>");
-						} catch (Exception e) {
-							impactservice.MessagePrinters.printWarningMessage(out, e);
-						}
-		%>
+													//Print warning when retrieving SLCS has failed.
+																try {
+																	impactservice.LoginManager.checkLogin(user);
+																	out.println("<br /> <strong>Installed credential info:</strong><br/>"+tools.HTMLParser.textToHTML(user.getLoginAndCredentialInfo())+"<br/><br/>");
+																} catch (Exception e) {
+																	impactservice.MessagePrinters.printWarningMessage(out, e);
+																}
+												%>
 			      
 				 <b>Actions:</b>
 				<ul>

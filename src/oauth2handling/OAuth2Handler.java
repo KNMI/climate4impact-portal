@@ -719,13 +719,13 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     String discoveryURL = "https://" + iss
         + "/.well-known/openid-configuration";
     JSONObject openid_configuration = (JSONObject) new JSONTokener(
-        HTTPTools.makeHTTPGetRequest(discoveryURL)).nextValue();
+        HTTPTools.makeHTTPGetRequest(discoveryURL,0)).nextValue();
     String jwks_uri = openid_configuration.getString("jwks_uri");
     Debug.println("jwks_uri:" + jwks_uri);
 
     // Load the jwks uri
     JSONObject certs = (JSONObject) new JSONTokener(
-        HTTPTools.makeHTTPGetRequest(jwks_uri)).nextValue();
+        HTTPTools.makeHTTPGetRequest(jwks_uri,0)).nextValue();
     JSONArray jwks_keys = certs.getJSONArray("keys");
     Debug.println("jwks_keys:" + jwks_keys.length());
 
@@ -946,7 +946,7 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
      Debug.println("Discovery        : " + discoveryURL);
     
      //3 Retrieve the Discovery service, so we get all service endpoints
-     String discoveryData = HTTPTools.makeHTTPGetRequest(discoveryURL);
+     String discoveryData = HTTPTools.makeHTTPGetRequest(discoveryURL,0);
      JSONObject jsonObject = (JSONObject) new JSONTokener(discoveryData)
      .nextValue();
     
@@ -958,8 +958,7 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
      KVPKey key = new KVPKey();
      key.addKVP("Authorization", access_token);
      Debug.println("Starting request");
-     String id_token = HTTPTools.makeHTTPGetRequestWithHeaders(userInfoEndpoint,
-     key);// ,"Authorization: Bearer "+access_token);
+     String id_token = HTTPTools.makeHTTPGetRequestWithHeaders(userInfoEndpoint,key,0);// ,"Authorization: Bearer "+access_token);
      Debug.println("Finished request");
     
      //6) The ID token is retrieved, now return the identifier from this token.

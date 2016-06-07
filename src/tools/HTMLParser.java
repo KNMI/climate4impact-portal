@@ -78,7 +78,7 @@ public class HTMLParser {
 		} catch (UnknownHostException e) {
 		}
 		try {
-			return HTTPTools.makeHTTPGetRequest(contentsURL);
+			return HTTPTools.makeHTTPGetRequest(contentsURL,0);
 		} catch (WebRequestBadStatusException e) {
 			Debug.errprintln(e.getMessage());
 			return "Statuscode: "+ e.getStatusCode();

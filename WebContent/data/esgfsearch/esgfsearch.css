@@ -10,7 +10,7 @@
 
 .c4i-esgfsearch-selectfacet-container{
   margin:6px 3px 2px 3px;
-  
+
 }
 
 
@@ -61,7 +61,7 @@
 }
 
 .c4i-esgfsearch-facets-selectmoreless{
-  background-color: #77F;
+  background-color: #428bca;
 
 }
 
@@ -79,6 +79,7 @@
 
 .c4i-esgfsearch-facetchoosed{
   background-color:#8E8;
+  background-color:#FFF;
   color:black;
   font-weight:bold;
 }
@@ -150,9 +151,9 @@
   max-height:170px;
   margin:0px;
   padding:5px;
-   border:1px solid #668;
+  /*ESGFmulticolor border:1px solid #668;*/
    border-radius:0px;
-
+ border-top:2px solid #B5B6BD;
      
 }
 
@@ -280,7 +281,7 @@ margin:6px 0px 0px 6px;
 
 .c4i-esgfsearch-autocomplete{
   margin:6px 0 2px 6px;
-
+ 
 }
 
 .c4i-esgfsearch-searchautocomplete{
@@ -327,7 +328,10 @@ margin:0px;
    display:block;
      line-height:0px;
 text-align:center;
-     
+         border-top-left-radius:3px;
+  border-top-right-radius:3px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
 }
 
 .esgfsearch-ppc-tile{
@@ -339,12 +343,14 @@ text-align:center;
     margin:6px;
     padding:0px;
     border:none;
-    color:white;
+    color:black;
+    background-color:#E0EBEB;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .esgfsearch-ppc-tile:hover{
 
-    color:white;
+    /*color:white;*/
 }
 
 
@@ -359,19 +365,19 @@ text-align:center;
 
 .esgfsearch-ppc-tileheader{
   width:100%;
-  height:28px;
+  height:32px;
   line-height:28px;
   font-weight:bold;
   font-size:20px;
 
   text-align:center;
-  border-bottom:1px solid white;
+/*  border-bottom:1px solid white;*/
  cursor: pointer; 
  vertical-align:middle;
 }
 
 .esgfsearch-ppc-tileproperty{
-  text-align:left;background:none;border:none;line-height:20px;padding:0px;color:white;
+  text-align:left;background:none;border:none;line-height:20px;padding:0px;color:black;
   height:19px;
   padding:0px;
   margin:0px;
@@ -400,53 +406,72 @@ line-height:16px;
 
 .c4i-esgfsearch-tabmain{
   margin:0px;padding:0px;
+/*  border-bottom:2px solid black;*/
 }
 
 .c4i-esgfsearch-tab{
   display:inline-block;
-  border:1px solid #668;
+ 
+  /*ESGFmulticolor border:1px solid #668;*/
   
   border-radius: 5px 5px 0px 0px;
-  background:#C8C8CF;
+  background:#888;
+  /*ESGFmulticolor background:#C8C8CF;*/
+  
   font-weight:normal;
   width:250px;
-  height:24px;
   text-align:center;
-  line-height:24px;
-  margin-right:5px;
-  color:#333;
-  
-  margin-bottom:-1px;
-
+  vertical-align:text-bottom;
+  border:none;
+  height:22px;
+  color:black;
+ 
+  margin:0px 5px 0px 5px;
+  cursor: pointer !important; 
+ padding:9px 12px 2px 12px !important;
 
 }
 
 
 .c4i-esgfsearch-tab-selected{
-  background-color: #FFF;
+  background-color: #B5B6BD;
   color:black;
+  /*ESGFgraycolor background-color: #C8C8CF;*/
+  /*ESGFmulticolor background-color: #FFF;*/
+  /*ESGFmulticolor color:black;*/
   font-weight:bold;
-  border-bottom:1px solid white;
+ 
+  padding:9px 12px 2px 12px !important;
+  /* ESGFmulticolor border-bottom:1px solid white;*/
 }
 
 .c4i-esgfsearch-tab-selected:hover{
-  background-color: #FFF !important;
+    background-color: #B5B6BD !important;
+  color:black !important;
+
+  /*ESGFmulticolor
+   background-color: #FFF !important;
   color:black;
-  font-weight:bold;
+ 
+  font-weight:bold;*/
 }
 
 .c4i-esgfsearch-tab:hover{
-   background-color: #8F8;
-  display:inline-block;
-  color:black;
+    background-color: #C5C6CD;
+  color:black ;
  
 }
 
 .c4i-esgfsearch-tabcontainer{
    background-color:#FFF;
- border:1px solid #668;
+/* ESGFmulticolor border:1px solid #668;*/ 
  padding:0px;
-  
+
+}
+
+.c4i-esgfsearch-tab-collapse{
+  float:right;
+  width:25px;
 }
 
 .c4i-esgfsearch-dataset-baseimage{
@@ -666,6 +691,16 @@ line-height:16px;
 }
 
 
+.c4i-esgfsearch-paginator-export{
+  float:right;
+  margin-right:10px;
+}
+
+.c4i-esgfsearch-paginator-export-csvbutton{
+  float:right;
+  margin-right:10px;
+}
+
 .c4i-esgfsearch-noselect{
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -715,8 +750,8 @@ line-height:16px;
 }
 
 .c4i-esgfsearch-ftq-input{
-  text-align:center;
-  width:150px;
+  text-align:left;
+  width:650px;
 }
 
 .c4i-esgfsearch-ftq-searchbutton{
@@ -764,4 +799,6 @@ line-height:16px;
   padding:5px;
   line-height:16px;
 }
+
+
 

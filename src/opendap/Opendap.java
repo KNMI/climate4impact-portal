@@ -707,6 +707,8 @@ public class Opendap {
 
     } catch (IOException ioe) {
       Debug.println("Error opening: " + filename);
+      response.getOutputStream().print("Error opening: " + filename);
+      response.setStatus(404);
     } finally { 
       if (null != ncFile) try {
         ncFile.close();

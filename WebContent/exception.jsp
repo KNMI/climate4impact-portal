@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"  import="impactservice.ImpactService"%>
+    pageEncoding="UTF-8"  import="impactservice.ImpactService,impactservice.MessagePrinters"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -11,19 +11,27 @@
     
     <div class="impactcontent">
      <div class="textstandardleft">
-      <h1>A problem occurred!</h1>
+      <h1>Oops!</h1>
+      <h2>We are sorry, but we encountered a problem :(</h2>
 
+      The message is:<br/><br/>
+      <div class="alert-box error">
+      <span> </span>
       <%
       out.print(session.getAttribute("message")); 
+      MessagePrinters.emailFatalErrorMessage("Exception Page",(String)session.getAttribute("message"));
       session.setAttribute("message",null);
       session.removeAttribute("message");
       %>
-      <br/><br/>
-      The system administrator has been notified.<br/>
+     
+      </div>
+      <br/>
+      We have been notified and hopefully we are able to fix this problem soon.<br/><br/>
       <hr/>
-      <b>Actions:</b>
+      <br/>
+      <b>If you want you can do the following:</b>
       <ul>
-      <li><a href="/impactportal/help/contactexpert.jsp">Provide feedback via the contact form.</a></li>
+      <li><a href="/impactportal/help/contactexpert.jsp">Provide additional feedback via the contact form.</a></li>
       <li><a href="javascript:javascript:history.go(-1)">Go back to previous page.</a></li>
       </ul>
     </div>

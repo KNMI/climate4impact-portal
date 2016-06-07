@@ -11,7 +11,7 @@
     
     <div class="impactcontent">
      <div class="textstandardleft">
-      <h1>A error occurred..</h1>
+      <h1>An error occurred..</h1>
 
       ${message}
       

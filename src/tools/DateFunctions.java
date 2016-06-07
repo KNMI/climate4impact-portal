@@ -5,9 +5,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateFunctions {
-	public static SimpleDateFormat ISO8601DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+  private static SimpleDateFormat getUTCSimpleDate(){
+    String DATE_FORMAT_NOW = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC")); 
+    return sdf;
+  }
+  private static SimpleDateFormat getUTCSimpleDate(String format){
+    SimpleDateFormat sdf = new SimpleDateFormat(format);
+    sdf.setTimeZone(TimeZone.getTimeZone("UTC")); 
+    return sdf;
+  }
 	//Todo: convert the dateResolutionString to ISO format
 	public static String dateAddStepInStringFormat(String stringDate,String dateResolutionString) throws Exception{
 	  return dateAddStepInStringFormat(stringDate,dateResolutionString,1);
@@ -15,7 +27,7 @@ public class DateFunctions {
 	public static String dateAddStepInStringFormat(String stringDate,String dateResolutionString, int amount) throws Exception{
 		Date dateStartTime = null;
 		try {
-			dateStartTime = ISO8601DateTimeFormat.parse(stringDate);
+			dateStartTime = getUTCSimpleDate().parse(stringDate);
 		} catch (ParseException e1) {
 			throw new Exception("Unable to parse start date: "+stringDate+" Exception message: "+e1.getMessage());
 		}
@@ -49,14 +61,12 @@ public class DateFunctions {
 		if(cal.getTimeInMillis()==time){
 			throw new Exception("dateResolutionString is invalid in dateAddStepInStringFormat: "+dateResolutionString);
 		}		//return  date
-		return ISO8601DateTimeFormat.format(cal.getTime());
+		return getUTCSimpleDate().format(cal.getTime());
 	}
 	
     public static String getCurrentDateInISO8601(){
-    	String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
 	    Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-	    String currentISOTimeString = sdf.format(cal.getTime())+"Z";
+	    String currentISOTimeString = getUTCSimpleDate().format(cal.getTime());
 	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
 	    //Add the T and Z characters
 	    currentISOTimeCharArray[10]='T';
@@ -64,9 +74,7 @@ public class DateFunctions {
 	    return currentISOTimeString;
     }
     public static String getTimeStampInMillisToISO8601(long milli){
-      String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
-      SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-      String currentISOTimeString = sdf.format(milli)+"Z";
+      String currentISOTimeString = getUTCSimpleDate().format(milli);
       char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
       //Add the T and Z characters
       currentISOTimeCharArray[10]='T';
@@ -76,17 +84,13 @@ public class DateFunctions {
     
     
     public static String getCurrentDateinADAGUC(){
-    	String DATE_FORMAT_NOW = "yyyyMMddHHmmss";
-	    Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
-	    String currentISOTimeString = sdf.format(cal.getTime());
+	    String currentISOTimeString = getUTCSimpleDate("yyyyMMddHHmmss").format(getCurrentDateInMillis());
 	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
 	    currentISOTimeString=new String(currentISOTimeCharArray);
 	    return currentISOTimeString;
     }
     public static String getISO8601TimeFromDate(Date date){
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    String currentISOTimeString = sdf.format(date)+"Z";
+	    String currentISOTimeString = getUTCSimpleDate().format(date);
 	    char currentISOTimeCharArray[]=currentISOTimeString.toCharArray();
 	    //Add the T and Z characters
 	    currentISOTimeCharArray[10]='T';
@@ -111,7 +115,7 @@ public class DateFunctions {
     public static long getMillisFromISO8601Date(String stringDate) throws Exception {
       Date dateStartTime = null;
       try {
-        dateStartTime = ISO8601DateTimeFormat.parse(stringDate);
+        dateStartTime = getUTCSimpleDate().parse(stringDate);
       } catch (ParseException e1) {
         throw new Exception("Unable to parse start date: "+stringDate+" Exception message: "+e1.getMessage());
       }

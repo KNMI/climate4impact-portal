@@ -12,6 +12,7 @@
 
 <!-- <script src="bootstrap.min.js"></script>-->
 <script src="js/jquery.iframe-transport.js"></script>
+
 </head>
 <body>
   <jsp:include page="../header.jsp" />
@@ -34,20 +35,36 @@
 		if(user == null){
 		    response.sendRedirect(Home+"/account/login.jsp");
 		}
+		
+		String userNamePrefill=user.getOpenId();
 		if (user != null) {
+			String userNamePrompt="User name (OpenID):";
+			String autoCompleteAttr="";
+			Debug.println("user.getUserMyProxyService() = "+user.getUserMyProxyService());
+			if(user.getUserMyProxyService() == null){
+				session.setAttribute("message","Sorry! Fetching the url from the myproxyservice from the OpenID XML document has failed.");
+				response.sendRedirect(Home+"exception.jsp");
+				return;
+			}else{
+				if (user.getUserMyProxyService().contains("ceda.ac.uk")) {
+					userNamePrompt="CEDA User name:";
+					userNamePrefill="";
+					autoCompleteAttr="autocomplete=\"off\"";
+				}
+			}
 %>
   <jsp:include page="loginmenu.jsp" />
   <div class="impactcontent">
     <h1>Create a script to download a set of files from your basket</h1>
     <div class="textstandardleft" style="width:540px;">
-      <form method="post"
+      <form method="post" <%=autoCompleteAttr%>
         action="/impactportal/GetDownloadScriptHandler">
         <table style="width: 100%">
           <tbody>
             <tr>
-              <td><b>User name (OpenID):</b></td>
+              <td><b><%=userNamePrompt%></b></td>
               <td><input id="openid" type="text" size="50"
-                name="openid" value="<%=user.getOpenId()%>"></input><br /></td>
+                name="openid" value="<%=userNamePrefill%>"></input><br /></td>
                 <td></td>
             </tr>
        
@@ -102,5 +119,8 @@
   <%} %>
 
   <jsp:include page="../footer.jsp" />
+  <script>
+	$("#openid").val(<%=userNamePrefill%>);
+  </script>
 </body>
 </html>

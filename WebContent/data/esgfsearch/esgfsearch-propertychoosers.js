@@ -35,7 +35,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
       }
     }
     
-    var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\" style=\"background-color:"+color+";\"/>");
+    var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\"/>");
     d.attr('name',name);
     var title = name;
     if(tileobj.shortname)name=tileobj.shortname;
@@ -43,22 +43,25 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
       d.css({"width":config.tilewidth});
     }
     d.html(
-      "<div class=\"esgfsearch-ppc-tileheader\">"+ "<div class=\""+cbcls+"\" style=\"float:none;\"></div>&nbsp;<span>"+name+""+
+      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+ "<div class=\""+cbcls+"\" style=\"float:none;\"></div>&nbsp;<span>"+name+""+
       "</span></div>"+
       "<div class=\"esgfsearch-ppc-tilebody\" style=\"padding:5px 15px 5px 15px;\">"+description+
       "</div>"
     );
     
-    if(enabled){
-      var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.25);
-      d.mouseenter(function(){d.css("background-color",colorsel);});
-      d.mouseleave(function(){d.css("background-color",color);});
-    }
+//    if(enabled){
+//      var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.25);
+//      d.mouseenter(function(){d.css("background-color",colorsel);});
+//      d.mouseleave(function(){d.css("background-color",color);});
+//    }
     return d;
   };
   
   
   var main=$("<div class=\"esgfsearch-ppc-main\" ></div>");
+  main.css('background-color', esgfsearch_currentcolorscheme.background);
+
+
   for(var j=0;j<this.config.properties.length;j++){
     var enable = true;
     if(facetList){
@@ -85,13 +88,13 @@ NestedPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
   var config = this.config;
   var createTile = function(color,name,description){
-    var d= $("<div class=\"esgfsearch-ppc-tile\" style=\"background-color:"+color+";\"/>");
+    var d= $("<div class=\"esgfsearch-ppc-tile\" />");
     if(config.tilewidth){
       d.css({"width":config.tilewidth});
     }
     d.attr('name',name);
     d.html(
-      "<div class=\"esgfsearch-ppc-tileheader\">"+name+""+
+      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+name+""+
       "</div>"+
       "<div class=\"esgfsearch-ppc-tilebody\">"+description+
       "</div>"
@@ -100,8 +103,8 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
 
     var colorsel = esgfsearch_pc_mutiplyHexColor(color,1.1);
     
-    d.mouseenter(function(){d.css("background-color",colorsel);});
-    d.mouseleave(function(){d.css("background-color",color);});
+//    d.mouseenter(function(){d.css("background-color",colorsel);});
+//    d.mouseleave(function(){d.css("background-color",color);});
     return d;
   };
   
@@ -110,6 +113,9 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
   var selectedPropertiesForFacet = selectedFacets[facetName];
   
   var main=$("<div class=\"esgfsearch-ppc-main\"></div>");
+  main.css('background-color', esgfsearch_currentcolorscheme.background);
+  
+  
   var foundProperties = 0;
   for(var j=0;j<this.config.properties.length;j++){
     
@@ -345,7 +351,7 @@ FreeTextQueryChooser.prototype.init = function(parentEl, facetName,facetList,que
   var foundProperties = 0;
 
   var html='<div class="c4i-esgfsearch-ftq">'+
-  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>'+
+  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>If you happen to know a property in the Solr metadata that gives an exact match, then you can search for it using "name:value" and just get the results of interest.<br/><br/>For example "drs_id:cmip5.output1.MPI-M.MPI-ESM-LR.abrupt4xCO2.day.atmos.cfDay.r1i1p1" will return results matching the drs_id.<br/><br/>'+
   '<input  class="c4i-esgfsearch-ftq-freetext c4i-esgfsearch-ftq-input" type="text"/>'+
   '<button class="c4i-esgfsearch-ftq-searchbutton">Search</button>'+
   '<button class="c4i-esgfsearch-ftq-clearbutton">X</button>'+

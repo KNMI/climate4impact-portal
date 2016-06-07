@@ -767,7 +767,7 @@ public class ImpactService extends HttpServlet {
       try{
         response.setContentType("text/plain");
         String[] procId=request.getParameterValues("id[]");
-        Debug.println("Delete file from basket: "+procId);
+        Debug.println("Delete file from basket ");
         //if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
         basketList = LoginManager.getUser(request,response).getShoppingCart();
         basketList.removeDataLocators(procId);
