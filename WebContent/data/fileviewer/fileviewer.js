@@ -181,7 +181,13 @@ var FileViewerInterface = function(options){
   
   function handleErrorMessage(data){
     var html=
-    
+     '<div class="simplecomponent c4i-fileviewer-globalmetadata">'+
+     '<div class="simplecomponent-body">'+
+     options.prettyquery+
+     '</div>'+
+     '<div class="simplecomponent-footer"></div>'+
+     '</div>'+
+     
     '<div class="c4-fileviewer-variable-error">'+
       '<b>'+data.error+'</b><br/>'+
       'You can try the following:<ul>'+

@@ -63,7 +63,7 @@
 }
 
 .c4i-esgfsearch-facets-selectmoreless{
-  background-color: #428bca;
+  background-color: #759fdf;
 
 }
 
@@ -110,6 +110,13 @@
 .c4i-esgfsearch-property-checkbox{
   margin-top:2px !important;
 }
+.c4i-esgfsearch-property-name{
+	min-width:150px;
+	display:inline-block;
+}
+.c4i-esgfsearch-property-description{
+  font-style:italic;
+}
 
 .c4i-esgfsearch-property-even{
  /*  background-color: #ebeFFF;*/
@@ -150,13 +157,13 @@
 
 .c4i-esgfsearch-property-container{
   margin:0px;
-  padding:3px !important;
+  padding:6px !important;
 }
 
 .c4i-esgfsearch-property-container-properties{
   overflow:auto;
   max-height:170px;
-
+  border-top:1px solid #ddd;
   padding:3px;
   /*ESGFmulticolor border:1px solid #668;*/
   
@@ -189,7 +196,8 @@
   /*max-height:260px;*/
   margin:0px;padding:0px;
 /*  border:1px solid #668;*/
-  background-color:#FFF; 
+  background-color:#FFF;
+  box-shadow: 0px 0px 2px #444; 
 }
 
 .c4i-esgfsearch-resultitem{
@@ -209,7 +217,7 @@
 }
 
 .c4i-esgfsearch-resultitem-checking{
-   background-color: #999;
+   background-color: #EEE;
 }
 
 .c4i-esgfsearch-resultitem-ok{
@@ -277,6 +285,15 @@ margin:6px 0px 0px 6px;
   display:inline-block;
 }
 
+.c4i-esgfsearch-loader-animationsmall{
+  background-image:url("../images/ajax-loader-small.gif") !important;
+  width:16px;
+  height:16px;
+  vertical-align:middle;
+  display:inline-block;
+}
+
+
 .c4i-esgfsearch-loader-message{
   margin:20px;
   font-weight:bold;
@@ -287,16 +304,16 @@ margin:6px 0px 0px 6px;
 
 
 .c4i-esgfsearch-autocomplete{
-  margin:5px;
-  padding:4px;
- height:30px;
+  margin:5px 5px 0 0;
+  /*padding:4px;*/
+ /*height:30px;*/
  
 }
 
 .c4i-esgfsearch-searchautocomplete{
-    border-radius:2px;
+    /*border-radius:2px;
   border-width:1px;
-padding:5px;
+padding:5px;*/
     
 }
 
@@ -317,18 +334,32 @@ padding:5px;
     background-image: url('../images/esgfsearch-checkbox.png');
     background-repeat: no-repeat;
     display: inline-block;
-    float: left;
+    /*float: left;*/
     width: 21px;
     height: 21px;
     padding: 0px;
-    margin: 2px 0px 2px 0px;
+    margin: 2px 0px 2px 2px;
     
     overflow:visible;
     vertical-align:middle;
 
 }
 
+.c4i-esgfsearch-property-counter{
+	display:inline-block;
+	width:34px;
+	text-align:right;
+	padding-right:4px;
+	color:#666;
+}
 
+.c4i-esgfsearch-property-count{
+	 color:#666;
+	 font-size:8;
+	 margin-top:2px;
+	 margin-left:5px;
+	 margin-right:5px;
+}
 
 .esgfsearch-ppc-main{
 
@@ -351,6 +382,7 @@ padding:5px;
     color:black;
     background-color:#E0EBEB;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+     /*box-shadow: 0px 0px 8px #444;*/
 }
 
 .esgfsearch-ppc-tile:hover{
@@ -371,14 +403,31 @@ padding:5px;
 .esgfsearch-ppc-tileheader{
   width:100%;
   height:32px;
-  line-height:28px;
-  font-weight:bold;
+  line-height:32px;
   font-size:20px;
-
+  font-weight: normal;
   text-align:center;
 /*  border-bottom:1px solid white;*/
  cursor: pointer; 
  vertical-align:middle;
+ color:white;
+}
+.esgfsearch-ppc-tileheader-text{
+  font-weight:normal;
+  font-size:20px;
+  color:#222;
+  padding-right:8px;
+   color:white;
+}
+.esgfsearch-ppc-tileheader-icon{
+	width:0px;
+	font-size:18px;
+	float:left;
+	clear:both;
+	padding-left:8px;
+	margin-top:6px;
+	font-weight:lighter !important;
+	 color:white;
 }
 
 .esgfsearch-ppc-tileproperty{
@@ -408,12 +457,17 @@ line-height:16px;
  
 }
 
+.esgfsearch-ppc-tilebody a:hover{
+	text-decoration:underline;
+}
+
 
 .c4i-esgfsearch-tabmain{
   margin:0px;
   overflow:hidden;
-  height:34px;
-  padding: 10px 10px 0 10px;
+  height:30px;
+  padding: 3px 10px 0 3px;
+  
 /*  border-bottom:2px solid black;*/
 }
 
@@ -423,7 +477,7 @@ line-height:16px;
   /*ESGFmulticolor border:1px solid #668;*/
   
  
-  background:#888;
+  background:#B5B6BD;/*#888;*/
   /*ESGFmulticolor background:#C8C8CF;*/
   
   font-weight:normal;
@@ -434,28 +488,28 @@ line-height:16px;
   height:22px;
   color:black;
  
-  margin:0px 5px 0px 5px;
+  margin:0px 3px 0px 3px;
   cursor: pointer !important; 
   
- padding:9px 12px 2px 12px !important;
+ padding:4px 6px 2px 6px !important;
  border-radius: 3px 3px 0px 0px;
- /*border-bottom:2px solid black;*/
+ border-bottom:1px solid #888;
  /*z-index:300;*/
 }
 
 
 .c4i-esgfsearch-tab-selected{
-	 border-radius: 5px 5px 0px 0px;
-	 border-top:1px solid #B5B6BD;
-
-  background-color: #B5B6BD;
+	
+	 border-top:1px solid #FCFCFC;/*#B5B6BD;*/
+   border-bottom:1px solid #FCFCFC;
+  background-color: #FCFCFC;
   color:black;
   /*ESGFgraycolor background-color: #C8C8CF;*/
   /*ESGFmulticolor background-color: #FFF;*/
   /*ESGFmulticolor color:black;*/
   font-weight:bold;
-  box-shadow: 0px 0px 5px #444;
-  padding:9px 12px 2px 12px !important;
+  box-shadow: 0px 0px 2px #444;
+ 
   /*z-index:400;
   position:relative;*/
   /*text-decoration: underline;*/
@@ -463,31 +517,27 @@ line-height:16px;
 }
 
 .c4i-esgfsearch-tab-selected:hover{
-  background-color: #B5B6BD !important;
-  color:black !important;
-
-  /*ESGFmulticolor
-   background-color: #FFF !important;
-  color:black;
- 
-  font-weight:bold;*/
+  /*background-color: #B5B6BD !important;
+  color:black !important;*/
+  
 }
 
 .c4i-esgfsearch-tab:hover{
-    background-color: #C5C6CD;
-  color:black ;
- 
+/*    background-color: #C5C6CD;
+  color:black ;*/
+  text-decoration: underline;
 }
 
 .c4i-esgfsearch-tabcontainer{
-   background-color:#B5B6BD;
+   background-color:#FCFCFC;
+   /*border-top:2px solid #759fdf;*/
 /* ESGFmulticolor border:1px solid #668;*/ 
  padding:0px;
          border-top-left-radius:3px;
   border-top-right-radius:3px;
-  border-bottom-left-radius:0px;
-  border-bottom-right-radius:0px;
-   box-shadow: 0px 0px 5px #444;
+  border-bottom-left-radius:3px;
+  border-bottom-right-radius:3px;
+   box-shadow: 0px 0px 2px #444;
    /*z-index:200;
     position:relative;*/
 }
@@ -698,7 +748,7 @@ line-height:16px;
 .c4i-esgfsearch-paginator-pagenr-selected{
   
     color:white;
-    background-color: #8888ee;
+    background-color: #759fdf;
   
   
 }
@@ -824,4 +874,14 @@ line-height:16px;
 }
 
 
+
+.c4i-esgfsearch-generallabel {
+
+  font-size:13px;
+  padding:5px 5px 8px 5px;
+  margin:0px;
+  
+  
+  
+}
 

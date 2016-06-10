@@ -371,131 +371,146 @@ public class ImpactService extends HttpServlet {
       try{
         treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request, variableFilter,textFilter); 
       }catch(Exception e){
-        response.setContentType("text/html");
-        response.getWriter().print("Unable to read catalog: "+e.getMessage());
+        jsonResponse.setException("Unable to read catalog", e);
+        try {
+          jsonResponse.print(response);
+        } catch (Exception e1) {
+           e1.printStackTrace();
+        }
         return;
+      
       }
 
       long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
       Debug.println("Finished CATALOG: "+" ("+(stopTimeInMillis-startTimeInMillis)+" ms) "+request.getQueryString());
 
       if(treeElements == null){
-        response.setContentType("text/html");
-        response.getWriter().print("Unable to read catalog");
-        return;
-      }
-      
-      if(flat == false){
-
-  
-        String html="";
-        /*for(int j=0;j<treeElements.getJSONObject(0).getJSONArray("children").length();j++){
-              html+="j="+treeElements.getJSONObject(0).getString("text")+"<br/>"; 
-            } */
-  
-        try{
-          Vector<String> availableVars = new Vector<String>();
-          try{
-            JSONArray variablesToChoose = treeElements.getJSONObject(0).getJSONArray("variables");
-            for(int j=0;j<variablesToChoose.length();j++){
-              availableVars.add(variablesToChoose.getJSONObject(j).getString("name"));
-              //DebugConsole.println("a "+variablesToChoose.getJSONObject(j).getString("name"));
-            }
-          }catch(Exception e){
-  
-          }
-  
-  
-          Debug.println("variableFilter: '"+variableFilter+"'");
-          Debug.println("textFilter: '"+textFilter+"'");
-          html+="<div class=\"c4i-catalogbrowser-variableandtextfilter\"><form  class=\"varFilter\">";
-          if(availableVars.size()>0){
-            html+="<b>Variables:</b>";
-            for(int j=0;j<availableVars.size();j++){
-              if(j!=0)html+="&nbsp;";
-              String checked="";//checked=\"yes\"";
-              if(variableFilter.length()>0){
-                checked="";
-                if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
-              }
-              html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
-            }
-            html+="<br/><br/>";
-          }
-          html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
-          html+="<br/>";
-          //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
-  
-          html+="</form></div>";
-        }catch(Exception e){
-          e.printStackTrace();
-        }
-  
-        html+="<div id=\"datasetfilelist\"><table class=\"c4i-catalogbrowser-table\">";
-        html+="<tr>";
-        html+="<th>#</th>";
-        html+="<th width=\"100%\" class=\"c4i-catalogbrowser-th\">Resource title</th>";
-        html+="<th class=\"c4i-catalogbrowser-th\"><b>Size</b></th>";
-        html+="<th class=\"c4i-catalogbrowser-th\"><b>Opendap</b></th>";
-        html+="<th class=\"c4i-catalogbrowser-th\"><b>Download</b></th>";
-        html+="<th class=\"c4i-catalogbrowser-th\"><b>Basket</b></th>";
-        html+="</tr>";
-  
-        long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
-  
-        String openid = null;
-        try{
-          openid= LoginManager.getUser(request).getOpenId();
-        }catch(Exception e){            
-        }
-        html+=buildHTML(treeElements,"",0,openid,0).result+"</table></div>";
-        long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
-        Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
-        if(format.equals("text/html")){
-          response.setContentType("text/html");
-          response.getWriter().print(html);
-        }else if(format.equals("application/json")){
-          JSONObject a = new JSONObject();
-          a.put("html", html);
-          try{
-            jsonResponse.setMessage(a);
-          } catch(Exception e){
-            jsonResponse.setException("Catalogbrowser error:",e);
-          }
-          try {
-            jsonResponse.print(response);
-          } catch (Exception e1) {
-  
-          }
-        }else{
-          try{
-            jsonResponse.setMessage(treeElements.toString());
-          } catch(Exception e){
-            jsonResponse.setException("Catalogbrowser error:",e);
-          }
-          try {
-            jsonResponse.print(response);
-          } catch (Exception e1) {
-  
-          }
-        }
-      }
-      
-      if(flat == true){
-        THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
-        JSONArray allFilesFlat = b.makeFlat(treeElements);
-        JSONObject data = new JSONObject();
-        data.put("files",allFilesFlat);
-        jsonResponse.setMessage(data);
-        Debug.println("Found "+allFilesFlat.length());
-
+        jsonResponse.setErrorMessage("Unable to read catalog", 200);
         try {
           jsonResponse.print(response);
         } catch (Exception e1) {
-
+           e1.printStackTrace();
         }
+        return;
+      
       }
-      Debug.println("Catalog request finished.");
+      
+      
+      
+      
+      if(jsonResponse.hasError()==false){
+        if(flat == false){
+  
+    
+          String html="";
+          /*for(int j=0;j<treeElements.getJSONObject(0).getJSONArray("children").length();j++){
+                html+="j="+treeElements.getJSONObject(0).getString("text")+"<br/>"; 
+              } */
+    
+          try{
+            Vector<String> availableVars = new Vector<String>();
+            try{
+              JSONArray variablesToChoose = treeElements.getJSONObject(0).getJSONArray("variables");
+              for(int j=0;j<variablesToChoose.length();j++){
+                availableVars.add(variablesToChoose.getJSONObject(j).getString("name"));
+                //DebugConsole.println("a "+variablesToChoose.getJSONObject(j).getString("name"));
+              }
+            }catch(Exception e){
+    
+            }
+    
+    
+            Debug.println("variableFilter: '"+variableFilter+"'");
+            Debug.println("textFilter: '"+textFilter+"'");
+            html+="<div class=\"c4i-catalogbrowser-variableandtextfilter\"><form  class=\"varFilter\">";
+            if(availableVars.size()>0){
+              html+="<b>Variables:</b>";
+              for(int j=0;j<availableVars.size();j++){
+                if(j!=0)html+="&nbsp;";
+                String checked="";//checked=\"yes\"";
+                if(variableFilter.length()>0){
+                  checked="";
+                  if(availableVars.get(j).matches(variableFilter))checked="checked=\"yes\"";
+                }
+                html+="<input type=\"checkbox\" name=\"variables\" id=\""+availableVars.get(j)+"\" "+checked+">"+availableVars.get(j);
+              }
+              html+="<br/><br/>";
+            }
+            html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
+            html+="<br/>";
+            //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
+    
+            html+="</form></div>";
+          }catch(Exception e){
+            e.printStackTrace();
+          }
+    
+          html+="<div id=\"datasetfilelist\"><table class=\"c4i-catalogbrowser-table\">";
+          html+="<tr>";
+          html+="<th>#</th>";
+          html+="<th width=\"100%\" class=\"c4i-catalogbrowser-th\">Resource title</th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Size</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Opendap</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Download</b></th>";
+          html+="<th class=\"c4i-catalogbrowser-th\"><b>Basket</b></th>";
+          html+="</tr>";
+    
+          long startTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
+    
+          String openid = null;
+          try{
+            openid= LoginManager.getUser(request).getOpenId();
+          }catch(Exception e){            
+          }
+          html+=buildHTML(treeElements,"",0,openid,0).result+"</table></div>";
+          long stopTimeInMillis1 = Calendar.getInstance().getTimeInMillis();
+          Debug.println("Finished building HTML with length "+html.length() +" in ("+(stopTimeInMillis1-startTimeInMillis1)+" ms)");
+          if(format.equals("text/html")){
+            response.setContentType("text/html");
+            response.getWriter().print(html);
+          }else if(format.equals("application/json")){
+            JSONObject a = new JSONObject();
+            a.put("html", html);
+            try{
+              jsonResponse.setMessage(a);
+            } catch(Exception e){
+              jsonResponse.setException("Catalogbrowser error:",e);
+            }
+            try {
+              jsonResponse.print(response);
+            } catch (Exception e1) {
+    
+            }
+          }else{
+            try{
+              jsonResponse.setMessage(treeElements.toString());
+            } catch(Exception e){
+              jsonResponse.setException("Catalogbrowser error:",e);
+            }
+            try {
+              jsonResponse.print(response);
+            } catch (Exception e1) {
+    
+            }
+          }
+        }
+        
+        if(flat == true){
+          THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
+          JSONArray allFilesFlat = b.makeFlat(treeElements);
+          JSONObject data = new JSONObject();
+          data.put("files",allFilesFlat);
+          jsonResponse.setMessage(data);
+          Debug.println("Found "+allFilesFlat.length());
+  
+          try {
+            jsonResponse.print(response);
+          } catch (Exception e1) {
+  
+          }
+        }
+        Debug.println("Catalog request finished.");
+      }
     }catch(WebRequestBadStatusException e){
       if(format.equals("text/html")){
         response.setContentType("text/html");

@@ -2,10 +2,13 @@ var property_descriptions = {
   "access": {
     "HTTPServer":"Enables data download via HTTP",
     "LAS":"Live Access Service",
-    "OPENDAP":"OPeNDAP Enables visualization and processing on this portal - (Open-source Project for a Network Data Access Protocol)",
+    "GridFTP":"High-performance and secure data transfer protocol optimized for high-bandwidth wide-area networks",
+    "OPENDAP":"Open-source Project for a Network Data Access Protocol - Enables visualization and processing on this portal",
     "httpserver":"Enables data download via HTTP",
     "las":"Live Access Service",
-    "opendap":"OPeNDAP Enables visualization and processing on this portal - (Open-source Project for a Network Data Access Protocol)"
+    "opendap":"Open-source Project for a Network Data Access Protocol - Enables visualization and processing on this portal",
+    "WCS":"OGC Web Coverage Service",
+    "WMS":"OGC Web Map Service"
   },
   "experiment": {
     "1pctCO2": "1 percent per year CO2",
@@ -248,7 +251,11 @@ var property_descriptions = {
     "monClim": "Climatological monthly mean",
     "night": "",
     "subhr": "Sampling frequency less than an hour",
-    "yr": "Annual sampling frequency"
+    "yr": "Annual sampling frequency",
+    "second":"Sampling frequency per second",
+    "dam":"Daily sampling frequency",
+    "mom":"Monthly sampling frequency",
+    "sem":"Seasonal sampling frequency"
   },
   "variable": {
     "abs550aer": "Ambient Aerosol Absorption Optical Thickness at 550 nm",
@@ -861,5 +868,38 @@ var property_descriptions = {
     "zostoga": "Global Average Thermosteric Sea Level Change",
     "zsatarag": "Aragonite Saturation Depth",
     "zsatcalc": "Calcite Saturation Depth"
+  },
+  "domain": {
+    "SAM-44":"South America",
+    "CAM-44":"Central America",
+    "NAM-44":"North America",
+    "EUR-44":"Europe",
+    "AFR-44":"Africa",
+    "WAS-44":"West Asia",
+    "EAS-44":"East Asia",
+    "CAS-44":"Central Asia",
+    "AUS-44":"Australasia",
+    "ANT-44":"Antarctica",
+    "ARC-44":"The Arctic",
+    "MED-44":"HYMEX Mediterranean",
+    "EUR-11":"High-res. Europe",
+    "EUR-05":"High-res. Europe",
+    "SAM-44i":"South America",
+    "CAM-44i":"Central America",
+    "NAM-44i":"North America",
+    "EUR-44i":"Europe",
+    "AFR-44i":"Africa",
+    "WAS-44i":"West Asia",
+    "EAS-44i":"East Asia",
+    "CAS-44i":"Central Asia",
+    "AUS-44i":"Australasia",
+    "ANT-44i":"Antarctica",
+    "ARC-44i":"The Arctic",
+    "MED-44i":"HYMEX Mediterranean",
+    "EUR-11i":"High-res. Europe",
+    "MNA-44":"Middle East and North Africa",
+    "MNA-22":"High-res. Middle East and North Africa",
+    "MNA-44i":"Middle East and North Africa",
+    "MNA-22i":"High-res. Middle East and North Africa"
   }
 }

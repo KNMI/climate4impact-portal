@@ -306,7 +306,7 @@ public class GenericCart {
             String error = elementProps.getString("error");
             if(error!=null){
               if(!error.equals("false")){
-                Debug.errprintln(error);
+                //Debug.errprintln(error);
                 hasError = true;
                 try{
                   if(error.indexOf("SAXException")!=-1){

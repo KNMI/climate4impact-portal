@@ -65,7 +65,7 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
   for(var j=0;j<this.config.properties.length;j++){
     var enable = true;
     if(facetList){
-      if(esgfSearchIndexOf(facetList,this.config.properties[j].name)==-1){
+      if(esgfSearchIndexOf(esgfSearchGetKeys(facetList),this.config.properties[j].name)==-1){
         enable = false;
       }
     }
@@ -87,14 +87,20 @@ NestedPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 
 NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
   var config = this.config;
-  var createTile = function(color,name,description){
+  var createTile = function(color,name,description,iconClass){
     var d= $("<div class=\"esgfsearch-ppc-tile\" />");
     if(config.tilewidth){
       d.css({"width":config.tilewidth});
     }
     d.attr('name',name);
+    var icon ="";
+    if(iconClass){
+      icon='<i class="esgfsearch-ppc-tileheader-icon '+iconClass+'"></i>';
+    }
     d.html(
-      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+name+""+
+      "<div class=\"esgfsearch-ppc-tileheader\" style=\"background-color:"+color+";\">"+
+      icon+
+      "<span class=\"esgfsearch-ppc-tileheader-text\">"+name+"</span>"+
       "</div>"+
       "<div class=\"esgfsearch-ppc-tilebody\">"+description+
       "</div>"
@@ -113,7 +119,7 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
   var selectedPropertiesForFacet = selectedFacets[facetName];
   
   var main=$("<div class=\"esgfsearch-ppc-main\"></div>");
-  main.css('background-color', esgfsearch_currentcolorscheme.background);
+//  main.css('background-color', esgfsearch_currentcolorscheme.background);
   
   
   var foundProperties = 0;
@@ -125,7 +131,7 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
       var cls = "";
       var cbcls = "c4i-esgfsearch-checkboxclear";
       
-      if(esgfSearchIndexOf(facetList,c.name)==-1){
+      if(esgfSearchIndexOf(esgfSearchGetKeys(facetList),c.name)==-1){
         cls = "c4i-esgfsearch-property-disabled"
       }else{
         foundProperties++;
@@ -145,7 +151,7 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
       
     }
   
-    main.append(createTile(this.config.properties[j].color,this.config.properties[j].shortname,tilehtml));
+    main.append(createTile(this.config.properties[j].color,this.config.properties[j].shortname,tilehtml,this.config.properties[j].weathericon));
   }
   
   parentEl.find(".esgfsearch-ppc").empty();
@@ -172,6 +178,7 @@ TimeChooser.prototype.init = function(parentEl, facetName,facetList,query,select
   var foundProperties = 0;
 
   var html='<div class="c4i-esgfsearch-tss">'+
+  '<span class="c4i-esgfsearch-generallabel">Specify the date in years you wish to search for. Results will be shown that overlap the specified date.<br/><br/></span>'+
   '<table>'+
   '<tr>'+
   '  <td><span class="c4i-esgfsearch-tss-text">Year from </span></td>'+
@@ -255,7 +262,7 @@ AreaChooser.prototype.init = function(parentEl, facetName,facetList,query,select
   var foundProperties = 0;
 
   var html='<div class="c4i-esgfsearch-bbox">'+
-  'Search box in degrees. Searches for data overlapping the box.<br/><br/>'+
+  '<span class="c4i-esgfsearch-generallabel">Search box in degrees. Searches for data overlapping the box.<br/><br/></span>'+
   '<table>'+
   '<tr>'+
   '  <td></td>'+
@@ -351,7 +358,7 @@ FreeTextQueryChooser.prototype.init = function(parentEl, facetName,facetList,que
   var foundProperties = 0;
 
   var html='<div class="c4i-esgfsearch-ftq">'+
-  'The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>If you happen to know a property in the Solr metadata that gives an exact match, then you can search for it using "name:value" and just get the results of interest.<br/><br/>For example "drs_id:cmip5.output1.MPI-M.MPI-ESM-LR.abrupt4xCO2.day.atmos.cfDay.r1i1p1" will return results matching the drs_id.<br/><br/>'+
+  '<span class="c4i-esgfsearch-generallabel">The free text query can be used to execute a query that matches the given text anywhere in the metadata fields.<br/><br/>If you happen to know a property in the Solr metadata that gives an exact match, then you can search for it using "name:value" and just get the results of interest.<br/><br/>For example "drs_id:cmip5.output1.MPI-M.MPI-ESM-LR.abrupt4xCO2.day.atmos.cfDay.r1i1p1" will return results matching the drs_id.<br/><br/></span>'+
   '<input  class="c4i-esgfsearch-ftq-freetext c4i-esgfsearch-ftq-input" type="text"/>'+
   '<button class="c4i-esgfsearch-ftq-searchbutton">Search</button>'+
   '<button class="c4i-esgfsearch-ftq-clearbutton">X</button>'+

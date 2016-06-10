@@ -202,9 +202,9 @@ p.last {
 	margin-bottom: 0;
 }
 
-ol {
+/*ol {
 	padding-left: 20px;
-}
+}*/
 
 ul,.ul {
 	padding-left: 5px;
@@ -655,11 +655,11 @@ div.impactcontent li {
 	/*-moz-background-clip: border;
 	-moz-background-inline-policy: continuous;
 	-moz-background-origin: padding;*/
-	background: transparent url("bullet_orange.png") no-repeat scroll left
+	/*background: transparent url("bullet_orange.png") no-repeat scroll left
 		0.45em;
 	list-style-image: none;
 	list-style-type: disc;
-	list-style-position: inside;
+	list-style-position: inside;*/
 	padding: 0 0 0 1.666em;
 	margin-bottom: 3px;
 }

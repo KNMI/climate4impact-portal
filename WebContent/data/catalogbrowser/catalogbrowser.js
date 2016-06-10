@@ -58,6 +58,10 @@ var CatalogBrowser = function(options){
       options.element.empty().html('<div class="ajaxloader"></div>');
       
       var httpCallback = function(_data){
+        if(_data.error){
+          options.element.empty().html(_data.error+"</br>Server returned exception: "+_data.exception);
+          return;
+        }
         var data = _data.html;
         options.element.empty().html(data);
         
@@ -94,7 +98,7 @@ var CatalogBrowser = function(options){
         httpCallback(d)
       }).fail(function(e) {
         console.log("fail");
-        httpCallback({html:"Failed "+e});
+        httpCallback({html:"Failed:: "+e.error});
      
       }).always(function(){
      

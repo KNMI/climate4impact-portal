@@ -194,14 +194,14 @@ public class Search {
                     sortedFacetElements.put(facet_name.getAttrValue("name"),Integer.parseInt(facet_name.getValue()));
                   }
                 
-                  JSONArray facet = new JSONArray();
+                  JSONObject facet = new JSONObject();
                   
                   //int first = 0;
                   for (SortedMap.Entry<String, Integer> entry : sortedFacetElements.entrySet()){
                     //if(first <5){
                     //Debug.println(entry.getKey());
                     //first++;
-                      facet.put(entry.getKey());//, entry.getValue());
+                      facet.put(entry.getKey(), entry.getValue());
                     //}
                   }
                   facetsObj.put(facet_field.getAttrValue("name"),facet);
@@ -246,6 +246,10 @@ public class Search {
             Vector<XMLElement> doclist=a.getList("doc");
             
             for(XMLElement doc : doclist){
+              //Debug.println(doc.toString());
+              String esgfurl = "";
+              String esgfid = "";
+              String esgfdatanode = "";
               JSONObject searchResult = new JSONObject();
               searchResults.put(searchResult);
               Vector<XMLElement> arrlist = doc.getList("arr");
@@ -256,15 +260,27 @@ public class Search {
                   String urlToCheck = arr.get("str").getValue().split("#")[0];
                   urlToCheck = urlToCheck.split("\\|")[0];
                   searchResult.put("url",urlToCheck);
+                  esgfurl = urlToCheck;
                 }
               }
               for(XMLElement str : strlist){
                 String attrName = str.getAttrValue("name");
                 if(attrName.equals("id")){
-                  searchResult.put("id",str.getValue().split("\\|")[0]);
-                  //
+                  esgfid=str.getValue().split("\\|")[0];
+                  searchResult.put("esgfid",esgfid);
                 }
+                if(attrName.equals("data_node")){
+                  esgfdatanode=str.getValue().split("\\|")[0];
+                  searchResult.put("data_node",esgfdatanode);
+                }
+
               }
+              
+              //Compose the unique id;
+              if(esgfdatanode.length()==0){
+                esgfdatanode = esgfurl;
+              }
+              searchResult.put("id",esgfdatanode+"::"+esgfid);
               
             }
           }

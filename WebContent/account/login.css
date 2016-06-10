@@ -95,49 +95,49 @@ div#users-contain table td,div#users-contain table th {
 }
 
 .logo_USA {
-	background-image: url("images/countries/USA.png") !important;
+	background-image: url("/impactportal/images/countries/USA.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_UK {
-	background-image: url("images/countries/UK.png") !important;
+	background-image: url("/impactportal/images/countries/UK.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_Sweden {
-	background-image: url("images/countries/Sweden.png") !important;
+	background-image: url("/impactportal/images/countries/Sweden.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_Germany {
-	background-image: url("images/countries/Germany.png") !important;
+	background-image: url("/impactportal/images/countries/Germany.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_France {
-	background-image: url("images/countries/France.png") !important;
+	background-image: url("/impactportal/images/countries/France.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_China {
-	background-image: url("images/countries/China.png") !important;
+	background-image: url("/impactportal/images/countries/China.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_Italy {
-	background-image: url("images/countries/Italy.png") !important;
+	background-image: url("/impactportal/images/countries/Italy.png") !important;
 	width: 16px;
 	height: 16px;
 }
 
 .logo_Australie {
-	background-image: url("images/countries/Australia.png") !important;
+	background-image: url("/impactportal/images/countries/Australia.png") !important;
 	width: 16px;
 	height: 16px;
 }
@@ -149,4 +149,9 @@ div#users-contain table td,div#users-contain table th {
 	color:#666;
 	font-size:12px;
 	margin:0px;
+}
+
+.c4i_openidcompositor_registerspan{
+	float:right;
+	margin-right:20px;
 }

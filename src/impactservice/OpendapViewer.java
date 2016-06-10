@@ -143,28 +143,39 @@ public class OpendapViewer {
             if(varDimensions.length>=2){
               if(variables.get(j).getAttrValue("name").indexOf("bnds")==-1){
                 
-                boolean show = true;
-                for(String dim : varDimensions){
-                  if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
-                    show=false;break;
-                  }
-                  boolean foundDim = false;
-                  for(int i=0;i<variables.size();i++){
-                    if(variables.get(i).getAttrValue("name").equals(dim)){
-                      foundDim=true;break;
-                    }
-                  }
-                  if(foundDim==false){show=false;break;}
-                }
-                if(show){
-                  if(variables.get(j).getAttrValue("name").equals("lon")==false&&
-                      variables.get(j).getAttrValue("name").equals("lat")==false&&
+//                boolean show = true;
+//                for(String dim : varDimensions){
+//                  if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
+//                    show=false;break;
+//                  }
+//                  boolean foundDim = false;
+//                  for(int i=0;i<variables.size();i++){
+//                    if(variables.get(i).getAttrValue("name").equals(dim)){
+//                      foundDim=true;break;
+//                    }
+//                  }
+//                  if(foundDim==false){show=false;break;}
+//                }
+                
+                //if(show){
+                  if(variables.get(j).getAttrValue("name").equalsIgnoreCase("lon")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lat")==false&&
+                      variables.get(j).getAttrValue("name").indexOf("bnds")==-1&&
+                      variables.get(j).getAttrValue("name").indexOf("bounds")==-1&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("x")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("y")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("row")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("col")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("latitude")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lon_vertices")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lat_vertices")==false&&
+                      variables.get(j).getAttrValue("name").equalsIgnoreCase("longitude")==false&&
                       variables.get(j).getAttrValue("name").equals("Actual_latitude")==false&&
                       variables.get(j).getAttrValue("name").equals("Actual_longitude")==false
                       ){
                     jsonVariable1.put("isViewable",1);
                   }
-                }
+                //}
               }
             }
   

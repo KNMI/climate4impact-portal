@@ -18,6 +18,21 @@ var esgfSearchIndexOf = function(thisobj,obj, start) {
     return -1;
 }
 
+var esgfSearchGetKeys = function(obj){
+  if (!Object.keys) {
+    var keys = [],
+        k;
+    for (k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k)) {
+            keys.push(k);
+        }
+    }
+    return keys;
+  }else{
+    return Object.keys(obj);
+  }
+};
+
 /**
 * Splits a url into key value pairs.
 */
@@ -69,7 +84,7 @@ var SearchInterface = function(options){
     "project":"Project",
     "variable":"Parameter",
     "time_frequency":"Frequency",
-    "experiment":"RCP/Experiment",
+    "experiment":"Experiment",
     "cf_standard_name":"CF name",
     "cmor_table":"CMOR table",   
     "data_node":"Data node",
@@ -80,6 +95,16 @@ var SearchInterface = function(options){
     "query":"Free text"
   };
   
+  var facetDescription = {
+      "domain":"This filter lists the geographical domains for CORDEX projects. For more info check <a target=\"_blank\" href=\"http://www.cordex.org/\">http://www.cordex.org/</a>. ",
+      "model":"Choose the climate model. Read more at the <a target=\"_blank\" href=\"/impactportal/general/index.jsp?q=climate_models\">Climate models</a> page.",
+      "access":"Choose the type of access. OpenDAP enables visualization and processing on this portal. Use HTTPServer for direct download.",
+      "variable":"Choose the Parameter. A list of CMIP5 variables is published at the <a target=\"_blank\" href=\"/impactportal/documentation.jsp?q=listofcmip5variables\">CMIP5 variables</a> page.",
+             
+        
+      
+      
+  }
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
   query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
   query = query.replaceAll("&amp;","&");
@@ -92,7 +117,7 @@ var SearchInterface = function(options){
  
   
   var propertyChooser = [];
-  var propertyTabMenu = "quickmenu";
+  var propertyTabMenu = [];
   
   /**
   * Class to make Ajax Calls which will complete in the same order as called; e.g. it blocks calls.
@@ -167,14 +192,14 @@ var SearchInterface = function(options){
     
     rootElement = options.element;
     options.element.html('<div class="simplecomponent-container">'+
-    '  <div class="simplecomponent c4i-esgfsearch-selectedelements">'+
-    '    <div class="simplecomponent-header">Selected filters:</div>'+
+    '  <div class="simplecomponent c4i-esgfsearch-facetoverview">'+
+    '    <div class="simplecomponent-header">Filters</div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
     ''+
-    '  <div class="simplecomponent c4i-esgfsearch-facetoverview">'+
-    '    <div class="simplecomponent-header">Filters:</div>'+
+    '  <div class="simplecomponent c4i-esgfsearch-selectedelements">'+
+    '    <div class="simplecomponent-header">Selected filters</div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
@@ -241,21 +266,21 @@ var SearchInterface = function(options){
   var _checkResponse = function(arg,ready){
   
     var setResult = function(arg,a){    
-      var el = rootElement.find("span[name=\""+arg.id+"\"]");//.first();
+      var el = rootElement.find("span[name=\""+arg.url+"\"]");//.first();
       
       if(a.ok=="ok"){
     	  el.removeClass("c4i-esgfsearch-resultitem-checking");
     	  el.addClass("c4i-esgfsearch-resultitem-ok");
     	  el.find(".c4i-esgfsearch-resultitem-checker").html("");
       }else if(a.ok=="busy"){
-    	  var el = rootElement.find("span[name=\""+arg.id+"\"]").first();
+    	  var el = rootElement.find("span[name=\""+arg.url+"\"]").first();
     	  el.addClass(".c4i-esgfsearch-resultitem-checking"); 
-    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - checking .. ");
+    	  el.find(".c4i-esgfsearch-resultitem-checker").html(" - <span class=\"c4i-esgfsearch-loader-animationsmall\"></span> checking catalog.. ");
     	  
-    	 // console.log("Busy for "+arg.id);
+
     	  
     	  function retry(arg){
-    		  el.find(".c4i-esgfsearch-resultitem-checker").html(" - checking ... ");
+    		  el.find(".c4i-esgfsearch-resultitem-checker").html(" - <span class=\"c4i-esgfsearch-loader-animationsmall\"></span> checking catalog ... ");
     		  setTimeout(function(){
     			  checkResponseFifo.call(arg);
     		  }, 300); 
@@ -264,7 +289,7 @@ var SearchInterface = function(options){
     	  
     	  setTimeout(function(){
     		  retry(arg);
-		  }, 5000); 
+		  }, 3000); 
       }else {
     	  el.removeClass("c4i-esgfsearch-resultitem-checking");
     	  el.addClass("c4i-esgfsearch-resultitem-wrong");
@@ -272,17 +297,17 @@ var SearchInterface = function(options){
       }
     };
     
-    if(recentlyCheckedResponses[arg.id]){
-      if(recentlyCheckedResponses[arg.id].ok=="ok"){
-	    setResult(arg,recentlyCheckedResponses[arg.id]);
+    if(recentlyCheckedResponses[arg.url]){
+      if(recentlyCheckedResponses[arg.url].ok=="ok"){
+	    setResult(arg,recentlyCheckedResponses[arg.url]);
 	    ready();
 	    return;
       }
     }
     
     var httpCallback = function(a){
-      recentlyCheckedResponses[arg.id]=a;
-      setResult(arg,recentlyCheckedResponses[arg.id]);
+      recentlyCheckedResponses[arg.url]=a;
+      setResult(arg,recentlyCheckedResponses[arg.url]);
  
       return;
     };
@@ -351,7 +376,7 @@ var SearchInterface = function(options){
     html+="<div class=\"c4i-esgfsearch-resultlist\">";
     for(var r in data.response.results){
      // html+="<span  name=\""+data.response.results[r].id+"\">";
-      html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].id+"\">";
+      html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].url+"\">";
       
       html+="<span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-collapsible c4i-esgfsearch-dataset-imgcollapsed\" title=\"Expand this dataset and show its content.\"></span>";
       
@@ -361,9 +386,10 @@ var SearchInterface = function(options){
       html+="  </span>";
       
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
-       var id = ""+data.response.results[r].id;
-       html+= id.replaceAll("."," ");
-       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">checking .</span>";
+       var id = data.response.results[r].esgfid;
+    
+       html+= id;//.replaceAll("."," ");
+       html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">Start checking .</span>";
        html+="</span>";
        //ESDOC
        if(data.response.results[r].id.indexOf("cmip5")==0){
@@ -501,7 +527,7 @@ var SearchInterface = function(options){
           var clickedID = $(this).parent().attr("name");
           var catalogObject = null;
           for(var r in data.response.results){
-            if(clickedID == data.response.results[r].id){
+            if(clickedID == data.response.results[r].url){
               catalogObject = data.response.results[r];
               break;
             }
@@ -616,92 +642,108 @@ var SearchInterface = function(options){
     var html="";
     var even = 0;
     var autocompleteList = [];
+    var facetListNr = 0;
     for(var i in facetList){
+      facetListNr++;
       var oddEvenClass = "";
       var selectedClass = "";  
       var checkboxclass = "c4i-esgfsearch-checkboxclear";
       if(even == 0)oddEvenClass="c4i-esgfsearch-property-even";else oddEvenClass="c4i-esgfsearch-property-odd";
       if(selectedPropertiesForFacet){
-        if(esgfSearchIndexOf(selectedPropertiesForFacet,facetList[i])!=-1){
+        if(esgfSearchIndexOf(selectedPropertiesForFacet,i)!=-1){
           selectedClass = "c4i-esgfsearch-property-selected";
           checkboxclass = "c4i-esgfsearch-checkbox";
         }
       }
       var description = "";
-      description = descriptions[facetList[i]];
+      description = descriptions[i];
       if(!description)description = "";
       if(description.length>0) {
         autocompleteList.push(description);
       }
-      html+="<span name=\""+facetList[i]+"\" class=\"c4i-esgfsearch-property "+selectedClass+" "+oddEvenClass+"\">"+
-      "<span class=\"c4i-esgfsearch-property-checkbox "+checkboxclass+"\"></span><span style=\"width:170px;display:inline-block;\">"+facetList[i]+"</span><i>"+description+"</i></span>";
+      html+="<span name=\""+i+"\" class=\"c4i-esgfsearch-property "+selectedClass+" "+oddEvenClass+"\">";
+      html+="<span class=\"c4i-esgfsearch-property-counter\" >"+facetListNr+")</span>";
+      html+="<span class=\"c4i-esgfsearch-property-checkbox "+checkboxclass+"\"></span>";
+      html+="<span class=\"c4i-esgfsearch-property-name\">"+i+"<span class=\"c4i-esgfsearch-property-count\">("+facetList[i]+")</span></span>";
+      html+="<span class=\"c4i-esgfsearch-property-description\">"+description+"</span>";
+      html+="</span>";
       even = 1-even;
       
-      autocompleteList.push(facetList[i]);
+      autocompleteList.push(i);
       
     }
     
-    var tabPropertySelector = "<div class=\"c4i-esgfsearch-tabcontainer c4i-esgfsearch-property-container\"><div class=\"c4i-esgfsearch-property-container-properties\">"+html+
+    var tabPropertySelector = "<div class=\"c4i-esgfsearch-tabcontainer c4i-esgfsearch-property-container\">";
+    if(facetDescription[facetName]){
+      tabPropertySelector+="<div class=\"c4i-esgfsearch-generallabel\">";
+      tabPropertySelector+="<span class=\"c4i-esgfsearch-property-headerlabel\">"+facetDescription[facetName]+"</span>";
+      tabPropertySelector+="</div>";
+    }
+    tabPropertySelector+="<div class=\"c4i-esgfsearch-property-container-properties\">"+html+
        "</div><div class=\"c4i-esgfsearch-autocomplete\">Filter: <input class=\"c4i-esgfsearch-searchautocomplete\" ></input></div></div>";
 
     rootElement.find(".c4i-esgfsearch-selectfacet-container").html(tabPropertySelector);
     
     rootElement.find(".c4i-esgfsearch-property-container").show();
     var noPropertyChooser = true;
-    //if(!selectedPropertiesForFacet)
-    {
-      if(propertyChooser){
-        if(propertyChooser[facetName]){
-          noPropertyChooser = false;
-          rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
-            "<div class=\"c4i-esgfsearch-property-menu c4i-esgfsearch-tabcontainer\">"+
-              propertyChooser[facetName].html+
-            "</div>"
-          );
-          var numprops = propertyChooser[facetName].init(rootElement,facetName,facetList,query,_this.addFilterProperty);
-          
-          var onlyquickselect = false;
-          if(propertyChooser[facetName].config.onlyquickselect===true){
-            onlyquickselect  = true;
-          }
-          
-          if(onlyquickselect == true){
-            rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
-              "<div class=\"c4i-esgfsearch-tabmain\">"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+"</div>"+
-              "</div>"
-            );
-             rootElement.find(".c4i-esgfsearch-property-container").hide();
-             
-             propertyTabMenu = "quickmenu";
-             
-          }else{
-            rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
-              "<div class=\"c4i-esgfsearch-tabmain\">"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-menu\">Quick select "+_getFacetName(facetName)+"</div>"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+facetList.length+")</div>"+
-              "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
-              "</div>"
-            );
-            if(numprops >0){
-              rootElement.find(".c4i-esgfsearch-property-container").hide();
-              rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
-            }else{
-              rootElement.find(".c4i-esgfsearch-property-menu").hide();
-              rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
-            }
-          }
-        }
+    
+    if(propertyChooser[facetName]){
+      if(! propertyTabMenu[facetName]){
+        propertyTabMenu[facetName] = "quickmenu";
       }
       
-      if(noPropertyChooser){
-         rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
-            "<div class=\"c4i-esgfsearch-tabmain\">"+
-            "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+" ("+facetList.length+")</div>"+
-            "</div>"
-          );
+      noPropertyChooser = false;
+      rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+        "<div class=\"c4i-esgfsearch-property-menu c4i-esgfsearch-tabcontainer\">"+
+          propertyChooser[facetName].html+
+        "</div>"
+      );
+      var numprops = propertyChooser[facetName].init(rootElement,facetName,facetList,query,_this.addFilterProperty);
+      
+      var onlyquickselect = false;
+      if(propertyChooser[facetName].config.onlyquickselect===true){
+        onlyquickselect  = true;
+      }
+      
+      if(onlyquickselect == true){
+        rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+          "<div class=\"c4i-esgfsearch-tabmain\">"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-menu c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+"</div>"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
+          "</div>"
+        );
+         rootElement.find(".c4i-esgfsearch-property-container").hide();
+         
+         propertyTabMenu[facetName] = "quickmenu";
+         
+      }else{
+        rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+          "<div class=\"c4i-esgfsearch-tabmain\">"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-menu\">Quick select "+_getFacetName(facetName)+"</div>"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-properties\">All "+_getFacetName(facetName)+" properties ("+esgfSearchGetKeys(facetList).length+")</div>"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
+          "</div>"
+        );
+        if(numprops >0){
+          rootElement.find(".c4i-esgfsearch-property-container").hide();
+          rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
+        }else{
+          rootElement.find(".c4i-esgfsearch-property-menu").hide();
+          rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
+        }
       }
     }
+  
+    
+    if(noPropertyChooser){
+       rootElement.find(".c4i-esgfsearch-selectfacet-container").prepend(
+          "<div class=\"c4i-esgfsearch-tabmain\">"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-tab-properties c4i-esgfsearch-tab-selected\">"+_getFacetName(facetName)+" ("+esgfSearchGetKeys(facetList).length+")</div>"+
+          "<div class=\"c4i-esgfsearch-tab c4i-esgfsearch-noselect c4i-esgfsearch-tab-collapse c4i-esgfsearch-tab-selected\">^</div>"+
+          "</div>"
+        );
+    }
+  
     
     var showPropertyTab = function(){
       rootElement.find(".c4i-esgfsearch-property-menu").hide();
@@ -713,7 +755,7 @@ var SearchInterface = function(options){
       
       rootElement.find(".c4i-esgfsearch-property-container").show();
       rootElement.find(".c4i-esgfsearch-tab-properties").addClass("c4i-esgfsearch-tab-selected");
-      propertyTabMenu = "allproperties";
+      propertyTabMenu[facetName]= "allproperties";
     };
     
     var showQuickSelect = function(){
@@ -726,10 +768,10 @@ var SearchInterface = function(options){
       
       rootElement.find(".c4i-esgfsearch-property-menu").show();
       rootElement.find(".c4i-esgfsearch-tab-menu").addClass("c4i-esgfsearch-tab-selected");
-      propertyTabMenu = "quickmenu";
+      propertyTabMenu[facetName] = "quickmenu";
     };
     
-    if(propertyTabMenu == "allproperties"){
+    if(propertyTabMenu[facetName] == "allproperties"){
       showPropertyTab();
     }
     
@@ -741,9 +783,9 @@ var SearchInterface = function(options){
     
     rootElement.find(".c4i-esgfsearch-tab-collapse").attr('onclick','').click(function(evt){
       if(rootElement.find(".c4i-esgfsearch-tab-collapse").html() == "+"){
-        if(propertyTabMenu == "allproperties"){
+        if(propertyTabMenu[facetName] == "allproperties" || !propertyTabMenu[facetName]){
           showPropertyTab();
-        }else if(propertyTabMenu == "quickmenu"){
+        }else if(propertyTabMenu[facetName] == "quickmenu"){
           showQuickSelect();
         }
       }else{
@@ -805,10 +847,8 @@ var SearchInterface = function(options){
           //Search in descriptions
           if(descriptions){
             for(var i in facetList){
-              if(descriptions[facetList[i]] == ui.item.value){
-//                 console.log("Found "+facetList[i]);
-//                 console.log("Found "+i);
-                el =rootElement.find("span[name=\""+facetList[i]+"\"]");
+              if(descriptions[i] == ui.item.value){
+                el =rootElement.find("span[name=\""+i+"\"]");
                 break;
               }
             }
@@ -831,7 +871,13 @@ var SearchInterface = function(options){
   var loadAndDisplayFacet = function(facetName){
     var facetselectordiv=rootElement.find(".c4i-esgfsearch-selectfacet-container");
     facetselectordiv.block();
-    getPropertiesForFacetName({name:facetName,callback:function(facetList){currentFacetList = facetList;currentSelectedFacet=facetName;generatePropertyListSelector(facetList,facetName);}});
+    getPropertiesForFacetName({name:facetName,
+      callback:function(facetList){
+        currentFacetList = facetList;
+        currentSelectedFacet=facetName;
+        generatePropertyListSelector(facetList,facetName);
+      }
+    });
   };
   
   this.addFilterProperty = function(facet,property){
@@ -876,11 +922,11 @@ var SearchInterface = function(options){
         var v= kvps[kvp][vkey];
         if(isDefined(property)){
           if(!(kvp==facet&&property==v)){
-            query+=kvp+"="+encodeURIComponent(v)+"&";
+            query+=kvp+"="+(v)+"&";
           }
         }else{
            if(!(kvp==facet)){
-            query+=kvp+"="+encodeURIComponent(v)+"&";
+            query+=kvp+"="+(v)+"&";
           }
         }
       }
@@ -1002,6 +1048,7 @@ var SearchInterface = function(options){
 
       var count;
       var html = "";
+      var facetNr = 0;
       for(var facetkey in facets){
         count =0;
         for(var property in facets[facetkey]){
@@ -1027,15 +1074,20 @@ var SearchInterface = function(options){
         
         //if(!selectedFacets[facetkey]){
           if(count>0||count==-1){
+            if(facetNr>0){
+              html+="/";
+            }
             html+=facet;
+            facetNr++;
           }
         //}
+          
       }
       
       if(!listAllFacets){
-        html+="<span name=\"showall\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">&gt; more...</span>";
+        html+="<span name=\"showall\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">&gt; show all filters</span>";
       }else{
-         html+="<span name=\"showdefault\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">^ less</span>";
+         html+="<span name=\"showdefault\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">^ show less filters</span>";
       }
       html+="<div class=\"c4i-esgfsearch-selectfacet-container\"></div>";
       html+="</div>";

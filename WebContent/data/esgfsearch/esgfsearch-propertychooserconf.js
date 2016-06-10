@@ -26,11 +26,11 @@ var esgfsearch_colorscheme_blueblackwhite = {
   "background":"#B5B6BD",
   "color1":"#f58d00",
   "color2":"#00a8ec",
-  "color6":"#c33c3c",
+  "color3":"#4CAF50",
   "color4":"#dda606",
   "color5":"#AEB404",
-  "color3":"#4CAF50",
-  "color7":"#8258FA"
+  "color6":"#e35c5c",
+  "color7":"#9268FF"
 };
 
 var esgfsearch_currentcolorscheme = esgfsearch_colorscheme_blueblackwhite;
@@ -40,12 +40,12 @@ var esgfsearch_pc_project={
   "properties":[
     {
       "name":"CMIP5",
-      "longname":"Coupled Model Intercomparison Project Phase 5<br/>Long term global climate change runs",
+      "longname":"Coupled Model Intercomparison Project Phase 5<br/>Long term global climate change runs<br/></br><a target=\"_blank\" href=\"http://cmip-pcmdi.llnl.gov/cmip5/\">CMIP5 project page</a>",
       "shortname":"CMIP5",
       "color":esgfsearch_currentcolorscheme.color1
     },{
       "name":"CORDEX",
-      "longname":"Coordinated Regional Climate Downscaling Experiment<br/>Long term regional climate change runs",
+      "longname":"Coordinated Regional Climate Downscaling Experiment<br/>Long term regional climate change runs<br/></br><a target=\"_blank\" href=\"http://www.cordex.org/\">CORDEX project page</a>",
       "shortname":"CORDEX",
       "color":esgfsearch_currentcolorscheme.color2
     },/*{
@@ -55,7 +55,7 @@ var esgfsearch_pc_project={
       "color":esgfsearch_currentcolorscheme.color3
     },*/{
         "name":"clipc",
-        "longname":"Climate Information Platform for Copernicus",
+        "longname":"Climate Information Platform for Copernicus</br></br></br><br/><br/><a target=\"_blank\" href=\"http://www.clipc.eu/\">CLIPC project page</a>",
         "shortname":"CLIPC",
         "color":esgfsearch_currentcolorscheme.color4
       }
@@ -145,6 +145,7 @@ var esgfsearch_pc_variables={
     {
       "longname": "Air Temperature",
       "shortname": "Temperature",
+      "weathericon":"wi wi-thermometer-exterior",
       "color":esgfsearch_currentcolorscheme.color1,
       "children": [
         {
@@ -172,6 +173,7 @@ var esgfsearch_pc_variables={
       "name": "pr",
       "longname": "Total Precipitation",
       "shortname": "Precipitation",
+      "weathericon":"wi wi-rain",
       "color":esgfsearch_currentcolorscheme.color2,
       "children": [ 
         {
@@ -194,6 +196,7 @@ var esgfsearch_pc_variables={
     {
     
       "shortname": "Humidity",
+      "weathericon":"wi wi-humidity",
       "color":esgfsearch_currentcolorscheme.color3,
       "children": [
         {
@@ -234,6 +237,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Wind",
+      "weathericon":"wi wi-strong-wind",
       "color":esgfsearch_currentcolorscheme.color5,
       "children": [
         {
@@ -259,6 +263,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Radiation",
+      "weathericon":"wi wi-day-sunny",
       "color":esgfsearch_currentcolorscheme.color6,
       "children":[
         {
@@ -294,6 +299,7 @@ var esgfsearch_pc_variables={
     },
     {
       "shortname": "Pressure",
+      "weathericon":"wi wi-barometer",
       "color":esgfsearch_currentcolorscheme.color7,
       "children": [
         {

@@ -10,7 +10,8 @@
     	logocls:'logo_UK',
     	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
     	needsusername:false
-      },'SMHI-NSC-LIU':{
+      },
+      'SMHI-NSC-LIU':{
           name:'SMHI-NSC-LIU',
           openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
           createaccount:'https://esg-dn1.nsc.liu.se/user/add/?next=https://esg-dn1.nsc.liu.se/projects/esgf-liu/',
@@ -73,6 +74,11 @@ var checkOpenIdCookie = function(a) {
 };
 
 $( document ).ready(function() {
+  $(".c4i-login-screen-others").hide();
+  $(".c4i-login-screen-showothersbutton").button().click(function(){
+    $(".c4i-login-screen-showothersbutton").hide();
+    $(".c4i-login-screen-others").show();
+  });
 	var currentRedir=getUrlVar("c4i_redir");
 	if(!currentRedir){
 		currentRedir="";
@@ -85,7 +91,7 @@ $( document ).ready(function() {
 			html+='<div class="oauth2loginbox" onclick="document.location.href=\'/impactportal/oauth?provider='+provider.id+'&c4i_redir='+URLEncode(currentRedir)+'\'">';
 			html+=' <a class="oauth2loginbutton" href="#"><img src="'+provider.logo+'"/> '+provider.description+'</a>';
 			if(provider.registerlink){
-				html+=' - <a class="c4i_openidcompositor_registerlink" href="'+provider.registerlink+'"><i> Register</i></a>';
+				html+='<span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="'+provider.registerlink+'"><i> Register</i></a></span>';
 			}
 			html+='</div><br/>';
 		 }
@@ -99,14 +105,14 @@ $( document ).ready(function() {
 		html+='<div class="oauth2loginbox" onclick="openDialog(\''+id+'\')">';
 		html+=' <a class="oauth2loginbutton" href="#"><img src="'+OpenIDProviders[id].logo+'"/> '+OpenIDProviders[id].name+'</a>';
 		if(OpenIDProviders[id].createaccount){
-			html+=' - <a class="c4i_openidcompositor_registerlink" href="'+OpenIDProviders[id].createaccount+'"><i> Register</i></a>';
+			html+='<span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="'+OpenIDProviders[id].createaccount+'"><i> Register</i></a></span>';
 		}
 		html+='</div><br/>';
 	}
 	$(".openidform").html(html);
 
   $("#openidcompositor").button().click(function(){openDialog();});
-  $('#login_button').button();
+  $('#login_button').button().click(function(){$(".c4i-login-screen").hide().parent().append("Redirecting to identity provider...");});
 });
 
 $(function() {
@@ -215,6 +221,7 @@ $(function() {
                 $(this).dialog("close");
               }
             }
+            
           }
         }
 
@@ -227,9 +234,8 @@ $(function() {
 });
 
 var dataNodeButtonClicked = function(datacentre){
-
+    
 	  if(OpenIDProviders[datacentre].needsusername==false){
-		  
 		  $('#openid_identifier_input').val(OpenIDProviders[datacentre].openidprefix);
 		  $('#login_button').click();
 		  $("#login_button").hide();
@@ -251,7 +257,8 @@ var dataNodeButtonClicked = function(datacentre){
 };
 
 var openDialog = function(datacentre) {
-	
+  
+  
   if(datacentre){
 	  $('#dialog-form').dialog('open');
 	  dataNodeButtonClicked(datacentre);

@@ -18,6 +18,7 @@
     
 	<link rel="stylesheet" href="esgfsearch/esgfsearch.css" />
 	<link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
+	<link rel="stylesheet" href="esgfsearch/weather-icons/css/weather-icons.min.css" />
 	 <%
 			ImpactUser user = null;
 				try{
