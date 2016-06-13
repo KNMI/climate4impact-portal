@@ -1,17 +1,19 @@
   var c4i_user=false;
   
-  var OpenIDProviders = {
+  var OpenIDProviders = [
       
-      'CEDA':{
-    	name:'BADC/CEDA'   ,
-    	openidprefix:'https://ceda.ac.uk/openid/',
-    	createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
-    	accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
-    	logocls:'logo_UK',
-    	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
-    	needsusername:false
+      {
+        id:'CEDA',
+      	name:'BADC/CEDA'   ,
+      	openidprefix:'https://ceda.ac.uk/openid/',
+      	createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
+      	accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
+      	logocls:'logo_UK',
+      	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
+      	needsusername:false
       },
-      'SMHI-NSC-LIU':{
+      {
+          id:'SMHI-NSC-LIU',
           name:'SMHI-NSC-LIU',
           openidprefix:'https://esg-dn1.nsc.liu.se/esgf-idp/openid/',
           createaccount:'https://esg-dn1.nsc.liu.se/user/add/?next=https://esg-dn1.nsc.liu.se/projects/esgf-liu/',
@@ -19,7 +21,16 @@
           logocls:'logo_Sweden',
           logo:'/impactportal/images/nsclogo.png',
           needsusername:true
-  	  },
+  	  },{
+  	    id:'IPSL',
+        name:'IPSL',
+        openidprefix:'https://esgf-node.ipsl.upmc.fr/esgf-idp/openid/',
+        createaccount:'https://esgf-node.ipsl.upmc.fr/user/add/?next=https://esgf-node.ipsl.upmc.fr/projects/esgf-ipsl/',
+        accountinfo:'https://esgf-node.ipsl.upmc.fr/esgf-web-fe/accountsview',
+        logocls:'logo_France',
+        logo:'/impactportal/images/countries/France.png',
+        needsusername:true
+  	  }]
       /*'PCMDI':       {
     	  name:'PCMDI'       ,
     	  openidprefix:'https://pcmdi9.llnl.gov/esgf-idp/openid/',
@@ -51,17 +62,25 @@
     	  accountinfo:'https://esg.pik-potsdam.de/esgf-web-fe/accountsview',
     	  logocls:'logo_Germany'}*/
       
-  };
+ //};
 
 
- var getOpenIDProviderFromOpenId = function(openidIdentifier){
-	 for(var id in OpenIDProviders){
-		 var provider = OpenIDProviders[id];
-		 if(openidIdentifier.indexOf(provider.openidprefix)!=-1){
-			 return provider;
-		 }
-	 }
- }
+  var getIDProviderFromId = function(id){
+    for(var j=0;j<OpenIDProviders.length;j++){
+      var provider = OpenIDProviders[j];
+      if(provider.id==id){
+        return provider;
+      }
+    }
+  }
+  var getOpenIDProviderFromOpenId = function(openidIdentifier){
+    for(var j=0;j<OpenIDProviders.length;j++){
+      var provider = OpenIDProviders[j];
+      if(openidIdentifier.indexOf(provider.openidprefix)!=-1){
+        return provider;
+      }
+    }
+  }
   
 
 var checkOpenIdCookie = function(a) {
@@ -73,22 +92,28 @@ var checkOpenIdCookie = function(a) {
 
 };
 
+var oauthClick = function(providerID){
+  $(".c4i-login-screen").hide().parent().append("Redirecting to identity provider...");
+  var currentRedir=getUrlVar("c4i_redir");
+  if(!currentRedir){
+    currentRedir="";
+  }
+  document.location.href='/impactportal/oauth?provider='+providerID+'&c4i_redir='+URLEncode(currentRedir);
+};
+
 $( document ).ready(function() {
   $(".c4i-login-screen-others").hide();
   $(".c4i-login-screen-showothersbutton").button().click(function(){
     $(".c4i-login-screen-showothersbutton").hide();
     $(".c4i-login-screen-others").show();
   });
-	var currentRedir=getUrlVar("c4i_redir");
-	if(!currentRedir){
-		currentRedir="";
-	}
+
 	 $.ajax('/impactportal/oauth?makeform').done(function(data){
-		 
+	
 		 var html ="";
 		 for(var j=0;j<data.providers.length;j++){
 		 	var provider = data.providers[j];
-			html+='<div class="oauth2loginbox" onclick="document.location.href=\'/impactportal/oauth?provider='+provider.id+'&c4i_redir='+URLEncode(currentRedir)+'\'">';
+			html+='<div class="oauth2loginbox" onclick="oauthClick(\''+provider.id+'\');">';
 			html+=' <a class="oauth2loginbutton" href="#"><img src="'+provider.logo+'"/> '+provider.description+'</a>';
 			if(provider.registerlink){
 				html+='<span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="'+provider.registerlink+'"><i> Register</i></a></span>';
@@ -101,11 +126,13 @@ $( document ).ready(function() {
 	 });
 	 
 	var html="";
-	for(var id in OpenIDProviders){
-		html+='<div class="oauth2loginbox" onclick="openDialog(\''+id+'\')">';
-		html+=' <a class="oauth2loginbutton" href="#"><img src="'+OpenIDProviders[id].logo+'"/> '+OpenIDProviders[id].name+'</a>';
-		if(OpenIDProviders[id].createaccount){
-			html+='<span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="'+OpenIDProviders[id].createaccount+'"><i> Register</i></a></span>';
+	
+	for(var i = 1; i < OpenIDProviders.length; i++){
+	  var provider = OpenIDProviders[i];
+		html+='<div class="oauth2loginbox" onclick="openDialog(\''+provider.id+'\')">';
+		html+=' <a class="oauth2loginbutton" href="#"><img src="'+provider.logo+'"/> '+provider.name+'</a>';
+		if(provider.createaccount){
+			html+='<span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="'+provider.createaccount+'"><i> Register</i></a></span>';
 		}
 		html+='</div><br/>';
 	}
@@ -184,7 +211,7 @@ $(function() {
     var openid = "";
     
     if(!dataCentreName)return undefined;
-    var dataCentreOpenIdProvider = OpenIDProviders[dataCentreName].openidprefix;
+    var dataCentreOpenIdProvider = getIDProviderFromId(dataCentreName).openidprefix;
   
     
     openid = dataCentreOpenIdProvider+username;
@@ -234,9 +261,9 @@ $(function() {
 });
 
 var dataNodeButtonClicked = function(datacentre){
-    
-	  if(OpenIDProviders[datacentre].needsusername==false){
-		  $('#openid_identifier_input').val(OpenIDProviders[datacentre].openidprefix);
+     var provider=getIDProviderFromId(datacentre);
+	  if(provider.needsusername==false){
+		  $('#openid_identifier_input').val(provider.openidprefix);
 		  $('#login_button').click();
 		  $("#login_button").hide();
           $("#openid_identifier_input").prop('disabled',true);
@@ -245,9 +272,9 @@ var dataNodeButtonClicked = function(datacentre){
 		  return;
 	  }
 	  $('#dialog-form').dialog("option", "datacentre", datacentre);
-	  $("#composedopenididentifier").text(OpenIDProviders[datacentre].openidprefix);
-	  if(OpenIDProviders[datacentre].createaccount){
-		  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+OpenIDProviders[datacentre].createaccount+"\">Create an account on this data node.</a><br/>" +
+	  $("#composedopenididentifier").text(provider.openidprefix);
+	  if(provider.createaccount){
+		  $("#datacentreurl").html("- <a target=\"_blank\" href=\""+provider.createaccount+"\">Create an account on this data node.</a><br/>" +
 		  		"- <a target=\"_blank\" href=\"/impactportal/help/howto.jsp?q=create_esgf_account\">Read why you will be directed to another website.</a>");
 	  }
 	  $(".c4i_openidcompositor_entername").show();
@@ -267,14 +294,16 @@ var openDialog = function(datacentre) {
 	  $("#composeidentifierbutton").hide();
 	  $(".c4i_openidcompositor_chooseprovider").show();
 	  var html='<ul>';
-	  for(var id in OpenIDProviders){
-	    html+='<li><button id="dnb_'+id+'" class="datanodebutton" onclick="dataNodeButtonClicked(\''+id+'\');">'+OpenIDProviders[id].name+'</button> <i>('+OpenIDProviders[id].openidprefix+')<i></li>';// - '+ OpenIDProviders[id].url+ '&lt;username&gt;</li>' ;
+	  for(var j=0;j<OpenIDProviders.length;j++){
+	    var provider = OpenIDProviders[j];
+	    html+='<li><button id="dnb_'+provider.id+'" class="datanodebutton" onclick="dataNodeButtonClicked(\''+provider.id+'\');">'+provider.name+'</button> <i>('+provider.openidprefix+')<i></li>';
 	    //alert(id.name);
 	  }
 	  html+='</ul>';
 	  $("#datanodebuttons").html(html);
-	  for(var id in OpenIDProviders){
-	    $("#dnb_"+id).button({icons: {primary: OpenIDProviders[id].logocls},text:true});
+	  for(var j=0;j<OpenIDProviders.length;j++){
+	    var provider = OpenIDProviders[j];
+	    $("#dnb_"+provider.id).button({icons: {primary: provider.logocls},text:true});
 	    
 	  }
 	  $('#dialog-form').dialog('open');

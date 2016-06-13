@@ -265,19 +265,21 @@ public class AdagucViewer extends HttpServlet {
             String statusLocation = request.getParameter("request");
             
             String jsonData = "";
-            int maximumTries = 40;
+            int maximumTries = 20;
             boolean success = false;
             try{
               MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
               do{
                 maximumTries--;
-                //Debug.println("Attempts remaining: "+maximumTries+" for get status location: "+statusLocation);
+                String data = null;
+                //10: import java.net.HttpURLConnection; Gives issues! 
                 try{
-                  b.parse(new URL(statusLocation));
+                  data = HTTPTools.makeHTTPGetRequest(statusLocation, -1);
+                  b.parseString(data);
                   success = true;
                 }catch(SAXException s){
                   Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
-                  Thread.sleep(10000);
+                  Thread.sleep(3000);
                   if(maximumTries == 0){
                     GenericCart jobList;
                     try {

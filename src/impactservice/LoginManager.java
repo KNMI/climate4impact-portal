@@ -640,7 +640,7 @@ public class LoginManager {
     request.getSession().setAttribute("certificate", null);
     request.getSession().setAttribute("access_token", null);
     request.getSession().setAttribute("login_method", null);
-    request.getSession().setAttribute("message", null);
+    //request.getSession().setAttribute("message", null);
     Debug.println("--- LOGOUT DONE --- ");
   }
 

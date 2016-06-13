@@ -196,11 +196,7 @@ public class MyXMLParser {
 				inputStream.close();
 				long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
 		    Debug.println("Finished XML GET: "+url.toString()+" ("+(stopTimeInMillis-startTimeInMillis)+" ms)");
-		  } catch (SAXException e) {
-        String msg="SAXException: "+e.getMessage()+" for URL "+url.toString();
-        Debug.errprintln(msg);
-        throw new SAXException(msg);
-    } catch (IOException e) {
+		  } catch (IOException e) {
         String msg="IOException: "+e.getMessage()+" for URL "+url.toString();;
         int statusCode = connection.getResponseCode();
         if(statusCode>300){
@@ -209,7 +205,12 @@ public class MyXMLParser {
         Debug.errprintln("Status code: "+ connection.getResponseCode());
         Debug.errprintln(msg);
         throw new IOException(msg);
-    }catch(Exception e){
+    }catch (SAXException e) {
+      Debug.printStackTrace(e);
+      String msg="SAXException: "+e.getMessage()+" for URL "+url.toString();
+      Debug.errprintln(msg);
+      throw new SAXException(msg);
+    } catch(Exception e){
       String msg="Exception: "+e.getMessage()+" for URL "+url.toString();;
       Debug.errprintln(msg);
       throw new Exception(msg);
