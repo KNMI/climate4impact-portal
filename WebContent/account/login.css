@@ -60,6 +60,7 @@ div#users-contain table td,div#users-contain table th {
 	 padding:4px;
 	 text-align:center;
 	 padding:5px;
+	 box-shadow: 0px 0px 2px #555;
 }
 .oauth2loginbox:hover{
 	  border:1px solid #888;

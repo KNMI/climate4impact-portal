@@ -1,10 +1,10 @@
 <div class="c4i-login-screen">
 
-<div onclick="openDialog('CEDA')" class="oauth2loginbox"> <a href="#" class="oauth2loginbutton"><img src="/impactportal/images/this_is_NOT_the_BADC_logo.jpg"> BADC/CEDA</a><span class="c4i_openidcompositor_registerspan"><a href="https://services.ceda.ac.uk/cedasite/register/info/" class="c4i_openidcompositor_registerlink"><i> Register</i></a></span></div>
+<div onclick="openDialog('CEDA')" class="oauth2loginbox"> <a href="#" class="oauth2loginbutton"><img src="/impactportal/images/this_is_NOT_the_BADC_logo.jpg">Login at BADC/CEDA</a><span class="c4i_openidcompositor_registerspan"><a href="https://services.ceda.ac.uk/cedasite/register/info/" class="c4i_openidcompositor_registerlink"><i> Register</i></a></span></div>
 <!-- We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).-->
 <br/>You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a><br/>
-<br/>
-<button class="c4i-login-screen-showothersbutton">Show other providers...</button>
+<br/><br/><br/>
+<button class="c4i-login-screen-showothersbutton">&raquo; Show other providers...</button>
 <div class="c4i-login-screen-others">
 
 
