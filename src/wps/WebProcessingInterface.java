@@ -18,6 +18,8 @@ import impactservice.ImpactUser;
 
 
 
+
+import javax.net.ssl.SSLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -518,9 +520,24 @@ public class WebProcessingInterface {
     html+="<link rel=\"stylesheet\" href=\"/impactportal/styles.css\" type=\"text/css\" />";
 
     try {
-      MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-      b.parse(new URL(statusLocation));
+      ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+      PyWPSServer.runPyWPS(null, null, stringOutputStream, statusLocation, null);
       
+      MyXMLParser.XMLElement  b  = null;
+      try{
+          b = new MyXMLParser.XMLElement();
+        b.parseString(stringOutputStream.toString());
+        
+      }catch(SSLException e){
+        Debug.printStackTrace(e);
+        Debug.errprintln("error");
+        return (e.getMessage()+"\n").toString();
+       
+      }catch(Exception e){
+        Debug.printStackTrace(e);
+        return (e.getMessage()+"\n").toString();
+      }
+    
       html += "<h1>Report for "+b.get("wps:ExecuteResponse").get("wps:Process").get("ows:Title").getValue()+"</h1>";
       html+="See <a href=\""+statusLocation+"\">"+statusLocation+"</a> (XML).";
       html+="<hr/>";

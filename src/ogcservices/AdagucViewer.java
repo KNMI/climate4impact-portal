@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Vector;
 
+import javax.net.ssl.SSLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -215,12 +216,15 @@ public class AdagucViewer extends HttpServlet {
       
       //Determine whether the request is to the ADAGUC server in our impactportal or to any other WMS server?
       if(requestStr.indexOf("impactportal/ImpactService?")!=-1){
+        Debug.errprintln("DEPRECATED: LOCAL ADAGUCSERVER Detected via /ImpactService: should be via /adagucserver");
         isLocalADAGUC=true;
       }
       if(requestStr.indexOf("impactportal/adagucserver?")!=-1){
+        Debug.println("LOCAL ADAGUCSERVER Detected");
         isLocalADAGUC=true;
       }
       if(requestStr.indexOf("impactportal/WPS?")!=-1){
+        Debug.println("LOCAL WPS Detected");
         isLocalWPS=true;
       }
 
@@ -241,62 +245,27 @@ public class AdagucViewer extends HttpServlet {
           throw new Exception("Unable to parse XML at "+requestStr);
         }
       }else if(isLocalWPS){
-        
-        
-        //Local XML2JSON request to our local pywpsserver
-        Debug.println("Running local WPS CGI with "+requestStr);
+        ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
         //Remove /impactportal/ImpactService? from the requeststring
         int beginningOfUrl = requestStr.indexOf("?");
         if(beginningOfUrl!=-1){
           requestStr = requestStr.substring(beginningOfUrl+1);
           Debug.println("Truncated URL to "+requestStr);
         }
+        PyWPSServer.runPyWPS(request, null, stringOutputStream, requestStr, null);
         
-        KVPKey pq = HTTPTools.parseQueryString(requestStr);
-        Vector<String> requestKVP = pq.getValue("request");
-        if(requestKVP.size()==1){
-          if(requestKVP.get(0).equalsIgnoreCase("execute")){
-            Debug.println("THIS iS EXECUTE");
-            thisIsWPSExecuteRequest = true;
-          }
-        }else{
-          Vector<String> output = pq.getValue("output");
-          if(output.size()==1){
-            String statusLocation = request.getParameter("request");
-            
-            String jsonData = "";
-            int maximumTries = 20;
-            boolean success = false;
+            String jsonData = null;
             try{
               MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-              do{
-                maximumTries--;
-                String data = null;
-                //10: import java.net.HttpURLConnection; Gives issues! 
-                try{
-                  data = HTTPTools.makeHTTPGetRequest(statusLocation, -1);
-                  b.parseString(data);
-                  success = true;
-                }catch(SAXException s){
-                  Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
-                  Thread.sleep(3000);
-                  if(maximumTries == 0){
-                    GenericCart jobList;
-                    try {
-                      jobList = LoginManager.getUser(request,null).getProcessingJobList();
-                      String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
-                      jobList.removeDataLocator(basename);
-                    } catch (Exception e1) {
-                      e1.printStackTrace();
-                    }
-                    throw s;
-                  }
-                }
-              }while(maximumTries>0 && success == false);
-              
-              jsonData = b.toJSON(tools.MyXMLParser.Options.NONE);
-              
+              b.parseString(stringOutputStream.toString());
+              jsonData  = b.toJSON(tools.MyXMLParser.Options.NONE);
+            }catch(SSLException e){
+              Debug.printStackTrace(e);
+              JSONObject o = new JSONObject();
+              o.put("error", e.getMessage());
+              jsonData=o.toString();
             }catch(Exception e){
+              Debug.printStackTrace(e);
               JSONObject o = new JSONObject();
               o.put("error", e.getMessage());
               jsonData=o.toString();
@@ -310,18 +279,8 @@ public class AdagucViewer extends HttpServlet {
             }
             rootElement = null;
             return;
-          }
-        }
+          
         
-        
-        
-        ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
-        PyWPSServer.runPyWPS(request,null,stringOutputStream,requestStr,null);
-        try{
-          rootElement.parseString(stringOutputStream.toString());
-        }catch(Exception e){
-          throw new Exception("Unable to parse XML at "+requestStr);
-        }
       }else{
         //Remote XML2JSON request to external WMS service
         Debug.println("Converting XML to JSON for "+requestStr);

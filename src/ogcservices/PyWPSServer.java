@@ -45,32 +45,37 @@ public class PyWPSServer extends HttpServlet {
    * @throws Exception
    */
   public static void runPyWPS(HttpServletRequest request,HttpServletResponse response,OutputStream outputStream,String queryString,String dataToPost) throws Exception{
+    Debug.println("runPyWPS");
     String[] environmentVariables = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
 
     //Try to get homedir
     String userHomeDir="";
     ImpactUser user = null;
-   
+ 
+    try{
       user = LoginManager.getUser(request,response);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WPS for user: "+user.getId());
- 
-    
-    if(userHomeDir.length()>0){
-      environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
-    }else{
-      throw new Exception("User : "+user.getId()+" has no home dir");
+   
+      
+      if(userHomeDir.length()>0){
+        environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
+      }else{
+        throw new Exception("User : "+user.getId()+" has no home dir");
+      }
+      
+      String userDataDir = user.getDataDir();
+      environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir);
+      
+      String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/";
+      pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
+      pofOutputURL = pofOutputURL.replace("?", "");
+      environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
+    }catch(Exception e){
+      //OK no user info
+      Debug.println("Anonymous WPS request received");
     }
-    
-    String userDataDir = user.getDataDir();
-    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir);
-    
-    String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/";
-    pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
-    pofOutputURL = pofOutputURL.replace("?", "");
-    environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
-    
     //Try to get query string
     if(queryString == null){
       queryString = request.getQueryString();
@@ -82,22 +87,55 @@ public class PyWPSServer extends HttpServlet {
       }
     }
     
+    //Check for status location first.
+    String output = HTTPTools.getKVPItem(queryString, "OUTPUT");
+    if(output!=null){
+      String env[] = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
+      String portalOutputPath = null;
+      for(int j=0;j<env.length;j++){
+        String []kvp = env[j].split("=");
+        if(kvp.length == 2){
+          if(kvp[0].equals("PORTAL_OUTPUT_PATH")){
+            portalOutputPath = kvp[1];
+          }
+        }
+      }
+
+
+
+      //Remove first "/" token;
+      output = output.substring(1);
+      portalOutputPath = Tools.makeCleanPath(portalOutputPath);
+      String fileName = portalOutputPath+"/"+output;
+      Debug.println("WPS GET status request: "+portalOutputPath+output);
+
+      Tools.checkValidCharsForFile(output);
+      String data = Tools.readFile(fileName);
+      if(response!=null){
+        response.setContentType("text/xml");
+      }
+      outputStream.write(data.getBytes());          
+      return;
+    }
+
+    
     //Get the pywps location
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
     Debug.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
+    Debug.println("queryString:"+queryString);
     
-  
+    
     
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     
     CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,os,dataToPost);
     
-    saveJobSettingsForUser(dataToPost,queryString,user,os);
+    _saveJobSettingsForUser(dataToPost,queryString,user,os);
     
     outputStream.write(os.toByteArray());
   }
   
-  private static void saveJobSettingsForUser(String dataToPost, String queryString, ImpactUser user, ByteArrayOutputStream os) {
+  private static void _saveJobSettingsForUser(String dataToPost, String queryString, ImpactUser user, ByteArrayOutputStream os) {
     //Try to convert a GET Execute into post, because this is how we store it in the joblist.
     try{
       if(dataToPost==null&&queryString!=null){
@@ -134,7 +172,7 @@ public class PyWPSServer extends HttpServlet {
   }
 
 
-  private void handleWPSRequests(HttpServletRequest request, HttpServletResponse response) {
+  private static void _handleWPSRequests(HttpServletRequest request, HttpServletResponse response) {
     Debug.println("Handle WPS requests");
     OutputStream out1 = null;
     //response.setContentType("application/json");
@@ -180,70 +218,15 @@ public class PyWPSServer extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     Debug.println("WPS POST request received");
     
-    handleWPSRequests(request,response);
+    _handleWPSRequests(request,response);
   }
   
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-    
-    Debug.println("WPS QueryString: "+request.getQueryString());
-    //Check if this is a WPS status request, which means reading a local XML file which resides on disk.
-    try{
-        String output = null;
-        output = request.getParameter("OUTPUT");
-        if(output!=null){
-          String env[] = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
-          String portalOutputPath = null;
-          for(int j=0;j<env.length;j++){
-            String []kvp = env[j].split("=");
-            if(kvp.length == 2){
-              if(kvp[0].equals("PORTAL_OUTPUT_PATH")){
-                portalOutputPath = kvp[1];
-              }
-            }
-          }
-          
-          
-          
-          //Remove first "/" token;
-          output = output.substring(1);
-          portalOutputPath = Tools.makeCleanPath(portalOutputPath);
-          String fileName = portalOutputPath+"/"+output;
-          Debug.println("WPS GET status request: "+portalOutputPath+output);
-          OutputStream out1 = null;
-          String data;
-          try{
-            Tools.checkValidCharsForFile(output);
-            data = Tools.readFile(fileName);
-          }catch(Exception e){
-            Debug.errprintln(e.getMessage());
-            try {
-              out1 = response.getOutputStream();
-            } catch (IOException e1) {
-              Debug.errprint(e1.getMessage());
-              return;
-            }
-            response.setContentType("text/html");
-            out1.write(("Invalid file: "+output).getBytes());   
-            return;
-          }
-         try {
-            out1 = response.getOutputStream();
-          } catch (IOException e) {
-            Debug.errprint(e.getMessage());
-            return;
-          }
-          response.setContentType("text/xml");
-          out1.write(data.getBytes());          
-          return;
-        }
-    }catch(Exception e){
-    }
-  
-    //Otherwise, just call pyWPS
+  protected void  doGet(HttpServletRequest request, HttpServletResponse response) {
     Debug.println("WPS GET request received");
-    handleWPSRequests(request,response);
+    _handleWPSRequests(request,response);
   }
   
+
   private static String _addLiteralData(String identifier,String value){
     String data="";
     

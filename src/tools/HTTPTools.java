@@ -28,6 +28,7 @@ import java.util.SortedSet;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -185,7 +186,7 @@ public class HTTPTools extends HttpServlet {
   }
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
       String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers, int timeOutMs)
-      throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException {
+      throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException, SSLException {
     String connectToURL = makeCleanURL(url);
     Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
@@ -284,6 +285,8 @@ public class HTTPTools extends HttpServlet {
       }
     } catch (SSLPeerUnverifiedException sSLPeerUnverifiedException){
       throw sSLPeerUnverifiedException;
+    } catch (SSLException sslException){
+      throw sslException;
     } catch (UnknownHostException unknownHostException) {
       throw unknownHostException;
     } catch(SocketTimeoutException e){
