@@ -15,12 +15,14 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Vector;
 
+import javax.net.ssl.SSLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import oauth2handling.OAuth2Handler;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -560,16 +562,21 @@ public class LoginManager {
       Debug.errprintln(msg);
       jsonResponse.setErrorMessage(msg, 500);
       return jsonResponse;
-    } catch (UnknownHostException e) {
+    } catch (SSLException e) {
+      msg = "SSLException: " + e.getMessage();
+      Debug.errprintln(msg);
+      jsonResponse.setErrorMessage(msg, 500);
+      return jsonResponse;
+    }catch (UnknownHostException e) {
       msg = "The host is unknown: '" + e.getMessage() + "'\n";
       Debug.errprintln(msg);
       jsonResponse.setErrorMessage(msg, 500);
       return jsonResponse;
-//    } catch (ConnectTimeoutException e) {
-//      msg = "The connection timed out: '" + e.getMessage() + "'\n";
-//      Debug.errprintln(msg);
-//      jsonResponse.setErrorMessage(msg, 500);
-//      return jsonResponse;
+    } catch (ConnectTimeoutException e) {
+      msg = "The connection timed out: '" + e.getMessage() + "'\n";
+      Debug.errprintln(msg);
+      jsonResponse.setErrorMessage(msg, 500);
+      return jsonResponse;
     } catch (WebRequestBadStatusException e) {
       Debug.println("WebRequestBadStatusException: " +":"
           + e.getStatusCode());
