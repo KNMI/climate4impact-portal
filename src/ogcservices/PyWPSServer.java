@@ -86,39 +86,40 @@ public class PyWPSServer extends HttpServlet {
         environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
       }
     }
-    
-    //Check for status location first.
-    String output = HTTPTools.getKVPItem(queryString, "OUTPUT");
-    if(output!=null){
-      String env[] = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
-      String portalOutputPath = null;
-      for(int j=0;j<env.length;j++){
-        String []kvp = env[j].split("=");
-        if(kvp.length == 2){
-          if(kvp[0].equals("PORTAL_OUTPUT_PATH")){
-            portalOutputPath = kvp[1];
+  
+    //  Check for status location first.
+    if(queryString!=null){      
+      String output = HTTPTools.getKVPItem(queryString, "OUTPUT");
+      if(output!=null){
+        String env[] = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
+        String portalOutputPath = null;
+        for(int j=0;j<env.length;j++){
+          String []kvp = env[j].split("=");
+          if(kvp.length == 2){
+            if(kvp[0].equals("PORTAL_OUTPUT_PATH")){
+              portalOutputPath = kvp[1];
+            }
           }
         }
+  
+  
+  
+        //Remove first "/" token;
+        output = output.substring(1);
+        portalOutputPath = Tools.makeCleanPath(portalOutputPath);
+        String fileName = portalOutputPath+"/"+output;
+        Debug.println("WPS GET status request: "+portalOutputPath+output);
+  
+        Tools.checkValidCharsForFile(output);
+        String data = Tools.readFile(fileName);
+        if(response!=null){
+          response.setContentType("text/xml");
+        }
+        outputStream.write(data.getBytes());          
+        return;
       }
-
-
-
-      //Remove first "/" token;
-      output = output.substring(1);
-      portalOutputPath = Tools.makeCleanPath(portalOutputPath);
-      String fileName = portalOutputPath+"/"+output;
-      Debug.println("WPS GET status request: "+portalOutputPath+output);
-
-      Tools.checkValidCharsForFile(output);
-      String data = Tools.readFile(fileName);
-      if(response!=null){
-        response.setContentType("text/xml");
-      }
-      outputStream.write(data.getBytes());          
-      return;
     }
-
-    
+      
     //Get the pywps location
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
     Debug.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
