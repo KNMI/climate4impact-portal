@@ -397,7 +397,9 @@ public class WebProcessingInterface {
       do{
         maximumTries--;
         try{
-          b.parse(new URL(statusLocation));
+          ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+          PyWPSServer.runPyWPS(request, null, stringOutputStream, statusLocation, null);
+          b.parseString(stringOutputStream.toString());
           success = true;
         }catch(SAXException s){
           Debug.errprintln("Statuslocation does not contain valid XML, retrying..., attempts left: "+maximumTries);
@@ -557,6 +559,10 @@ public class WebProcessingInterface {
           //Literaldata are integers and strings
           try{
             String literalDataValue = dataEl.get("wps:LiteralData").getValue();
+            if(literalDataValue.startsWith("base64:")){
+              literalDataValue = new String(Base64.decodeBase64(literalDataValue.substring(7)));
+            }
+            
             String literalDataValueLowerCase = literalDataValue.toLowerCase();
             //Check if this output is an OPENDAP URL, in that case we can make a link to our file viewer
             if(literalDataValueLowerCase.indexOf("dap")!=-1&&literalDataValueLowerCase.indexOf("http")!=-1&&literalDataValueLowerCase.indexOf(".nc")!=-1){
@@ -564,6 +570,7 @@ public class WebProcessingInterface {
               String datasetViewerLocation = "/"+Configuration.getHomeURLPrefix()+"/data/datasetviewer.jsp?dataset=";
               data+="<a target=\"_blank\" href=\""+datasetViewerLocation+URLEncoder.encode(literalDataValue,"UTF-8")+"\">"+literalDataValue+"</a>";
             }else{
+              literalDataValue = literalDataValue.replace("\n","<br/>");
               data = literalDataValue;
             }
           }catch(Exception e){}

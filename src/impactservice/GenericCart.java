@@ -160,7 +160,7 @@ public class GenericCart {
       while(itr.hasNext()) {
         
         DataLocator element = itr.next();
-        Debug.println("Checking "+element.id);
+        //Debug.println("Checking "+element.id);
         if(element.id.equals(id)){
           Debug.println("Removing "+element.id);
           try {
@@ -174,7 +174,7 @@ public class GenericCart {
         }
       }
       Debug.println("There are "+dataLocatorList.size() +" files");
-      if(fileWasRemoved && dataLocatorList.size()!=0){
+      if(fileWasRemoved){
         saveToStore();
       }
     }
