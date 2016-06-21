@@ -57,7 +57,7 @@
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImageStore.js"></script>
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDivBuffer.js"></script>
     <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSelector.js"></script>
-    <script type="text/javascript" src="../adagucviewer/config.js"></script>
+    <script type="text/javascript" src="../adagucviewer/configc4i.js"></script>
     
     
     <link rel="stylesheet" type="text/css" href="../adagucviewer/webmapjs/WMJSStyles.css" />
