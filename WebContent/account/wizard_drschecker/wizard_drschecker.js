@@ -1,3 +1,5 @@
+if (window.location.protocol != "https:")
+    window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);    
     var mainWebmapJS ;
     setBaseURL("../adagucviewer/webmapjs");
     
@@ -121,6 +123,14 @@
       $("#startcalculation").hide();
       $("#results").hide();
  
+      var base64DecodeURLEncode = function(data){
+        var d =(decodeBase64(data.substring("base64:".length)));
+        d = d.replaceAll("<","&lt;");
+        d = d.replaceAll(">","&gt;");
+        d=d.replaceAll("\n","<br/>");
+        return d;
+      }
+      
       /*WPS finished callback*/
       var wpsComplete = function(data){
         console.log(data);
@@ -144,17 +154,20 @@
         
         
         if(goodorbad=="ERROR"){
-          html+="<div class=\"c4i-wizard-drschecker-results-error\">ERROR: Your file is not compliant with the CLIPC DRS standard!<br/>It has "+nroferrors+" error(s).</div>";
-          html+="<div class=\"c4i-wizard-drschecker-results-errors\"><span class=\"c4i-wizard-drschecker-results-errormessagestitle\">Error messages:</span>"+decodeBase64(errors.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
+          html+="<div class=\"c4i-wizard-drschecker-results-error\">ERROR: Your file is not compliant with the CLIPC DRS standard!<br/>"+nroferrors+" error(s) found.</div>";
+          html+="<div class=\"c4i-wizard-drschecker-results-errors\"><span class=\"c4i-wizard-drschecker-results-errormessagestitle\"></span>";
+          html+=base64DecodeURLEncode(errors)+"</div>";
         }else{
           html+="<div class=\"c4i-wizard-drschecker-results-good\">Your file is compliant with the CLIPC DRS metadata standards.<br/>Well done!</div>";
         }
         
         
-        html+="<div class=\"c4i-wizard-drschecker-results-DatasetDRS\"><span class=\"c4i-wizard-drschecker-results-datasetdrstitle\">DatasetDRS:</span>"+decodeBase64(DatasetDRS.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
-        html+="<div class=\"c4i-wizard-drschecker-results-FilenameDRS\"><span class=\"c4i-wizard-drschecker-results-filenamedrstitle\">FilenameDRS:</span>"+decodeBase64(FilenameDRS.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
+        html+="<div class=\"c4i-wizard-drschecker-results-DatasetDRS\"><span class=\"c4i-wizard-drschecker-results-datasetdrstitle\">Derived DatasetDRS:</span>";
+        html+=base64DecodeURLEncode(DatasetDRS)+"</div>";
+        html+="<div class=\"c4i-wizard-drschecker-results-FilenameDRS\"><span class=\"c4i-wizard-drschecker-results-filenamedrstitle\">Derived FilenameDRS:</span>";
+        html+=base64DecodeURLEncode(FilenameDRS)+"</div>";
         
-        var logmessageshtml=decodeBase64(logmessages.substring("base64:".length)).replaceAll("\n","<br/>");
+        var logmessageshtml=base64DecodeURLEncode(logmessages);
         logmessageshtml = logmessageshtml.replaceAll("[OK]","[OK-C4I]");
         logmessageshtml = logmessageshtml.replaceAll("[ERROR]","[ERROR-C4I]");
         logmessageshtml = logmessageshtml.replaceAll("[INFO]","[INFO-C4I]");

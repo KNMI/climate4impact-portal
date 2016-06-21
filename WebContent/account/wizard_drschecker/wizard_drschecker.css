@@ -54,7 +54,7 @@
 
 
 @keyframes blinker {  
-  50% { opacity: 0.0; }
+  50% { opacity: 0.2; }
 }
 
 .c4i-wizard-drschecker-results-error {
@@ -64,7 +64,7 @@
 	margin:10px;
 	text-align:center;
 	font-size:bold;
-	animation: blinker 0.6s linear infinite;
+	/*animation: blinker 1.6s linear infinite;*/
 }
 
 .c4i-wizard-drschecker-results-good {
