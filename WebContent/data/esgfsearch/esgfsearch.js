@@ -107,9 +107,9 @@ var SearchInterface = function(options){
       "experiment_family": "Choose family to reduce list of 'experiments', see <a target=\"_blank\" href=\http://cmip-pcmdi.llnl.gov/cmip5/getting_started_CMIP5_experiment.html#_T4\">CMIP5 Experiments</a>",
       "driving_model": "GCM used to force regional climate models",
       "data_node": "Generally not relevant, but for large downloads you may wish to choose the one closest to you",
-      "time_frequency": "Frequency at which model data are archived (is not equal to model time step). Note that for some (high) frequencies instantaneous model states are stored, generally for anything less than daily average states over that period are stored. See respective netcdf metadata for exact details.",
-      
-  }
+      "time_frequency": "Frequency at which model data are archived (is not equal to model time step). Note that for some (high) frequencies instantaneous model states are stored, generally for daily and longer periods average states over that period are stored. See respective netcdf metadata for exact details."
+ };
+  
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
   query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
   query = query.replaceAll("&amp;","&");
