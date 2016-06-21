@@ -12,19 +12,15 @@
         });   
     };
     
-    //var defaultProjection = {srs:'EPSG:3857',bbox:'13238.944477686076,6372693.810359594,1163089.5564179858,7299992.69095661'};
-    //var defaultProjection = {srs:'EPSG:28992',bbox:'-11207.614738397242,269926.44380811695,318293.5111561029,665327.7948815171'};
     var defaultProjection = {srs:'EPSG:4326',bbox:'-180,-90,180,90'};
     //var scaleBarURL       = "http://euro4mvis.knmi.nl/adagucviewer/webmapjs/php/makeScaleBar.php?";
     
-    
-    //var WPSURL = "http://bhw485.knmi.nl:8080/cgi-bin/wps.cgi?";
-    var resource = "Please select a file...";
+    var resource = "Please select a file or paste an opendap URL...";
+    //var resource = "http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/gsi_nco-4-4-8_CERFACS_multi-platform-tier2v1_day_19890101-20101231.nc";
     
     var urlvars = getUrlVars();
     if(urlvars.resource){
      	resource = urlvars.resource;
-    	//console.log(resource);
     };
     
     
@@ -33,7 +29,6 @@
     var coordinateRounder = function(original){
       return Math.round(original*1000)/1000;
     };
-    
     
     var boundingBoxBBOX;
     var currentCoverage;
@@ -58,45 +53,16 @@
           update(ui.value);
           
         }
-      });//('bla'+dim.size());
+      });
       update(0);
     }
     
     /* Callback function called when user clicks on the map*/
     var pointOnMapClicked = function(options){
-//       var m = options.map;
-//       var x = options.x;
-//       var y = options.y;
-//       
-//      
-//       var lalo=m.getLatLongFromPixelCoord({x: x, y: y});
-//       var geo=m.getGeoCoordFromPixelCoord({x: x, y: y});
-//       
-//       $("#calcinx").val(coordinateRounder(lalo.x));
-//       $("#calciny").val(coordinateRounder(lalo.y));
-//      // showInfo('You clicked at ('+coordinateRounder(lalo.x)+", "+coordinateRounder(lalo.y)+')');
-      
     };
-    var bboxChangedByEvent = function(options){
-     // console.log(options);
-        
-      $("#"+rootElementId).find(".bboxwest").val(options.bbox.left);
-      $("#"+rootElementId).find(".bboxnorth").val(options.bbox.top);
-      $("#"+rootElementId).find(".bboxeast").val(options.bbox.right);
-      $("#"+rootElementId).find(".bboxsouth").val(options.bbox.bottom);
-      
 
-      $("#"+rootElementId).find(".resolutionxinfo").html(parseInt(Math.abs((options.bbox.right-options.bbox.left)/$("#"+rootElementId).find(".resolutionx").val())+0.5));
-      $("#"+rootElementId).find(".resolutionyinfo").html(parseInt(Math.abs((options.bbox.bottom-options.bbox.top)/$("#"+rootElementId).find(".resolutiony").val())+0.5));
-      
-      
+    var bboxChangedByEvent = function(options){
     };
-    
- 
-  
-    
-   
-    
    
     /* Returns a new webmapjs mapping component based on a div element id*/
     var newMap = function(element){
@@ -104,25 +70,21 @@
       webMapJS.setProjection(defaultProjection);
       webMapJS.displayLegendInMap(false);
       var baseLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
         service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
         name:"world_raster",
         title:"World base layer",
         enabled:true
       });
+
       var overLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
         service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
         name:"world_line",
         title:"World base layer",
         enabled:true,
         keepOnTop:true
       });
-            var grid = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
+      
+      var grid = new WMJSLayer({
         service:" http://geoservices.knmi.nl/cgi-bin/SAFNWC_MSG_prod.cgi?",
         name:"grid10",
         title:"World base layer",
@@ -130,25 +92,21 @@
         keepOnTop:true
       });
 
-    
-      
       webMapJS.setBaseLayers([baseLayer,overLayer,grid]);
       webMapJS.draw();
       return webMapJS;
     };
-   
-    
     
     /* Document ready function */
     $(function() {
-		$.blockUI.defaults.message='<img src="wizard_convert/ajax-loader.gif"/>';
+		$.blockUI.defaults.message='<img src="wizard_drschecker/ajax-loader.gif"/>';
 		$.blockUI.defaults.css.border='none';
 		$.blockUI.defaults.overlayCSS.backgroundColor="white";
 
-      showInfo = function(html,_title){
-    	  $("#"+rootElementId).unblock();
-   	  	html = html.replace(/(\r\n|\n|\r)/g,"<br/>");
-   	 	
+    showInfo = function(html,_title){
+  	  $("#"+rootElementId).unblock();
+ 	  	html = html.replace(/(\r\n|\n|\r)/g,"<br/>");
+ 	 	
    	 	var title = "Processing status";
    	 	if(_title){
    	 		title=_title;
@@ -157,64 +115,65 @@
           width:600,
           height:400
         });
-        
       };
       
-      //showInfo("Choose a location and click start to run processing");
       $("#timeheader").hide();
       $("#startcalculation").hide();
       $("#results").hide();
+ 
       /*WPS finished callback*/
-      var wpsComplete = function(_data){
-        var namespace = 'wps:';
-        var data  = _data[namespace+'Data'][namespace+'LiteralData'].value;
+      var wpsComplete = function(data){
+        console.log(data);
         $("#startcalculation").show();
         $('#progressbar').hide();
         var visualizeLink = "";
-        if(data.lastIndexOf(".nc")==data.length-3){
-        	visualizeLink = '<br/><br/>Or <a href="#" onclick="visualizeVariable(\''+activeLayer+'\',\''+data+'\')">visualize</a> directly.<br/><br/>';	
+        var logmessages = undefined,errors = undefined,goodorbad = undefined,DatasetDRS = undefined,nroferrors = undefined,FilenameDRS = undefined;
+        
+        for(var j=0;j<data.length;j++){
+          var identifier = data[j]["ows:Identifier"].value;
+          var outputdata= data[j]["wps:Data"]["wps:LiteralData"].value;
+          if(identifier == "logmessages")logmessages=outputdata;
+          if(identifier == "errors")errors=outputdata;
+          if(identifier == "goodorbad")goodorbad=outputdata;
+          if(identifier == "DatasetDRS")DatasetDRS=outputdata;
+          if(identifier == "nroferrors")nroferrors=outputdata;
+          if(identifier == "FilenameDRS")FilenameDRS=outputdata;
         }
         
-        showInfo('<h1>Succesfully completed!</h1>The results are stored in your basket.<br/><br/>'+
-        		 'You can download the result directly <a href="'+data+'">here</a> directly.<br/>'+
-        		 visualizeLink+
-        		 '<br/>The link to your file is<br/><br/>'+data);
+        var html = "";
         
-//         var layerFailed= function(layer,message){
-//           showInfo("Operation completed, but WMS failed: "+message);
-//         };
-//         
-//         var layer =  new WMJSLayer({
-//           service:data,
-//           name:"raypath",
-//           failure:layerFailed,
-//           style:'alphafade/volume'
-//         });
-//         layer.onReady = function(){
-//           
-//           showInfo('Succesfully completed for location ('+ $("#calcinx").val()+", "+$("#calciny").val()+') and height ('+ $("#calcinheight").val()+')');
-//           dimensionsUpdate(layer);
-//           updateLayerList();
-//           
-//           mainWebmapJS.draw();
-//         };
-//         mainWebmapJS.addLayer(layer);
+        
+        if(goodorbad=="ERROR"){
+          html+="<div class=\"c4i-wizard-drschecker-results-error\">ERROR: Your file is not compliant with the CLIPC DRS standard!<br/>It has "+nroferrors+" error(s).</div>";
+          html+="<div class=\"c4i-wizard-drschecker-results-errors\"><span class=\"c4i-wizard-drschecker-results-errormessagestitle\">Error messages:</span>"+decodeBase64(errors.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
+        }else{
+          html+="<div class=\"c4i-wizard-drschecker-results-good\">Your file is compliant with the CLIPC DRS metadata standards.<br/>Well done!</div>";
+        }
+        
+        
+        html+="<div class=\"c4i-wizard-drschecker-results-DatasetDRS\"><span class=\"c4i-wizard-drschecker-results-datasetdrstitle\">DatasetDRS:</span>"+decodeBase64(DatasetDRS.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
+        html+="<div class=\"c4i-wizard-drschecker-results-FilenameDRS\"><span class=\"c4i-wizard-drschecker-results-filenamedrstitle\">FilenameDRS:</span>"+decodeBase64(FilenameDRS.substring("base64:".length)).replaceAll("\n","<br/>")+"</div>";
+        
+        var logmessageshtml=decodeBase64(logmessages.substring("base64:".length)).replaceAll("\n","<br/>");
+        logmessageshtml = logmessageshtml.replaceAll("[OK]","[OK-C4I]");
+        logmessageshtml = logmessageshtml.replaceAll("[ERROR]","[ERROR-C4I]");
+        logmessageshtml = logmessageshtml.replaceAll("[INFO]","[INFO-C4I]");
+        logmessageshtml = logmessageshtml.replaceAll("[DRSFilename]","[INFO-DRSFilename]");
+        logmessageshtml = logmessageshtml.replaceAll("[DRSDatasetname]","[INFO-DRSDatasetname]");
+        logmessageshtml = logmessageshtml.replaceAll("[OK-C4I]","<span class=\"c4i-wizard-drschecker-results-OK\">[OK]</span>");
+        logmessageshtml = logmessageshtml.replaceAll("[ERROR-C4I]","<span class=\"c4i-wizard-drschecker-results-ERROR\">[ERROR]</span>");
+        logmessageshtml = logmessageshtml.replaceAll("[INFO-C4I]","<span class=\"c4i-wizard-drschecker-results-INFO\">[INFO]</span>");
+        logmessageshtml = logmessageshtml.replaceAll("[INFO-DRSFilename]","<span class=\"c4i-wizard-drschecker-results-FILENAMEDRSSPAN\">[FILENAME DRS]</span>");
+        logmessageshtml = logmessageshtml.replaceAll("[INFO-DRSDatasetname]","<span class=\"c4i-wizard-drschecker-results-DATASETDRSSPAN\">[DATASET DRS]</span>");
+        
+        html+="<div class=\"c4i-wizard-drschecker-results-logmessages\">Log:<br/>"+logmessageshtml+"</div>";
+        $(".c4i-wizard-drschecker-results").html(html);
       };
       
       /*Start button function*/
       $("#startcalculation").click(function(){
-        //showInfo("bla");
-        //return;
-        //mainWebmapJS.positionMapPinByLatLon({x:$("#calcinx").val(),y:$("#calciny").val()});
-        mainWebmapJS.setMapPin(mainWebmapJS.getPixelCoordFromLatLong({x:$("#calcinx").val(),y:$("#calciny").val()}));
-        mainWebmapJS.showMapPin();
+        $(".c4i-wizard-drschecker-results").html('<div class="ajaxloader"></div>');
         $("#startcalculation").hide();
-        
-      
-        //showInfo('Operation started at location ('+ $("#calcinx").val()+", "+$("#calciny").val()+') and height ('+ $("#calcinheight").val()+')');
-        
-
-        
         /*WPS progress callback*/
         var wpsProgress = function(percentCompleted,message){
           var progressLabel = $( ".progress-label" );
@@ -246,24 +205,7 @@
           progress:wpsProgress,
           failure:wpsFailure
         });
-        
-        var dates = $("#"+rootElementId).find(".startdate").first().val()+"/"+
-                    $("#"+rootElementId).find(".stopdate").first().val() +"/"+
-                    $("#"+rootElementId).find(".timeresolution").first().val();
-                    
-
-        wps.execute('WCS_subsetting',
-                    {'dates':dates,
-                      'resx':$("#"+rootElementId).find(".resolutionx").val(),
-                      'resy':$("#"+rootElementId).find(".resolutionx").val(),
-                      'bbox':[boundingBoxBBOX.left,boundingBoxBBOX.top,boundingBoxBBOX.right,boundingBoxBBOX.bottom],
-                      'resource':resource,
-                      'outputFormat':$("#"+rootElementId).find(".outputFormat").val(),
-                      'outputFileName':$("#"+rootElementId).find(".outputFileName").val(),
-                      'coverage':activeLayer,
-                      'crs':currentProjection
-                    
-                    });
+        wps.execute('clipc_drschecker',{'resource':resource});
       });
       
       
@@ -453,6 +395,7 @@
       });
 
       setNewResource = function(_resource){
+        $(".c4i-wizard-drschecker-results").html("");
     	  if(isDefined(_resource)){
 				$("#"+rootElementId).find(".resource").val(_resource);
     	  }
@@ -488,7 +431,7 @@
       
       setNewResource();
       
-      $(".c4i_wizard_convert_helpbutton").button({
+      $(".c4i_wizard_drschecker_helpbutton").button({
           
           icons: {
             primary: "ui-icon-help"
@@ -504,7 +447,7 @@
             el.html(data);    
           }
           $.ajax({
-            url: "./wizard_convert/wizard_convert_help.html"     
+            url: "./wizard_drschecker/wizard_drschecker_help.html"     
           }).done(function(d) {
             helpReturned(d)
           })
@@ -528,10 +471,6 @@
 	      	showInfo(html,'File info');
 	      	
 	      };
-
-      /* Debug for WMS */
-//       wpsComplete("http://birdexp02.knmi.nl/cgi-bin/adaguc/dragonsdenwms.cgi?DATASET=WPS_raypath_1400073951_wmsconfig_201405140000&");
-//       wpsComplete("http://birdexp02.knmi.nl/cgi-bin/adaguc/dragonsdenwms.cgi?DATASET=WPS_raypath_1400073951_wmsconfig_201405140000&");
     });
     
     var showBasketWidget= function(){

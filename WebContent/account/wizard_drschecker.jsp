@@ -22,7 +22,8 @@
    	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/esgfsearch.css" />
 	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
-    
+    <link rel="stylesheet"        href="/impactportal/account/wizard_drschecker/wizard_drschecker.css"></link>
+
     <script type="text/javascript">
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
@@ -61,54 +62,10 @@
     
     
     <link rel="stylesheet" type="text/css" href="../adagucviewer/webmapjs/WMJSStyles.css" />
-    
-     <style>
-      .ui-progressbar {
-        position: relative;
-      }
-      .progress-label {
-        position: absolute;
-        left: 36%;
-        top: 4px;
-        font-weight: bold;
-        text-shadow: 1px 1px 0 #fff;
-      }
-      
-      .wpsinput{
-       text-align:left;
-        background:#e0ebeb;
-         border-collapse: collapse;
-          width:100%;
-         margin-bottom:4px;
-      }
-      .wpsinput table{
-      
-      }
-      .wpsinput td{
-        padding:5px;
-      }
-      .wpsinput th{
-        
-      background-color: #428bca;
-    color: white;
-    padding:5px;
-    font-weight:bold;
-    font-size:14px;
-        
-      }
-      .inputdiv{
-        width:460px;
-      
-       
-      }
-      .mytable tr{
-         vertical-align:top;
-      }
-    
-    </style>
+
           
 
-    <script type="text/javascript" src="./wizard_convert/wizard_convert.js"></script>
+    <script type="text/javascript" src="./wizard_drschecker/wizard_drschecker.js"></script>
   
   </head>
   <body>
@@ -118,9 +75,9 @@
 		<jsp:include page="loginmenu.jsp" />
  
 		<div class="impactcontent">
-		<div class="breadcrumb"><a href="login.jsp">Account</a> » <a href="processing.jsp">Processing</a> » Wizard convert and subset </div>
+		<div class="breadcrumb"><a href="login.jsp">Account</a> » <a href="processing.jsp">Processing</a> » CLIPC DRS Checker </div>
 		
-		<table class="headertable" ><tr><td><h1>Convert and subset</h1></td><td class="headerhelptd"><button class="c4i_wizard_convert_helpbutton">Help</button></td></tr></table>
+		<table class="headertable" ><tr><td><h1>CLIPC DRS Checker</h1></td><td class="headerhelptd"><button class="c4i_wizard_drschecker_helpbutton">Help</button></td></tr></table>
 		<%
 			ImpactUser user = null;
 				try{
@@ -144,68 +101,24 @@
           <div class="inputdiv">
           <table class="wpsinput">
               <tr><th><b>Resource</b></th><th></th></tr>
-              <tr><td><input class="resource" style="width:330px;" value="---"/></td><td><button onclick="showBasketWidget();"><code class="ui-icon codeshoppingcarticon" style="width:0px;"></code></button><button onclick="showFileInfo();"><span class="ui-icon ui-icon-info"></span></button></td></tr>
+              <tr><td><input class="resource" style="width:800px;" value="---"/></td><td><button onclick="showBasketWidget();"><code class="ui-icon codeshoppingcarticon" style="width:0px;"></code></button><button onclick="showFileInfo();"><span class="ui-icon ui-icon-info"></span></button></td></tr>
             </table>
             <table class="wpsinput">
               <tr><th><b>Variable</b></th><th></th></tr>
               <tr><td><div class="coverage"><select class="coveragecombo"><option>---</option></select></div></td></tr>
             </table>
-            <table class="wpsinput">
-              <tr><th><b>Geographic projection</b></th><th></th></tr>
-              <tr><td><div class="projectionselector"><select name="projectioncombo"><option>---</option></select></div></td></tr>
-            </table>
-            <table class="wpsinput">
-              <tr><th><b>Bounding box</b></th><th></th><th></th></tr>
-              <tr><td></td><td style="width:150px;">North:<input class="bboxnorth" style="width:100px;" type="text" value="---"/></td></tr>
-              <tr><td>West:<input class="bboxwest" style="width:100px;" type="text" value="---"/></td><td></td><td>East:<input class="bboxeast" style="width:100px;" type="text" value="---"/></td></tr>
-              <tr><td></td><td>South:<input class="bboxsouth" style="width:100px;" type="text" value="---"/></td></tr>
-            </table>
-            <table class="wpsinput">
-              <tr><th><b>Resolution</b></th><th></th><th></th><th></th></tr>
-              <tr><td>Horizontal:</td><td><input class="resolutionx" style="width:150px;" type="text" value="---"/></td><td>width:</td><td><div class="resolutionxinfo">---</div></td></tr>
-              <tr><td>Vertical:</td><td><input class="resolutiony" style="width:150px;" type="text" value="---"/></td><td>height:</td><td><div class="resolutionyinfo">---</div></td></tr>
-            </table>
-            <table class="wpsinput">
-              <tr><th><b>Dates</b></th><th></th></tr>
-              <tr><td>Start date:</td><td><input class="startdate" style="width:150px;" type="text" value="2014-01-01T00:00:00Z"/></td></tr>
-              <tr><td>Stop date:</td><td><input class="stopdate" style="width:150px;" type="text" value="2015-01-01T00:00:00Z"/></td></tr>
-              <!-- <tr><td>Time resolution:</td><td><input class="timeresolution" style="width:150px;" type="text" value="P1D"/></td></tr>-->
-            </table>
-            <table class="wpsinput">
-              <tr><th><b>Format</b></th><th></th></tr>
-              <tr><td><select class="outputFormat"><option>netcdf</option><option>geotiff</option><option>aaigrid</option></select></td></tr>
-            </table>
-       
-            
-            <table class="wpsinput">
-              <tr><th><b>Output file name</b></th></tr>
-              <tr><td ><input class="outputFileName" style="width:350px;" type="text" value="out.nc"/></td></tr>
+             <table class="wpsinput">
+              <tr><th><button id="startcalculation">Check this file</button><div id="progressbar" style="display:none"><div class="progress-label"></div></div></th><th></th></tr>
             </table>
           </div>
-          <button id="startcalculation">Start processing</button>
-          <div class="inputdiv">
-            <div id="progressbar" style="display:none"><div class="progress-label"></div></div>
           
-          
-
-     <!--        
-            <div id="results">
-              <hr/>
-              <b>Results:</b><br/>
-              <div id="layerlist"></div><hr/>
-              <b>Select date:</b><br/>
-              <div id="timeheader">
-                <div id="timeslider"></div>
-                <h2>Time: <span id="currenttime"></span></h2>
-                <span id="timeinfo"></span>
-              </div>
-            </div> -->
-            
-          </div>
-        </td>
+        </td></tr>
+        <tr><td><div class="c4i-wizard-drschecker-results"></div></td></tr>
+        
+        <tr>
         <td>
-          <div style="border:1px solid gray;">
-            <div id="webmap1" style="width:480px;height:680px;"></div>
+          <div style="border:0px solid gray;padding:0px;margin:0px;">
+            <div id="webmap1" style="width:950px;height:350px;"></div>
           </div>
         </td>
         </tr>
@@ -213,12 +126,6 @@
     </div>			
 			
 			<% 
-			
-			
-			
-			
-			
-			//out.println(GenericCart.CartPrinters.showJobList(jobList,request));
 		}
 		%>
 

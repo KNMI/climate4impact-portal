@@ -1,0 +1,140 @@
+@CHARSET "UTF-8";
+
+.ui-progressbar {
+	position: relative;
+}
+
+.progress-label {
+	position: absolute;
+	left: 36%;
+	top: 4px;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff;
+}
+
+.wpsinput {
+	text-align: left;
+	background: #e0ebeb;
+	border-collapse: collapse;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+.wpsinput table {
+	
+}
+
+.wpsinput td {
+	padding: 5px;
+}
+
+.wpsinput th {
+	background-color: #428bca;
+	color: white;
+	padding: 5px;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.inputdiv {
+	width: 950px;
+}
+
+.mytable tr {
+	vertical-align: top;
+}
+
+.c4i-wizard-drschecker-results {
+	
+	padding:0px;
+	width:950px;
+	display:block;
+}
+
+
+
+@keyframes blinker {  
+  50% { opacity: 0.0; }
+}
+
+.c4i-wizard-drschecker-results-error {
+	color:red;
+	font-size:26px;
+	line-height:28px;
+	margin:10px;
+	text-align:center;
+	font-size:bold;
+	animation: blinker 0.6s linear infinite;
+}
+
+.c4i-wizard-drschecker-results-good {
+	color:green;
+	font-size:26px;
+	line-height:28px;
+	margin:10px;
+	text-align:center;
+	font-size:bold;
+}
+
+
+.c4i-wizard-drschecker-results-DatasetDRS,.c4i-wizard-drschecker-results-FilenameDRS,.c4i-wizard-drschecker-results-errors,.c4i-wizard-drschecker-results-logmessages{
+	margin:10px; 
+	
+}
+.c4i-wizard-drschecker-results-errors{
+	margin-bottom:30px;
+	background-color:#FCC;
+	padding:5px;
+}
+.c4i-wizard-drschecker-results-logmessages{
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+	margin-top:20px;
+	margin-bottom:20px;
+}
+
+
+.c4i-wizard-drschecker-results-errormessagestitle{
+	display:block;
+	
+}
+.c4i-wizard-drschecker-results-datasetdrstitle{
+	display:inline-block;
+	width:150px;
+}
+.c4i-wizard-drschecker-results-filenamedrstitle{
+	display:inline-block;
+	width:150px;
+}
+
+.c4i-wizard-drschecker-results-OK{
+	display:inline-block;
+	width:60px;
+	color:green;
+}
+
+.c4i-wizard-drschecker-results-ERROR{
+	display:inline-block;
+	width:60px;
+	color:red;
+	font-weight:bold;
+}
+
+.c4i-wizard-drschecker-results-INFO{
+	display:inline-block;
+	width:60px;
+	color:blue;
+}
+
+.c4i-wizard-drschecker-results-DATASETDRSSPAN{
+	display:inline-block;
+	width:150px;
+	color:blue;
+	font-weight:bold;
+}
+.c4i-wizard-drschecker-results-FILENAMEDRSSPAN{
+	display:inline-block;
+	width:150px;
+	color:blue;
+	font-weight:bold;
+}
