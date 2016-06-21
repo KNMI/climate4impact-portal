@@ -92,6 +92,7 @@ var SearchInterface = function(options){
     "variable_long_name":"Variable long name",
     "time_start_stop":"Date",
     "bbox":"Geobox",
+    "driving_model": "Driving model", 
     "query":"Free text"
   };
   
@@ -100,11 +101,13 @@ var SearchInterface = function(options){
       "model":"Choose the climate model. Read more at the <a target=\"_blank\" href=\"/impactportal/general/index.jsp?q=climate_models\">Climate models</a> page.",
       "access":"Choose the type of access. OpenDAP enables visualization and processing on this portal. Use HTTPServer for direct download.",
       "variable":"Choose the Parameter. A list of CMIP5 variables is published at the <a target=\"_blank\" href=\"/impactportal/documentation.jsp?q=listofcmip5variables\">CMIP5 variables</a> page. If you select from 'All Parameters' you can reduce the list by first chosing the appropriate 'Realm'.",
-      "ensemble":"Choose ensemble member. For most impact assessments a single member is enough (choose 'r1i1p1')",
-      "realm": "Choose earth system compartment to reduce the list of 'Parameters'", 
-      "institute":"Choose institute to reduce list of 'Models'"        
-        
-      
+      "ensemble":"Choose ensemble member. For most impact assessments a single member is enough (choose 'r1i1p1'); you do need more members in case you are interested in a) rare (extreme) events, b) changes over  <a target=\"_blank\" href=\"/impactportal/documentation/backgroundandtopics.jsp?q=scenarios_2030\">short periods/time horizons (<30yrs)</a> ",
+      "realm": "Choose earth system compartment to reduce the list of 'Parameters'",
+      "institute":"Choose institute to reduce list of 'Models'",
+      "experiment_family": "Choose family to reduce list of 'experiments', see <a target=\"_blank\" href=\http://cmip-pcmdi.llnl.gov/cmip5/getting_started_CMIP5_experiment.html#_T4\">CMIP5 Experiments</a>",
+      "driving_model": "GCM used to force regional climate models",
+      "data_node": "Generally not relevant, but for large downloads you may wish to choose the one closest to you",
+      "time_frequency": "Frequency at which model data are archived (is not equal to model time step). Note that for some (high) frequencies instantaneous model states are stored, generally for anything less than daily average states over that period are stored. See respective netcdf metadata for exact details.",
       
   }
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
