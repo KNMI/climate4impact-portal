@@ -625,13 +625,11 @@ var SearchInterface = function(options){
   };
   
   
-  
   /* Generate the propertylist for selected facet */
   var generatePropertyListSelector = function(facetList,facetName){
     if(!isDefined(facetList)){
       return;
     }
-    
     //Get property_descriptions
     var descriptions = "";
     if(property_descriptions){
@@ -648,7 +646,9 @@ var SearchInterface = function(options){
     var even = 0;
     var autocompleteList = [];
     var facetListNr = 0;
-    for(var i in facetList){
+    var sortedKeys=esgfSearchGetKeys(facetList).sort();
+    for(var si=0; si<sortedKeys.length;si++){
+      var i=sortedKeys[si]
       facetListNr++;
       var oddEvenClass = "";
       var selectedClass = "";  
