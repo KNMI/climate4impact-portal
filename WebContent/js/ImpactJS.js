@@ -1,3 +1,7 @@
+/* This redirect is a temporal workaround until HTTPS is forced by tomcat - updated 20160621 by mplieger*/
+if (window.location.protocol != "https:")
+    window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+
 var c4iconfigjs = {
   searchservice:"/impactportal/esgfsearch?",
   impactservice:"/impactportal/ImpactService?",
