@@ -132,6 +132,8 @@
 /*   border:1px solid #999;*/
 
 }
+
+
 .c4i-esgfsearch-property-selected{
   background-color: #D8E8FC;
   font-weight:bold;
@@ -879,9 +881,6 @@ line-height:16px;
 
   font-size:13px;
   padding:5px 5px 8px 5px;
-  margin:0px;
-  
-  
-  
+  margin:0px;  
 }
 

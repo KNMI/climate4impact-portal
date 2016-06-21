@@ -99,8 +99,10 @@ var SearchInterface = function(options){
       "domain":"This filter lists the geographical domains for CORDEX projects. For more info check <a target=\"_blank\" href=\"http://www.cordex.org/\">http://www.cordex.org/</a>. ",
       "model":"Choose the climate model. Read more at the <a target=\"_blank\" href=\"/impactportal/general/index.jsp?q=climate_models\">Climate models</a> page.",
       "access":"Choose the type of access. OpenDAP enables visualization and processing on this portal. Use HTTPServer for direct download.",
-      "variable":"Choose the Parameter. A list of CMIP5 variables is published at the <a target=\"_blank\" href=\"/impactportal/documentation.jsp?q=listofcmip5variables\">CMIP5 variables</a> page.",
-             
+      "variable":"Choose the Parameter. A list of CMIP5 variables is published at the <a target=\"_blank\" href=\"/impactportal/documentation.jsp?q=listofcmip5variables\">CMIP5 variables</a> page. If you select from 'All Parameters' you can reduce the list by first chosing the appropriate 'Realm'.",
+      "ensemble":"Choose ensemble member. For most impact assessments a single member is enough (choose 'r1i1p1')",
+      "realm": "Choose earth system compartment to reduce the list of 'Parameters'", 
+      "institute":"Choose institute to reduce list of 'Models'"        
         
       
       
