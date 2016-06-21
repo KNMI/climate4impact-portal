@@ -1,5 +1,5 @@
 <div class="c4i-login-screen">
-Preferred login provider:
+Preferred identity provider:
 <div onclick="openDialog('CEDA')" class="oauth2loginbox"> <a href="#" class="oauth2loginbutton">
 <img src="/impactportal/images/this_is_NOT_the_BADC_logo.jpg">Login at BADC/CEDA</a>
 <span class="c4i_openidcompositor_registerspan"><a href="https://services.ceda.ac.uk/cedasite/register/info/" class="c4i_openidcompositor_registerlink">

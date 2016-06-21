@@ -392,7 +392,7 @@ var SearchInterface = function(options){
        html+= " <span class=\"c4i-esgfsearch-resultitem-checker\">Start checking .</span>";
        html+="</span>";
        //ESDOC
-       if(data.response.results[r].id.indexOf("cmip5")==0){
+       if(data.response.results[r].esgfid.indexOf("cmip5")==0){
          html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
          html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
          html+="</span>";
@@ -1074,9 +1074,9 @@ var SearchInterface = function(options){
         
         //if(!selectedFacets[facetkey]){
           if(count>0||count==-1){
-            if(facetNr>0){
-              html+="/";
-            }
+//            if(facetNr>0){
+//              html+="/";
+//            }
             html+=facet;
             facetNr++;
           }

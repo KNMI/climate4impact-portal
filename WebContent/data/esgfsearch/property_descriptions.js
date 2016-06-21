@@ -185,7 +185,7 @@ var property_descriptions = {
     "CanAM4": "Canadian Atmospheric Model (vers. 4)",
     "CanCM4": "Canadian Climate Model (vers. 4)",
     "CanESM2": "Canadian Earth Sys. Model (vers. 2)",
-    "EC-EARTH": "Earth sytem Model based on ECMWFs Seasonal Forecasting System",
+    "EC-EARTH": "Earth sytem Model based on ECMWF forecasting models",
     "FGOALS-s2": "Flexible non-flux-correction Global Ocean-Atmosphere-Land-Ice climate model system",
     "FIO-ESM": "Earth System Model of the First Institute of Oceanography",
     "GEOS-5": "Goddard Earth Observing System Model, version 5",

@@ -75,6 +75,7 @@
 			<div class="drupal">
 			<table class="drupal"><tr><th>Name</th><th>Description</th></tr>
 			<tr class='clickable-row' data-href='wizard_convert.jsp'><td><code class="codejobsicon"></code>&nbsp;Convert and subset</td><td>Extracts a region in space and time, regrids and converts to other formats. Uses the WCS_subsetting WPS in the background.</td></tr>
+			<tr class='clickable-row' data-href='wizard_drschecker.jsp'><td><code class="codejobsicon"></code>&nbsp;CLIPC DRS Checker</td><td>Checks files against the CLIPC DRS metadata standard.</td></tr>
 			</table>
 			</div>
 		
