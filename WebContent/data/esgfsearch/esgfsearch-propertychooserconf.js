@@ -330,7 +330,8 @@ var esgfsearch_pc_variables={
         {
           "name":      "rsdsdiff",
           "longname":  "Surface Diffuse Downwelling Shortwave Radiation",
-          "shortname": "Diff. Radiation Dn"
+          "shortname": "Diff. Radiation Dn",
+          "tooltip":   "Diffuse SW radiation (so direct SW = rsds-rsdsdiff)"
         },
         {
           /* can we insert a blank line so as to create two groups within the temperature box */
@@ -351,7 +352,7 @@ var esgfsearch_pc_variables={
           "name":      "ps",
           "longname":  "Surface Air Pressur",
           "shortname": "Pressure",
-          "tooltip":   "air pressure, as in observed station data"
+          "tooltip":   "surface air pressure, as in observed station data"
         },
         {
           "name":      "psl",
