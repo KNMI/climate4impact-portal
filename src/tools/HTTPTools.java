@@ -188,7 +188,7 @@ public class HTTPTools extends HttpServlet {
       String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers, int timeOutMs)
       throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException, SSLException {
     String connectToURL = makeCleanURL(url);
-    Debug.println("  Making GET: " + connectToURL);
+ //   Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
       Debug.println("  Using private key: " + pemFile);
       Debug.println("  Using trustRootsFile: " + trustRootsFile);
@@ -326,8 +326,8 @@ public class HTTPTools extends HttpServlet {
     }
     long stopTimeInMillis = Calendar.getInstance().getTimeInMillis();
     //System.out.println(result)
-    Debug.println("Finished GET: " + connectToURL + " ("
-        + (stopTimeInMillis - startTimeInMillis) + " ms)");
+ //   Debug.println("Finished GET: " + connectToURL + " ("
+ //      + (stopTimeInMillis - startTimeInMillis) + " ms)");
     //Debug.println("Retrieved "+result.length()+" bytes");
     return result;
   }

@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import tools.Debug;
 import tools.HTTPTools;
@@ -90,7 +91,18 @@ public class ESGFSearchServlet extends HttpServlet {
       
       if(service.equalsIgnoreCase("search")){
         //Thread.sleep(100);
+
         if(mode.equalsIgnoreCase("getfacets")){
+          HttpSession session=request.getSession();
+          String savedQuery=(String)session.getAttribute("savedquery");
+          
+          if (query.equals("clear=clear")){
+            query="";
+          } else if (query.equals("clear=onload")){
+            query=savedQuery!=null?savedQuery:"";
+          }
+          session.setAttribute("savedquery", query);
+
           JSONResponse jsonresponse = esgfSearch.getFacets(facets,query,pageNr,pageLimit);
           jsonresponse.setJSONP(jsonp);
           response.setContentType(jsonresponse.getMimeType());

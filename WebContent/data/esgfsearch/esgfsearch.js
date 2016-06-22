@@ -109,6 +109,9 @@ var SearchInterface = function(options){
   }
   var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
   query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+  if (query.length==0) {
+	  query="clear=onload";
+  }
   query = query.replaceAll("&amp;","&");
  //query="variable=tas";
   var currentFacetList = undefined;
@@ -201,7 +204,9 @@ var SearchInterface = function(options){
     '  </div>'+
     ''+
     '  <div class="simplecomponent c4i-esgfsearch-selectedelements">'+
-    '    <div class="simplecomponent-header">Selected filters</div>'+
+    '    <div class="simplecomponent-header">Selected filters'+
+//    '      <button class="c4i_esgfsearch_clear">Clear</button>'+
+    '    </div>'+
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
@@ -249,6 +254,13 @@ var SearchInterface = function(options){
         helpReturned(d)
       })
     });
+    
+//    $(".c4i-esgfsearch-clear").attr('onclick','').click(function(t){
+//	  console.log("clear query");
+//	  query="clear";
+//	  window.location.hash="clear";
+//   //   getAllFacets();
+//    });
     
     getAllFacets();
     
@@ -321,23 +333,23 @@ var SearchInterface = function(options){
       return;
     }
   
-    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
-    $.ajax({
-      url: url,
-          crossDomain:true,
-          dataType:"jsonp"
-    }).done(function(d) {
-      httpCallback(d)
-    }).fail(function() {
-      //alert("fail 154");
-      console.log("Ajax call failed: "+url);
-      httpCallback("Failed for "+arg);
-    }).always(function(){
-      
-      if(ready){
-        ready();
-      }
-    });
+//    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
+//    $.ajax({
+//      url: url,
+//          crossDomain:true,
+//          dataType:"jsonp"
+//    }).done(function(d) {
+//      httpCallback(d)
+//    }).fail(function() {
+//      //alert("fail 154");
+//      console.log("Ajax call failed: "+url);
+//      httpCallback("Failed for "+arg);
+//    }).always(function(){
+//      
+//      if(ready){
+//        ready();
+//      }
+//    });
     
   };
   
@@ -364,6 +376,9 @@ var SearchInterface = function(options){
       return;
     }
     var limit = data.response.limit;
+    var returnedQuery = data.response.query;
+    window.location.hash=returnedQuery;
+    query=returnedQuery;
     if(limit>data.response.numfound)limit = data.response.numfound;
     var numPages = parseInt((data.response.numfound/data.response.limit))+1;
     var html="";
@@ -643,7 +658,15 @@ var SearchInterface = function(options){
     var even = 0;
     var autocompleteList = [];
     var facetListNr = 0;
-    var sortedKeys=esgfSearchGetKeys(facetList).sort();
+    var caseInsensitiveCompare=function(a,b){
+    	if (a.toUpperCase()>b.toUpperCase()){
+    		return 1;
+    	}else if (a.toUpperCase()<b.toUpperCase()){
+    		return -1;
+    	}
+    	return 0;
+    };
+    var sortedKeys=esgfSearchGetKeys(facetList).sort(caseInsensitiveCompare);
     for(var si=0; si<sortedKeys.length;si++){
       var i=sortedKeys[si]
       facetListNr++;
@@ -997,6 +1020,12 @@ var SearchInterface = function(options){
     }
     return 0;
   };
+
+  var clearQuery=function(){
+  	window.location.hash="";
+	query="clear=clear";
+	getAllFacets();
+  }
   
   var _getAllFacets = function(args,ready){
     showFilters();
@@ -1033,8 +1062,6 @@ var SearchInterface = function(options){
           facets[key]=result.facets[key];
         }
       }
-      
-
       
       //Add remaining facets sorted
       if(listAllFacets){
@@ -1091,6 +1118,7 @@ var SearchInterface = function(options){
       }else{
          html+="<span name=\"showdefault\" class=\"c4i-esgfsearch-listallfacets c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">^ show less filters</span>";
       }
+      html+="<span name=\"clear\" class=\"c4i-esgfsearch-clear c4i-esgfsearch-facets c4i-esgfsearch-facets-selectmoreless c4i-esgfsearch-roundedborder\">clear all filters</span>";
       html+="<div class=\"c4i-esgfsearch-selectfacet-container\"></div>";
       html+="</div>";
       
@@ -1110,6 +1138,9 @@ var SearchInterface = function(options){
            listAllFacets=false;
         }
          getAllFacets();
+      });
+      rootElement.find(".c4i-esgfsearch-clear").attr('onclick','').click(function(t){
+    	clearQuery();  
       });
       generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };

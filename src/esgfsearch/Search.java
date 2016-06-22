@@ -84,7 +84,7 @@ public class Search {
     }
     
     if(query!=null){
-      //Debug.println("QUERY is "+query);
+      Debug.println("QUERY is "+query);
        KVPKey kvp = HTTPTools.parseQueryString(query);
        SortedSet<String> kvpKeys = kvp.getKeys();
        for(String k : kvpKeys){
@@ -230,6 +230,11 @@ public class Search {
     result.put("response",responseObj);
     
     responseObj.put("limit",searchLimit);
+    if (query.contains("clear=")){
+      responseObj.put("query", "");
+    } else {
+      responseObj.put("query", query);
+    }
     
    
     
@@ -294,13 +299,6 @@ public class Search {
       e.printStackTrace();
     }
     
-    
-        
-    
-    
-  
-    
-    
     try {
       responseObj.put("results",searchResults );
     } catch (JSONException e) {
@@ -314,7 +312,6 @@ public class Search {
       r.setException("JSONException unable to put facets", e);
       return r;
     }
-    
    
     r.setMessage(result.toString());
   
@@ -482,7 +479,7 @@ public class Search {
     boolean ISOK = false;
     String errorMessage = "";
     try {
-      Debug.println("CATALOG GET "+catalogURL);
+//      Debug.println("CATALOG GET "+catalogURL);
       ImpactUser user = null;
       try{
         user = LoginManager.getUser(request);

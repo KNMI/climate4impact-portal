@@ -656,11 +656,16 @@ line-height:16px;
     color: white;
     font-size: 16px;
     font-weight: bold;
-  
-  
 }
 
 .c4i_esgfsearch_help{
+	float:right;
+	margin:20px;
+	height:25px;
+	line-height:25px;
+}
+
+.c4i_esgfsearch_clear{
 	float:right;
 	margin:20px;
 	height:25px;

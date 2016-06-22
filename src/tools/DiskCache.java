@@ -41,7 +41,7 @@ public class DiskCache  {
         //DebugConsole.println("Created:"+createdHowManySecondsAgo);
         if(createdHowManySecondsAgo>mustbeYoungerThanNSeconds)
         {
-          Debug.println("Ignoring "+uniqueId+"Because too old.");
+//          Debug.println("Ignoring "+uniqueId+"Because too old.");
           tools.Tools.rm(diskCacheLocation+"/"+uniqueId);
           return null;
         }
@@ -49,7 +49,7 @@ public class DiskCache  {
 //          Debug.println(fileCacheId.toString()+"("+createdHowManySecondsAgo+"<"+mustbeYoungerThanNSeconds+")");
 //        }
       }
-      Debug.println("Found "+diskCacheLocation+"/"+uniqueId);
+//      Debug.println("Found "+diskCacheLocation+"/"+uniqueId);
       return tools.Tools.readFile(diskCacheLocation+"/"+uniqueId);
     } catch (IOException e) {
     }
