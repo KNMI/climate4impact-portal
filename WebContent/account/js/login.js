@@ -329,6 +329,22 @@ var userHasSignedInOrOut = function(){
         
     );
     console.log( "Done ADjusting login fields");
+    
+    $.ajax('/impactportal/ImpactService?service=getopenid').done(function(data){
+      console.log("openidresponse:");
+      console.log(data);
+      if(data)if(data.openid){
+        openid=data.openid;
+        //Adjust hrefs in download buttons: append openid
+        var hrefs=$(".c4i-wizard-catalogbrowser-downloadlinknoopenid");
+        for(var j=0;j<hrefs.length;j++){
+          var href=$(hrefs[j]);
+          var currentHREF = href.attr("href");
+          href.attr("href", currentHREF+"?openid="+openid);  
+        }
+      }
+    });
+    
   }
   
 }
@@ -381,7 +397,6 @@ var closeLoginPopupDialog = function(){
     console.log('calling reload directly');
     reloadWindow();
   }
-  userHasSignedInOrOut();
 };
 
 /*

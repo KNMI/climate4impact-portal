@@ -297,9 +297,9 @@ public class ImpactService extends HttpServlet {
          }
          if(httpserverURL!=null){
            if(openid!=null){
-             httpLink="<a href=\""+httpserverURL+"?openid="+openid+"\" target=\"_blank\"\">download</a>";
+             httpLink="<a class=\"c4i-wizard-catalogbrowser-downloadlinkwithopenid\"  href=\""+httpserverURL+"?openid="+openid+"\" target=\"_blank\"\">download</a>";
            }else{
-             httpLink="<a href=\""+httpserverURL+"\">download</a>";
+             httpLink="<a class=\"c4i-wizard-catalogbrowser-downloadlinknoopenid\" href=\""+httpserverURL+"\">download</a>";
            }
          }
          //html+="</td><td>"+dapLink+"</td><td>"+httpLink;
@@ -1006,8 +1006,27 @@ public class ImpactService extends HttpServlet {
       handleBasketRequest(request,response,errorResponder);
     }
 
-
-
+    /*
+     * Handle getopenid requests
+     */
+    if(serviceStr.equals("getopenid")){
+      JSONResponse jsonResponse = new JSONResponse(request);
+      try{
+        ImpactUser user = checkUserAndPrintJSONError(request,response);
+        if(user == null){
+          jsonResponse.setErrorMessage("You are not signed in.", 401);
+        }else{
+          JSONObject openid=new JSONObject();
+          openid.put("openid", user.getOpenId());
+          jsonResponse.setMessage(openid);
+        }
+      }catch(Exception e){
+        jsonResponse.setException("Processor: removefromlist failed", e);
+      }
+      jsonResponse.printNE(response);
+    }
+    
+    
 
   }
 
