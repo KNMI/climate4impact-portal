@@ -969,6 +969,7 @@ var SearchInterface = function(options){
     
   };
   var showFilters = function(){
+    if(query.indexOf("clear")==0)return;
     var k = new ESGFSearch_KVP(query);
     var kvps = k.getKeyValues();
     var html = "";
