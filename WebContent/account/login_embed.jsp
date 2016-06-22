@@ -51,6 +51,8 @@ body,.x-body {
 	%>
 	<script type="text/javascript">
 	 c4i_user=false;
+	 openid=undefined;
+	 userHasSignedInOrOut();
 	 console.log("Setting user info to false");
 	</script>
 	<div class="impactcontent">
@@ -67,12 +69,14 @@ body,.x-body {
 		<h1>You are signed in.</h1>
 		You have successfully signed in with the following OpenID:<br /> <br />
 		<strong><%=user.getOpenId()%></strong><br /> <br />
+		
 		<div id="c4i_info"></div>
 		<h1>This window will now close.</h1>
 	</div>
 
 	<script type="text/javascript">
 	c4i_user=true;
+	openid='<%=user.getOpenId()%>';
 	console.log("Setting user info to true");
     var t = new Timer();
     console.log("starting closeLoginPopupDialog");

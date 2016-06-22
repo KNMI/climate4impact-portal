@@ -237,6 +237,8 @@ var SearchInterface = function(options){
         primary: "ui-icon-help"
       },
     }).click(function(){
+      userHasSignedInOrOut();
+      return;
       var el = jQuery('<div title="Search help" class="headerhelpdiv"></div>', {}).dialog({
         width:800,
         height:400,

@@ -117,7 +117,7 @@
         
         <tr>
         <td>
-          <div style="border:0px solid gray;padding:0px;margin:0px;">
+          <div style="border:0px solid gray;padding:0px;margin:0px;" class="c4i-wizard-drschecker-map">
             <div id="webmap1" style="width:950px;height:350px;"></div>
           </div>
         </td>

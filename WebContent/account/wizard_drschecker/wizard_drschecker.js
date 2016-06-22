@@ -121,8 +121,9 @@ if (window.location.protocol != "https:")
       };
       
       $("#timeheader").hide();
-      $("#startcalculation").hide();
+      $("#startcalculation").button({icons: { primary: "ui-icon-search"}}).hide();
       $("#results").hide();
+      $(".c4i-wizard-drschecker-map").hide();
  
       var base64DecodeURLEncode = function(data){
         var d =(decodeBase64(data.substring("base64:".length)));
@@ -341,6 +342,8 @@ if (window.location.protocol != "https:")
       };
       
       var WMSReady = function(l,service){
+        $(".c4i-wizard-drschecker-map").show();
+
         var html =  "<select class=\"coveragecombo\">";
         var selectedLayer = undefined;
         for(var j=0;j<l.length;j++){
