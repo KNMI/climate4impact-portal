@@ -23,7 +23,7 @@
      <img src="/impactportal/images/logo_in_nav_44x36.png" alt="linked in logo" height="20"/></a></td>
       <td valign="middle">| <a target="_blank" href="https://is.enes.org/">IS-ENES</a></td>
        <td valign="middle">| <a href="<%=Home%>help/contactexpert.jsp">Contact</a></td>
-        <td valign="middle">| <%=loginStr%></td>
+        <td class="c4i-mainmenu-login-header" valign="middle">| <%=loginStr%></td>
     </tr></table>
     </div>
     <h1 style="padding-top:36px;"><a href="<%=Home%>index.jsp">

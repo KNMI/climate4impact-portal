@@ -74,27 +74,27 @@ var esgfsearch_pc_time_frequency={
   "properties":[
     {
       "name":      "3hr",
-      "longname":  "Sampling frequency every 3 hours",
+      "longname":  "Instantaneous states every 3 hours",
       "shortname": "3hr",
       "color":     esgfsearch_currentcolorscheme.color1
     },{
       "name":      "6hr",
-      "longname":  "Sampling frequency every 6 hours",
+      "longname":  "Instantaneous states every 6 hours",
       "shortname": "6hr",
       "color":     esgfsearch_currentcolorscheme.color2
     },{
       "name":      "day",
-      "longname":  "Daily sampling frequency",
+      "longname":  "Daily averages",
       "shortname": "daily",
       "color":     esgfsearch_currentcolorscheme.color3
     },{
       "name":      "mon",
-      "longname":  "Monthly sampling frequency",
+      "longname":  "Monthly averages",
       "shortname": "monthly",
       "color":     esgfsearch_currentcolorscheme.color5
     },{
       "name":      "year",
-      "longname":  "Yearly sampling frequency",
+      "longname":  "Annual averages",
       "shortname": "yearly",
       "color":     esgfsearch_currentcolorscheme.color6
     }

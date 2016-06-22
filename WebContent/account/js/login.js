@@ -1,5 +1,5 @@
   var c4i_user=false;
-  
+  var openid = undefined;
   var OpenIDProviders = [
       
       {
@@ -313,6 +313,45 @@ var openDialog = function(datacentre) {
 
 };
 
+/**
+ * Triggered when a user has signed in or has signed out
+ */
+var userHasSignedInOrOut = function(){
+  console.log("userHasSignedInOrOut")
+  console.log("c4i_user"+c4i_user);
+  console.log("openid"+openid);
+  if(c4i_user==true){
+    console.log($(".c4i-mainmenu-login-tab"));
+    $(".c4i-mainmenu-login-tab").html("<a href=\"/impactportal/account/login.jsp\">Account&nbsp;<code class=\"codeusersicon\"></code></a>");
+    $(".c4i-mainmenu-login-header").html(
+        '| <a href="/impactportal/account/login.jsp">Account</a>&nbsp;<a href="/impactportal/account/basket.jsp"><code class="codeshoppingcarticon"></code></a>&nbsp;<a href="/impactportal/account/processing.jsp"><code class="codejobsicon"></code></a>'
+        
+        
+    );
+    console.log( "Done ADjusting login fields");
+    
+    $.ajax('/impactportal/ImpactService?service=getopenid').done(function(data){
+      console.log("openidresponse:");
+      console.log(data);
+      if(data)if(data.openid){
+        openid=data.openid;
+        //Adjust hrefs in download buttons: append openid
+        var hrefs=$(".c4i-wizard-catalogbrowser-downloadlinknoopenid");
+        for(var j=0;j<hrefs.length;j++){
+          var href=$(hrefs[j]);
+          var currentHREF = href.attr("href");
+          href.attr("href", currentHREF+"?openid="+openid);  
+        }
+      }
+    });
+    
+  }
+  
+}
+
+/**
+ * Triggerd when tne login dialog is closed
+ */
 var closeLoginPopupDialog = function(){
   c4i_user=true;
   console.log("closeLoginPopupDialog")
@@ -326,7 +365,7 @@ var closeLoginPopupDialog = function(){
   
 
   var reloadWindow = function(){
-	
+    
     console.log('reloadWindow: isDialogTrueOrWindowFalse'+isDialogTrueOrWindowFalse);
     var doReload = false;
     if(isDialogTrueOrWindowFalse == false){
@@ -358,7 +397,6 @@ var closeLoginPopupDialog = function(){
     console.log('calling reload directly');
     reloadWindow();
   }
-  
 };
 
 /*
@@ -374,7 +412,9 @@ var doReloadAfterLogin = false;
 /*Being called by the dialog popup*/
 var setReloadAfterLogin = function(reload){
   c4i_user=true;
-  //console.log("Reload function called by popup with value "+reload);
+  //TODO AJAX call to fill in openID
+  console.log("setReloadAfterLogin:"+c4i_user);
+  console.log("Reload function called by popup with value "+reload);
   if(reload == 'true'){
     doReloadAfterLogin = true;
   }
@@ -403,6 +443,7 @@ var generateLoginDialogNewPage = function(doReload){
  */
 var generateLoginDialog = function(doReload){
 	c4i_user=false;
+	console.log("generateLoginDialog:"+c4i_user);
 	$.ajax('/impactportal/account/logout.jsp').done(function(data){
 		_generateLoginDialog(doReload);
 	});
@@ -414,6 +455,7 @@ var c4i_logindialog_dialog;
 
 var c4i_logindialog_dialog_reload = function(){
 	c4i_user=true;
+	console.log("c4i_logindialog_dialog_reload:"+c4i_user);
 	c4i_logindialog_dialog.dialog('close');
 }
 
@@ -467,6 +509,7 @@ var _generateLoginDialog = function(doReload){
 	    src+="&doreload=true";
 	  }
 	  c4i_logindialog_dialog.bind('dialogclose', function(event) {
+	  userHasSignedInOrOut();
 		if(c4i_user===true){ //Set in login_embed.jsp
 			console.log("Found user info");
 	    if (typeof doReload === "function") {

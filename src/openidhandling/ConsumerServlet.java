@@ -189,7 +189,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			throws ServletException, IOException {
     Debug.println("Validating request...");
 		Identifier identifier = this.verifyResponse(req);
-		log.debug("identifier: " + identifier);
+		Debug.println("identifier: " + identifier);
 		
 		
 	  String referrer = getValidReferrer(req);
@@ -203,7 +203,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 			req.getSession().setAttribute("login_method","openid");
 		}else{
 		  Debug.println("Validation is INVALID");
-      req.getSession().setAttribute("message", "Invalid referer found in login dialog: Is the portal's online resource configured correctly?.");
+      req.getSession().setAttribute("message", "Unable to verifyResponse.");
       referrer = "/exception.jsp";
 		}
 	 
@@ -215,12 +215,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	}
 
 	private String getValidReferrer(HttpServletRequest req) {
-//	  Enumeration headerNames = req.getHeaderNames();
-//	  while(headerNames.hasMoreElements()) {
-//	    String headerName = (String)headerNames.nextElement();
-//	    Debug.println("" + headerName);
-//	    Debug.println("" + req.getHeader(headerName));
-//	  }
+
 	  String returnURL = "/account/login.jsp";
 	  
 	  String referrer = null; 

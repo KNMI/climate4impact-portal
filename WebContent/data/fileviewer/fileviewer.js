@@ -77,16 +77,24 @@ var FileViewerInterface = function(options){
   
   var downloadbutton = { 
     text: 'Download',
-    icons: { primary: "icon-download"},
+    icons: { primary: "ui-icon-arrowthick-1-s"},
     click: function( event ) {
       event.preventDefault();
       _this.openDownloadWindow();
     }
   };
-  
+  var checkCLIPCDRS = { 
+      text:"Check CLIPC DRS",
+      icons: { primary: "ui-icon-search"},
+      click: function( event ) {
+        event.preventDefault();
+        var url = options.prettyquery;
+        window.open("/impactportal/account/wizard_drschecker.jsp?resource="+url, '_blank');
+      }
+    };
   var addtobasketbutton = { 
     text:"Add to basket",
-    icons: { primary: "icon-shoppingbasket"},
+    icons: { primary: "ui-icon-cart"},
     click: function( event ) {
       event.preventDefault();
       var url = options.prettyquery;
@@ -101,7 +109,7 @@ var FileViewerInterface = function(options){
   
   var reloadbutton = {
     text: "Reload",
-    icons: { primary: "icon-reload"},
+    icons: { primary: "ui-icon-refresh"},
     click: function( event ) {
       event.preventDefault();
       _this.renderFileViewerInterface(options);
@@ -243,7 +251,7 @@ var FileViewerInterface = function(options){
     options.element.html(html);
     
     if(options.dialog){
-      var b= [downloadbutton,addtobasketbutton,reloadbutton]
+      var b= [checkCLIPCDRS,downloadbutton,addtobasketbutton,reloadbutton]
       options.element.dialog("option","buttons",b);
     }else{
       rootElement.find(".c4i-fileviewer-downloadbutton").button(downloadbutton).click(downloadbutton.click);
