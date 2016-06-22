@@ -338,23 +338,23 @@ var SearchInterface = function(options){
       return;
     }
   
-//    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
-//    $.ajax({
-//      url: url,
-//          crossDomain:true,
-//          dataType:"jsonp"
-//    }).done(function(d) {
-//      httpCallback(d)
-//    }).fail(function() {
-//      //alert("fail 154");
-//      console.log("Ajax call failed: "+url);
-//      httpCallback("Failed for "+arg);
-//    }).always(function(){
-//      
-//      if(ready){
-//        ready();
-//      }
-//    });
+    var url = impactESGFSearchEndPoint+"service=search&request=checkurl&query="+encodeURIComponent(arg.url);
+    $.ajax({
+      url: url,
+          crossDomain:true,
+          dataType:"jsonp"
+    }).done(function(d) {
+      httpCallback(d)
+    }).fail(function() {
+      //alert("fail 154");
+      console.log("Ajax call failed: "+url);
+      httpCallback("Failed for "+arg);
+    }).always(function(){
+      
+      if(ready){
+        ready();
+      }
+    });
     
   };
   
