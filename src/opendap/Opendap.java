@@ -462,25 +462,16 @@ public class Opendap {
       //attrStr+="\""+attr.getStringValue()+"\";\n";
       String s = attr.getStringValue();
       if(s == null) s = "";
-      
       s = s.replaceAll(";", "");
-/*      if(attr.getName().startsWith("a"))s="";
-      if(attr.getName().startsWith("s"))s="";
-      if(attr.getName().startsWith("u"))s="";
-      if(attr.getName().startsWith("l"))s="";
-      if(attr.getName().startsWith("c"))s="";
-      if(attr.getName().startsWith("e"))s="";
-      if(attr.getName().startsWith("r"))s="";
-      s = s.replaceAll("<", "");
-      s = s.replaceAll(">", "");*/
       s = s.replaceAll("\"", "\\\\\"");
+      byte b[]= s.getBytes();
       
-//      s = s.replaceAll("\\[", "A");
-//      s = s.replaceAll("\\]", "A");
-//      s="";
-      //s = s.replaceAll(">", "");
-      //if(attr.getName().startsWith("p"))s="";
-      //DebugConsole.println(s);
+      //Valid tokens should be in this range, otherwise replace with exclamation mark.
+      for(int j=0;j<b.length;j++){
+        if(b[j]<32||b[j]>126)b[j]='!';
+      }
+      s= new String(b);
+      //Debug.println(attrName+":"+s);
       attrStr+="\""+s+"\";\n";
       foundType = true;
     }else{
@@ -694,7 +685,9 @@ public class Opendap {
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,externalFileName,URLDecoder.decode(queryString,"UTF-8"),false));
       }else if(path.endsWith(".das")){
         response.setContentType("text/plain");
+        Debug.println("OPEN");
         ncFile = NetcdfFile.open(filename);
+        Debug.println("START DAS");
         response.getOutputStream().print(getDASFromNetCDFFile(ncFile));
       }else if(path.endsWith(".dods")){
         response.setContentType("application/octet");
@@ -706,7 +699,8 @@ public class Opendap {
       }
 
     } catch (IOException ioe) {
-      Debug.println("Error opening: " + filename);
+      Debug.errprintln("Error opening: " + filename);
+      Debug.printStackTrace(ioe);
       response.getOutputStream().print("Error opening: " + filename);
       response.setStatus(404);
     } finally { 

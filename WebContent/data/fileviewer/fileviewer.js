@@ -178,7 +178,7 @@ var FileViewerInterface = function(options){
         for(var d=0;d<variable.dimensions.length;d++){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
         }
-        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay,grid10&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
+        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
         var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
       }
@@ -413,7 +413,7 @@ var FileViewerInterface = function(options){
     }).fail(function() {
       //alert("fail 154");
       console.log("Ajax call failed: "+url);
-      httpCallback("Failed for "+arg);
+      httpCallback({"error":"Request failed for "+url});
     }).always(function(){
       
       if(ready){

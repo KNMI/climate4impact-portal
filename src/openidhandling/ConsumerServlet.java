@@ -246,7 +246,9 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
           Debug.errprintln("Valid referer 1: "+Configuration.getHomeURLHTTP());
           Debug.errprintln("Valid referer 2: "+Configuration.getHomeURLHTTPS());
           Debug.errprintln("Probably the onlineresources are incorrectly configured.");
-          req.getSession().setAttribute("message", "Invalid referer found in login dialog: Is the portal's online resource configured correctly?.");
+          String validReferrer = Configuration.getHomeURLHTTPS();
+          req.getSession().setAttribute("message", "Invalid referer found in login dialog: Is the portal's online resource configured correctly? The referrer was "+referrer+
+              ".\nValid referrer is: <a href=\""+validReferrer+"/account/login.jsp\">"+validReferrer+"/*</a>.");
           returnURL = "/exception.jsp";
         }
       }else{

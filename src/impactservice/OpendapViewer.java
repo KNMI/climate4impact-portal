@@ -4,6 +4,7 @@ import impactservice.SessionManager.DatasetViewerSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -106,8 +107,11 @@ public class OpendapViewer {
         for(int a=0;a<attributes.size();a++){
 
           JSONObject attribute = new JSONObject();
-          attribute.put("name",attributes.get(a).getAttrValue("name"));
-          attribute.put("value",attributes.get(a).getAttrValue("value"));
+          XMLElement att = attributes.get(a);
+          String n= att.getAttrValue("name");
+          String v = att.getAttrValue("value");
+          attribute.put("name",n);
+          attribute.put("value",checkAttrValues(v));
           jsonattributeArray.put(attribute);
         }
         jsonVariable.put("attributes",jsonattributeArray);
@@ -219,7 +223,9 @@ public class OpendapViewer {
             String attrName=attributes1.get(a).getAttrValue("name");
             String attrValue=attributes1.get(a).getAttrValue("value");
             attribute.put("name",attrName);
-            attribute.put("value",attrValue);
+            attribute.put("value",checkAttrValues(attrValue));
+            
+            
             if(attrName.equals("long_name"))longName=attrValue;
             jsonattributeArray.put(attribute);
           }
@@ -308,6 +314,20 @@ public class OpendapViewer {
   }
   
   
+
+  private String checkAttrValues(String attrValue) {
+    byte b[]= attrValue.getBytes();
+    
+    //Valid tokens should be in this range, otherwise replace with exclamation mark.
+    for(int j=0;j<b.length;j++){
+      if(b[j]<32||b[j]>126)b[j]='!';
+    }
+    attrValue= new String(b);
+    return attrValue;
+  }
+
+
+
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try {
