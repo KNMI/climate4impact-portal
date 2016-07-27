@@ -59,6 +59,10 @@ public class JSONResponse {
     this.jsonp = jsonp;
     
   }
+  public void disableJSONP() {
+    this.jsonp = null;
+    
+  }
 
   private String message = "";
   private String mimetype = "application/json";

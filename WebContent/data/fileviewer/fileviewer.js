@@ -127,8 +127,13 @@ var FileViewerInterface = function(options){
         title:'NetCDF Metadata',
         width:800,
         height:600,
+
         dialogClass:'c4i-fileviewer-containerdialog'
-      });
+      }).dialogExtend({
+        "maximizable" : true,
+        "dblclick" : "maximize",
+        "icons" : { "maximize" : "ui-icon-arrow-4-diag" }
+      });;
       
     }else{
       options.element.addClass("c4i-fileviewer-container");
@@ -189,9 +194,89 @@ var FileViewerInterface = function(options){
   
   function checkForProvenanceVariable(variable){
     if(variable.variable != "knmi_provenance"){return "";}
-    var url=options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance";
-    var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
+    var html=
+       '<div class="c4i-fileviewer-previewstyle-SVG">'
+      +'  <div  class="c4i-fileviewer-provenance"></div>'
+      +'  <div class="c4i-fileviewer-provenance-controls">'
+      //+'    <div class="c4i-fileviewer-provenance-controls-zoom">'
+      +'      <p><i class="btn btn-success fa fa-refresh"></i></p>'
+      +'      <button class="c4i-fileviewer-provenance-controls-zoomout">Zoom out</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-zoomin">Zoom in</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-panleft">Left</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-panup">Up</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-panright">Right</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-pandown">Down</button><br/>'
+      +'      <button class="c4i-fileviewer-provenance-controls-json">JSON</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-xml">XML</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-png">PNG</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-svg">SVG</button>'
+      +'    </div>'
+      //+'  </div>'
+      +'</div>';
+
     return html;
+  };
+  function doForProvenanceVariable(variable){
+    if(variable.variable != "knmi_provenance"){return "";}
+    var el = options.element.find(".c4i-fileviewer-provenance").first();
+    
+    options.element.find(".c4i-fileviewer-provenance-controls-json").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=application/json", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-xml").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=application/xml", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-svg").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=text/html", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-png").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=image/png", '_blank');
+    });
+
+    var url=options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=image/svg";
+    
+    var httpCallback = function(data){
+      if(data.error){
+        alert(data.error);
+        return;
+      }
+      var el = options.element.find(".c4i-fileviewer-provenance").first();
+      el.html(data.svg);
+      var svgEl =  el.find("svg").first();
+      
+      svgEl.attr('width', '100%');
+      svgEl.attr('height', '330px');
+      
+      "use strict";
+      var mySVG =svgEl.svgPanZoom({
+        mouseWheel: false 
+      });
+      
+      options.element.find(".c4i-fileviewer-provenance-controls-zoomin").button({icons: { primary: "ui-icon-circle-zoomin"}}).button({}).attr('onclick','').click(function(event){mySVG.zoomIn()});
+      options.element.find(".c4i-fileviewer-provenance-controls-zoomout").button({icons: { primary: "ui-icon-circle-zoomout"}}).attr('onclick','').click(function(event){mySVG.zoomOut()});
+      options.element.find(".c4i-fileviewer-provenance-controls-panleft").button({icons: { primary: "ui-icon-circle-arrow-w"}}).attr('onclick','').click(function(event){mySVG.panLeft()});
+      options.element.find(".c4i-fileviewer-provenance-controls-panright").button({icons: { primary: "ui-icon-circle-arrow-e"}}).attr('onclick','').click(function(event){mySVG.panRight()});
+      options.element.find(".c4i-fileviewer-provenance-controls-panup").button({icons: { primary: "ui-icon-circle-arrow-n"}}).attr('onclick','').click(function(event){mySVG.panUp()});
+      options.element.find(".c4i-fileviewer-provenance-controls-pandown").button({icons: { primary: "ui-icon-circle-arrow-s"}}).attr('onclick','').click(function(event){mySVG.panDown()});
+      
+
+      
+            
+
+    };
+    
+    $.ajax({
+      url: url,
+          crossDomain:true,
+          dataType:"jsonp"
+    }).done(function(d) {
+      httpCallback(d)
+    }).fail(function() {
+      //alert("fail 154");
+      console.log("Ajax call failed: "+url);
+      httpCallback({"error":"Request failed for "+url});
+    })
+    
   };
   
   
@@ -280,10 +365,14 @@ var FileViewerInterface = function(options){
    rootElement.find(".c4i-fileviewer-globalmetadata").find(".simplecomponent-body").html(html);
       
     var html="";
+    var provenanceVar = undefined;
     for(var v=0;v<data.length;v++){
       var preview=checkForViewableVariable(data[v]);
       if(preview==""){
         preview=checkForProvenanceVariable(data[v]);
+        if(preview!=""){
+          provenanceVar = data[v];
+        }
       }
 
       html+="<span class=\"c4i-fileviewer-resultitem\">";     
@@ -407,6 +496,10 @@ var FileViewerInterface = function(options){
   
     rootElement.find(".c4i-fileviewer-resultitem-content").attr('onclick','').click(expandcollapse);
     rootElement.find(".c4i-fileviewer-dataset-collapsible").attr('onclick','').click(expandcollapse);
+    
+    if(provenanceVar){
+      doForProvenanceVariable(provenanceVar);
+    }
   }
   
   function ready(){

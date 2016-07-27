@@ -16,4 +16,6 @@
     <link rel="stylesheet" href="/impactportal/styles.css" type="text/css" />
     <script type="text/javascript" src="/impactportal/js/ImpactJS.js"></script>
 	<script type="text/javascript" src="/impactportal/js/jquery-ui-1.11.4/jquery-ui.min.js"></script>
-  
+  <script type="text/javascript" src="/impactportal/js/jqueryextensions/jquery.dialogextend.min.js"></script>
+    <script type="text/javascript" src="/impactportal/js/jqueryextensions/jquery.svg.pan.zoom.js"></script>
+    

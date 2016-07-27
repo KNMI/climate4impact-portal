@@ -88,14 +88,39 @@ public class PROV extends HttpServlet {
   	    //If no error, just continue
   	    if(!jsonResponse.hasError()){
   	      try {
+  	        jsonResponse.disableJSONP();
             String provdm = ((JSONObject) new JSONTokener(jsonResponse.getMessage()).nextValue()).getString("prov-dm");
             //Convert stuff to image
             if(formatKVP.equalsIgnoreCase("image/png")){
               try {
-                byte[] pngFile = runPythonProvOnXML(provdm);
+                byte[] pngFile = runPythonProvOnXML(provdm,"png");
                 response.setContentType("image/png");
                 OutputStream output = response.getOutputStream();
                 output.write(pngFile);
+                output.close();
+                return;
+              } catch (Exception e) {
+                jsonResponse.setException("Unable run runPythonProvOnXML",e);
+              }
+            }
+            
+            if(formatKVP.equalsIgnoreCase("image/svg")){
+              try {
+                byte[] svgFile = runPythonProvOnXML(provdm,"svg");
+                JSONObject svgObj = new JSONObject();
+                svgObj.put("svg", new String(svgFile));
+                jsonResponse.setMessage(svgObj);
+              } catch (Exception e) {
+                jsonResponse.setException("Unable run runPythonProvOnXML",e);
+              }
+            }
+            
+            if(formatKVP.equalsIgnoreCase("text/html")){
+              try {
+                byte[] svgFile = runPythonProvOnXML(provdm,"svg");
+                response.setContentType("text/html");
+                OutputStream output = response.getOutputStream();
+                output.write(svgFile);
                 output.close();
                 return;
               } catch (Exception e) {
@@ -121,6 +146,7 @@ public class PROV extends HttpServlet {
   	}
 	  
 	  try {
+	    jsonResponse.setJSONP(request);
       jsonResponse.print(response);
     } catch (Exception e1) {
     }
@@ -147,10 +173,11 @@ public class PROV extends HttpServlet {
 	/**
 	 * Runs a python script using the prov library to visualize PROV XML data
 	 * @param provdm String with XML data containing provenance
+	 * @param format Can either be png or svg
 	 * @return Bytes of the image
 	 * @throws Exception
 	 */
-	private byte[] runPythonProvOnXML(String provdm) throws Exception {
+	private byte[] runPythonProvOnXML(String provdm,String format)throws Exception {
 	  String script=
 	      "import prov\n"+
 	      "import io\n"+
@@ -165,8 +192,8 @@ public class PROV extends HttpServlet {
 	      "xml_doc.seek(0, 0)\n"+
 	      "doc=ProvDocument.deserialize(xml_doc,format=\"xml\")\n"+
 	      "dot = prov_to_dot(doc)\n"+
-	      "svg_content = dot.create(format=\"png\")\n"+
-	      "with open(\"testWPS_PROV.png\",\"w+\") as text_file:\n"+
+	      "svg_content = dot.create(format=\""+format+"\")\n"+
+	      "with open(\"testWPS_PROV.dat\",\"w+\") as text_file:\n"+
 	      "    text_file.write(str(svg_content))\n";
 
 	  File tmpDir = createTempDirectory();
@@ -227,7 +254,7 @@ public class PROV extends HttpServlet {
       Debug.errprintln(error);
       throw new Exception ("Unable to do run python: "+error);
     }
-    byte[] pngFile = tools.Tools.readFileRaw(tmpDir+"/testWPS_PROV.png");
+    byte[] pngFile = tools.Tools.readFileRaw(tmpDir+"/testWPS_PROV.dat");
     
     tools.Tools.rmdir(tmpDir);
     return pngFile;
@@ -248,7 +275,7 @@ public class PROV extends HttpServlet {
     if(viewerResponse.hasError()){
       return viewerResponse;
     }
-  
+    viewerResponse.disableJSONP();
     JSONArray ncDump = null;
     try {
       ncDump = (JSONArray) new JSONTokener(viewerResponse.getMessage()).nextValue();
