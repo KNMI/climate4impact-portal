@@ -22,7 +22,7 @@ public class HandleAdminRequests {
 
     ImpactUser user = null;
     try {
-      user = LoginManager.getUser(request,response);
+      user = LoginManager.getUser(request);
     } catch (Exception e) {
       jsonResponse.setErrorMessage("No user information", 401);
       e.printStackTrace();

@@ -468,7 +468,7 @@ public class Opendap {
       
       //Valid tokens should be in this range, otherwise replace with exclamation mark.
       for(int j=0;j<b.length;j++){
-        if(b[j]<32||b[j]>126)b[j]='!';
+        if(b[j]!=13&&b[j]!=10)if(b[j]<32||b[j]>126)b[j]='!';
       }
       s= new String(b);
       //Debug.println(attrName+":"+s);
@@ -639,7 +639,7 @@ public class Opendap {
     //Debug.println("filePath        : "+filePath);
     try {
       Debug.println("user:");
-      ImpactUser user =  LoginManager.getUser(request,response);
+      ImpactUser user =  LoginManager.getUser(request);
       //Debug.println("user:"+user);
       
       

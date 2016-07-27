@@ -35,7 +35,7 @@ public class OpendapViewer {
  
 
 
-  private JSONResponse viewOpenDap(String requestStr,HttpServletRequest request, HttpServletResponse response){
+  public JSONResponse viewOpenDap(String requestStr,HttpServletRequest request){
     JSONResponse jsonResponse = new JSONResponse(request);
     /* Check if we really have an URL here and not a localfile */
     String prefixCheck = requestStr.toLowerCase();
@@ -60,7 +60,7 @@ public class OpendapViewer {
       String ncdumpMessage = "";
    
       try{
-        user=LoginManager.getUser(request,response);
+        user=LoginManager.getUser(request);
         Debug.println("INFO: User logged in: "+user.getInternalName());
 //        if(user == null){
 //          jsonResponse.setErrorMessage("Unable to get user from LoginManager",500);
@@ -78,7 +78,7 @@ public class OpendapViewer {
     
       if(ncdumpMessage==""){
         try{
-          jsonResponse = LoginManager.identifyWhyGetRequestFailed(requestStr+".ddx",request,response);
+          jsonResponse = LoginManager.identifyWhyGetRequestFailed(requestStr+".ddx",request);
         }catch(WebRequestBadStatusException e2){
         }
         return jsonResponse;
@@ -320,7 +320,7 @@ public class OpendapViewer {
     
     //Valid tokens should be in this range, otherwise replace with exclamation mark.
     for(int j=0;j<b.length;j++){
-      if(b[j]<32||b[j]>126)b[j]='!';
+      if(b[j]!=13&&b[j]!=10)if(b[j]<32||b[j]>126)b[j]='!';
     }
     attrValue= new String(b);
     return attrValue;
@@ -346,7 +346,7 @@ public class OpendapViewer {
         }
   
   
-          JSONResponse jsonresponse = viewOpenDap(query,request,response);
+          JSONResponse jsonresponse = viewOpenDap(query,request);
           jsonresponse.setJSONP(jsonp);
           response.setContentType(jsonresponse.getMimeType());
           response.getOutputStream().print(jsonresponse.getMessage());

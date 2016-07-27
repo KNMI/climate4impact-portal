@@ -47,7 +47,7 @@ public class FileUploadHandler extends HttpServlet {
       ImpactUser user = null;
    
       try{
-          user=LoginManager.getUser(request,response);
+          user=LoginManager.getUser(request);
           if(user == null)return;
       }catch(Exception e){
           user = null;

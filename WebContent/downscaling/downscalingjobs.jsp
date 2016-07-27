@@ -35,7 +35,7 @@
 			<div class="breadcrumb"><a href="login.jsp">Downscaling</a> » Jobs </div>
 			<h1>Submitted downscaling jobs</h1>
 	
-				Jobs for: <strong><%out.print(LoginManager.getUser(request,null).getUserName());%> </strong><br/>
+				Jobs for: <strong><%out.print(LoginManager.getUser(request).getUserName());%> </strong><br/>
 			<table class="basket">
 				<tr>
 					<td style="width:150px;background-color:#DDD;"><b>Job ID:</b></td>

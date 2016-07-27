@@ -43,7 +43,7 @@ public class AdagucServer extends HttpServlet{
     //Try to get homedir, ignore if failed
     String userHomeDir="/tmp/";
     try{
-      ImpactUser user = LoginManager.getUser(request,response);
+      ImpactUser user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WMS for user: "+user.getId());
@@ -55,7 +55,7 @@ public class AdagucServer extends HttpServlet{
         String source = HTTPTools.getKVPItemDecoded(URLDecoder.decode(queryString,"UTF-8"), "source");
         if(source != null){
           Debug.println("Checking reason for "+source);
-          JSONResponse reason = LoginManager.identifyWhyGetRequestFailed(source, request,response);
+          JSONResponse reason = LoginManager.identifyWhyGetRequestFailed(source, request);
           if(reason.getStatusCode()==401){
             Debug.println("Redirecting to login page");
             LoginManager.redirectToLoginPage(request,response);

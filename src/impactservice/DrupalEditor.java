@@ -109,7 +109,7 @@ public class DrupalEditor {
 	static public String showDrupalContent(String defaultPage,HttpServletRequest request,HttpServletResponse response) throws DrupalEditorException{
 	  boolean showEditButton = false;
 	  try {
-      ImpactUser user = LoginManager.getUser(request,null);
+      ImpactUser user = LoginManager.getUser(request);
       if(user!=null){
         showEditButton = true;
       }

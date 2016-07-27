@@ -291,7 +291,7 @@ public class AdagucViewer extends HttpServlet {
       
       try{
         if(thisIsWPSExecuteRequest){
-          WebProcessingInterface.trackJobForUser( LoginManager.getUser(request,null), rootElement, null);
+          WebProcessingInterface.trackJobForUser( LoginManager.getUser(request), rootElement, null);
         }
       }catch(Exception e){
         e.printStackTrace();

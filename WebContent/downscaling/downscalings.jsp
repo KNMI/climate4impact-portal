@@ -35,7 +35,7 @@
 			<div class="breadcrumb"><a href="login.jsp">Downscaling</a> » Downscalings </div>
 			<h1>Downscalings</h1>
 	
-				Downscalings for: <strong><%out.print(LoginManager.getUser(request,null).getUserName());%> </strong><br/>
+				Downscalings for: <strong><%out.print(LoginManager.getUser(request).getUserName());%> </strong><br/>
 			<table class="basket">
 				<tr>
 					<td style="background-color:#DDD;"><b>Job ID:</b></td>
@@ -56,7 +56,7 @@
 					out.print("<tr><td class='job-id'>"+d.getJobId()+"</td>"+"<td class='type'>"+d.getType()+"</td>"+"<td class='predictand'>"+d.getPredictand()+"</td><td class='d-method'>"+d.getDownscalingMethod()+
 							"</td><td class='project'>"+d.getProject()+"<td class='scenario'>"+d.getScenario()+"</td>"+"<td class='s-year'>"+d.getsYear()+"</td>"+"<td class='e-year'>"+d.geteYear()+"</td>");
 					if(d.getStatus() == 30){
-						out.print("<td>Finished</td><td><a download='downscaling-"+d.getJobId()+".zip' href='../DownscalingService/downscalings/download?jobId="+d.getJobId()+"&zone="+d.getZone()+"&predictand="+d.getPredictand()+"&downscalingMethod="+d.getDownscalingMethod()+"&project="+d.getProject()+"&scenario="+d.getScenario()+"&sYear="+d.getsYear()+"&eYear="+d.geteYear()+"&username="+LoginManager.getUser(request,null).getInternalName()+"&type="+d.getType()+"'>Download</a></td>");						
+						out.print("<td>Finished</td><td><a download='downscaling-"+d.getJobId()+".zip' href='../DownscalingService/downscalings/download?jobId="+d.getJobId()+"&zone="+d.getZone()+"&predictand="+d.getPredictand()+"&downscalingMethod="+d.getDownscalingMethod()+"&project="+d.getProject()+"&scenario="+d.getScenario()+"&sYear="+d.getsYear()+"&eYear="+d.geteYear()+"&username="+LoginManager.getUser(request).getInternalName()+"&type="+d.getType()+"'>Download</a></td>");						
 					}else if(d.getStatus() == 50){
 						out.print("<td>Failed</td><td>X</td>");
 					}else{

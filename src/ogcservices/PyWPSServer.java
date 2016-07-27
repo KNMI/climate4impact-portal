@@ -53,7 +53,7 @@ public class PyWPSServer extends HttpServlet {
     ImpactUser user = null;
  
     try{
-      user = LoginManager.getUser(request,response);
+      user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WPS for user: "+user.getId());

@@ -22,6 +22,7 @@ var renderFileViewer = function(options){
   newoptions.adagucviewer=c4iconfigjs.adagucviewer;
   newoptions.howtologinlink=c4iconfigjs.howtologinlink;
   newoptions.contactexpertlink=c4iconfigjs.contactexpertlink;
+  newoptions.provenanceservice=c4iconfigjs.provenanceservice;
   newoptions.query=options.url;
   newoptions.dialog=true;
   newoptions.element=jQuery('<div/>');
@@ -168,7 +169,7 @@ var FileViewerInterface = function(options){
     getVariableInfoFromServer();
   };
   
-  function checkForUsableVariable(variable){
+  function checkForViewableVariable(variable){
       if(variable.variable == "lon"){return "";}
       if(variable.variable == "lat"){return "";}
       if(variable.variable == "x"){return "";}
@@ -184,6 +185,13 @@ var FileViewerInterface = function(options){
       }
     }
     return "";
+  };
+  
+  function checkForProvenanceVariable(variable){
+    if(variable.variable != "knmi_provenance"){return "";}
+    var url=options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance";
+    var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
+    return html;
   };
   
   
@@ -273,7 +281,10 @@ var FileViewerInterface = function(options){
       
     var html="";
     for(var v=0;v<data.length;v++){
-      var preview=checkForUsableVariable(data[v]);
+      var preview=checkForViewableVariable(data[v]);
+      if(preview==""){
+        preview=checkForProvenanceVariable(data[v]);
+      }
 
       html+="<span class=\"c4i-fileviewer-resultitem\">";     
       html+="  <span class=\"c4i-fileviewer-dataset-baseimage c4i-fileviewer-dataset-collapsible c4i-fileviewer-dataset-imgcollapsed \" name=\""+data[v].variable+"\"></span>";

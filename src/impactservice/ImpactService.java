@@ -71,7 +71,7 @@ public class ImpactService extends HttpServlet {
       try{
         String procId=request.getParameter("id");
         if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-        jobList = LoginManager.getUser(request,response).getProcessingJobList();
+        jobList = LoginManager.getUser(request).getProcessingJobList();
         jobList.removeDataLocator(procId);
         jsonResponse.setMessage("{\"numproducts\":\""+(jobList.getNumProducts())+"\"}");
       }catch(Exception e){
@@ -87,7 +87,7 @@ public class ImpactService extends HttpServlet {
       JSONResponse jsonResponse = new JSONResponse(request);
       GenericCart jobList = null;
       try{
-        jobList = LoginManager.getUser(request,response).getProcessingJobList();
+        jobList = LoginManager.getUser(request).getProcessingJobList();
         JSONObject json = GenericCart.CartPrinters.showJobList(jobList,request);
         jsonResponse.setMessage(json);
       }catch(Exception e){
@@ -710,7 +710,7 @@ public class ImpactService extends HttpServlet {
 
       ImpactUser user = null;
       try{
-        user = LoginManager.getUser(request,response);
+        user = LoginManager.getUser(request);
       }catch(Exception e){
         DebugConsole.println("Exception "+e.getMessage());
       }
@@ -784,7 +784,7 @@ public class ImpactService extends HttpServlet {
         String[] procId=request.getParameterValues("id[]");
         Debug.println("Delete file from basket ");
         //if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-        basketList = LoginManager.getUser(request,response).getShoppingCart();
+        basketList = LoginManager.getUser(request).getShoppingCart();
         basketList.removeDataLocators(procId);
         response.setContentType("application/json");
         response.getWriter().println("{\"numproducts\":\""+(basketList.getNumProducts())+"\"}");
@@ -802,7 +802,7 @@ public class ImpactService extends HttpServlet {
         JSONResponse jsonResponse = new JSONResponse(request);
         try{
           GenericCart shoppingCart = null;
-          shoppingCart = LoginManager.getUser(request,response).getShoppingCart();
+          shoppingCart = LoginManager.getUser(request).getShoppingCart();
 
           Debug.println("Adding data to basket"+request.getParameter("id"));
 
@@ -849,7 +849,7 @@ public class ImpactService extends HttpServlet {
   private ImpactUser checkUserAndPrintJSONError(HttpServletRequest request,HttpServletResponse response) throws IOException {
     ImpactUser user = null;
     try{
-      user = LoginManager.getUser(request,response);
+      user = LoginManager.getUser(request);
     }catch(Exception e){
       response.setContentType("application/json");
       //response.setStatus(401);  <--Does not work with ExtJS proxy 

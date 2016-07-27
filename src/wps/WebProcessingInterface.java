@@ -287,7 +287,7 @@ public class WebProcessingInterface {
 	 */
 	
   public static JSONObject executeProcess(String procId, String dataInputs, HttpServletRequest request,HttpServletResponse response) throws Exception {
-    ImpactUser user = LoginManager.getUser(request,response);
+    ImpactUser user = LoginManager.getUser(request);
     if(user == null){
       return null;
     }
@@ -407,7 +407,7 @@ public class WebProcessingInterface {
           if(maximumTries == 0){
             GenericCart jobList;
             try {
-              jobList = LoginManager.getUser(request,null).getProcessingJobList();
+              jobList = LoginManager.getUser(request).getProcessingJobList();
               String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
               jobList.removeDataLocator(basename);
             } catch (Exception e1) {

@@ -391,6 +391,7 @@ var BasketWidget = function() {
           service:c4iconfigjs.impactservice,
           adagucservice:c4iconfigjs.adagucservice,
           adagucviewer:c4iconfigjs.adagucviewer,
+          provenanceservice:c4iconfigjs.provenanceservice,
           //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
           query:record.get('dapurl'),
           dialog:true

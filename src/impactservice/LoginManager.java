@@ -197,7 +197,7 @@ public class LoginManager {
    * @return The user object or null when a redirect is requested.
    * @throws Exception
    */
-  public static ImpactUser getUser(HttpServletRequest request,
+  public static ImpactUser _getUser(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
 
 //    String doLogOut = tools.HTTPTools.getHTTPParam(request,"c4i_dologout");
@@ -252,7 +252,7 @@ public class LoginManager {
 
 
     //"Trying to get user info from X509 cert"
-    if (id == null && response != null) {
+    if (id == null) {
       String CertOpenIdIdentifier = null;
       // org.apache.catalina.authenticator.SSLAuthenticator
       X509Certificate[] certs = (X509Certificate[]) request
@@ -327,7 +327,7 @@ public class LoginManager {
   }
 
   public static ImpactUser getUser(HttpServletRequest request) throws Exception {
-    return getUser(request, null);
+    return _getUser(request, null);
   }
 
   /**
@@ -529,7 +529,7 @@ public class LoginManager {
    * @throws IOException
    */
   public static JSONResponse identifyWhyGetRequestFailed(String requestStr,
-      HttpServletRequest request, HttpServletResponse response)
+      HttpServletRequest request)
       throws WebRequestBadStatusException, IOException {
     JSONResponse jsonResponse = new JSONResponse(request);
     ImpactUser user = null;
