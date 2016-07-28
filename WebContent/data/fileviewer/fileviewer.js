@@ -188,7 +188,7 @@ var FileViewerInterface = function(options){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
         }
         var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
-        var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
+        var html='<div class="c4i-fileviewer-previewstyle" name="'+variable.variable+'"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
       }
     }
@@ -495,7 +495,8 @@ var FileViewerInterface = function(options){
         
         var previewImage = el.parent().find(".c4i-fileviewer-previewstyle");
         previewImage.attr('onclick','').click(function(event){
-          event.preventDefault();          
+          event.preventDefault();        
+          var variable =  $(this).attr('name');
           _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });
