@@ -8,10 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import tools.JSONResponse.JSONResponseException;
-
 /**
- *  @author plieger
+ *  @author Maarten Plieger - KNMI
  *  
  *  Helper class for creating json and jsonp responses
  *  
@@ -34,10 +32,18 @@ import tools.JSONResponse.JSONResponseException;
  *
  */
 public class JSONResponse {
+  
+  public JSONResponse(HttpServletRequest request,String userId){
+    setJSONP(request);
+    this.userId = userId;
+    
+  }  
+  
   public JSONResponse(HttpServletRequest request){
     setJSONP(request);
-    
+    this.userId = null;    
   }
+  
   
   public JSONResponse(){
   }
@@ -64,6 +70,7 @@ public class JSONResponse {
     
   }
 
+  private String userId = null;
   private String message = "";
   private String mimetype = "application/json";
   private String jsonp = null;
@@ -102,6 +109,8 @@ public class JSONResponse {
       error.put("error", string);
       error.put("statuscode", this.statusCode);
       error.put("exception", e2.getMessage());
+      if(redirectURL!=null){error.put("redirect", this.redirectURL);}
+      if(this.userId!=null){error.put("userid", this.userId);}  
       if(url!=null){
         error.put("url", url);
       }
@@ -126,7 +135,7 @@ public class JSONResponse {
       if(redirectURL!=null){error.put("redirect", this.redirectURL);}
       if(currentPage!=null){error.put("current", currentPage);}
       if(resource!=null){error.put("resource", resource);}
-      
+      if(this.userId!=null){error.put("userid", this.userId);}      
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -188,5 +197,9 @@ public class JSONResponse {
   public void setException(JSONResponseException e) {
     this.hasError = true;
     this.message = e.getMessage();    
+  }
+
+  public void setUserId(String id) {
+    this.userId = id;    
   }
 }

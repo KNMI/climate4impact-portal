@@ -20,10 +20,14 @@ import impactservice.OpendapViewer;
 import tools.Debug;
 import tools.JSONResponse;
 import tools.ProcessRunner;
-//https://bhw485.knmi.nl:9443/impactportal/PROV?request=getprovenance&source=https%3A%2F%2Fbhw485.knmi.nl%3A9443%2Fimpactportal%2FDAP%2Fceda.ac.uk.openid.Maarten.Plieger%2FNORMADV.nc
+
 /**
  * Servlet implementation class PROV
+ * @author Maarten Plieger - KNMI Created servlet
+ * @author Alessandro Spinuso - KNMI: Created Python code for s-provenance
+ * https://github.com/aspinuso/s-provenance/blob/master/provenance-api/src/prov-services/Vis%20PROV.ipynb
  */
+
 public class PROV extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -178,6 +182,9 @@ public class PROV extends HttpServlet {
 	 * @throws Exception
 	 */
 	private byte[] runPythonProvOnXML(String provdm,String format)throws Exception {
+    /* s-provenance code used from author aspinuso: 
+     * https://github.com/aspinuso/s-provenance/blob/master/provenance-api/src/prov-services/Vis%20PROV.ipynb
+     */
 	  String script=
 	      "import prov\n"+
 	      "import io\n"+

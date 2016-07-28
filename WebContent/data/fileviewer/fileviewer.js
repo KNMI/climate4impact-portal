@@ -17,12 +17,7 @@ var renderFileViewerInterface = function(options){
 var renderFileViewer = function(options){
   var newoptions = [];
   
-  newoptions.service=c4iconfigjs.impactservice;
-  newoptions.adagucservice=c4iconfigjs.adagucservice;
-  newoptions.adagucviewer=c4iconfigjs.adagucviewer;
-  newoptions.howtologinlink=c4iconfigjs.howtologinlink;
-  newoptions.contactexpertlink=c4iconfigjs.contactexpertlink;
-  newoptions.provenanceservice=c4iconfigjs.provenanceservice;
+
   newoptions.query=options.url;
   newoptions.dialog=true;
   newoptions.element=jQuery('<div/>');
@@ -33,6 +28,14 @@ var renderFileViewer = function(options){
 
 var FileViewerInterface = function(options){
   var _this = this;
+  
+  if(!options.service)options.service=c4iconfigjs.impactservice;
+  if(!options.adagucservice)options.adagucservice=c4iconfigjs.adagucservice;
+  if(!options.adagucviewer)options.adagucviewer=c4iconfigjs.adagucviewer;
+  if(!options.howtologinlink)options.howtologinlink=c4iconfigjs.howtologinlink;
+  if(!options.contactexpertlink)options.contactexpertlink=c4iconfigjs.contactexpertlink;
+  if(!options.provenanceservice)options.provenanceservice=c4iconfigjs.provenanceservice;
+  
   
   options.prettyquery=options.query.split("#")[0];
   
@@ -194,6 +197,7 @@ var FileViewerInterface = function(options){
   
   function checkForProvenanceVariable(variable){
     if(variable.variable != "knmi_provenance"){return "";}
+
     var html=
        '<div class="c4i-fileviewer-previewstyle-SVG">'
       +'  <div  class="c4i-fileviewer-provenance"></div>'
@@ -224,7 +228,7 @@ var FileViewerInterface = function(options){
       window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=application/json", '_blank');
     });
     options.element.find(".c4i-fileviewer-provenance-controls-xml").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
-      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=application/xml", '_blank');
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=text/xml", '_blank');
     });
     options.element.find(".c4i-fileviewer-provenance-controls-svg").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
       window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=text/html", '_blank');
@@ -281,6 +285,7 @@ var FileViewerInterface = function(options){
   
   
   function handleErrorMessage(data){
+    
     var html=
      '<div class="simplecomponent c4i-fileviewer-globalmetadata">'+
      '<div class="simplecomponent-body">'+
@@ -291,13 +296,30 @@ var FileViewerInterface = function(options){
      
     '<div class="c4-fileviewer-variable-error">'+
       '<b>'+data.error+'</b><br/>'+
-      'You can try the following:<ul>'+
-      '<li><span class="c4i-fileviewer-error-signinbutton c4i-fileviewer-spanlink" >Sign in</span></li>'+
-      '<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
-      '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a>.</li>'+
-      '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>'+
-      '<li>The list of available groups can be found here: <a class="c4i-fileviewer-spanlink" target="_blank" href="https://esgf-node.jpl.nasa.gov/ac/list/">List of ESGF groups</a></li>'+
-      '<li>Open this file directly in your browser  <span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >here</span>, you might get a hint on what is going wrong.</li>'+
+      ''+data.exception+'<br/><hr/>'+
+      'You can try the following:<ul>';
+    
+    if(!data.userid){
+      html+='<li><span class="c4i-fileviewer-error-signinbutton c4i-fileviewer-spanlink" >Sign in</span></li>'
+    }
+    html+='<li><a class="c4i-fileviewer-spanlink" target="_blank" href="https://esgf-node.jpl.nasa.gov/ac/list/">Become a member of the right ESGF data group</a> and then <span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >reload</span</li>';
+    
+
+    
+    html+=
+      //'<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
+      '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a></li>';
+    html+='<li><span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >Open this file directly in your browser to get a hint</span>./li>';
+
+    html+=
+      '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>';
+      
+    
+    if(data.userid){
+      html+='<li>You are signed in as <b>'+data.userid+'</b>.</li>'
+    }
+    
+    html+=     
       '</ul>'+
    '</div>'
     options.element.html(html);
@@ -436,8 +458,8 @@ var FileViewerInterface = function(options){
         $(el).addClass("c4i-fileviewer-dataset-imgexpand");
         $(el).parent().find(".c4i-fileviewer-dataset-expandedarea").show();
         var serviceOptions = el.parent().find(".c4i-fileviewer-adagucviewershow");
-        
-        var adagucViewerAddLayer = $('<span />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
+        var variable = data[v].variable;
+        var adagucViewerAddLayer = $('<span name="'+variable+'" />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
         var WMS = $('<span />').addClass('c4i-fileviewer-wms').html(
           '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.prettyquery)+'&service=WMS&request=GetCapabilities">WMS</a>');
         
@@ -450,10 +472,11 @@ var FileViewerInterface = function(options){
             '<a target="_blank" href="'+options.prettyquery+'.das">opendap</a>');
         serviceOptions.append(opendap);
         
-        var variable = data[v].variable;
+        
         
         adagucViewerAddLayer.attr('onclick','').click(function(event){
-          event.preventDefault();          
+          event.preventDefault();
+          var variable =  $(this).attr('name');
           _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });

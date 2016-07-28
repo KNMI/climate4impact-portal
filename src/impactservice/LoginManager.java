@@ -535,6 +535,7 @@ public class LoginManager {
     ImpactUser user = null;
     try {
       user = getUser(request);
+      jsonResponse.setUserId(user.getId());
     } catch (Exception e1) {
     }
     String msg = "";

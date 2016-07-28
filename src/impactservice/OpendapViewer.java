@@ -34,8 +34,14 @@ public class OpendapViewer {
 
  
 
-
+  /**
+   * Returns a JSONObject containing ncdump like structure for given opendap URL.
+   * @param requestStr
+   * @param request
+   * @return
+   */
   public JSONResponse viewOpenDap(String requestStr,HttpServletRequest request){
+    ImpactUser user = null;
     JSONResponse jsonResponse = new JSONResponse(request);
     /* Check if we really have an URL here and not a localfile */
     String prefixCheck = requestStr.toLowerCase();
@@ -50,7 +56,7 @@ public class OpendapViewer {
       datasetViewerSession = new DatasetViewerSession();session.setAttribute("datasetviewersession",datasetViewerSession);
     }
     datasetViewerSession.datasetURL=requestStr;
-    ImpactUser user = null;
+  
 
     try{
       //Strip the # token.
@@ -62,27 +68,28 @@ public class OpendapViewer {
       try{
         user=LoginManager.getUser(request);
         Debug.println("INFO: User logged in: "+user.getInternalName());
-//        if(user == null){
-//          jsonResponse.setErrorMessage("Unable to get user from LoginManager",500);
-//        }
       }catch(Exception e){
         Debug.println("INFO: User NOT logged in");
       }
       
 
-      
-      
-      ncdumpMessage=NetCDFC.executeNCDumpCommand(user,requestStr);
-      
-      
-    
-      if(ncdumpMessage==""){
+      try{
+        ncdumpMessage=NetCDFC.executeNCDumpCommand(user,requestStr);
+      }catch(Exception e){
+        //Try to find a proper error, probably caused by an offline server or authetnication problem
         try{
           jsonResponse = LoginManager.identifyWhyGetRequestFailed(requestStr+".ddx",request);
         }catch(WebRequestBadStatusException e2){
         }
+        //If not give it the ncdump error
+        if(jsonResponse.hasError() == false){
+          jsonResponse.setException("NCDump error", e);
+        }
         return jsonResponse;
       }
+      
+      
+
       
       Debug.println("Trying to parse ncdump message");
       MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
@@ -267,7 +274,7 @@ public class OpendapViewer {
 
     */
     }catch(Exception e){
-      
+      Debug.errprintln("ncdump exception "+e.getMessage());
       String requestStrWithOpenId = requestStr;
       if(user!=null){
         if(user.getOpenId()!=null){
@@ -309,7 +316,7 @@ public class OpendapViewer {
     }
 
 
-
+    
     return jsonResponse;
   }
   
@@ -330,29 +337,16 @@ public class OpendapViewer {
 
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    JSONResponse jsonresponse = new JSONResponse(request);
     try {
       String service=HTTPTools.getHTTPParam(request,"service");
       if("getvariables".equals(service)){
         String query=HTTPTools.getHTTPParam(request,"request");
-        
-        String jsonp = null;
-        try{
-          jsonp=HTTPTools.getHTTPParam(request,"jsonp");
-        }catch (Exception e) {
-          try{
-            jsonp=HTTPTools.getHTTPParam(request,"callback");
-          }catch(Exception e2){
-          }
-        }
-  
-  
-          JSONResponse jsonresponse = viewOpenDap(query,request);
-          jsonresponse.setJSONP(jsonp);
-          response.setContentType(jsonresponse.getMimeType());
-          response.getOutputStream().print(jsonresponse.getMessage());
+        jsonresponse = viewOpenDap(query,request);
       }
-      
     } catch (Exception e) {
+      jsonresponse.setException("Unable to get variables", e);
     }
+    jsonresponse.print(response);
   }
 }
