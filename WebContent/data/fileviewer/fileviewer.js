@@ -128,7 +128,7 @@ var FileViewerInterface = function(options){
     if(options.dialog){
       options.element.dialog({
         title:'NetCDF Metadata',
-        width:800,
+        width:1000,
         height:600,
 
         dialogClass:'c4i-fileviewer-containerdialog'
@@ -187,7 +187,10 @@ var FileViewerInterface = function(options){
         for(var d=0;d<variable.dimensions.length;d++){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
         }
-        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
+
+     
+        var maxAllowedWidth=rootElement.width()-120;
+        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width="+maxAllowedWidth+"&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
         var html='<div class="c4i-fileviewer-previewstyle" name="'+variable.variable+'"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
       }
@@ -204,12 +207,12 @@ var FileViewerInterface = function(options){
       +'  <div class="c4i-fileviewer-provenance-controls">'
       //+'    <div class="c4i-fileviewer-provenance-controls-zoom">'
       +'      <p><i class="btn btn-success fa fa-refresh"></i></p>'
-      +'      <button class="c4i-fileviewer-provenance-controls-zoomout">Zoom out</button>'
-      +'      <button class="c4i-fileviewer-provenance-controls-zoomin">Zoom in</button>'
-      +'      <button class="c4i-fileviewer-provenance-controls-panleft">Left</button>'
-      +'      <button class="c4i-fileviewer-provenance-controls-panup">Up</button>'
-      +'      <button class="c4i-fileviewer-provenance-controls-panright">Right</button>'
-      +'      <button class="c4i-fileviewer-provenance-controls-pandown">Down</button><br/>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-zoomout">Zoom out</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-zoomin">Zoom in</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panleft">Left</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panup">Up</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panright">Right</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-pandown">Down</button><br/>'
       +'      <button class="c4i-fileviewer-provenance-controls-json">JSON</button>'
       +'      <button class="c4i-fileviewer-provenance-controls-xml">XML</button>'
       +'      <button class="c4i-fileviewer-provenance-controls-png">PNG</button>'
@@ -241,7 +244,14 @@ var FileViewerInterface = function(options){
     
     var httpCallback = function(data){
       if(data.error){
-        alert(data.error);
+        
+        alert("<b>"+data.error+"</b><hr/>Note: Exception info has been logged to your browsers console.");
+        
+        if(data.exception){
+          if(console.log){
+            console.log(data.exception);
+          }
+        }
         return;
       }
       var el = options.element.find(".c4i-fileviewer-provenance").first();
@@ -249,20 +259,29 @@ var FileViewerInterface = function(options){
       var svgEl =  el.find("svg").first();
       
       svgEl.attr('width', '100%');
-      svgEl.attr('height', '330px');
-      
-      "use strict";
-      var mySVG =svgEl.svgPanZoom({
-        mouseWheel: false 
+      svgEl.attr('height', '350px');
+      svgEl.attr('id','svgid');
+      console.log(svgEl.attr('id'));
+      // Expose to window namespase for testing purposes
+      window.zoomTiger = svgPanZoom("#"+svgEl.attr('id'), {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true,
+        zoomScaleSensitivity: 1
       });
-      
-      options.element.find(".c4i-fileviewer-provenance-controls-zoomin").button({icons: { primary: "ui-icon-circle-zoomin"}}).button({}).attr('onclick','').click(function(event){mySVG.zoomIn()});
-      options.element.find(".c4i-fileviewer-provenance-controls-zoomout").button({icons: { primary: "ui-icon-circle-zoomout"}}).attr('onclick','').click(function(event){mySVG.zoomOut()});
-      options.element.find(".c4i-fileviewer-provenance-controls-panleft").button({icons: { primary: "ui-icon-circle-arrow-w"}}).attr('onclick','').click(function(event){mySVG.panLeft()});
-      options.element.find(".c4i-fileviewer-provenance-controls-panright").button({icons: { primary: "ui-icon-circle-arrow-e"}}).attr('onclick','').click(function(event){mySVG.panRight()});
-      options.element.find(".c4i-fileviewer-provenance-controls-panup").button({icons: { primary: "ui-icon-circle-arrow-n"}}).attr('onclick','').click(function(event){mySVG.panUp()});
-      options.element.find(".c4i-fileviewer-provenance-controls-pandown").button({icons: { primary: "ui-icon-circle-arrow-s"}}).attr('onclick','').click(function(event){mySVG.panDown()});
-      
+//      "use strict";
+//      var mySVG =svgEl.svgPanZoom({
+//        mouseWheel: false 
+//      });
+//      
+//      options.element.find(".c4i-fileviewer-provenance-controls-zoomin").button({icons: { primary: "ui-icon-circle-zoomin"}}).button({}).attr('onclick','').click(function(event){mySVG.zoomIn()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-zoomout").button({icons: { primary: "ui-icon-circle-zoomout"}}).attr('onclick','').click(function(event){mySVG.zoomOut()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panleft").button({icons: { primary: "ui-icon-circle-arrow-w"}}).attr('onclick','').click(function(event){mySVG.panLeft()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panright").button({icons: { primary: "ui-icon-circle-arrow-e"}}).attr('onclick','').click(function(event){mySVG.panRight()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panup").button({icons: { primary: "ui-icon-circle-arrow-n"}}).attr('onclick','').click(function(event){mySVG.panUp()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-pandown").button({icons: { primary: "ui-icon-circle-arrow-s"}}).attr('onclick','').click(function(event){mySVG.panDown()});
+//      
 
       
             
@@ -295,9 +314,9 @@ var FileViewerInterface = function(options){
      '</div>'+
      
     '<div class="c4-fileviewer-variable-error">'+
-      '<b>'+data.error+'</b><br/>'+
-      ''+data.exception+'<br/><hr/>'+
-      'You can try the following:<ul>';
+      '<b>'+data.error+'</b><br/>';
+    if(data.exception)html+=data.exception+'<br/><hr/>';
+    html+='You can try the following:<ul>';
     
     if(!data.userid){
       html+='<li><span class="c4i-fileviewer-error-signinbutton c4i-fileviewer-spanlink" >Sign in</span></li>'
@@ -353,7 +372,7 @@ var FileViewerInterface = function(options){
     ''+
     '  <div class="simplecomponent c4i-fileviewer-variables">'+
 //     '    <div class="simplecomponent-header">NetCDF Variables</div>'+
-    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-body c4i-fileviewer-variables-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>';
     if(!options.dialog){
@@ -402,6 +421,7 @@ var FileViewerInterface = function(options){
     
      
       html+='    <span class="c4i-fileviewer-resultitem-content ">';
+      html+='    <span class="c4i-fileviewer-resultitem-content-varinfo ">';
       if(data[v].variabletype){
         html+="<span class=\"c4i-fileviewer-variabletype\">"+data[v].variabletype+ "</span>";     
       }else{
@@ -423,7 +443,9 @@ var FileViewerInterface = function(options){
       
       if(data[v].isDimension){
         html+=  "<span class=\"c4i-fileviewer-vardimension\">dimension "+data[v].variable+" of length "+data[v].isDimension[0].length+"</span>";
-      }if(preview.length>0)
+      }
+      html+='</span>'
+      if(preview.length>0)
       {
         html+=  "<span class=\"c4i-fileviewer-adagucviewershow\"></span>";
       }
@@ -469,7 +491,7 @@ var FileViewerInterface = function(options){
         serviceOptions.append(WCS);
         
         var opendap = $('<span />').addClass('c4i-fileviewer-opendap').html(
-            '<a target="_blank" href="'+options.prettyquery+'.das">opendap</a>');
+            '<a target="_blank" href="'+options.prettyquery+'.das">OpenDAP</a>');
         serviceOptions.append(opendap);
         
         

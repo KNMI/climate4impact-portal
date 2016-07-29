@@ -60,7 +60,7 @@ public class NetCDFC {
   
   
   public static String executeNCDumpCommand(ImpactUser user,String url) throws Exception{
-    Debug.println("Execute ncdump on "+url);
+    //Debug.println("Execute ncdump on "+url);
     String result;
     NCDump doNCDump = new NCDump();
     result=doNCDump.doNCDump(user,url);

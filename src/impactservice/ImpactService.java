@@ -753,7 +753,7 @@ public class ImpactService extends HttpServlet {
       requestStr="";
     }
     /**
-     *  get basket list as HTML
+     *  get basket list
      */
     if(requestStr.equals("getoverview")){
       ImpactUser user = null;
@@ -770,6 +770,55 @@ public class ImpactService extends HttpServlet {
         Debug.printStackTrace(e);
         response.getWriter().println(e.getMessage());
       }
+      return;
+    }
+    
+    if(requestStr.equals("getfile")){
+      JSONResponse result = new JSONResponse(request);
+      String fileName = null;
+      try {
+        fileName=tools.HTTPTools.getHTTPParam(request, "file");
+      } catch (Exception e1) {
+      }
+      if(fileName == null){
+        return;
+      }
+      
+      ImpactUser user = null;
+      user = checkUserAndPrintJSONError(request,response);
+      if(user == null)return;
+      
+      JSONObject json = new JSONObject (); 
+      
+      if(!fileName.startsWith(Configuration.getHomeURLHTTPS())){
+        result.setErrorMessage("File does not start with "+Configuration.getHomeURLHTTPS(), 500);
+      }
+      
+      Debug.println(fileName);
+      if(result.hasError() == false){
+        String data = null;
+        try{
+          data = tools.HTTPTools.makeHTTPGetRequestX509ClientAuthentication(fileName, user.certificateFile,Configuration.LoginConfig.getTrustStoreFile(), Configuration.LoginConfig.getTrustStorePassword(),0);
+          if(data == null){
+            result.setErrorMessage("Unable to load data for "+fileName, 500);
+          }
+        }catch(Exception e){
+          result.setException("Unable to load data for "+fileName, e);
+        }
+     
+        if(result.hasError() == false){
+          try {
+            
+            json.put("data", new JSONTokener(data).nextValue());
+          } catch (JSONException e) {
+            result.setException("Unable to return data for "+fileName, e);
+          }
+        }
+        
+        result.setMessage(json);
+      }
+      result.print(response);
+  
       return;
     }
 

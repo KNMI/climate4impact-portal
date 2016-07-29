@@ -576,10 +576,10 @@ public class Opendap {
     
     String queryString = request.getQueryString();
     if(queryString == null)queryString="";
-    Debug.println("queryString: =["+queryString+"]");
+    //Debug.println("queryString: =["+queryString+"]");
     String path = request.getPathInfo();
     if(path==null)return;
-    Debug.println("path: =["+path+"]");
+    //Debug.println("path: =["+path+"]");
     String filename = null;//"/home/c4m/Downloads/australia.nc";
     
     
@@ -588,7 +588,7 @@ public class Opendap {
 
     boolean skipTokenFirst=false;
     if(token!=null){
-      Debug.println("Found token in URL");
+      //Debug.println("Found token in URL");
       //Debug.println(token.toString());
       skipTokenFirst = true;//token is the first piece of the part.
     }
@@ -638,13 +638,13 @@ public class Opendap {
     filePath = filePath.substring(0,filePath.lastIndexOf("/"));
     //Debug.println("filePath        : "+filePath);
     try {
-      Debug.println("user:");
+      //Debug.println("user:");
       ImpactUser user =  LoginManager.getUser(request);
       //Debug.println("user:"+user);
       
       
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
-      Debug.println("fileNameFromPath: "+fileNameFromPath);
+      //Debug.println("fileNameFromPath: "+fileNameFromPath);
       
       filename = user.getDataDir()+"/"+filePath+"/"+opendapNameFromPath;
       
@@ -659,7 +659,7 @@ public class Opendap {
         response.getOutputStream().print("403 Forbidden (Wrong user id)");
         return;
       }
-      Debug.println("Comparing "+user.getInternalName() + "==" + userIdFromPath+ " OK");
+      //Debug.println("Comparing "+user.getInternalName() + "==" + userIdFromPath+ " OK");
     } catch (Exception e) {
       String message = "401 No user information provided: "+e.getMessage();
       response.setStatus(401);
@@ -685,9 +685,9 @@ public class Opendap {
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,externalFileName,URLDecoder.decode(queryString,"UTF-8"),false));
       }else if(path.endsWith(".das")){
         response.setContentType("text/plain");
-        Debug.println("OPEN");
+        //Debug.println("OPEN");
         ncFile = NetcdfFile.open(filename);
-        Debug.println("START DAS");
+        //Debug.println("START DAS");
         response.getOutputStream().print(getDASFromNetCDFFile(ncFile));
       }else if(path.endsWith(".dods")){
         response.setContentType("application/octet");

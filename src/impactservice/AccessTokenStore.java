@@ -250,7 +250,7 @@ public class AccessTokenStore {
         }
       }
       path = path.replaceAll("/", "");
-      Debug.println("getPathInfo: "+path);
+      //Debug.println("getPathInfo: "+path);
       if(path.indexOf(".")!=-1){
         return null;
       }

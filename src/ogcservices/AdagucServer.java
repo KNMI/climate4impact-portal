@@ -38,6 +38,7 @@ public class AdagucServer extends HttpServlet{
    * @throws Exception
    */
   public static void runADAGUCWMS(HttpServletRequest request,HttpServletResponse response,String queryString,OutputStream outputStream) throws Exception{
+    Debug.println("runADAGUCWMS");
     String[] environmentVariables = Configuration.ADAGUCServerConfig.getADAGUCEnvironment();
     
     //Try to get homedir, ignore if failed
@@ -48,20 +49,20 @@ public class AdagucServer extends HttpServlet{
       userHomeDir=user.getWorkspace();
       Debug.println("WMS for user: "+user.getId());
     }catch(Exception e){    
-        /* This checks when a resource needs authentication and there is no user is signed in, 
-         * the user is redirected to the login screen.
-         */
-   
-        String source = HTTPTools.getKVPItemDecoded(URLDecoder.decode(queryString,"UTF-8"), "source");
-        if(source != null){
-          Debug.println("Checking reason for "+source);
-          JSONResponse reason = LoginManager.identifyWhyGetRequestFailed(source, request);
-          if(reason.getStatusCode()==401){
-            Debug.println("Redirecting to login page");
-            LoginManager.redirectToLoginPage(request,response);
-            return;
-          }
-        }
+//        /* This checks when a resource needs authentication and there is no user is signed in, 
+//         * the user is redirected to the login screen.
+//         */
+//   
+//        String source = HTTPTools.getKVPItemDecoded(URLDecoder.decode(queryString,"UTF-8"), "source");
+//        if(source != null){
+//          Debug.println("Checking reason for "+source);
+//          JSONResponse reason = LoginManager.identifyWhyGetRequestFailed(source, request);
+//          if(reason.getStatusCode()==401){
+//            Debug.println("Redirecting to login page");
+//            LoginManager.redirectToLoginPage(request,response);
+//            return;
+//          }
+//        }
     }
     
 

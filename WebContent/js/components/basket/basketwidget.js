@@ -138,8 +138,8 @@ var BasketWidget = function() {
 	        //console.log(selectedNodesMixed);
 	        
 	        for ( var j = 0; j < selectedNodesMixed.length || j < 1; j++) {
-	          if(selectedNodesMixed[j].data.dapurl){
-	            selectedNode.push({dapurl:selectedNodesMixed[j].data.dapurl});
+	          if(selectedNodesMixed[j].data.dapurl||selectedNodesMixed[j].data.httpurl){
+	            selectedNode.push(selectedNodesMixed[j].data);
 	          }
 	          if(selectedNodesMixed[j].data.catalogurl){
 	            pendingRequests++;

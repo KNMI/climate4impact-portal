@@ -91,10 +91,10 @@ public class OpendapViewer {
       
 
       
-      Debug.println("Trying to parse ncdump message");
+      //Debug.println("Trying to parse ncdump message");
       MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
       rootElement.parseString(ncdumpMessage);
-      Debug.println("Parsed");
+      //Debug.println("Parsed");
       //DebugConsole.println(rootElement.toString());
 
       List<XMLElement>dimensions = rootElement.get("netcdf").getList("dimension");

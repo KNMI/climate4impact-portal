@@ -261,7 +261,7 @@ public class LoginManager {
         X509Certificate cert = certs[0];
 
         String subjectDN = cert.getSubjectDN().toString();
-        Debug.println("getSubjectDN: " + subjectDN);
+        //Debug.println("getSubjectDN: " + subjectDN);
         String[] dnItems = subjectDN.split(", ");
         for (int j = 0; j < dnItems.length; j++) {
           int CNIndex = dnItems[j].indexOf("CN");
@@ -270,17 +270,17 @@ public class LoginManager {
                 + CNIndex);
           }
         }
-
-      } else {
-
-        String message = "No user information available from either session, oauth2 or x509\n";
-        Debug.errprintln(message);
-        // response.setStatus(403);
-        /*
-         * response.getOutputStream().println(message); throw new
-         * Exception("You are not logged in...");
-         */
       }
+//      } else {
+//
+//        //String message = "No user information available from either session, oauth2 or x509\n";
+//        //Debug.errprintln(message);
+//        // response.setStatus(403);
+//        /*
+//         * response.getOutputStream().println(message); throw new
+//         * Exception("You are not logged in...");
+//         */
+//      }
 
       if (CertOpenIdIdentifier != null) {
         id = CertOpenIdIdentifier;

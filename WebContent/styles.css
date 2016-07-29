@@ -1753,7 +1753,12 @@ ul.pager {
 	border-top-left-radius:0px;
 } */
 
+.ui-state-default .ui-icon{
+  background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
 .ui-iconbutton {
+	color:black;
 	background: transparent;
 	border: none;
 	display: block;

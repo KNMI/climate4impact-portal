@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import tools.Debug;
 import tools.MyXMLParser;
+import tools.Tools;
 import tools.MyXMLParser.Options;
 import tools.MyXMLParser.XMLElement;
 
@@ -371,6 +372,12 @@ public class WebProcessingInterface {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    //Save also in user basket.
+    String baseName = statusLocation.substring(statusLocation.lastIndexOf("/")).replace(".xml", ".wpssettings");
+    String wpsSettingsFile = user.getDataDir()+baseName;
+    Tools.writeFile(wpsSettingsFile, data.toString());
+    
     return data;
   }
   

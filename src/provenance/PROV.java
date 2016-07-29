@@ -104,7 +104,7 @@ public class PROV extends HttpServlet {
                 output.close();
                 return;
               } catch (Exception e) {
-                jsonResponse.setException("Unable run runPythonProvOnXML",e);
+                jsonResponse.setException("Sorry, unable run convert XML provenance (prov-dm) data to PNG image.",e);
               }
             }
             
@@ -115,7 +115,7 @@ public class PROV extends HttpServlet {
                 svgObj.put("svg", new String(svgFile));
                 jsonResponse.setMessage(svgObj);
               } catch (Exception e) {
-                jsonResponse.setException("Unable run runPythonProvOnXML",e);
+                jsonResponse.setException("Sorry, unable run convert XML provenance (prov-dm) data to SVG image.",e);
               }
             }
             
@@ -128,7 +128,7 @@ public class PROV extends HttpServlet {
                 output.close();
                 return;
               } catch (Exception e) {
-                jsonResponse.setException("Unable run runPythonProvOnXML",e);
+                jsonResponse.setException("Sorry, unable run convert XML provenance (prov-dm) data to SVG data.",e);
               }
             }
             

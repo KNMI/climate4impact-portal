@@ -6,6 +6,7 @@ var c4iconfigjs = {
   searchservice:"/impactportal/esgfsearch?",
   impactservice:"/impactportal/ImpactService?",
   provenanceservice:"/impactportal/PROV?",
+  basketservice:"/impactportal/basket?",
   adagucservice:"/impactportal/adagucserver?",
   adagucviewer:"/impactportal/adagucviewer/",
   howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
