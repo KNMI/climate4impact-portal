@@ -85,7 +85,7 @@
       
       }
        .wpsinput-separator{
-      margin-bottom:4px;
+      margin-bottom:6px;
       display:block;
       }
       .wpsinput td{
@@ -115,6 +115,10 @@
     #startcalculation{
     float:right;
     margin-right:8px;
+    }
+    
+    .projcombo{
+    width:300px;
     }
     
     
@@ -176,45 +180,65 @@
               <tr><td><div class="coverage"><select class="coveragecombo"><option>---</option></select></div></td></tr>
             </table>
             <span class="wpsinput-separator"></span>
-             <table class="wpsinput">
-              <tr><th><b>Bounding box</b></th><th></th><th></th><th></th></tr>
+            <table class="wpsinput">
+              <tr><th><b>Geographic projection, bounding box and resolution</b></th><th></th><th></th><th></th></tr>
+            </table>
+            <table class="wpsinput">
+              <tr><td>Projection:</td><td><div class="projectionselector"><select name="projectioncombo"><option>---</option></select></div></td></tr>
+            </table>
+            <table class="wpsinput">
+              <tr><td><hr/></td></tr>
+            </table>
+            <table class="wpsinput">
               <tr><td></td><td style="width:150px;">North:<input class="bboxnorth" style="width:100px;" type="text" value="---"/></td></tr>
               <tr><td>West:<input class="bboxwest" style="width:100px;" type="text" value="---"/></td><td></td><td>East:<input class="bboxeast" style="width:100px;" type="text" value="---"/></td></tr>
               <tr><td></td><td>South:<input class="bboxsouth" style="width:100px;" type="text" value="---"/></td><td></td></tr>
             </table>
             <table class="wpsinput">
+              <tr><td><hr/></td></tr>
+            </table>
+            
+            <table class="wpsinput">
+              <tr><td>X resolution:</td><td><input class="resolutionx" style="width:150px;" type="text" value="---"/></td><td>New width:</td><td><div class="resolutionxinfo">---</div></td></tr>
+              <tr><td>Y resolution:</td><td><input class="resolutiony" style="width:150px;" type="text" value="---"/></td><td>New height:</td><td><div class="resolutionyinfo">---</div></td></tr>
+              
+            </table>
+            
+            <table class="wpsinput">
             <tr><td><button class="c4i_wizard_convert_fitboundingboxtolayer c4i_wizard_convert-buttonbig">Fit BBOX to data</button></td>
-            <td><button class="c4i_wizard_convert_fitboundingboxtowindow c4i_wizard_convert-buttonbig">Fit BBOX to window</button></td></tr>
+            <td><button class="c4i_wizard_convert_fitboundingboxtowindow c4i_wizard_convert-buttonbig">Fit BBOX to map</button></td>
+            <td><button class="c4i_wizard_convert_zoomtobbox c4i_wizard_convert-buttonbig">Zoom to BBOX</button></td></tr>
             </table>
-            <span class="wpsinput-separator"></span>
+            
+            <div id="c4i_wizard_convert_fileinfodialog" title="File info">
             <table class="wpsinput">
-              <tr><th><b>Geographic projection</b></th></tr>
-              <tr><td><div class="projectionselector"><select name="projectioncombo"><option>---</option></select></div></td></tr>
-             </table>
-            <table class="wpsinput">              
+              <tr><td>WCS Describe coverage:</td><td><div class="wcsdescribecoverageURL">---</div></td></tr>              
               <tr><td>Native projection:</td><td><div class="c4i_wizard_convert_projectioninfo"></div></td></tr>
+              <tr><td>Data resX :</td><td><span class="nativeresolutionxinfo"/></td></tr>
+              <tr><td>Data resY:</td><td><span  class="nativeresolutionyinfo"/></td></tr>
+              <tr><td>Data width:</td><td><div class="nativeresolutionwidthinfo">---</div></td></tr>
+              <tr><td>Data height:</td><td><div class="nativeresolutionheightinfo">---</div></td></tr>
+              <tr><td>BBOX left:</td><td><div class="nativeresolutionbbox_left">---</div></td></tr>
+              <tr><td>BBOX bottom:</td><td><div class="nativeresolutionbbox_bottom">---</div></td></tr>                 
+              <tr><td>BBOX right:</td><td><div class="nativeresolutionbbox_right">---</div></td></tr>
+              <tr><td>BBOX top:</td><td><div class="nativeresolutionbbox_top">---</div></td></tr>
+              <tr><td>Start date:</td><td><span class="startdateinfo"/></td></tr>
+              <tr><td>Stop date:</td><td><span class="stopdateinfo"/></td></tr>
+              
+              
             </table>
-            <table class="wpsinput">
-              <tr><td>Data resX :</td><td><span class="nativeresolutionxinfo"/></td><td>Data width:</td><td><div class="nativeresolutionwidthinfo">---</div></td></tr>
-              <tr><td>Data resY:</td><td><span  class="nativeresolutionyinfo"/></td><td>Data height:</td><td><div class="nativeresolutionheightinfo">---</div></td></tr>
-            </table>
+            </div>
             
             <span class="wpsinput-separator"></span>
            
-            <table class="wpsinput">
-              <tr><th><b>Resolution</b></th><th></th><th></th><th></th></tr>
-              <tr><td>X resolution:</td><td><input class="resolutionx" style="width:150px;" type="text" value="---"/></td><td>New width:</td><td><div class="resolutionxinfo">---</div></td></tr>
-              <tr><td>Y resolution:</td><td><input class="resolutiony" style="width:150px;" type="text" value="---"/></td><td>New height:</td><td><div class="resolutionyinfo">---</div></td></tr>
-            </table>
+
             
             <span class="wpsinput-separator"></span>
             <table class="wpsinput">
-              <tr><th><b>Dates</b></th><th></th><th></th></tr>
+              <tr><th><b>Time coverage</b></th><th></th><th></th></tr>
               <tr><td>Start date:</td><td><input class="startdate" style="width:150px;" type="text" value="2014-01-01T00:00:00Z"/></td></tr>
               <tr><td>End date:</td><td><input class="stopdate" style="width:150px;" type="text" value="2015-01-01T00:00:00Z"/></td></tr>
               <tr><td>Number of dates to process</td><td><span class="numberofdatestoprocess"/></td></tr>
-              <tr><td>Data start date:</td><td><span class="startdateinfo"/></td></tr>
-              <tr><td>Data stop date:</td><td><span class="stopdateinfo"/></td></tr>
               <!-- <tr><td>Time resolution:</td><td><input class="timeresolution" style="width:150px;" type="text" value="P1D"/></td></tr>-->
             </table>
             <span class="wpsinput-separator"></span>

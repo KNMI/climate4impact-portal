@@ -16,7 +16,7 @@
     //var defaultProjection = {srs:'EPSG:3857',bbox:'13238.944477686076,6372693.810359594,1163089.5564179858,7299992.69095661'};
     //var defaultProjection = {srs:'EPSG:28992',bbox:'-11207.614738397242,269926.44380811695,318293.5111561029,665327.7948815171'};
     var defaultProjection = {srs:'EPSG:4326',bbox:'-180,-90,180,90'};
-    //var scaleBarURL       = "http://euro4mvis.knmi.nl/adagucviewer/webmapjs/php/makeScaleBar.php?";
+    var scaleBarURL       = c4iconfigjs.adagucservice+"service=WMS&request=getscalebar&"
     
     
     //var WPSURL = "http://bhw485.knmi.nl:8080/cgi-bin/wps.cgi?";
@@ -112,28 +112,19 @@
       webMapJS.setProjection(defaultProjection);
       webMapJS.displayLegendInMap(false);
       var baseLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
-        name:"world_raster",
-        title:"World base layer",
+        service:c4iconfigjs.adagucservice,
+        name:"baselayer",
         enabled:true
       });
       var overLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
-        name:"world_line",
-        title:"World base layer",
+        service:c4iconfigjs.adagucservice,
+        name:"overlay",
         enabled:true,
         keepOnTop:true
       });
-            var grid = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:" http://geoservices.knmi.nl/cgi-bin/SAFNWC_MSG_prod.cgi?",
+      var grid = new WMJSLayer({
+        service:c4iconfigjs.adagucservice,
         name:"grid10",
-        title:"World base layer",
         enabled:true,
         keepOnTop:true
       });
@@ -320,9 +311,74 @@
 //         };
 //         mainWebmapJS.addLayer(layer);
       };
-      
       /*Start button function*/
       $("#startcalculation").click(function(){
+        var service = WMJSgetServiceFromStore('/impactportal/ImpactService?source='+resource+'&');
+        var layer = mainWebmapJS.getLayerByServiceAndName(service.service,activeLayer);
+        var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
+        if(numberOfSteps<=0)return;
+        var width = parseInt($("#"+rootElementId).find(".resolutionxinfo").html());
+        var height = parseInt($("#"+rootElementId).find(".resolutionyinfo").html());
+        var nrOfElements = numberOfSteps*width*height;
+        
+        var dataSize = (nrOfElements*4)/(1024*1024);
+        
+        var html='<div><h1>Please check and confirm your processing settings</h1>'+
+        '<div style="margin-left:30px;">'+
+        '<hr/>You are about to start a job that has to process <b style="font-size:16px;color:red;">'+nrOfElements+'</b> elements.<br/><br/>'+
+        'The outputted uncompressed data volume will be approximately <b>'+Math.round(dataSize*100)/100+'</b> MB .<hr/>'+
+        '<p><You will start a process with the following properties:<br/><table>'+
+        '<tr><td>Selected grid width:</td><td><b>'+width+'</b></td></tr>'+    
+        '<tr><td>Selected grid height:</td><td><b>'+height+'</b></td></tr>'+
+        '<tr><td>Selected number of time steps:</td><td><b>'+numberOfSteps+'</b></td></tr>'+
+        '</table>'+
+        
+        '</table></p><p>Generally:<br/>- a width of ~1000, a height of ~1000 and ~5000 timesteps is a large job.<br/>'+
+        '- a width of ~100, a height of ~100 and ~50 timesteps is a small job.<br/>'+
+        '<br/>'+
+        'Execution time depends on data access speed and the amount of selected elements.<br/>This can vary between a few minutes and a couple of days.'+
+        '</p></div>'+
+        '</div>'
+        
+        if(numberOfSteps>10||width>1000||height>1000){
+          $('<div></div>').appendTo('body')
+          .html(html)
+          .dialog({
+              modal: true,
+              width:600,
+              height:450,
+              title: 'Confirm processing settings...',
+              zIndex: 10000,
+              autoOpen: true,
+              resizable: false,
+              buttons: [{
+                    text:'Cancel',
+                    click:function () {
+                      $(this).dialog("close");
+                    }
+                  },{
+                    text:'Start',
+                    icons:{primary:'codejobsicon'},
+                    click:function () {
+                      if(nrOfElements>10000*10000*10000){
+                        alert("Too much elements selected, please reduce.");
+                        return;
+                      }
+                      startCalculation();
+                      $(this).dialog("close");
+                    }
+                  }],
+              close: function (event, ui) {
+                  $(this).remove();
+              }
+          });
+        }else{
+          startCalculation();
+        }
+        
+      });
+      
+      var startCalculation = function(){
         //showInfo("bla");
         //return;
         //mainWebmapJS.positionMapPinByLatLon({x:$("#calcinx").val(),y:$("#calciny").val()});
@@ -377,11 +433,17 @@
         var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
 
         $("#startcalculation").hide();
+        
+        var bbox = new WMJSBBOX(parseFloat($("#"+rootElementId).find(".bboxwest").val()),
+            parseFloat($("#"+rootElementId).find(".bboxsouth").val()),
+            parseFloat($("#"+rootElementId).find(".bboxeast").val()),
+            parseFloat($("#"+rootElementId).find(".bboxnorth").val()));
+        
         wps.execute(wpsProcessSubsettingName,
           {'dates':dates,
-            'resx':$("#"+rootElementId).find(".resolutionx").val(),
-          'resy':$("#"+rootElementId).find(".resolutionx").val(),
-          'bbox':[boundingBoxBBOX.left,boundingBoxBBOX.top,boundingBoxBBOX.right,boundingBoxBBOX.bottom],
+          'resx':$("#"+rootElementId).find(".resolutionx").val(),
+          'resy':$("#"+rootElementId).find(".resolutiony").val(),
+          'bbox':[bbox.left,bbox.top,bbox.right,bbox.bottom],
           'resource':resource,
           'outputFormat':$("#"+rootElementId).find(".outputFormat").val(),
           'outputFileName':$("#"+rootElementId).find(".outputFileName").val(),
@@ -389,7 +451,7 @@
           'crs':currentProjection
         
         });
-      });
+      };
       
       
       
@@ -426,73 +488,82 @@
                 html+="<option selected>"+currentCoverage.supportedProjections[j].srs+"</option>";
                 setProjection(layer,currentCoverage.supportedProjections[j].srs);
               }else{
-                html+="<option>"+currentCoverage.supportedProjections[j].srs+"</option>";
+                html+="<option>"+decodeURIComponent(currentCoverage.supportedProjections[j].srs)+"</option>";
               }
-              var startdate = "";
-              var stopdate = "";
-              var timeRes = "";
-              try{
-                startdate = layer.getDimension("time").getValueForIndex(0);
-                timeRes = "P1D";
-              }catch(e){
-              }
-              
-              
-              
-              
-              try{
-                stopdate = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size()-1);
-                var v = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size());
-                if(v){
-                  if(v.length>10){
-                    stopdate = v;
-                  }
-                }
-              }catch(e){
-              }
-              $("#"+rootElementId).find(".startdate").first().val(startdate);
-              $("#"+rootElementId).find(".stopdate").first().val(stopdate);
-              
-              $("#"+rootElementId).find(".startdateinfo").html(startdate);
-              $("#"+rootElementId).find(".stopdateinfo").html(stopdate);
-              
-              
-              var updateNumTimeSteps = function(){
-                var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
-                $("#"+rootElementId).find(".numberofdatestoprocess").html(numberOfSteps);
-                if(numberOfSteps>0){
-                  $("#startcalculation span").text('Start processing '+numberOfSteps+' timestep(s)');
-                }
-                
-              }
-              
-              updateNumTimeSteps();
-              $("#"+rootElementId).find(".startdate").change(updateNumTimeSteps);
-              $("#"+rootElementId).find(".stopdate").change(updateNumTimeSteps);
-              
-   
-              
-              
-              try{
-                if( layer.getDimension("time").values.split("/").length==3){
-                  timeRes = layer.getDimension("time").values.split("/")[2];
-                }
-              }catch(e){}
-              $("#"+rootElementId).find(".timeresolution").first().val(timeRes);
             }
             html+="</select>";
+
+            var startdate = "";
+            var stopdate = "";
+            var timeRes = "";
+            try{
+              startdate = layer.getDimension("time").getValueForIndex(0);
+              timeRes = "P1D";
+            }catch(e){
+            }
+            
+            try{
+              stopdate = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size()-1);
+              var v = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size());
+              if(v){
+                if(v.length>10){
+                  stopdate = v;
+                }
+              }
+            }catch(e){
+            }
+            
+            $("#"+rootElementId).find(".startdate").first().val(startdate);
+            $("#"+rootElementId).find(".stopdate").first().val(stopdate);
+            
+            $("#c4i_wizard_convert_fileinfodialog").find(".startdateinfo").html(startdate);
+            $("#c4i_wizard_convert_fileinfodialog").find(".stopdateinfo").html(stopdate);
+            
+            
+            var updateNumTimeSteps = function(){
+              var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
+              $("#"+rootElementId).find(".numberofdatestoprocess").html(numberOfSteps);
+              
+              $("#startcalculation span").text('Start processing '+numberOfSteps+' timestep(s)');
+              
+              
+            }
+            
+            updateNumTimeSteps();
+            $("#"+rootElementId).find(".startdate").change(updateNumTimeSteps);
+            $("#"+rootElementId).find(".stopdate").change(updateNumTimeSteps);
+            
+ 
+            
+            
+            try{
+              if( layer.getDimension("time").values.split("/").length==3){
+                timeRes = layer.getDimension("time").values.split("/")[2];
+              }
+            }catch(e){}
+            $("#"+rootElementId).find(".timeresolution").first().val(timeRes);
+            
             $("#"+rootElementId).find(".projectionselector").first().html(html);
             $("#"+rootElementId).find(".projectionselector").find(".projcombo").first().on('change',function(){setProjection(layer,this.value);} );
             
-            console.log(currentCoverage);
-            $("#"+rootElementId).find(".c4i_wizard_convert_projectioninfo").html(decodeURIComponent(currentCoverage.nativeCRS));
+            //console.log(currentCoverage);
+            $("#c4i_wizard_convert_fileinfodialog").find(".c4i_wizard_convert_projectioninfo").html(decodeURIComponent(currentCoverage.nativeCRS));
             
-            $("#"+rootElementId).find(".nativeresolutionxinfo").html(currentCoverage.cellsizeX);
-            $("#"+rootElementId).find(".nativeresolutionyinfo").html(currentCoverage.cellsizeY);
-            $("#"+rootElementId).find(".nativeresolutionwidthinfo").html(currentCoverage.width);
-            $("#"+rootElementId).find(".nativeresolutionheightinfo").html(currentCoverage.height);
-            
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionxinfo").html(currentCoverage.cellsizeX);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionyinfo").html(currentCoverage.cellsizeY);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionwidthinfo").html(currentCoverage.width);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionheightinfo").html(currentCoverage.height);
 
+            
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_left").html(parseFloat(currentCoverage.originX));
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_bottom").html(parseFloat(currentCoverage.originY));
+
+            var right = parseFloat(currentCoverage.originX)+parseFloat(currentCoverage.width*currentCoverage.cellsizeX);
+            var top   = parseFloat(currentCoverage.originY)+parseFloat(currentCoverage.height*currentCoverage.cellsizeY)
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_right").html(right);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_top").html(top);
+            var wcsdescribecoverageURL=layer.service+"service=WCS&request=DescribeCoverage&layer="+layer.name;
+            $("#c4i_wizard_convert_fileinfodialog").find(".wcsdescribecoverageURL").html("<a target=\"_blank\" href=\""+wcsdescribecoverageURL+"\">"+wcsdescribecoverageURL+"</a>");
             
             
             mainWebmapJS.draw();
@@ -507,7 +578,14 @@
       
       var setProjection = function (layer,srsname) {
         mainWebmapJS.hideBoundingBox();
-        var srs = layer.getProjection(srsname);      
+        var srs = layer.getProjection(srsname);
+        if(!srs){
+          alert("Unknown projection: ["+srsname+"]<br/><br/><b>You have to fill out the correct BBOX yourself.</b>");
+          srs = [];
+          srs.srs=srsname;
+          srs.bbox=new WMJSBBOX();
+          
+        }
         currentProjection = srsname;
         setProjectionDirectly(srs);
       }
@@ -613,8 +691,9 @@
       });
 
       setNewResource = function(_resource){
+        
     	  if(isDefined(_resource)){
-				$("#"+rootElementId).find(".resource").val(_resource);
+				  $("#"+rootElementId).find(".resource").val(_resource);
     	  }
     	  resource = $("#"+rootElementId).find(".resource").val();
     	  
@@ -625,7 +704,7 @@
     	  
     	  if(resource.length>0){
     	    if(resource.indexOf("http")==0){
-    	    	$("#"+rootElementId).block();
+    	      $("#"+rootElementId).block();  	
     	    
 		    	  //console.log(resource);
 		          try{
@@ -670,23 +749,22 @@
           })
         });
       
+      $( "#c4i_wizard_convert_fileinfodialog" ).dialog({
+        autoOpen: false,
+        width:900,
+        height:500,
+        show: {
+          effect: "fade",
+          duration: 300
+        },
+        hide: {
+          effect: "fade",
+          duration: 300
+        }
+      });
+      
 	      showFileInfo = function(){
-	    	var html="No layer selected";
-	    	try{
-		    	if(s){
-			    	var layer = mainWebmapJS.getLayerByServiceAndName(s.service,activeLayer);
-			    	
-			    	if(layer){
-				    	var dim = layer.getDimension("time");
-				    	html="<b>Dates:</b><br/>";
-				       	html+=dim.size() + " dates available from "+dim.getValueForIndex(0)+" till "+dim.getValueForIndex(dim.size()-1)+"<br/>";
-				       	
-				       	
-			    	}
-		    	}
-	    	}catch(e){}
-	      	showInfo(html,'File info');
-	      	
+	        $( "#c4i_wizard_convert_fileinfodialog" ).dialog( "open" );
 	      };
 	      
 	      $(".c4i_wizard_convert_fitboundingboxtowindow").button({
@@ -725,6 +803,22 @@
 	          bboxChangedByEvent(bbox);
 	          mainWebmapJS.showBoundingBox(bbox);
 	        });
+	       
+	       $(".c4i_wizard_convert_zoomtobbox").button({
+           icons: {
+             primary: "ui-icon-arrow-4-diag"
+           }
+         }).click(function(){
+           var layer = mainWebmapJS.getLayers()[0];
+           var srsNew = layer.getProjection(currentProjection);
+           var bbox = new WMJSBBOX(parseFloat($("#"+rootElementId).find(".bboxwest").val()),
+               parseFloat($("#"+rootElementId).find(".bboxsouth").val()),
+               parseFloat($("#"+rootElementId).find(".bboxeast").val()),
+               parseFloat($("#"+rootElementId).find(".bboxnorth").val()));
+           mainWebmapJS.zoomTo(bbox);
+           mainWebmapJS.draw();
+         });
+        
 	       
 	       
 	       var calculateAndCheckNumberOfStepsToProcess = function(layer){

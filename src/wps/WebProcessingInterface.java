@@ -375,7 +375,9 @@ public class WebProcessingInterface {
     
     //Save also in user basket.
     String baseName = statusLocation.substring(statusLocation.lastIndexOf("/")).replace(".xml", ".wpssettings");
-    String wpsSettingsFile = user.getDataDir()+baseName;
+    String wpsSettingsFile = user.getDataDir()+"/WPS_Settings/";
+    tools.Tools.mksubdirs(wpsSettingsFile);
+    wpsSettingsFile+=baseName;
     Tools.writeFile(wpsSettingsFile, data.toString());
     
     return data;
