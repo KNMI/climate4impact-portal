@@ -6,6 +6,7 @@
         renderFileViewerInterface({element:el,
           service:c4iconfigjs.impactservice,
           adagucservice:c4iconfigjs.adagucservice,
+          provenanceservice:c4iconfigjs.provenanceservice,
           adagucviewer:c4iconfigjs.adagucviewer,
           query:resource,
           dialog:true
@@ -15,11 +16,13 @@
     //var defaultProjection = {srs:'EPSG:3857',bbox:'13238.944477686076,6372693.810359594,1163089.5564179858,7299992.69095661'};
     //var defaultProjection = {srs:'EPSG:28992',bbox:'-11207.614738397242,269926.44380811695,318293.5111561029,665327.7948815171'};
     var defaultProjection = {srs:'EPSG:4326',bbox:'-180,-90,180,90'};
-    //var scaleBarURL       = "http://euro4mvis.knmi.nl/adagucviewer/webmapjs/php/makeScaleBar.php?";
+    var scaleBarURL       = c4iconfigjs.adagucservice+"service=WMS&request=getscalebar&"
     
     
     //var WPSURL = "http://bhw485.knmi.nl:8080/cgi-bin/wps.cgi?";
     var resource = "Please select a file...";
+    
+    var wpsProcessSubsettingName='WCS_subsetting';
     
     var urlvars = getUrlVars();
     if(urlvars.resource){
@@ -79,15 +82,20 @@
     };
     var bboxChangedByEvent = function(options){
      // console.log(options);
-        
-      $("#"+rootElementId).find(".bboxwest").val(options.bbox.left);
-      $("#"+rootElementId).find(".bboxnorth").val(options.bbox.top);
-      $("#"+rootElementId).find(".bboxeast").val(options.bbox.right);
-      $("#"+rootElementId).find(".bboxsouth").val(options.bbox.bottom);
+      var bbox;
+      if(options.bbox){
+        bbox=options.bbox;
+      }else{
+        bbox=options;
+      }
+      $("#"+rootElementId).find(".bboxwest").val(bbox.left);
+      $("#"+rootElementId).find(".bboxnorth").val(bbox.top);
+      $("#"+rootElementId).find(".bboxeast").val(bbox.right);
+      $("#"+rootElementId).find(".bboxsouth").val(bbox.bottom);
       
 
-      $("#"+rootElementId).find(".resolutionxinfo").html(parseInt(Math.abs((options.bbox.right-options.bbox.left)/$("#"+rootElementId).find(".resolutionx").val())+0.5));
-      $("#"+rootElementId).find(".resolutionyinfo").html(parseInt(Math.abs((options.bbox.bottom-options.bbox.top)/$("#"+rootElementId).find(".resolutiony").val())+0.5));
+      $("#"+rootElementId).find(".resolutionxinfo").html(parseInt(Math.abs((bbox.right-bbox.left)/$("#"+rootElementId).find(".resolutionx").val())+0.5));
+      $("#"+rootElementId).find(".resolutionyinfo").html(parseInt(Math.abs((bbox.bottom-bbox.top)/$("#"+rootElementId).find(".resolutiony").val())+0.5));
       
       
     };
@@ -104,28 +112,19 @@
       webMapJS.setProjection(defaultProjection);
       webMapJS.displayLegendInMap(false);
       var baseLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
-        name:"world_raster",
-        title:"World base layer",
+        service:c4iconfigjs.adagucservice,
+        name:"baselayer",
         enabled:true
       });
       var overLayer = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:"http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?",
-        name:"world_line",
-        title:"World base layer",
+        service:c4iconfigjs.adagucservice,
+        name:"overlay",
         enabled:true,
         keepOnTop:true
       });
-            var grid = new WMJSLayer({
-        //service:"http://birdexp03.knmi.nl/cgi-bin/plieger/wmst.cgi?",
-        //name:"satellite",
-        service:" http://geoservices.knmi.nl/cgi-bin/SAFNWC_MSG_prod.cgi?",
+      var grid = new WMJSLayer({
+        service:c4iconfigjs.adagucservice,
         name:"grid10",
-        title:"World base layer",
         enabled:true,
         keepOnTop:true
       });
@@ -162,7 +161,119 @@
       
       //showInfo("Choose a location and click start to run processing");
       $("#timeheader").hide();
-      $("#startcalculation").hide();
+      $("button").button();
+      $("#startcalculation").button({icons:{primary:'codejobsicon'}}).hide();
+      
+      $("#c4i_wizard_convert_savetemplate").button({icons:{primary:'ui-icon-star'}}).hide();
+      $("#c4i_wizard_convert_loadtemplate").button({icons:{primary:'ui-icon-arrowthickstop-1-s'}}).click(function(){
+      
+          basketWidget.show(function(selectedNodes) {
+          if(selectedNodes.length!=1){
+            alert("Please select one settings file");
+            return true;
+          }
+
+          console.log(selectedNodes[0]);
+          if(selectedNodes[0].hashttp!="true"){
+            alert("This file is not http enabled");
+            return;
+          }
+          
+          var fileLocation = selectedNodes[0].httpurl;
+          
+          if(fileLocation.indexOf(".wpssettings")==-1){
+            alert("Please select a file with the wpssettings extension");
+            return;
+          }
+          
+          var url = c4iconfigjs.basketservice+"service=basket&request=getfile&file="+encodeURIComponent(fileLocation);
+          
+          console.log(url);
+          var httpCallback = function(data){
+            if(data.error){
+              
+              alert("<b>"+data.error+"</b><hr/>Note: Exception info has been logged to your browsers console.");
+              
+              if(data.exception){
+                if(console.log){
+                  console.log(data.exception);
+                }
+              }
+              return;
+            }
+            //console.log(data.data.wpspostdata.Execute);
+            var identifier = data.data.wpspostdata.Execute.Identifier.value;
+            var inputs = data.data.wpspostdata.Execute.DataInputs.Input;
+            if(wpsProcessSubsettingName!=identifier){
+              alert("This settings file was used for process "+identifier+".");
+            }
+            console.log(inputs);
+            
+            var bbox = "";
+            var srsname = "";
+            var dates = "";
+            var resx="";
+            var resy="";
+            
+              
+            for(var j=0;j<inputs.length;j++){
+              var name = inputs[j].Identifier.value ;
+              var value = inputs[j].Data.LiteralData.value;
+              console.log("name:"+name+"="+value);
+              if(name =="bbox"){if(bbox.length>0)bbox+=",";bbox+=value;}
+              if(name =="crs")srsname=value;
+              if(name =="dates")dates=value;
+              if(name =="resx")resx=value;
+              if(name =="resy")resy=value;
+            }
+      
+            dates = dates.split("/");
+            bbox = bbox.split(",");
+            var bboxObj = new WMJSBBOX(parseFloat(bbox[0]),parseFloat(bbox[3]),parseFloat(bbox[2]),parseFloat(bbox[1]));
+            
+            console.log("startdate:"+dates[0]);
+            $("#"+rootElementId).find(".startdate").val(dates[0]);
+            $("#"+rootElementId).find(".stopdate").val(dates[1]);
+            $("#"+rootElementId).find(".stopdate").change();
+            var layer = mainWebmapJS.getLayers()[0];
+           
+            
+            $("#"+rootElementId).find(".projectionselector").find(".projcombo").first().val(srsname);
+            console.log(bboxObj.toString());
+          
+            var srs = layer.getProjection(srsname);
+            console.log(srs);
+            currentProjection = srsname;
+            var newSRS={bbox:bboxObj,srs:srs.srs};
+            console.log(newSRS);
+            setProjectionDirectly(newSRS);
+            $("#"+rootElementId).find(".resolutionx").val(resx);
+            $("#"+rootElementId).find(".resolutiony").val(resy);
+            bboxChangedByEvent(newSRS);
+          };
+            
+          $.ajax({
+            url: url,
+            crossDomain:true,
+            dataType:"jsonp"
+          }).done(function(d) {
+            httpCallback(d)
+          }).fail(function() {
+            //alert("fail 154");
+            console.log("Ajax call failed: "+url);
+            httpCallback({"error":"Request failed for "+url});
+          });
+          
+          //https://bhw485.knmi.nl:9443/impactportal/basket?&service=basket&request=getfile&file=https%3A%2F%2Fbhw485.knmi.nl%3A9443%2Fimpactportal%2FDAP%2Fceda.ac.uk.openid.Maarten.Plieger%2Ftest.wpssettings
+          
+              
+
+          return true;
+        });
+      
+      });
+     
+      
       $("#results").hide();
       /*WPS finished callback*/
       var wpsComplete = function(_data){
@@ -200,15 +311,80 @@
 //         };
 //         mainWebmapJS.addLayer(layer);
       };
-      
       /*Start button function*/
       $("#startcalculation").click(function(){
+        var service = WMJSgetServiceFromStore('/impactportal/ImpactService?source='+resource+'&');
+        var layer = mainWebmapJS.getLayerByServiceAndName(service.service,activeLayer);
+        var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
+        if(numberOfSteps<=0)return;
+        var width = parseInt($("#"+rootElementId).find(".resolutionxinfo").html());
+        var height = parseInt($("#"+rootElementId).find(".resolutionyinfo").html());
+        var nrOfElements = numberOfSteps*width*height;
+        
+        var dataSize = (nrOfElements*4)/(1024*1024);
+        
+        var html='<div><h1>Please check and confirm your processing settings</h1>'+
+        '<div style="margin-left:30px;">'+
+        '<hr/>You are about to start a job that has to process <b style="font-size:16px;color:red;">'+nrOfElements+'</b> elements.<br/><br/>'+
+        'The outputted uncompressed data volume will be approximately <b>'+Math.round(dataSize*100)/100+'</b> MB .<hr/>'+
+        '<p><You will start a process with the following properties:<br/><table>'+
+        '<tr><td>Selected grid width:</td><td><b>'+width+'</b></td></tr>'+    
+        '<tr><td>Selected grid height:</td><td><b>'+height+'</b></td></tr>'+
+        '<tr><td>Selected number of time steps:</td><td><b>'+numberOfSteps+'</b></td></tr>'+
+        '</table>'+
+        
+        '</table></p><p>Generally:<br/>- a width of ~1000, a height of ~1000 and ~5000 timesteps is a large job.<br/>'+
+        '- a width of ~100, a height of ~100 and ~50 timesteps is a small job.<br/>'+
+        '<br/>'+
+        'Execution time depends on data access speed and the amount of selected elements.<br/>This can vary between a few minutes and a couple of days.'+
+        '</p></div>'+
+        '</div>'
+        
+        if(numberOfSteps>10||width>1000||height>1000){
+          $('<div></div>').appendTo('body')
+          .html(html)
+          .dialog({
+              modal: true,
+              width:600,
+              height:450,
+              title: 'Confirm processing settings...',
+              zIndex: 10000,
+              autoOpen: true,
+              resizable: false,
+              buttons: [{
+                    text:'Cancel',
+                    click:function () {
+                      $(this).dialog("close");
+                    }
+                  },{
+                    text:'Start',
+                    icons:{primary:'codejobsicon'},
+                    click:function () {
+                      if(nrOfElements>10000*10000*10000){
+                        alert("Too much elements selected, please reduce.");
+                        return;
+                      }
+                      startCalculation();
+                      $(this).dialog("close");
+                    }
+                  }],
+              close: function (event, ui) {
+                  $(this).remove();
+              }
+          });
+        }else{
+          startCalculation();
+        }
+        
+      });
+      
+      var startCalculation = function(){
         //showInfo("bla");
         //return;
         //mainWebmapJS.positionMapPinByLatLon({x:$("#calcinx").val(),y:$("#calciny").val()});
         mainWebmapJS.setMapPin(mainWebmapJS.getPixelCoordFromLatLong({x:$("#calcinx").val(),y:$("#calciny").val()}));
         mainWebmapJS.showMapPin();
-        $("#startcalculation").hide();
+       
         
       
         //showInfo('Operation started at location ('+ $("#calcinx").val()+", "+$("#calciny").val()+') and height ('+ $("#calcinheight").val()+')');
@@ -248,23 +424,34 @@
         });
         
         var dates = $("#"+rootElementId).find(".startdate").first().val()+"/"+
-                    $("#"+rootElementId).find(".stopdate").first().val() +"/"+
-                    $("#"+rootElementId).find(".timeresolution").first().val();
-                    
+                    $("#"+rootElementId).find(".stopdate").first().val();
+        
+        var service = WMJSgetServiceFromStore('/impactportal/ImpactService?source='+resource+'&');
+        
+        var layer = mainWebmapJS.getLayerByServiceAndName(service.service,activeLayer);
+        
+        var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
 
-        wps.execute('WCS_subsetting',
-                    {'dates':dates,
-                      'resx':$("#"+rootElementId).find(".resolutionx").val(),
-                      'resy':$("#"+rootElementId).find(".resolutionx").val(),
-                      'bbox':[boundingBoxBBOX.left,boundingBoxBBOX.top,boundingBoxBBOX.right,boundingBoxBBOX.bottom],
-                      'resource':resource,
-                      'outputFormat':$("#"+rootElementId).find(".outputFormat").val(),
-                      'outputFileName':$("#"+rootElementId).find(".outputFileName").val(),
-                      'coverage':activeLayer,
-                      'crs':currentProjection
-                    
-                    });
-      });
+        $("#startcalculation").hide();
+        
+        var bbox = new WMJSBBOX(parseFloat($("#"+rootElementId).find(".bboxwest").val()),
+            parseFloat($("#"+rootElementId).find(".bboxsouth").val()),
+            parseFloat($("#"+rootElementId).find(".bboxeast").val()),
+            parseFloat($("#"+rootElementId).find(".bboxnorth").val()));
+        
+        wps.execute(wpsProcessSubsettingName,
+          {'dates':dates,
+          'resx':$("#"+rootElementId).find(".resolutionx").val(),
+          'resy':$("#"+rootElementId).find(".resolutiony").val(),
+          'bbox':[bbox.left,bbox.top,bbox.right,bbox.bottom],
+          'resource':resource,
+          'outputFormat':$("#"+rootElementId).find(".outputFormat").val(),
+          'outputFileName':$("#"+rootElementId).find(".outputFileName").val(),
+          'coverage':activeLayer,
+          'crs':currentProjection
+        
+        });
+      };
       
       
       
@@ -283,7 +470,7 @@
         
         var layer = new WMJSLayer({service:service.service,name:n});
         layer.onReady = function(){
-        	console.log("Layer ready");
+        	//console.log("Layer ready");
         	mainWebmapJS.draw();
         	//showInfo('slfksl;fkasl;fkas;fkasfk');
           var failed = function(e){
@@ -301,44 +488,82 @@
                 html+="<option selected>"+currentCoverage.supportedProjections[j].srs+"</option>";
                 setProjection(layer,currentCoverage.supportedProjections[j].srs);
               }else{
-                html+="<option>"+currentCoverage.supportedProjections[j].srs+"</option>";
+                html+="<option>"+decodeURIComponent(currentCoverage.supportedProjections[j].srs)+"</option>";
               }
-              var startdate = "";
-              var stopdate = "";
-              var timeRes = "";
-              try{
-                startdate = layer.getDimension("time").getValueForIndex(0);
-                timeRes = "P1D";
-              }catch(e){
-              }
-              
-              
-              
-              try{
-                stopdate = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size()-1);
-                var v = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size());
-                if(v){
-                  if(v.length>10){
-                    stopdate = v;
-                  }
-                }
-              }catch(e){
-              }
-              $("#"+rootElementId).find(".startdate").first().val(startdate);
-              $("#"+rootElementId).find(".stopdate").first().val(stopdate);
-              
-              try{
-                if( layer.getDimension("time").values.split("/").length==3){
-                  timeRes = layer.getDimension("time").values.split("/")[2];
-                }
-              }catch(e){}
-              $("#"+rootElementId).find(".timeresolution").first().val(timeRes);
             }
             html+="</select>";
+
+            var startdate = "";
+            var stopdate = "";
+            var timeRes = "";
+            try{
+              startdate = layer.getDimension("time").getValueForIndex(0);
+              timeRes = "P1D";
+            }catch(e){
+            }
+            
+            try{
+              stopdate = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size()-1);
+              var v = layer.getDimension("time").getValueForIndex(layer.getDimension("time").size());
+              if(v){
+                if(v.length>10){
+                  stopdate = v;
+                }
+              }
+            }catch(e){
+            }
+            
+            $("#"+rootElementId).find(".startdate").first().val(startdate);
+            $("#"+rootElementId).find(".stopdate").first().val(stopdate);
+            
+            $("#c4i_wizard_convert_fileinfodialog").find(".startdateinfo").html(startdate);
+            $("#c4i_wizard_convert_fileinfodialog").find(".stopdateinfo").html(stopdate);
+            
+            
+            var updateNumTimeSteps = function(){
+              var numberOfSteps = calculateAndCheckNumberOfStepsToProcess(layer);
+              $("#"+rootElementId).find(".numberofdatestoprocess").html(numberOfSteps);
+              
+              $("#startcalculation span").text('Start processing '+numberOfSteps+' timestep(s)');
+              
+              
+            }
+            
+            updateNumTimeSteps();
+            $("#"+rootElementId).find(".startdate").change(updateNumTimeSteps);
+            $("#"+rootElementId).find(".stopdate").change(updateNumTimeSteps);
+            
+ 
+            
+            
+            try{
+              if( layer.getDimension("time").values.split("/").length==3){
+                timeRes = layer.getDimension("time").values.split("/")[2];
+              }
+            }catch(e){}
+            $("#"+rootElementId).find(".timeresolution").first().val(timeRes);
+            
             $("#"+rootElementId).find(".projectionselector").first().html(html);
             $("#"+rootElementId).find(".projectionselector").find(".projcombo").first().on('change',function(){setProjection(layer,this.value);} );
             
-  
+            //console.log(currentCoverage);
+            $("#c4i_wizard_convert_fileinfodialog").find(".c4i_wizard_convert_projectioninfo").html(decodeURIComponent(currentCoverage.nativeCRS));
+            
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionxinfo").html(currentCoverage.cellsizeX);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionyinfo").html(currentCoverage.cellsizeY);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionwidthinfo").html(currentCoverage.width);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionheightinfo").html(currentCoverage.height);
+
+            
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_left").html(parseFloat(currentCoverage.originX));
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_bottom").html(parseFloat(currentCoverage.originY));
+
+            var right = parseFloat(currentCoverage.originX)+parseFloat(currentCoverage.width*currentCoverage.cellsizeX);
+            var top   = parseFloat(currentCoverage.originY)+parseFloat(currentCoverage.height*currentCoverage.cellsizeY)
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_right").html(right);
+            $("#c4i_wizard_convert_fileinfodialog").find(".nativeresolutionbbox_top").html(top);
+            var wcsdescribecoverageURL=layer.service+"service=WCS&request=DescribeCoverage&layer="+layer.name;
+            $("#c4i_wizard_convert_fileinfodialog").find(".wcsdescribecoverageURL").html("<a target=\"_blank\" href=\""+wcsdescribecoverageURL+"\">"+wcsdescribecoverageURL+"</a>");
             
             
             mainWebmapJS.draw();
@@ -346,15 +571,25 @@
           },failed);
           
         };
-        console.log("Adding layer"+layer.name)
+//        console.log("Adding layer"+layer.name)
         mainWebmapJS.addLayer(layer);
       };
       
       
       var setProjection = function (layer,srsname) {
         mainWebmapJS.hideBoundingBox();
-        var srs = layer.getProjection(srsname);      
+        var srs = layer.getProjection(srsname);
+        if(!srs){
+          alert("Unknown projection: ["+srsname+"]<br/><br/><b>You have to fill out the correct BBOX yourself.</b>");
+          srs = [];
+          srs.srs=srsname;
+          srs.bbox=new WMJSBBOX();
+          
+        }
         currentProjection = srsname;
+        setProjectionDirectly(srs);
+      }
+      var setProjectionDirectly = function(srs){
         mainWebmapJS.setProjection(srs);
         mainWebmapJS.zoomOut();
       
@@ -367,12 +602,12 @@
         
         mainWebmapJS.draw();
         
-        boundingBoxBBOX = srs.bbox;
+        boundingBoxBBOX = srs.bbox.clone();
 
-        $("#"+rootElementId).find(".bboxwest").val(srs.bbox.left);
-        $("#"+rootElementId).find(".bboxnorth").val(srs.bbox.top);
-        $("#"+rootElementId).find(".bboxeast").val(srs.bbox.right);
-        $("#"+rootElementId).find(".bboxsouth").val(srs.bbox.bottom);
+        $("#"+rootElementId).find(".bboxwest").val(boundingBoxBBOX.left);
+        $("#"+rootElementId).find(".bboxnorth").val(boundingBoxBBOX.top);
+        $("#"+rootElementId).find(".bboxeast").val(boundingBoxBBOX.right);
+        $("#"+rootElementId).find(".bboxsouth").val(boundingBoxBBOX.bottom);
         
         var resx=((boundingBoxBBOX.right-boundingBoxBBOX.left)/currentCoverage.width);//if(resx<0)resx=-resx;
         var resy=((boundingBoxBBOX.top-boundingBoxBBOX.bottom)/currentCoverage.height);//if(resy<0)resy=-resy;
@@ -410,12 +645,15 @@
 
       
       var bboxChangedByInput = function(){
-        var value = $(this).val();
-        var className = $(this).attr('class');
-        if(className.indexOf("west")>0)boundingBoxBBOX.left = parseFloat(value);
-        if(className.indexOf("north")>0)boundingBoxBBOX.top= parseFloat(value);
-        if(className.indexOf("east")>0)boundingBoxBBOX.right = parseFloat(value);
-        if(className.indexOf("south")>0)boundingBoxBBOX.bottom = parseFloat(value);
+        try{
+          var value = $(this).val();
+          var className = $(this).attr('class');
+          if(className.indexOf("west")>0)boundingBoxBBOX.left = parseFloat(value);
+          if(className.indexOf("north")>0)boundingBoxBBOX.top= parseFloat(value);
+          if(className.indexOf("east")>0)boundingBoxBBOX.right = parseFloat(value);
+          if(className.indexOf("south")>0)boundingBoxBBOX.bottom = parseFloat(value);
+        }catch(e){}
+        console.log(boundingBoxBBOX);
         mainWebmapJS.showBoundingBox(boundingBoxBBOX);
         bboxChangedByEvent({bbox:boundingBoxBBOX});
       };
@@ -453,8 +691,9 @@
       });
 
       setNewResource = function(_resource){
+        
     	  if(isDefined(_resource)){
-				$("#"+rootElementId).find(".resource").val(_resource);
+				  $("#"+rootElementId).find(".resource").val(_resource);
     	  }
     	  resource = $("#"+rootElementId).find(".resource").val();
     	  
@@ -465,7 +704,7 @@
     	  
     	  if(resource.length>0){
     	    if(resource.indexOf("http")==0){
-    	    	$("#"+rootElementId).block();
+    	      $("#"+rootElementId).block();  	
     	    
 		    	  //console.log(resource);
 		          try{
@@ -492,7 +731,7 @@
           
           icons: {
             primary: "ui-icon-help"
-          },
+          }
         }).click(function(){
           var el = jQuery('<div title="Help" class="headerhelpdiv"></div>', {}).dialog({
             width:800,
@@ -510,24 +749,113 @@
           })
         });
       
+      $( "#c4i_wizard_convert_fileinfodialog" ).dialog({
+        autoOpen: false,
+        width:900,
+        height:500,
+        show: {
+          effect: "fade",
+          duration: 300
+        },
+        hide: {
+          effect: "fade",
+          duration: 300
+        }
+      });
+      
 	      showFileInfo = function(){
-	    	var html="No layer selected";
-	    	try{
-		    	if(s){
-			    	var layer = mainWebmapJS.getLayerByServiceAndName(s.service,activeLayer);
-			    	
-			    	if(layer){
-				    	var dim = layer.getDimension("time");
-				    	html="<b>Dates:</b><br/>";
-				       	html+=dim.size() + " dates available from "+dim.getValueForIndex(0)+" till "+dim.getValueForIndex(dim.size()-1)+"<br/>";
-				       	
-				       	
-			    	}
-		    	}
-	    	}catch(e){}
-	      	showInfo(html,'File info');
-	      	
+	        $( "#c4i_wizard_convert_fileinfodialog" ).dialog( "open" );
 	      };
+	      
+	      $(".c4i_wizard_convert_fitboundingboxtowindow").button({
+          icons: {
+            primary: "ui-icon-arrow-4-diag"
+          }
+        }).click(function(){
+          var srsNew = mainWebmapJS.getProjection();
+          var bbox = srsNew.bbox.clone();
+          var w=(bbox.right-bbox.left)*0.02;
+          var h=(bbox.top-bbox.bottom)*0.02;
+          bbox.left+=w;
+          bbox.right-=w;
+          bbox.top-=h;
+          bbox.bottom+=h;
+          $("#"+rootElementId).find(".bboxwest").val(bbox.left);
+          $("#"+rootElementId).find(".bboxnorth").val(bbox.top);
+          $("#"+rootElementId).find(".bboxeast").val(bbox.right);
+          $("#"+rootElementId).find(".bboxsouth").val(bbox.bottom);
+          bboxChangedByEvent(bbox);
+          mainWebmapJS.showBoundingBox(bbox);
+        });
+	      
+	       $(".c4i_wizard_convert_fitboundingboxtolayer").button({
+	          icons: {
+	            primary: "ui-icon-arrow-4-diag"
+	          }
+	        }).click(function(){
+	          var layer = mainWebmapJS.getLayers()[0];
+	          var srsNew = layer.getProjection(currentProjection);
+	          var bbox = srsNew.bbox.clone();
+	          $("#"+rootElementId).find(".bboxwest").val(bbox.left);
+	          $("#"+rootElementId).find(".bboxnorth").val(bbox.top);
+	          $("#"+rootElementId).find(".bboxeast").val(bbox.right);
+	          $("#"+rootElementId).find(".bboxsouth").val(bbox.bottom);
+	          bboxChangedByEvent(bbox);
+	          mainWebmapJS.showBoundingBox(bbox);
+	        });
+	       
+	       $(".c4i_wizard_convert_zoomtobbox").button({
+           icons: {
+             primary: "ui-icon-arrow-4-diag"
+           }
+         }).click(function(){
+           var layer = mainWebmapJS.getLayers()[0];
+           var srsNew = layer.getProjection(currentProjection);
+           var bbox = new WMJSBBOX(parseFloat($("#"+rootElementId).find(".bboxwest").val()),
+               parseFloat($("#"+rootElementId).find(".bboxsouth").val()),
+               parseFloat($("#"+rootElementId).find(".bboxeast").val()),
+               parseFloat($("#"+rootElementId).find(".bboxnorth").val()));
+           mainWebmapJS.zoomTo(bbox);
+           mainWebmapJS.draw();
+         });
+        
+	       
+	       
+	       var calculateAndCheckNumberOfStepsToProcess = function(layer){
+	         try{
+	           var dates = $("#"+rootElementId).find(".startdate").first().val()+"/"+
+             $("#"+rootElementId).find(".stopdate").first().val();
+//	           console.log("dates[0]:"+dates.split("/")[0]);
+//	           console.log("dates[1]:"+dates.split("/")[1]);
+	           var startIndex =  layer.getDimension("time").getIndexForValue(dates.split("/")[0]);
+	           var stopIndex  =  layer.getDimension("time").getIndexForValue(dates.split("/")[1]);
+	           if(startIndex == -1){
+	             startIndex = 0;//The start date is before the time coverage of the data, OK
+	           }
+	           if(startIndex == -2){
+	             alert("Start date is after time coverage span of the data");
+	             return -1;
+	           }
+	           if(stopIndex == -1){
+	             stopIndex = 0;
+	           }
+	           if(stopIndex == -2){
+	             stopIndex = layer.getDimension("time").size()-1;
+	           }
+	           if(startIndex>stopIndex){
+	             alert("End date is before start date");
+	             return -1;
+	           }
+	           
+//	           console.log("startIndex:"+startIndex);
+//	           console.log("stopIndex:"+stopIndex);
+//	           console.log("Number of dates to process:"+((stopIndex-startIndex)+1));
+	           return ((stopIndex-startIndex)+1);
+	         }catch(e){
+	           console.log(e);
+	         }
+	       };
+	    
 
       /* Debug for WMS */
 //       wpsComplete("http://birdexp02.knmi.nl/cgi-bin/adaguc/dragonsdenwms.cgi?DATASET=WPS_raypath_1400073951_wmsconfig_201405140000&");
@@ -535,7 +863,7 @@
     });
     
     var showBasketWidget= function(){
-	  console.log("showBasketWidget");
+	  //console.log("showBasketWidget");
       basketWidget.show(function(selectedNodes) {
         //console.log(selectedNodes);
 	    for ( var j = 0; j < selectedNodes.length && j<1; j++) {

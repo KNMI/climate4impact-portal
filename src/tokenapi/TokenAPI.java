@@ -78,7 +78,7 @@ public class TokenAPI extends HttpServlet {
     try {
       String requestStr=HTTPTools.getHTTPParam(request, "request");
       ImpactUser user = null;
-      user = LoginManager.getUser(request,response);
+      user = LoginManager.getUser(request);
       if(requestStr.equals("generatetoken")){
         jsonResponse.setMessage(AccessTokenStore.generateAccessToken(user).toString());
       }

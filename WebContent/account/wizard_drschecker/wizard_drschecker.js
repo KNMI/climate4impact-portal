@@ -9,6 +9,7 @@ if (window.location.protocol != "https:")
         renderFileViewerInterface({element:el,
           service:c4iconfigjs.impactservice,
           adagucservice:c4iconfigjs.adagucservice,
+          provenanceservice:c4iconfigjs.provenanceservice,
           adagucviewer:c4iconfigjs.adagucviewer,
           query:resource,
           dialog:true

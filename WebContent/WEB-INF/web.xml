@@ -183,4 +183,14 @@
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>
+  <servlet>
+    <description></description>
+    <display-name>PROV</display-name>
+    <servlet-name>PROV</servlet-name>
+    <servlet-class>provenance.PROV</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PROV</servlet-name>
+    <url-pattern>/PROV</url-pattern>
+  </servlet-mapping>
 </web-app>

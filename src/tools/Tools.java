@@ -11,6 +11,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -330,7 +333,7 @@ public class Tools {
     out.close();
     fstream.close();
 	}
-	 static public String readFile(String fileName) throws IOException{
+	static public String readFile(String fileName) throws IOException{
 	   StringBuffer fileData = new StringBuffer(1000);
      BufferedReader reader = new BufferedReader(
              new FileReader(fileName));
@@ -345,7 +348,14 @@ public class Tools {
      return fileData.toString();
 
   }
-	 
+
+	static public byte[] readFileRaw(String fileName) throws IOException{
+	  Path path = Paths.get(fileName);
+	  byte[] data = Files.readAllBytes(path);
+	  return data;
+ }
+  
+
 
   public static String checkValidCharsForFile(String input) throws Exception{
     if(input.indexOf("..")!=-1){

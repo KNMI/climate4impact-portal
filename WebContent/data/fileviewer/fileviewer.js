@@ -17,11 +17,7 @@ var renderFileViewerInterface = function(options){
 var renderFileViewer = function(options){
   var newoptions = [];
   
-  newoptions.service=c4iconfigjs.impactservice;
-  newoptions.adagucservice=c4iconfigjs.adagucservice;
-  newoptions.adagucviewer=c4iconfigjs.adagucviewer;
-  newoptions.howtologinlink=c4iconfigjs.howtologinlink;
-  newoptions.contactexpertlink=c4iconfigjs.contactexpertlink;
+
   newoptions.query=options.url;
   newoptions.dialog=true;
   newoptions.element=jQuery('<div/>');
@@ -32,6 +28,14 @@ var renderFileViewer = function(options){
 
 var FileViewerInterface = function(options){
   var _this = this;
+  
+  if(!options.service)options.service=c4iconfigjs.impactservice;
+  if(!options.adagucservice)options.adagucservice=c4iconfigjs.adagucservice;
+  if(!options.adagucviewer)options.adagucviewer=c4iconfigjs.adagucviewer;
+  if(!options.howtologinlink)options.howtologinlink=c4iconfigjs.howtologinlink;
+  if(!options.contactexpertlink)options.contactexpertlink=c4iconfigjs.contactexpertlink;
+  if(!options.provenanceservice)options.provenanceservice=c4iconfigjs.provenanceservice;
+  
   
   options.prettyquery=options.query.split("#")[0];
   
@@ -124,10 +128,15 @@ var FileViewerInterface = function(options){
     if(options.dialog){
       options.element.dialog({
         title:'NetCDF Metadata',
-        width:800,
+        width:1000,
         height:600,
+
         dialogClass:'c4i-fileviewer-containerdialog'
-      });
+      }).dialogExtend({
+        "maximizable" : true,
+        "dblclick" : "maximize",
+        "icons" : { "maximize" : "ui-icon-arrow-4-diag" }
+      });;
       
     }else{
       options.element.addClass("c4i-fileviewer-container");
@@ -168,7 +177,7 @@ var FileViewerInterface = function(options){
     getVariableInfoFromServer();
   };
   
-  function checkForUsableVariable(variable){
+  function checkForViewableVariable(variable){
       if(variable.variable == "lon"){return "";}
       if(variable.variable == "lat"){return "";}
       if(variable.variable == "x"){return "";}
@@ -178,16 +187,124 @@ var FileViewerInterface = function(options){
         for(var d=0;d<variable.dimensions.length;d++){
           if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
         }
-        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay,grid10&width=390&height=260&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
-        var html='<div class="c4i-fileviewer-previewstyle"><span>Preview</span>: <img src="'+url+'"/></div>';
+
+     
+        var maxAllowedWidth=rootElement.width()-120;
+        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width="+maxAllowedWidth+"&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
+        var html='<div class="c4i-fileviewer-previewstyle" name="'+variable.variable+'"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
       }
     }
     return "";
   };
   
+  function checkForProvenanceVariable(variable){
+    if(variable.variable != "knmi_provenance"){return "";}
+
+    var html=
+       '<div class="c4i-fileviewer-previewstyle-SVG">'
+      +'  <div  class="c4i-fileviewer-provenance"></div>'
+      +'  <div class="c4i-fileviewer-provenance-controls">'
+      //+'    <div class="c4i-fileviewer-provenance-controls-zoom">'
+      +'      <p><i class="btn btn-success fa fa-refresh"></i></p>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-zoomout">Zoom out</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-zoomin">Zoom in</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panleft">Left</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panup">Up</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-panright">Right</button>'
+//      +'      <button class="c4i-fileviewer-provenance-controls-pandown">Down</button><br/>'
+      +'      <button class="c4i-fileviewer-provenance-controls-json">JSON</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-xml">XML</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-png">PNG</button>'
+      +'      <button class="c4i-fileviewer-provenance-controls-svg">SVG</button>'
+      +'    </div>'
+      //+'  </div>'
+      +'</div>';
+
+    return html;
+  };
+  function doForProvenanceVariable(variable){
+    if(variable.variable != "knmi_provenance"){return "";}
+    var el = options.element.find(".c4i-fileviewer-provenance").first();
+    
+    options.element.find(".c4i-fileviewer-provenance-controls-json").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=application/json", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-xml").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=text/xml", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-svg").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=text/html", '_blank');
+    });
+    options.element.find(".c4i-fileviewer-provenance-controls-png").button({icons: { primary: "ui-icon-arrowthick-1-s"}}).attr('onclick','').click(function(event){
+      window.open(options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=image/png", '_blank');
+    });
+
+    var url=options.provenanceservice+"source="+URLEncode(options.prettyquery)+ "&service=prov&request=getprovenance&format=image/svg";
+    
+    var httpCallback = function(data){
+      if(data.error){
+        
+        alert("<b>"+data.error+"</b><hr/>Note: Exception info has been logged to your browsers console.");
+        
+        if(data.exception){
+          if(console.log){
+            console.log(data.exception);
+          }
+        }
+        return;
+      }
+      var el = options.element.find(".c4i-fileviewer-provenance").first();
+      el.html(data.svg);
+      var svgEl =  el.find("svg").first();
+      
+      svgEl.attr('width', '100%');
+      svgEl.attr('height', '350px');
+      svgEl.attr('id','svgid');
+      console.log(svgEl.attr('id'));
+      // Expose to window namespase for testing purposes
+      window.zoomTiger = svgPanZoom("#"+svgEl.attr('id'), {
+        zoomEnabled: true,
+        controlIconsEnabled: true,
+        fit: true,
+        center: true,
+        zoomScaleSensitivity: 1
+      });
+//      "use strict";
+//      var mySVG =svgEl.svgPanZoom({
+//        mouseWheel: false 
+//      });
+//      
+//      options.element.find(".c4i-fileviewer-provenance-controls-zoomin").button({icons: { primary: "ui-icon-circle-zoomin"}}).button({}).attr('onclick','').click(function(event){mySVG.zoomIn()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-zoomout").button({icons: { primary: "ui-icon-circle-zoomout"}}).attr('onclick','').click(function(event){mySVG.zoomOut()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panleft").button({icons: { primary: "ui-icon-circle-arrow-w"}}).attr('onclick','').click(function(event){mySVG.panLeft()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panright").button({icons: { primary: "ui-icon-circle-arrow-e"}}).attr('onclick','').click(function(event){mySVG.panRight()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-panup").button({icons: { primary: "ui-icon-circle-arrow-n"}}).attr('onclick','').click(function(event){mySVG.panUp()});
+//      options.element.find(".c4i-fileviewer-provenance-controls-pandown").button({icons: { primary: "ui-icon-circle-arrow-s"}}).attr('onclick','').click(function(event){mySVG.panDown()});
+//      
+
+      
+            
+
+    };
+    
+    $.ajax({
+      url: url,
+          crossDomain:true,
+          dataType:"jsonp"
+    }).done(function(d) {
+      httpCallback(d)
+    }).fail(function() {
+      //alert("fail 154");
+      console.log("Ajax call failed: "+url);
+      httpCallback({"error":"Request failed for "+url});
+    })
+    
+  };
+  
   
   function handleErrorMessage(data){
+    
     var html=
      '<div class="simplecomponent c4i-fileviewer-globalmetadata">'+
      '<div class="simplecomponent-body">'+
@@ -197,14 +314,31 @@ var FileViewerInterface = function(options){
      '</div>'+
      
     '<div class="c4-fileviewer-variable-error">'+
-      '<b>'+data.error+'</b><br/>'+
-      'You can try the following:<ul>'+
-      '<li><span class="c4i-fileviewer-error-signinbutton c4i-fileviewer-spanlink" >Sign in</span></li>'+
-      '<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
-      '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a>.</li>'+
-      '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>'+
-      '<li>The list of available groups can be found here: <a class="c4i-fileviewer-spanlink" target="_blank" href="https://esgf-node.jpl.nasa.gov/ac/list/">List of ESGF groups</a></li>'+
-      '<li>Open this file directly in your browser  <span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >here</span>, you might get a hint on what is going wrong.</li>'+
+      '<b>'+data.error+'</b><br/>';
+    if(data.exception)html+=data.exception+'<br/><hr/>';
+    html+='You can try the following:<ul>';
+    
+    if(!data.userid){
+      html+='<li><span class="c4i-fileviewer-error-signinbutton c4i-fileviewer-spanlink" >Sign in</span></li>'
+    }
+    html+='<li><a class="c4i-fileviewer-spanlink" target="_blank" href="https://esgf-node.jpl.nasa.gov/ac/list/">Become a member of the right ESGF data group</a> and then <span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >reload</span</li>';
+    
+
+    
+    html+=
+      //'<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
+      '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a></li>';
+    html+='<li><span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >Open this file directly in your browser to get a hint</span>./li>';
+
+    html+=
+      '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>';
+      
+    
+    if(data.userid){
+      html+='<li>You are signed in as <b>'+data.userid+'</b>.</li>'
+    }
+    
+    html+=     
       '</ul>'+
    '</div>'
     options.element.html(html);
@@ -238,7 +372,7 @@ var FileViewerInterface = function(options){
     ''+
     '  <div class="simplecomponent c4i-fileviewer-variables">'+
 //     '    <div class="simplecomponent-header">NetCDF Variables</div>'+
-    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-body c4i-fileviewer-variables-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>';
     if(!options.dialog){
@@ -272,14 +406,22 @@ var FileViewerInterface = function(options){
    rootElement.find(".c4i-fileviewer-globalmetadata").find(".simplecomponent-body").html(html);
       
     var html="";
+    var provenanceVar = undefined;
     for(var v=0;v<data.length;v++){
-      var preview=checkForUsableVariable(data[v]);
+      var preview=checkForViewableVariable(data[v]);
+      if(preview==""){
+        preview=checkForProvenanceVariable(data[v]);
+        if(preview!=""){
+          provenanceVar = data[v];
+        }
+      }
 
       html+="<span class=\"c4i-fileviewer-resultitem\">";     
       html+="  <span class=\"c4i-fileviewer-dataset-baseimage c4i-fileviewer-dataset-collapsible c4i-fileviewer-dataset-imgcollapsed \" name=\""+data[v].variable+"\"></span>";
     
      
       html+='    <span class="c4i-fileviewer-resultitem-content ">';
+      html+='    <span class="c4i-fileviewer-resultitem-content-varinfo ">';
       if(data[v].variabletype){
         html+="<span class=\"c4i-fileviewer-variabletype\">"+data[v].variabletype+ "</span>";     
       }else{
@@ -301,7 +443,9 @@ var FileViewerInterface = function(options){
       
       if(data[v].isDimension){
         html+=  "<span class=\"c4i-fileviewer-vardimension\">dimension "+data[v].variable+" of length "+data[v].isDimension[0].length+"</span>";
-      }if(preview.length>0)
+      }
+      html+='</span>'
+      if(preview.length>0)
       {
         html+=  "<span class=\"c4i-fileviewer-adagucviewershow\"></span>";
       }
@@ -336,8 +480,8 @@ var FileViewerInterface = function(options){
         $(el).addClass("c4i-fileviewer-dataset-imgexpand");
         $(el).parent().find(".c4i-fileviewer-dataset-expandedarea").show();
         var serviceOptions = el.parent().find(".c4i-fileviewer-adagucviewershow");
-        
-        var adagucViewerAddLayer = $('<span />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
+        var variable = data[v].variable;
+        var adagucViewerAddLayer = $('<span name="'+variable+'" />').addClass('c4i-fileviewer-adagucview').html('Add to viewer');serviceOptions.append(adagucViewerAddLayer);
         var WMS = $('<span />').addClass('c4i-fileviewer-wms').html(
           '<a target="_blank" href="'+options.adagucservice+ 'source='+URLEncode(options.prettyquery)+'&service=WMS&request=GetCapabilities">WMS</a>');
         
@@ -347,13 +491,14 @@ var FileViewerInterface = function(options){
         serviceOptions.append(WCS);
         
         var opendap = $('<span />').addClass('c4i-fileviewer-opendap').html(
-            '<a target="_blank" href="'+options.prettyquery+'.das">opendap</a>');
+            '<a target="_blank" href="'+options.prettyquery+'.das">OpenDAP</a>');
         serviceOptions.append(opendap);
         
-        var variable = data[v].variable;
+        
         
         adagucViewerAddLayer.attr('onclick','').click(function(event){
-          event.preventDefault();          
+          event.preventDefault();
+          var variable =  $(this).attr('name');
           _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });
@@ -372,7 +517,8 @@ var FileViewerInterface = function(options){
         
         var previewImage = el.parent().find(".c4i-fileviewer-previewstyle");
         previewImage.attr('onclick','').click(function(event){
-          event.preventDefault();          
+          event.preventDefault();        
+          var variable =  $(this).attr('name');
           _this.visualizeVariable(variable,options.prettyquery);
           return false;
         });
@@ -396,6 +542,10 @@ var FileViewerInterface = function(options){
   
     rootElement.find(".c4i-fileviewer-resultitem-content").attr('onclick','').click(expandcollapse);
     rootElement.find(".c4i-fileviewer-dataset-collapsible").attr('onclick','').click(expandcollapse);
+    
+    if(provenanceVar){
+      doForProvenanceVariable(provenanceVar);
+    }
   }
   
   function ready(){
@@ -413,7 +563,7 @@ var FileViewerInterface = function(options){
     }).fail(function() {
       //alert("fail 154");
       console.log("Ajax call failed: "+url);
-      httpCallback("Failed for "+arg);
+      httpCallback({"error":"Request failed for "+url});
     }).always(function(){
       
       if(ready){

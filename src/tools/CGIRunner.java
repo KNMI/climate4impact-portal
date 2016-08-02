@@ -21,7 +21,7 @@ public class CGIRunner {
    */
   public static void runCGIProgram(String[] commands,String[] environmentVariables,String directory,final HttpServletResponse response,OutputStream outputStream,String postData) throws Exception{
     Debug.println("Working Directory: "+directory);
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}      public void setError(String message) {}public String getError() {      return null;    }}
+    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message,0,bytesRead));}      public void setError(String message) {}public String getError() {      return null;    }}
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
       boolean headersSent = false;
       boolean foundLF = false;
@@ -141,8 +141,6 @@ public class CGIRunner {
     
     if(processRunner.exitValue()!=0){
       Debug.errprintln("Warning: exit code: "+processRunner.exitValue());
-    }else{
-      Debug.println("Exit code 0 == OK");
     }
     if(stdoutPrinter.getError()!=null){
       Debug.errprintln("Warning: errors occured while writing to pipe");

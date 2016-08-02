@@ -71,7 +71,7 @@ public class GetDownloadScriptHandler extends HttpServlet {
    */
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     try{
-      user=LoginManager.getUser(request,response);
+      user=LoginManager.getUser(request);
       if(user == null)return;
     }catch(Exception e){
       user = null;

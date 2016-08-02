@@ -53,7 +53,7 @@ public class PyWPSServer extends HttpServlet {
     ImpactUser user = null;
  
     try{
-      user = LoginManager.getUser(request,response);
+      user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WPS for user: "+user.getId());
@@ -66,9 +66,10 @@ public class PyWPSServer extends HttpServlet {
       }
       
       String userDataDir = user.getDataDir();
-      environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir);
+      Tools.mksubdirs(userDataDir+"/WPS_Scratch/");
+      environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir+"/WPS_Scratch/");
       
-      String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/";
+      String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/WPS_Scratch/";
       pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
       pofOutputURL = pofOutputURL.replace("?", "");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
@@ -287,14 +288,19 @@ public class PyWPSServer extends HttpServlet {
         
         
         dataInputArray[j] = dataInputArray[j].split("#")[0];
-        Debug.println(dataInputArray[j]);
+        //Debug.println(dataInputArray[j]);
         try{
-        String[] kvp=dataInputArray[j].split("=");
-        if(kvp.length<2){
-          postData+=_addLiteralData(kvp[0],"");
-        }else{
-          postData+=_addLiteralData(kvp[0],kvp[1]);
-        }
+          int equalSignIndex = dataInputArray[j].indexOf('=');
+          String key = dataInputArray[j].substring(0,equalSignIndex);
+          
+          if(equalSignIndex==-1){
+            postData+=_addLiteralData(key,"");
+          }else{
+            String value =  dataInputArray[j].substring(equalSignIndex+1);;
+//            String v= URLEncoder.encode(value,"utf-8");
+//            Debug.println(value);
+            postData+=_addLiteralData(key,value);
+          }
         }catch(Exception e){
           e.printStackTrace();
           Debug.errprintln("error");

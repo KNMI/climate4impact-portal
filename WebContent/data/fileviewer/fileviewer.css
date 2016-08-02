@@ -94,6 +94,26 @@
 }
 
 
+.c4i-fileviewer-adagucviewershow{
+    cursor: pointer;
+    position:absolute;
+    right:15px;
+    /*float: right;*/
+    font-weight: bold;
+    /*margin-right: 2px;*/
+    padding-left:10px;
+    text-decoration: underline;
+    overflow:auto; 
+    background:#428bca;
+}
+
+.c4i-fileviewer-resultitem-content-varinfo{
+	display:inline-block;
+
+	
+	height:24px;
+}
+
 .c4i-fileviewer-table  {
     border-collapse: collapse;
     width:100%;
@@ -163,20 +183,11 @@
 }
 
 .c4i-fileviewer-vardimension{
-  float:right;
-  
-  margin-right:5px;
-  font-weight:normal;
-}
-
-.c4i-fileviewer-adagucviewershow{
-    float:right;
-
-  margin-right:2px;
-  font-weight:bold;
- cursor: pointer;
-   text-decoration: underline;
- 
+    position:absolute;
+    right:20px;
+    padding-left:10px;
+    overflow:auto; 
+    
 }
 
 
@@ -201,15 +212,62 @@
   border:1px solid gray;
   margin:2px;
   padding:3px;
-  height:264px;
+  /*height:264px;*/
   vertical-align:middle;
   line-height:260px;
  cursor: pointer;
+ overflow:auto;
+   display:block;
+   margin:5px;
+}
+.c4i-fileviewer-previewstyle-SVG{
+ background-color: #444;
+  color:white;
+  font-weight:normal;
+  border:3px solid black;
+  
+  height:400px;
 }
 
+svg {
+
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+ }
+
+.c4i-fileviewer-provenance{
+  
+}
+.c4i-fileviewer-provenance-controls{
+
+	height:30px;
+  text-align:center;  
+  line-height:28px;
+  margin-bottom:3px;
+  display:block;
+}
+
+.c4i-fileviewer-provenance-controls-zoom{
+
+}
+
+
+.c4i-fileviewer-provenance svg{
+
+  display: block;
+     margin-left: auto;
+     margin-right: auto;
+}
+	
 .c4i-fileviewer-previewstyle img{
   vertical-align:middle;
-    
+ max-height: 400px;
+ display:inline;
+}
+
+.c4i-fileviewer-variables-body{
+	padding:10px;
 }
 
 .c4i-fileviewer-containerdialog, .c4i-fileviewer-containerdialog .ui-dialog-content{

@@ -24,10 +24,10 @@ public class ImpactUser {
   private String usersDir = null;
   private String loginInfo = null; /* String composed by checklogin function based on login params */
   private String certInfo = null;
-  private String certificate = null;/* String is retrieved from a session set during OAuth2 login */
+  private String oauth2certificate = null;/* String is retrieved from a session set during OAuth2 login */
   private String loginMethod = null;/* Set by the login method in the session */
   public long certificateValidityNotAfter = -1;
-  public String certificateFile = null;
+  public String certificateFile = null;/*Pointer to the users credential */
   public boolean credentialError = false;
   public boolean configured = false;
   private GenericCart shoppingCart = null;
@@ -223,7 +223,7 @@ public class ImpactUser {
       }
     }
   
-    certificate = (String) request.getSession().getAttribute("certificate");
+    oauth2certificate = (String) request.getSession().getAttribute("certificate");
     loginMethod = (String) request.getSession().getAttribute("login_method");
     
     try {
@@ -245,7 +245,7 @@ public class ImpactUser {
   
   /* Returns The X509 credential is stored as string, not as file location */
   public String getCertificate() {
-    return certificate;
+    return oauth2certificate;
   } 
   public String getLoginMethod() {
     return loginMethod;

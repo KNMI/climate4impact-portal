@@ -5,42 +5,23 @@ import tools.ProcessRunner;
 
 public class NetCDFC {
   static class NCDump{
-    private String ncdumpResult="";
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message));}
-
-    @Override
-    public void setError(String message) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public String getError() {
-      // TODO Auto-generated method stub
-      return null;
-    }}
-    class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {
-        ncdumpResult+=new String(message,0,bytesRead);
-
-      }
-
-    @Override
-    public void setError(String message) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public String getError() {
-      // TODO Auto-generated method stub
-      return null;
-    }
-    }
-
+   
      
     public String doNCDump(ImpactUser user,String url) throws Exception{
-      ncdumpResult="";
-     
+    
+      class StderrPrinter implements ProcessRunner.StatusPrinterInterface{
+        String ncdumpError="";
+        public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message,0,bytesRead));ncdumpError+=new String(message,0,bytesRead);}
+        public void setError(String message) {}
+        public String getError() {return ncdumpError;}
+      }
+      class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
+        String ncdumpResult="";
+        public void print(byte[] message,int bytesRead) {ncdumpResult+=new String(message,0,bytesRead);}
+        public void setError(String message) {}
+        public String getError() {return ncdumpResult;}
+      }
+
      
       ProcessRunner.StatusPrinterInterface stdoutPrinter = new StdoutPrinter();
       ProcessRunner.StatusPrinterInterface stderrPrinter = new StderrPrinter();
@@ -60,6 +41,18 @@ public class NetCDFC {
         Debug.errprint(e.getMessage());
         throw new Exception ("Unable to do ncdump: "+e.getMessage());
       }
+
+      String ncdumpResult=stdoutPrinter.getError();
+      String ncdumpError=stderrPrinter.getError();
+     
+      if(ncdumpResult.length()==0){
+        if(ncdumpError.length()>0){
+          throw new Exception ("Unable to do ncdump, error occured:["+ncdumpError+"]");
+        }else{
+          throw new Exception ("Unable to do ncdump, no info available.");
+        }
+      }
+
       return ncdumpResult;        
     }
   }
@@ -67,7 +60,7 @@ public class NetCDFC {
   
   
   public static String executeNCDumpCommand(ImpactUser user,String url) throws Exception{
-    Debug.println("Execute ncdump on "+url);
+    //Debug.println("Execute ncdump on "+url);
     String result;
     NCDump doNCDump = new NCDump();
     result=doNCDump.doNCDump(user,url);

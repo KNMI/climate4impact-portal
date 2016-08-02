@@ -197,7 +197,7 @@ public class LoginManager {
    * @return The user object or null when a redirect is requested.
    * @throws Exception
    */
-  public static ImpactUser getUser(HttpServletRequest request,
+  public static ImpactUser _getUser(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
 
 //    String doLogOut = tools.HTTPTools.getHTTPParam(request,"c4i_dologout");
@@ -252,7 +252,7 @@ public class LoginManager {
 
 
     //"Trying to get user info from X509 cert"
-    if (id == null && response != null) {
+    if (id == null) {
       String CertOpenIdIdentifier = null;
       // org.apache.catalina.authenticator.SSLAuthenticator
       X509Certificate[] certs = (X509Certificate[]) request
@@ -261,7 +261,7 @@ public class LoginManager {
         X509Certificate cert = certs[0];
 
         String subjectDN = cert.getSubjectDN().toString();
-        Debug.println("getSubjectDN: " + subjectDN);
+        //Debug.println("getSubjectDN: " + subjectDN);
         String[] dnItems = subjectDN.split(", ");
         for (int j = 0; j < dnItems.length; j++) {
           int CNIndex = dnItems[j].indexOf("CN");
@@ -270,17 +270,17 @@ public class LoginManager {
                 + CNIndex);
           }
         }
-
-      } else {
-
-        String message = "No user information available from either session, oauth2 or x509\n";
-        Debug.errprintln(message);
-        // response.setStatus(403);
-        /*
-         * response.getOutputStream().println(message); throw new
-         * Exception("You are not logged in...");
-         */
       }
+//      } else {
+//
+//        //String message = "No user information available from either session, oauth2 or x509\n";
+//        //Debug.errprintln(message);
+//        // response.setStatus(403);
+//        /*
+//         * response.getOutputStream().println(message); throw new
+//         * Exception("You are not logged in...");
+//         */
+//      }
 
       if (CertOpenIdIdentifier != null) {
         id = CertOpenIdIdentifier;
@@ -327,7 +327,7 @@ public class LoginManager {
   }
 
   public static ImpactUser getUser(HttpServletRequest request) throws Exception {
-    return getUser(request, null);
+    return _getUser(request, null);
   }
 
   /**
@@ -529,12 +529,13 @@ public class LoginManager {
    * @throws IOException
    */
   public static JSONResponse identifyWhyGetRequestFailed(String requestStr,
-      HttpServletRequest request, HttpServletResponse response)
+      HttpServletRequest request)
       throws WebRequestBadStatusException, IOException {
     JSONResponse jsonResponse = new JSONResponse(request);
     ImpactUser user = null;
     try {
       user = getUser(request);
+      jsonResponse.setUserId(user.getId());
     } catch (Exception e1) {
     }
     String msg = "";

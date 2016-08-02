@@ -83,7 +83,7 @@ public class HTTPTools extends HttpServlet {
       'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
       'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '|', '&',
-      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')',';'};
+      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')',';','%'};
   /**
    * Validates input for valid tokens, preventing XSS attacks. Throws Exception when invalid tokens are encountered.
    * @param input The string as input
@@ -187,6 +187,8 @@ public class HTTPTools extends HttpServlet {
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
       String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers, int timeOutMs)
       throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException, SSLException {
+    Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
+    Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
     String connectToURL = makeCleanURL(url);
  //   Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
@@ -464,6 +466,8 @@ public class HTTPTools extends HttpServlet {
       CertificateException, IOException, UnrecoverableKeyException,
       KeyManagementException {
 
+    Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
+    Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
     ExtendedGSSManager m = (ExtendedGSSManager) ExtendedGSSManager
         .getInstance();
     GlobusGSSCredentialImpl cred = (GlobusGSSCredentialImpl) m
@@ -482,6 +486,7 @@ public class HTTPTools extends HttpServlet {
     // Load trustroots
     FileInputStream trustStoreStream = new FileInputStream(new File(
         trustRootsFile));
+    
     try {
       keyStore.load(trustStoreStream, "changeit".toCharArray());
     } finally {

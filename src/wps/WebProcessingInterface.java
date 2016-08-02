@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import tools.Debug;
 import tools.MyXMLParser;
+import tools.Tools;
 import tools.MyXMLParser.Options;
 import tools.MyXMLParser.XMLElement;
 
@@ -287,7 +288,7 @@ public class WebProcessingInterface {
 	 */
 	
   public static JSONObject executeProcess(String procId, String dataInputs, HttpServletRequest request,HttpServletResponse response) throws Exception {
-    ImpactUser user = LoginManager.getUser(request,response);
+    ImpactUser user = LoginManager.getUser(request);
     if(user == null){
       return null;
     }
@@ -371,6 +372,14 @@ public class WebProcessingInterface {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    //Save also in user basket.
+    String baseName = statusLocation.substring(statusLocation.lastIndexOf("/")).replace(".xml", ".wpssettings");
+    String wpsSettingsFile = user.getDataDir()+"/WPS_Settings/";
+    tools.Tools.mksubdirs(wpsSettingsFile);
+    wpsSettingsFile+=baseName;
+    Tools.writeFile(wpsSettingsFile, data.toString());
+    
     return data;
   }
   
@@ -407,7 +416,7 @@ public class WebProcessingInterface {
           if(maximumTries == 0){
             GenericCart jobList;
             try {
-              jobList = LoginManager.getUser(request,null).getProcessingJobList();
+              jobList = LoginManager.getUser(request).getProcessingJobList();
               String basename = statusLocation.substring(statusLocation.lastIndexOf("/")+1);
               jobList.removeDataLocator(basename);
             } catch (Exception e1) {
