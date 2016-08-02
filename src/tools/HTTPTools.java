@@ -519,7 +519,7 @@ public class HTTPTools extends HttpServlet {
 
     DefaultHttpClient httpclient = new DefaultHttpClient();
     httpclient.getConnectionManager().getSchemeRegistry().register(sch);
-
+    Debug.println("x509 http client has been created");
     return httpclient;
   }
 

@@ -173,7 +173,7 @@
             return true;
           }
 
-          console.log(selectedNodes[0]);
+          //console.log(selectedNodes[0]);
           if(selectedNodes[0].hashttp!="true"){
             alert("This file is not http enabled");
             return;
@@ -188,7 +188,7 @@
           
           var url = c4iconfigjs.basketservice+"service=basket&request=getfile&file="+encodeURIComponent(fileLocation);
           
-          console.log(url);
+          //console.log(url);
           var httpCallback = function(data){
             if(data.error){
               
@@ -207,7 +207,7 @@
             if(wpsProcessSubsettingName!=identifier){
               alert("This settings file was used for process "+identifier+".");
             }
-            console.log(inputs);
+            //console.log(inputs);
             
             var bbox = "";
             var srsname = "";
@@ -219,7 +219,7 @@
             for(var j=0;j<inputs.length;j++){
               var name = inputs[j].Identifier.value ;
               var value = inputs[j].Data.LiteralData.value;
-              console.log("name:"+name+"="+value);
+              //console.log("name:"+name+"="+value);
               if(name =="bbox"){if(bbox.length>0)bbox+=",";bbox+=value;}
               if(name =="crs")srsname=value;
               if(name =="dates")dates=value;
@@ -231,7 +231,7 @@
             bbox = bbox.split(",");
             var bboxObj = new WMJSBBOX(parseFloat(bbox[0]),parseFloat(bbox[3]),parseFloat(bbox[2]),parseFloat(bbox[1]));
             
-            console.log("startdate:"+dates[0]);
+            //console.log("startdate:"+dates[0]);
             $("#"+rootElementId).find(".startdate").val(dates[0]);
             $("#"+rootElementId).find(".stopdate").val(dates[1]);
             $("#"+rootElementId).find(".stopdate").change();
@@ -239,13 +239,13 @@
            
             
             $("#"+rootElementId).find(".projectionselector").find(".projcombo").first().val(srsname);
-            console.log(bboxObj.toString());
+            //console.log(bboxObj.toString());
           
             var srs = layer.getProjection(srsname);
-            console.log(srs);
+            //console.log(srs);
             currentProjection = srsname;
             var newSRS={bbox:bboxObj,srs:srs.srs};
-            console.log(newSRS);
+            //console.log(newSRS);
             setProjectionDirectly(newSRS);
             $("#"+rootElementId).find(".resolutionx").val(resx);
             $("#"+rootElementId).find(".resolutiony").val(resy);
