@@ -96,8 +96,9 @@
 
       $("#"+rootElementId).find(".resolutionxinfo").html(parseInt(Math.abs((bbox.right-bbox.left)/$("#"+rootElementId).find(".resolutionx").val())+0.5));
       $("#"+rootElementId).find(".resolutionyinfo").html(parseInt(Math.abs((bbox.bottom-bbox.top)/$("#"+rootElementId).find(".resolutiony").val())+0.5));
-      
       boundingBoxBBOX = bbox;
+      mainWebmapJS.showBoundingBox(bbox);
+
     };
     
  
@@ -782,12 +783,8 @@
           bbox.right-=w;
           bbox.top-=h;
           bbox.bottom+=h;
-          $("#"+rootElementId).find(".bboxwest").val(bbox.left);
-          $("#"+rootElementId).find(".bboxnorth").val(bbox.top);
-          $("#"+rootElementId).find(".bboxeast").val(bbox.right);
-          $("#"+rootElementId).find(".bboxsouth").val(bbox.bottom);
           bboxChangedByEvent(bbox);
-          mainWebmapJS.showBoundingBox(bbox);
+
         });
 	      
 	       $(".c4i_wizard_convert_fitboundingboxtolayer").button({
@@ -798,12 +795,7 @@
 	          var layer = mainWebmapJS.getLayers()[0];
 	          var srsNew = layer.getProjection(currentProjection);
 	          var bbox = srsNew.bbox.clone();
-	          $("#"+rootElementId).find(".bboxwest").val(bbox.left);
-	          $("#"+rootElementId).find(".bboxnorth").val(bbox.top);
-	          $("#"+rootElementId).find(".bboxeast").val(bbox.right);
-	          $("#"+rootElementId).find(".bboxsouth").val(bbox.bottom);
 	          bboxChangedByEvent(bbox);
-	          mainWebmapJS.showBoundingBox(bbox);
 	        });
 	       
 	       $(".c4i_wizard_convert_zoomtobbox").button({
