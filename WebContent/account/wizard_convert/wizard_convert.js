@@ -97,7 +97,7 @@
       $("#"+rootElementId).find(".resolutionxinfo").html(parseInt(Math.abs((bbox.right-bbox.left)/$("#"+rootElementId).find(".resolutionx").val())+0.5));
       $("#"+rootElementId).find(".resolutionyinfo").html(parseInt(Math.abs((bbox.bottom-bbox.top)/$("#"+rootElementId).find(".resolutiony").val())+0.5));
       
-      
+      boundingBoxBBOX = bbox;
     };
     
  
@@ -132,7 +132,9 @@
     
       
       webMapJS.setBaseLayers([baseLayer,overLayer,grid]);
+      
       webMapJS.draw();
+
       return webMapJS;
     };
    
