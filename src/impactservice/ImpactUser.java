@@ -18,7 +18,7 @@ import tools.Tools;
 
 
 public class ImpactUser {
-
+  static boolean debug=false;
   private String id = null; // The unique ID of the user object
   private String internalName = null;
   private String usersDir = null;

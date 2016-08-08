@@ -72,7 +72,7 @@ import tools.Tools;
  */
 
 public class LoginManager {
-
+  static boolean debug=false;
   private static Vector<ImpactUser> users = new Vector<ImpactUser>();
   
   
@@ -386,15 +386,16 @@ public class LoginManager {
    * @throws Exception
    */
   public synchronized static void checkLogin(ImpactUser user) throws Exception {
-    Debug.println("Check login " + user.getId());
 
-    Debug.println("internalName = " + user.getInternalName());
+    if(debug)Debug.println("Check login " + user.getId());
+
+    if(debug)Debug.println("internalName = " + user.getInternalName());
     String workspace = Configuration.getImpactWorkspace();
-    Debug.println("Base workspace = " + workspace);
+    if(debug)Debug.println("Base workspace = " + workspace);
     user.setWorkspace(workspace + user.getInternalName() + "/");
-    Debug.println("User workspace = " + user.getWorkspace());
+    if(debug)Debug.println("User workspace = " + user.getWorkspace());
     try {
-      Debug.println("Making dir " + user.getWorkspace());
+      if(debug)Debug.println("Making dir " + user.getWorkspace());
       Tools.mkdir(user.getWorkspace());
       Tools.mkdir(user.getWorkspace() + "certs");
       user.certificateFile = user.getWorkspace() + "certs/" + "creds.pem";
@@ -418,15 +419,15 @@ public class LoginManager {
       try{
         _checkCertificate(user);
         if(user.certificateValidityNotAfter!=-1){
-          Debug.println("GetCredential: checking validity notafter: "+user.certificateValidityNotAfter);
+          if(debug)Debug.println("GetCredential: checking validity notafter: "+user.certificateValidityNotAfter);
           long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
           long minValidityPeriodAfterMillis = 8*60*60*1000;
 //          Debug.println("currentMillis                     :["+currentMillis+"]");
 //          Debug.println("certificateValidityNotAfter       :["+user.certificateValidityNotAfter+"]");
 //          Debug.println("certificateValidityNotAfter min 8 :["+(user.certificateValidityNotAfter-(minValidityPeriodAfterMillis))+"]");
-          Debug.println("remaining H                       :["+(((user.certificateValidityNotAfter-minValidityPeriodAfterMillis)-currentMillis)/(1000*60*60))+"]");
+          if(debug)Debug.println("remaining H                       :["+(((user.certificateValidityNotAfter-minValidityPeriodAfterMillis)-currentMillis)/(1000*60*60))+"]");
           if(user.certificateValidityNotAfter-minValidityPeriodAfterMillis>currentMillis){
-            Debug.println("Certificate is still valid");
+            if(debug)Debug.println("Certificate is still valid");
             certNeedsRefresh = false;
           }
         }

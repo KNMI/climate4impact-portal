@@ -18,6 +18,7 @@ import org.json.JSONTokener;
 import tools.Debug;
 
 public class AccessTokenStore {
+  static boolean debug=false;
   /**
    * Map of access_tokens, key is the access_token, value is the stringified JSONObject.
    */
@@ -265,7 +266,7 @@ public class AccessTokenStore {
         
         JSONObject props = (JSONObject) new JSONTokener(a).nextValue();
         String userID = props.getString("userid");
-        Debug.println("[OK] Token is Valid for user "+userID);
+        if(debug)Debug.println("[OK] Token is Valid for user "+userID);
         ImpactUser user = LoginManager.getUser(userID, null);
         LoginManager.checkLogin(user);
         return props;

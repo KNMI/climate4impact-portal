@@ -125,7 +125,7 @@ public class Opendap {
     }
     if(cdmType == CDMTypes.String)return "String";
     if(cdmType == CDMTypes.Byte)return "Byte";
-    
+
     if(cdmType == CDMTypes.UInt16)return "UInt16";
     if(cdmType == CDMTypes.Int16)return "Int16";
     if(cdmType == CDMTypes.UInt32)return "UInt32";
@@ -140,12 +140,12 @@ public class Opendap {
     StringBuilder ddsResult = new StringBuilder();
 
     int rank = variable.getRank();
-//    Debug.println(variable.getDODSName());
-//    Debug.println(variable.getFullName());
-//    Debug.println(variable.getDataType().toString());
-//    Debug.println(variable.getDataType().name());
-//    Debug.println(variable.getDataType().getPrimitiveClassType().getName());
-    
+    //    Debug.println(variable.getDODSName());
+    //    Debug.println(variable.getFullName());
+    //    Debug.println(variable.getDataType().toString());
+    //    Debug.println(variable.getDataType().name());
+    //    Debug.println(variable.getDataType().getPrimitiveClassType().getName());
+
     if(rank == 0){
       ddsResult.append("    "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
     }
@@ -159,19 +159,19 @@ public class Opendap {
       ddsResult.append("["+dim.getFullName()+" = "+dim.getLength()+"]");  
     }
     if(rank>1){
-     // if(variableDodsQuery.equals("")){
-        /*if(1==2){
+      // if(variableDodsQuery.equals("")){
+      /*if(1==2){
           ddsResult.append("    Grid {\n");
           ddsResult.append("     ARRAY:\n        "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
           List<Dimension> dims = variable.getDimensions();
           for(int i=0;i<dims.size();i++){
             ddsResult.append("["+dims.get(i).getName()+" = "+dims.get(i).getLength()+"]");
           }
-  
+
           ddsResult.append(";\n");
-  
+
           ddsResult.append("     MAPS:\n");
-  
+
           for(int i=0;i<dims.size();i++ ){
             Variable vare = ncfile.findVariable(dims.get(i).getName());
             if(vare != null){
@@ -183,13 +183,13 @@ public class Opendap {
           }
           ddsResult.append("    } "+variable.getFullName());
         }else{*/
-          ddsResult.append("    "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
-          DimInfo dimInfo = new DimInfo();
+      ddsResult.append("    "+CDMTypeToString(ncTypeToCDMType(variable.getDataType().toString()))+" "+variable.getFullName());
+      DimInfo dimInfo = new DimInfo();
 
-          dimInfo.parse(variable,variableDodsQuery);
-          for(int i=0;i<dimInfo.dims.size();i++){
-            ddsResult.append("["+dimInfo.dims.get(i).getFullName()+" = "+dimInfo.count[i]+"]");
-          }
+      dimInfo.parse(variable,variableDodsQuery);
+      for(int i=0;i<dimInfo.dims.size();i++){
+        ddsResult.append("["+dimInfo.dims.get(i).getFullName()+" = "+dimInfo.count[i]+"]");
+      }
 
     }
 
@@ -197,32 +197,32 @@ public class Opendap {
     return ddsResult;
   }
   public static byte[] getDatasetDDSFromNetCDFFile(NetcdfFile ncfile,String fileName,String queryString, boolean includeData) throws IOException {
-    
+
     if(queryString == null){
       queryString = "";
     }
     if(queryString.equals("null")) queryString = "";
-    
+
     StringBuilder ddsResult = new StringBuilder();
- 
+
     if(Debugger.DebugOpendap)Debug.println("getDatasetDODSFromNetCDFFile: ["+queryString+"]");
-    
-    
+
+
     String[] varNames = null;
-    
+
     if(queryString.length() != 0){
-//      Debug.println("Selection");
+      //      Debug.println("Selection");
       varNames = queryString.split(",");
     }else{
-//      Debug.println("ALL");
+      //      Debug.println("ALL");
       List<Variable> var = ncfile.getVariables();
       for(int j=0;j<var.size();j++){
-//        Debug.println("Adding ["+var.get(j).getFullName()+"]");
+        //        Debug.println("Adding ["+var.get(j).getFullName()+"]");
         varNames = tools.Tools.appendString(varNames, var.get(j).getFullName());
       }
     }
 
-  
+
     ddsResult.append("Dataset {\n");
 
     DimInfo[] dimInfo = new DimInfo[varNames.length];
@@ -235,16 +235,16 @@ public class Opendap {
         varName = varNames[j].substring(0, subSetRequestP);
         variableDodsQuery = varNames[j].substring(subSetRequestP+1);
       }else{
-      
+
         int subsetRequest2 = varNames[j].indexOf("[");
         if(subsetRequest2!=-1){
-         
+
           varName = varNames[j].substring(0, subsetRequest2);
           variableDodsQuery = varNames[j];//.substring(subsetRequest2+1);
-         
+
         }
       }
-      
+
       //DebugConsole.println("variable "+varName);
       Variable var = ncfile.findVariable(varName);
       if(var == null){
@@ -271,23 +271,23 @@ public class Opendap {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     bos.write(ddsResult.toString().getBytes());
     bos.flush();
-  
+
 
     for(int j=0;j<varNames.length;j++){
-     
-     
+
+
       int subSetRequestP = varNames[j].indexOf(".");;
       String varName = varNames[j];
 
       if(subSetRequestP!=-1){
         varName = varNames[j].substring(0, subSetRequestP);
       }else{
-        
+
         int subsetRequest2 = varNames[j].indexOf("[");
         if(subsetRequest2!=-1){
-        
+
           varName = varNames[j].substring(0, subsetRequest2);
-        
+
         }
       }
       Variable variable = ncfile.findVariable(varName);
@@ -296,16 +296,16 @@ public class Opendap {
         return null;
       }
       int varSize = dimInfo[j].size;
-      
+
       if(Debugger.DebugOpendap){
-      //  DebugConsole.println(j+"): name: "+varName+" size: "+varSize+ " all: " + (int) variable.getSize()+" type: "+variable.getDataType().toString()+" scalar:"+variable.isScalar());
+        //  DebugConsole.println(j+"): name: "+varName+" size: "+varSize+ " all: " + (int) variable.getSize()+" type: "+variable.getDataType().toString()+" scalar:"+variable.isScalar());
       }
 
       //boolean wasScalar = false;
       if(variable.isScalar()==false)
       {
         DataOutputStream dos = new DataOutputStream(bos);
-     /*   if(wasScalar){
+        /*   if(wasScalar){
           dos.writeInt(1);
           dos.writeInt(0);
         }*/
@@ -315,12 +315,12 @@ public class Opendap {
         //dos.
         //bos.write(b)
         //os.writeInt(varSize);
-       
+
         dos.writeInt(varSize);
         dos.writeInt(varSize);
         //dos.writeInt(varSize);
         dos.flush();
-     
+
         //byte[] b = variable.read().getDataAsByteBuffer().array();
 
 
@@ -329,25 +329,25 @@ public class Opendap {
           //Debug.println("variable.getDataType().toString():"+variable.getDataType().toString());
           //DebugConsole.println("ByteBuffer "+byteBuffer.hasArray()+" - "+b.length);
           CDMTypes type = ncTypeToCDMType(variable.getDataType().toString());
-//          if(type == CDMTypes.String){
-//            for(int i=0;i<dimInfo[j].size;i++){
-//              Debug.println("String "+i+" count/start:"+dimInfo[j].start[i]+"/"+dimInfo[j].count[i]);              
-//            }
-//          
-//          }
-////          
-//          Array a = variable.read();
-//          for(int i=0;i<a.getSize();i++){
-//            Debug.println(i+"="+a.getByte(i));
-//          }
-//          
+          //          if(type == CDMTypes.String){
+          //            for(int i=0;i<dimInfo[j].size;i++){
+          //              Debug.println("String "+i+" count/start:"+dimInfo[j].start[i]+"/"+dimInfo[j].count[i]);              
+          //            }
+          //          
+          //          }
+          ////          
+          //          Array a = variable.read();
+          //          for(int i=0;i<a.getSize();i++){
+          //            Debug.println(i+"="+a.getByte(i));
+          //          }
+          //          
           if(Debugger.DebugOpendap)Debug.println("Normal read "+varName+" start:"+dimInfo[j].start[0] +" count:"+ dimInfo[j].count[0]);
           ByteBuffer byteBuffer = variable.read(dimInfo[j].start, dimInfo[j].count).getDataAsByteBuffer();
-          
-         
-          
-          
-          
+
+
+
+
+
           int elsize = 1;
           if(type == CDMTypes.Byte)elsize=1;
           if(type == CDMTypes.UInt16)elsize=2;
@@ -360,25 +360,33 @@ public class Opendap {
             Debug.println("ElSize = "+elsize);
           }
           //if(b.length!=varSize){
-            //DebugConsole.errprintln(""+b.length/elsize+" and "+varSize);
+          //DebugConsole.errprintln(""+b.length/elsize+" and "+varSize);
           //}
 
-          //DebugConsole.println("ByteBuffer "+byteBuffer.hasArray()+" - "+b.length+" elsize="+elsize);
+          //Debug.println(" elsize="+elsize);
           byte[] c = new byte[elsize];
-          
+
           //DataOutputStream dos2 = new DataOutputStream(bos);
           b = byteBuffer.array();
 
           for(int g=0;g<b.length;g=g+elsize){
             for(int i=0;i<elsize;i++){
-             // c[i]=b[((elsize-1)-i)+g];
+              // c[i]=b[((elsize-1)-i)+g];
               c[i]=b[i+g];
-             //Debug.println(""+c[i]);
+              //Debug.println(""+c[i]);
             }
+
             //dos2.writeFloat(0);
+
+            if(type == CDMTypes.Int16 || type == CDMTypes.UInt16){
+              bos.write(0);
+              bos.write(0);
+            }
             bos.write(c);
-            
           }
+
+
+
           c=null;
           bos.flush();
         } catch (InvalidRangeException e) {
@@ -387,12 +395,12 @@ public class Opendap {
         int dapLength = ((int)((b.length/4.0+0.9)))*4;
         if(Debugger.DebugOpendap)Debug.println(varName+" numbytes: "+b.length+ " dapLength "+dapLength);
 
-       
+
         for(int i=b.length;i<dapLength;i++){
           dos.writeByte(0);
           if(Debugger.DebugOpendap)Debug.println("X");
         }
-     //  wasScalar = false;
+        //  wasScalar = false;
       }else{
         if(Debugger.DebugOpendap)Debug.println("Scalar");
         //Debug.println("Scalar size: "+variable.getSize());
@@ -405,7 +413,7 @@ public class Opendap {
             bos.write(variable.readScalarByte());
             bos.write(variable.readScalarByte());
             bos.write(variable.readScalarByte());
-            
+
             //dos.writeDouble(variable.readScalarByte());
           }
           if(type == CDMTypes.Int16||type == CDMTypes.UInt16){
@@ -415,47 +423,47 @@ public class Opendap {
             if(Debugger.DebugOpendap)Debug.println("Writing scalar int32");
             //dos.writeDouble(variable.readScalarInt());
             dos.writeInt(variable.readScalarInt());
-//            bos.write(0xFF);
-//            bos.write(0xFF);
-//            bos.write(0x80);
-//            bos.write(0x01);
+            //            bos.write(0xFF);
+            //            bos.write(0xFF);
+            //            bos.write(0x80);
+            //            bos.write(0x01);
           }
           if(type == CDMTypes.Float32){
             if(Debugger.DebugOpendap)Debug.println("Writing scalar float32");
             dos.writeFloat(variable.readScalarFloat());
-            
+
           }
           if(type == CDMTypes.Float64){
-            
+
             if(Debugger.DebugOpendap)Debug.println("Writing scalar double");
             dos.writeDouble(variable.readScalarDouble());
           }
-          
+
           //bos.write(0xFF);
           //bos.write(0xFF);
           //bos.write(0x80);
           //bos.write(0x01);
         }else{
-          
+
           dos.writeInt(1);
           dos.writeInt(0);
           dos.flush();
         }
-        
+
       }
-      
+
     }
- 
+
     //return dos.g
     return bos.toByteArray();
   }
 
-  private static String getAttribute(Attribute attr){
+  private static StringBuilder getAttribute(Attribute attr){
     DataType type = attr.getDataType();
     String attrName = attr.getFullNameEscaped();
     attrName = attrName.replaceAll("\\[","_");
     attrName = attrName.replaceAll("\\]","_");
-    String attrStr = ("        "+CDMTypeToString(ncTypeToCDMType(type.toString()))+" "+attrName)+" ";
+    StringBuilder attrStr = new StringBuilder(("        "+CDMTypeToString(ncTypeToCDMType(type.toString()))+" "+attrName)+" ");
     //+" \""+attr.getStringValue()+"\";\n");
     boolean foundType = false;
     if(type == DataType.STRING){
@@ -465,57 +473,60 @@ public class Opendap {
       s = s.replaceAll(";", "");
       s = s.replaceAll("\"", "\\\\\"");
       byte b[]= s.getBytes();
-      
+
       //Valid tokens should be in this range, otherwise replace with exclamation mark.
       for(int j=0;j<b.length;j++){
         if(b[j]!=13&&b[j]!=10)if(b[j]<32||b[j]>126)b[j]='!';
       }
-      s= new String(b);
-      //Debug.println(attrName+":"+s);
-      attrStr+="\""+s+"\";\n";
+
+      //if(Debugger.DebugOpendap)Debug.println(attrName+":"+s);
+      attrStr.append("\"");
+      attrStr.append(new String(b));
+      attrStr.append("\";\n");
       foundType = true;
     }else{
-        String attrValue = "";
-        Array vals = attr.getValues();
-        
-        for(int j=0;j<vals.getSize();j++){
-          if(attrValue.length()>0)attrValue+=",";
-          if(type == DataType.BYTE){
-            attrValue+=vals.getByte(j);
-            foundType = true;
-          }
-          if(type == DataType.CHAR){
-            attrValue+=vals.getChar(j);
-            foundType = true;
-          }
-          if(type == DataType.SHORT){
-            attrValue+=vals.getShort(j);
-            foundType = true;
-          }
-          
-          if(type == DataType.STRUCTURE){
-            attrValue+="";
-            foundType = true;
-          }
+      foundType = true;
 
-          if(type == DataType.INT){
-            attrValue+=vals.getInt(j);
-            foundType = true;
+
+      StringBuilder attrValue = new StringBuilder();
+      Array vals = attr.getValues();
+
+      if(vals.isUnsigned()==false){
+        for(int j=0;j<vals.getSize();j++){
+          if(attrValue.length()>0)attrValue.append(",");
+          switch(type){
+          case BYTE:
+            attrValue.append(vals.getByte(j));
+            break;
+          case CHAR:
+            attrValue.append(vals.getChar(j));
+            break;
+          case SHORT:
+            attrValue.append(vals.getShort(j));
+            break;
+          case INT:
+            attrValue.append(vals.getInt(j));
+            break;
+          case LONG:
+            attrValue.append(vals.getLong(j));
+            break;
+          case FLOAT:
+            attrValue.append(vals.getFloat(j));
+            break;
+          case DOUBLE:
+            attrValue.append(vals.getDouble(j));
+            break;
+          default:
+            foundType = false;
+            break;
           }
-          if(type == DataType.LONG){
-            attrValue+=vals.getLong(j);
-          }
-          if(type == DataType.FLOAT){
-            attrValue+=vals.getFloat(j);
-            foundType = true;
-          }
-          if(type == DataType.DOUBLE){
-            attrValue+=vals.getDouble(j);
-            foundType = true;
-          }
-          attrStr+=attrValue;
+        }
+      }else{
+        Debug.errprintln("Unsigned stuffs found!:"+attrName);
       }
-      attrStr+=";\n";
+      attrStr.append(attrValue);
+      attrStr.append(";\n");
+      if(Debugger.DebugOpendap)Debug.println(attrName+":"+attrStr);
     }
 
     if(foundType == false){
@@ -563,8 +574,8 @@ public class Opendap {
      * 
      * When an access token is provided, it is part of the path. 
      */
-    
-    
+
+
     //Get User ID from tokenstore 
     JSONObject token = null;
     try {
@@ -572,8 +583,8 @@ public class Opendap {
     } catch (AccessTokenIsNotYetValid e1) {
     } catch (AccessTokenHasExpired e1) {
     }
-    
-    
+
+
     String queryString = request.getQueryString();
     if(queryString == null)queryString="";
     //Debug.println("queryString: =["+queryString+"]");
@@ -581,8 +592,8 @@ public class Opendap {
     if(path==null)return;
     //Debug.println("path: =["+path+"]");
     String filename = null;//"/home/c4m/Downloads/australia.nc";
-    
-    
+
+
 
     //Retrieve user ID from path
 
@@ -624,15 +635,15 @@ public class Opendap {
       }
       pathPartsIndex++;
     }
-    
+
     token = null;
-    
+
     //Debug.println("cleanPath: "+cleanPath);
     String fileNameFromPath = cleanPath.substring(cleanPath.lastIndexOf("/")+1);
     //Debug.println("fileNameFromPath:    "+fileNameFromPath);
     String opendapNameFromPath = fileNameFromPath.substring(0,fileNameFromPath.lastIndexOf("."));
     //Debug.println("opendapNameFromPath: "+opendapNameFromPath);
-    
+
     //Debug.println("userIdFromPath:      "+userIdFromPath);
     String filePath = cleanPath.substring(userIdFromPath.length()+1);
     filePath = filePath.substring(0,filePath.lastIndexOf("/"));
@@ -641,17 +652,17 @@ public class Opendap {
       //Debug.println("user:");
       ImpactUser user =  LoginManager.getUser(request);
       //Debug.println("user:"+user);
-      
-      
+
+
       fileNameFromPath = user.getDataDir()+"/"+filePath+"/"+fileNameFromPath;
       //Debug.println("fileNameFromPath: "+fileNameFromPath);
-      
+
       filename = user.getDataDir()+"/"+filePath+"/"+opendapNameFromPath;
-      
-      
+
+
       //Debug.println("Local file name is "+filename);
-      
-      
+
+
       if(!userIdFromPath.startsWith(user.getInternalName())){
         Debug.println("Comparing "+user.getInternalName() + "==" + userIdFromPath+ " UNEQUAL");
         Debug.errprintln("403, Unauthorized: "+userIdFromPath+"!="+user.getInternalName());
@@ -665,20 +676,20 @@ public class Opendap {
       response.setStatus(401);
       Debug.errprintln(message);
       response.getOutputStream().print(message);
-      
+
       return;
-      
-     
+
+
     }
 
     String externalFileName = opendapNameFromPath;
     //String externalFileName = "IS-ENES/TESTSETS/"+opendapNameFromPath;
-    
+
 
     NetcdfFile ncFile = null;
     try {
 
-      
+
       if(path.endsWith(".dds")){
         response.setContentType("text/plain");
         ncFile = NetcdfFile.open(filename);
@@ -694,7 +705,7 @@ public class Opendap {
         ncFile = NetcdfFile.open(filename);
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,externalFileName,URLDecoder.decode(queryString,"UTF-8"),true));
       }else {
-        
+
         streamFileToClient(response,fileNameFromPath);
       }
 
@@ -719,7 +730,7 @@ public class Opendap {
     ServletOutputStream outputStream = response.getOutputStream();
     FileInputStream input = null;
     try{
-    input = new FileInputStream(filename);
+      input = new FileInputStream(filename);
     }catch(FileNotFoundException e){
       response.setStatus(404);
       outputStream.println("404 Not found");
@@ -737,5 +748,5 @@ public class Opendap {
       }
     }
   };
-  
+
 }
