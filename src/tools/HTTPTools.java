@@ -363,8 +363,6 @@ public class HTTPTools extends HttpServlet {
     try {
       return getHTTPParam(request,name);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
     return null;
   }

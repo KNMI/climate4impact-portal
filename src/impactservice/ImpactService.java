@@ -928,7 +928,7 @@ public class ImpactService extends HttpServlet {
         jsonResponse.print(response);
       }
     }catch(Exception e){
-      e.printStackTrace();
+      Debug.printStackTrace(e);
       return;
     }
   }

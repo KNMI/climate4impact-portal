@@ -577,6 +577,11 @@ var BasketWidget = function() {
         opendap = httpserver.replace("fileServer","dodsC");
         alert("<h1>Info:</h1> You entered a URL with HTTP enabled.<br/>Automatically derived opendap by replacing fileServer by dodsC.");
       }
+      
+      if(opendap == "null" &&httpserver == "null"&&catalogURL=="null"){
+        httpserver=input;
+        opendap=input;
+      }
 
       var id = input.substring(input.lastIndexOf("/")+1);
 //      console.log(id);
