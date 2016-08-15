@@ -625,12 +625,21 @@
       var WMSReady = function(l,service){
         var html =  "<select class=\"coveragecombo\">";
         var selectedLayer = undefined;
+        if(activeLayer){
+          if(activeLayer!=""){
+            selectedLayer = activeLayer;
+            console.log("selectedLayer ="+selectedLayer);
+          }
+        }
         for(var j=0;j<l.length;j++){
           var n = l[j];
           if(n!='baselayer'&&n!='overlay'&&n!='grid10'){
             if(selectedLayer == undefined){
-              html+="<option selected>"+n+"</option>";
               selectedLayer = n;
+            }
+            if(selectedLayer == n){
+              html+="<option selected>"+n+"</option>";
+             
               setLayer(service,n);
             }else{
               html+="<option>"+n+"</option>";
