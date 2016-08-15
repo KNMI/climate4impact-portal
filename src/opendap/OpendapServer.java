@@ -553,7 +553,31 @@ public class OpendapServer {
           }
         }
       }else{
-        Debug.errprintln("Unsigned stuffs found!:"+attrName);
+        for(int j=0;j<vals.getSize();j++){
+          if(attrValue.length()>0)attrValue.append(",");
+          switch(type){
+          case BYTE:
+            attrValue.append((byte)Integer.toUnsignedLong(vals.getByte(j)));
+            break;
+          case CHAR:
+            attrValue.append(Integer.toUnsignedString(vals.getChar(j)));
+            break;
+          case SHORT:
+            attrValue.append(Integer.toUnsignedString(vals.getShort(j)));
+            break;
+          case INT:
+            attrValue.append(Integer.toUnsignedString(vals.getInt(j)));
+            break;
+          case LONG:
+            attrValue.append(Integer.toUnsignedLong((int) vals.getLong(j)));
+            break;
+
+          default:
+            foundType = false;
+            break;
+          }
+        }
+       // Debug.errprintln("Unsigned stuffs found!:"+attrName+":"+attrValue);
       }
       attrStr.append(attrValue);
       attrStr.append(";\n");

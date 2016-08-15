@@ -229,8 +229,19 @@ public class OpendapViewer {
             JSONObject attribute = new JSONObject();
             String attrName=attributes1.get(a).getAttrValue("name");
             String attrValue=attributes1.get(a).getAttrValue("value");
+            String attrType=null;
+            try{
+              attrType=attributes1.get(a).getAttrValue("type");
+            }catch(Exception e){
+              
+            }
             attribute.put("name",attrName);
             attribute.put("value",checkAttrValues(attrValue));
+            if(attrType!=null){
+              attribute.put("type",checkAttrValues(attrType));
+            }else{
+              attribute.put("type","string");
+            }
             
             
             if(attrName.equals("long_name"))longName=attrValue;
