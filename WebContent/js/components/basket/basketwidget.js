@@ -10,7 +10,7 @@ var BasketWidget = function() {
   var _init = function(){
     if(initialized == true)return;
     initialized = true;
-  
+
     Ext.define('basketgrid', {
       extend : 'Ext.data.Model',
       fields : [{
@@ -45,7 +45,7 @@ var BasketWidget = function() {
         type : 'string'
       }]
     });
-  
+
     store = Ext.create('Ext.data.TreeStore', {
       model : 'basketgrid',
       root : {
@@ -63,9 +63,9 @@ var BasketWidget = function() {
               }else{
                 if(t.getReader().rawData.statuscode == 401){
                   generateLoginDialog(function(){ 
-                	  store.reload();
-                	//  basketWindow.show();
-            	  });
+                    store.reload();
+                    //  basketWindow.show();
+                  });
                   return;
                 }else{
                   Ext.MessageBox.alert("Error","Response: Unable to load basket from server:\n"+ (t.getReader().rawData.message));
@@ -87,103 +87,112 @@ var BasketWidget = function() {
           }
         }
       }
-      
-      
+
+
     });
-    
+
     function endsWith(str, suffix) {
       return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
-    
+
     var getSelectedFilesForUsage = function(){
-	      if (tree.getSelectionModel().hasSelection()) {
-	        var pendingRequests = 0;
-	        var allFilesAssembled = function(selectedNode){
-	          if(pendingRequests!=0){
-	            console.log("Still some requests open");
-	            return;
-	          }else{
-	            console.log("OK continue!");
-	          }
-	          
-	          if (_callbackFunction) {
-	            if(selectedNode.length == 0){
-	              Ext.MessageBox.alert('Error','No valid nodes selected.');
-	            }
-	            var doClose = _callbackFunction(selectedNode);
-	            if (doClose === true) {
-	              for(w in openedWindows){
-	                w = openedWindows[w];
-	                try{
-	                  w.close();
-	                  w.destroy();
-	                }catch(e){
-	                }
-	              }
-	              openedWindows = [];
-	              
-	              basketWindow.close();
-	            }
-	          }else{
-	            Ext.MessageBox.alert('Error','Nothing to apply to.');
-	          }
-	        };
-	        
-	        
-	        var selectedNodesMixed = tree.getSelectionModel().getSelection();
-	        
-	        var selectedNode = [];
-	        
-	       
-	        //console.log(selectedNodesMixed);
-	        
-	        for ( var j = 0; j < selectedNodesMixed.length || j < 1; j++) {
-	          if(selectedNodesMixed[j].data.dapurl||selectedNodesMixed[j].data.httpurl){
-	            selectedNode.push(selectedNodesMixed[j].data);
-	          }
-	          if(selectedNodesMixed[j].data.catalogurl){
-	            pendingRequests++;
-	            var urlRequest = c4iconfigjs.impactservice+"service=catalogbrowser&mode=flat&format=application/json&node="+ URLEncode(selectedNodesMixed[j].data.catalogurl);
-	            console.log(urlRequest);
-	            $.ajax({
-	              url: urlRequest,
-	            }).done(function(data) {
-	            
-	              for(var j=0;j<data.files.length;j++){
-	                if(data.files[j].opendap){
-	                  if(endsWith(data.files[j].opendap,"aggregation")){
-	                    console.log("Skipping (aggregation) "+data.files[j].opendap);
-	                  }else{
-	                    console.log("Pushing "+data.files[j].opendap);
-	                    selectedNode.push({dapurl:data.files[j].opendap});
-	                  }
-	                  
-	                }
-	              }
-	              pendingRequests--;
-	              allFilesAssembled(selectedNode);
-	            }).fail(function() {
-              
-              }).always(function() {
-              
-              });
-	            //selectedNode.push({dapurl:selectedNodes[j].data.dapurl});
-	          }
-	        }
-	        allFilesAssembled(selectedNode);
-	      
-	        
-	        //
-	            // alert(selectedNode[0].data.dapurl + ' was selected');
-	  
-	      } else {
-	        Ext.MessageBox.alert('Error','No selected files.');
-	      }
+      if (tree.getSelectionModel().hasSelection()) {
+        var pendingRequests = 0;
+        var allFilesAssembled = function(selectedNode){
+          if(pendingRequests!=0){
+            console.log("Still some requests open");
+            return;
+          }else{
+            console.log("OK continue!");
+          }
+
+          if (_callbackFunction) {
+            if(selectedNode.length == 0){
+              Ext.MessageBox.alert('Error','No valid nodes selected.');
+            }
+            var doClose = _callbackFunction(selectedNode);
+            if (doClose === true) {
+              for(w in openedWindows){
+                w = openedWindows[w];
+                try{
+                  w.close();
+                  w.destroy();
+                }catch(e){
+                }
+              }
+              openedWindows = [];
+
+              basketWindow.close();
+            }
+          }else{
+            Ext.MessageBox.alert('Error','Nothing to apply to.');
+          }
+        };
+
+
+        var selectedNodesMixed = tree.getSelectionModel().getSelection();
+
+        var selectedNode = [];
+
+
+        //console.log(selectedNodesMixed);
+
+        for ( var j = 0; j < selectedNodesMixed.length || j < 1; j++) {
+          if(selectedNodesMixed[j].data.dapurl||selectedNodesMixed[j].data.httpurl){
+            selectedNode.push(selectedNodesMixed[j].data);
+          }
+          if(selectedNodesMixed[j].data.catalogurl){
+            pendingRequests++;
+            var urlRequest = c4iconfigjs.impactservice+"service=catalogbrowser&mode=flat&format=application/json&node="+ URLEncode(selectedNodesMixed[j].data.catalogurl);
+            console.log(urlRequest);
+            $.ajax({
+              url: urlRequest,
+            }).done(function(data) {
+
+              for(var j=0;j<data.files.length;j++){
+                if(data.files[j].opendap){
+                  if(endsWith(data.files[j].opendap,"aggregation")){
+                    console.log("Skipping (aggregation) "+data.files[j].opendap);
+                  }else{
+                    console.log("Pushing "+data.files[j].opendap);
+                    selectedNode.push({dapurl:data.files[j].opendap});
+                  }
+
+                }
+              }
+              pendingRequests--;
+              allFilesAssembled(selectedNode);
+            }).fail(function() {
+
+            }).always(function() {
+
+            });
+            //selectedNode.push({dapurl:selectedNodes[j].data.dapurl});
+          }
+        }
+        allFilesAssembled(selectedNode);
+
+
+        //
+        // alert(selectedNode[0].data.dapurl + ' was selected');
+
+      } else {
+        Ext.MessageBox.alert('Error','No selected files.');
+      }
     };
-  
+
     var getButtons = function(){
       var buttons =[{
+        text : 'Link file',
+        tooltip:'Link a file to your baskets remote data folder',
+        iconCls : 'ext-ui-icon-link',
+        handler : function() {
+          openLinkDialog();
+        }
+      },{
         text : 'Search',
+        tooltip:'Opens up the search window, data can be added to the basket from here',
+        iconCls:'ext-ui-icon-search',
         handler : function() {
           var el=jQuery('<div/>');
           renderSearchInterface({
@@ -193,15 +202,17 @@ var BasketWidget = function() {
             catalogbrowserservice:c4iconfigjs.impactservice,
             dialog:true
           });
-          
+
         }
-         
+
       },{
-        text : 'View file',
+        text : 'View',
+        tooltip:'Open the NetCDF file in the fileviewer',
+        iconCls:'ext-ui-icon-video',
         handler : function() {
           if (tree.getSelectionModel().hasSelection()) {
             var selectedNode = tree.getSelectionModel().getSelection();
-            
+
             if(selectedNode.length>1){
               Ext.MessageBox.alert('Error','Please select a single file to browse.');
               return;
@@ -213,43 +224,45 @@ var BasketWidget = function() {
           }
         }
       },{
-          text : 'Download file',
-          iconCls : 'icon-download',
-          handler : function() {
-            var downloadWin;
-            if (tree.getSelectionModel().hasSelection()) {
-              var selectedNodes = tree.getSelectionModel().getSelection();
-              if ((selectedNodes.length>1)||(selectedNodes.length==0)) { 
-              	  Ext.MessageBox.alert('Error','Please select exactly one file with HTTP enabled to download.');
-              } else {
-                var securePage=location.protocol=="https:";
-                var selectedNode = selectedNodes[0];
-                var httpURL = selectedNode.data.httpurl;
-                if(!httpURL){
-                  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
-                } else {
-                  if(openid){
-                    if(openid!=""){
-                      httpURL+="?openid="+openid;
-                    }
-                  }
-               	  if (downloadWin) {
-                	downloadwin.close();
-                  }
-              	  downloadWin=window.open(httpURL, 'dwnl', 'width=900,height=600,resizable=yes');
-                }
-              }
+        text : 'Download',
+        tooltip:'Download a file from your basket via the browser',
+        iconCls : 'ext-ui-icon-arrowthickstop-1-s',
+        handler : function() {
+          var downloadWin;
+          if (tree.getSelectionModel().hasSelection()) {
+            var selectedNodes = tree.getSelectionModel().getSelection();
+            if ((selectedNodes.length>1)||(selectedNodes.length==0)) { 
+              Ext.MessageBox.alert('Error','Please select exactly one file with HTTP enabled to download.');
             } else {
-              Ext.MessageBox.alert('Error','No selected files.');
+              var securePage=location.protocol=="https:";
+              var selectedNode = selectedNodes[0];
+              var httpURL = selectedNode.data.httpurl;
+              if(!httpURL){
+                Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
+              } else {
+                if(openid){
+                  if(openid!=""){
+                    httpURL+="?openid="+openid;
+                  }
+                }
+                if (downloadWin) {
+                  downloadwin.close();
+                }
+                downloadWin=window.open(httpURL, 'dwnl', 'width=900,height=600,resizable=yes');
+              }
             }
+          } else {
+            Ext.MessageBox.alert('Error','No selected files.');
           }
+        }
       },{
         text : 'Script download',
-        iconCls : 'icon-download',
+        tooltip:'Creates a download script which is able to download multiple files at once',
+        iconCls : 'ext-ui-icon-arrowthickstop-1-s',
         handler : function() {
           if (tree.getSelectionModel().hasSelection()) {
             var selectedNodes = tree.getSelectionModel().getSelection();
-            
+
             console.log('INFO Script Download: '+selectedNodes.length+" files");
             var urlList=[];
             var i;
@@ -257,54 +270,56 @@ var BasketWidget = function() {
               var selectedNode = selectedNodes[i];
               var httpURL = selectedNode.data.httpurl;
               if(!httpURL){
-            	  Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
-            	  continue; //return;
+                Ext.MessageBox.alert('Error','Please select a file with HTTP enabled to download.');
+                continue; //return;
               }
               urlList.push(httpURL);
               console.log(selectedNode);
             }
             if (urlList.length>0) {
-            	var mySecureHostname="https:"+"//"+window.location.hostname;
-            	var scriptForm = $('<form/>', {
-            		action: serverurlhttps+"/account/downloadscript.jsp",
-            		target: "_blank",
-            		method: "post"
-            	});
-            	scriptForm.append($("<input/>", {
-            		type: "hidden",
-            		name: "urls",
-            		value: urlList.join("\r\n")
-            	}));
-            	if ((openid) && (openid != "")) {
-            		scriptForm.append($("<input/>", {
-            			type: "hidden",
-            			name: "openid",
-            			value: openid
-            		}));
-            	}
-            	$("body").append(scriptForm);
-            	scriptForm.submit();
+              var mySecureHostname="https:"+"//"+window.location.hostname;
+              var scriptForm = $('<form/>', {
+                action: serverurlhttps+"/account/downloadscript.jsp",
+                target: "_blank",
+                method: "post"
+              });
+              scriptForm.append($("<input/>", {
+                type: "hidden",
+                name: "urls",
+                value: urlList.join("\r\n")
+              }));
+              if ((openid) && (openid != "")) {
+                scriptForm.append($("<input/>", {
+                  type: "hidden",
+                  name: "openid",
+                  value: openid
+                }));
+              }
+              $("body").append(scriptForm);
+              scriptForm.submit();
             } else {
-            	Ext.MessageBox.alert('Error','No selected files.');
+              Ext.MessageBox.alert('Error','No selected files.');
             }
           } else {
             Ext.MessageBox.alert('Error','No selected files.');
           }
         }
       },{
-          text : 'Upload file',
-          iconCls : 'icon-download',
-          handler : function() {
-        	 window.location='upload.jsp'; 
-          }
-        },{
-        text : 'Delete file(s)',
-        iconCls : 'button_remove',
+        text : 'Upload',
+        tooltip:'Upload a file from your  computer to your basket',
+        iconCls : 'ext-ui-icon-arrowthickstop-1-n ',
         handler : function() {
-          
-         
-          
-          
+          window.location='upload.jsp'; 
+        }
+      },{
+        text : 'Delete',
+        tooltip:'Deletes the selected files or directories',
+        iconCls : 'ext-ui-icon-trash',
+        handler : function() {
+
+
+
+
           if (tree.getSelectionModel().hasSelection()) {
             Ext.MessageBox.show({
               title:'Messagebox Title',
@@ -325,39 +340,42 @@ var BasketWidget = function() {
                         }
                       }
                     }
-                    
+
                   }
-                  basket.removeId(itemsToRemove);
+                  basket.removeId(itemsToRemove,function(){t.reload();});
                   store.sync();
+
                 }
               }
             });
           } else {
             Ext.MessageBox.alert('Error','No selected files.');
           }
+          ;
         }
       },{
-        text : 'Reload basket',
-        
-        iconCls : 'button_refresh',
+        text : 'Reload',
+        tooltip:'Reloads the basket',
+
+        iconCls : 'ext-ui-icon-refresh',
         handler : function() {
           store.reload();
         }
       }];
-      
+
       if(_callbackFunction){
         var useFileButton =  {
-          text : 'Use file(s)',
-          handler : function() {
-        	  getSelectedFilesForUsage();
-          }
-          
+            text : 'Use file(s)',
+            handler : function() {
+              getSelectedFilesForUsage();
+            }
+
         };
         buttons.push(useFileButton);
       }
       return buttons;
     }
-    
+
     var showFileInfo = function(record,frombutton){
       if (!record.get('dapurl')&&!record.get('catalogurl')) {
         if(record.get('leaf')==false){
@@ -370,22 +388,22 @@ var BasketWidget = function() {
         return;
       }
       if(record.get('dapurl')){
-//        var fileViewer = new ExtFileViewer();
-//        var w = Ext.create('Ext.Window', {
-//          width : 900,
-//          height : 680,
-//          autoScroll : true,
-//          autoDestroy : true,
-//          closeAction : 'destroy',
-//          frame : false,
-//          title : 'NetCDF metadata',
-//          layout : 'fit',
-//          items : fileViewer.getViewer()
-//        });
-//        w.show();
-//        openedWindows.push(w);
-//        fileViewer.load(record.get('dapurl'));
-        
+//      var fileViewer = new ExtFileViewer();
+//      var w = Ext.create('Ext.Window', {
+//      width : 900,
+//      height : 680,
+//      autoScroll : true,
+//      autoDestroy : true,
+//      closeAction : 'destroy',
+//      frame : false,
+//      title : 'NetCDF metadata',
+//      layout : 'fit',
+//      items : fileViewer.getViewer()
+//      });
+//      w.show();
+//      openedWindows.push(w);
+//      fileViewer.load(record.get('dapurl'));
+
         var el=jQuery('<div/>');
         renderFileViewerInterface({element:el,
           service:c4iconfigjs.impactservice,
@@ -398,21 +416,21 @@ var BasketWidget = function() {
         });   
       }else if(record.get('catalogurl')){
         var el = jQuery('<div></div>', {
-            title: record.get("id"),
-          }).dialog({
-            width:900,
-            height:500
-          });
-          el.html('<div class="ajaxloader"></div>');
+          title: record.get("id"),
+        }).dialog({
+          width:900,
+          height:500
+        });
+        el.html('<div class="ajaxloader"></div>');
         //var callback = function(data){
-          
-          renderCatalogBrowser({element:el,url:record.get('catalogurl')});
-          //alert("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
+
+        renderCatalogBrowser({element:el,url:record.get('catalogurl')});
+        //alert("Found "+data.numFiles+" files with totalsize of "+data.fileSize+" bytes");
         //}
         //window.open('/impactportal/data/catalogbrowser.jsp?catalog='+URLEncode(record.get('catalogurl')));
       }
     };
-    
+
     tree = Ext.create('Ext.tree.Panel', {
       store : store,
       rootVisible : false,
@@ -421,36 +439,36 @@ var BasketWidget = function() {
       singleExpand : false,
       border:false,
       columns : [
-          {
-            xtype : 'treecolumn', // this is so we know which column will show the
-                                  // tree
-            text : 'File',
-            flex : 2,
-            sortable : true,
-            dataIndex : 'text'
-          },{
-            text : 'Type',
-            width : 65,
-            dataIndex : 'type',
-            hidden:true
-          },{
-            text : 'DAP',
-            width : 60,
-            dataIndex : 'hasdap'
-          },{
-            text : 'HTTP',
-            width : 60,
-            dataIndex : 'hashttp'
-          },{
-            text : 'Filesize',
-            width : 80,
-            dataIndex : 'filesize'
-          },{
-            text : 'Date',
-            width : 200,
-            dataIndex : 'date',
-            hidden:false
-          }/*,{
+                 {
+                   xtype : 'treecolumn', // this is so we know which column will show the
+                   // tree
+                   text : 'File',
+                   flex : 2,
+                   sortable : true,
+                   dataIndex : 'text'
+                 },{
+                   text : 'Type',
+                   width : 65,
+                   dataIndex : 'type',
+                   hidden:true
+                 },{
+                   text : 'DAP',
+                   width : 60,
+                   dataIndex : 'hasdap'
+                 },{
+                   text : 'HTTP',
+                   width : 60,
+                   dataIndex : 'hashttp'
+                 },{
+                   text : 'Filesize',
+                   width : 80,
+                   dataIndex : 'filesize'
+                 },{
+                   text : 'Date',
+                   width : 200,
+                   dataIndex : 'date',
+                   hidden:false
+                 }/*,{
             text : 'Info',
             width : 40,
             menuDisabled : true,
@@ -462,26 +480,26 @@ var BasketWidget = function() {
               showFileInfo(record);
             }
           }*/],
-      buttons : getButtons(),
-      listeners:{
-        itemdblclick:{
-          fn:function(e,node,e){
-        	if(_callbackFunction){
-        		getSelectedFilesForUsage();
-        	}else{
-        		showFileInfo(node,false);
-        	}
+          buttons : getButtons(),
+          listeners:{
+            itemdblclick:{
+              fn:function(e,node,e){
+                if(_callbackFunction){
+                  getSelectedFilesForUsage();
+                }else{
+                  showFileInfo(node,false);
+                }
+              }
+            }
           }
-        }
-      }
     });
   }
 
   t.show = function(callbackFunction) {
-	  
+
     _callbackFunction = callbackFunction;
     if (basketWindow == undefined) {
-	  _init();
+      _init();
       basketWindow = Ext.create('Ext.Window', {
         width : 900,
         height : 550,
@@ -497,17 +515,17 @@ var BasketWidget = function() {
           afterrender : {
             fn : function() {
               window.setTimeout(function(){store.load();;}, 300);    
-              
+
 
             }
           }
         }
       });
     }
-  
+
     basketWindow.show();
   };
-  
+
   t.embed = function(element,callbackFunction){
     _callbackFunction = callbackFunction;
     _init();
@@ -534,6 +552,86 @@ var BasketWidget = function() {
   this.reload = function(){
     store.reload();
   };
+
+  var linkDialog;
+  var openLinkDialog=function(){
+
+    var linkFile = function(){
+      var input=Ext.getCmp('c4i-basket-linkfiletextfield').getValue().trim();
+      var httpserver="null";
+      var opendap = "null";
+      var catalogURL="null";
+
+      if(input.indexOf("fileServer")!=-1){
+        httpserver = input;
+      }
+      if(input.indexOf("dodsC")!=-1){
+        opendap= input;
+      }
+      if(input.endsWith(".xml")||input.endsWith(".html")){
+        catalogURL= input;
+        catalogURL = catalogURL.replace(".html",".xml");
+      }
+
+      if(opendap == "null" && httpserver != "null"){
+        opendap = httpserver.replace("fileServer","dodsC");
+        alert("<h1>Info:</h1> You entered a URL with HTTP enabled.<br/>Automatically derived opendap by replacing fileServer by dodsC.");
+      }
+
+      var id = input.substring(input.lastIndexOf("/")+1);
+//      console.log(id);
+//      console.log(httpserver);
+//      console.log(opendap);
+//      console.log(catalogURL);
+      //http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/tudo/tier3/WATER_LUISA_2010-2050.nc
+      basket.postIdentifiersToBasket({id:id,
+        httpserver:httpserver,
+        opendap:opendap,
+        catalogURL:catalogURL});
+      linkDialog.close();
+    };
+
+    if(!linkDialog){
+
+      linkDialog = Ext.create('Ext.Window', {
+        width : 900,
+        height : 100,
+        autoScroll : true,
+        autoDestroy : false,
+        modal:true,
+        closeAction : 'hide',
+        frame : false,
+        title : 'Link a file to your basket by URL',
+        layout : 'fit',
+        items : [{xtype:'textfield',id: 'c4i-basket-linkfiletextfield',    listeners: {
+          specialkey: function(f,e){
+            if(e.getKey() == e.ENTER){
+              linkFile();
+            }
+          }
+        }}],
+
+        buttons:[{
+          text:'Cancel',
+          iconCls:'ext-ui-icon-cancel',
+          tooltip:'Cancel',
+          handler:function(){linkDialog.close();}
+
+        },{
+          text:'Link',
+          tooltip:'Link this file to your basket',
+          iconCls : 'ext-ui-icon-link',
+          handler:function(){
+            linkFile()
+          }
+        }]
+
+      });
+    }
+    linkDialog.show();
+
+
+  }
 };
 
 var basketWidget = new BasketWidget();

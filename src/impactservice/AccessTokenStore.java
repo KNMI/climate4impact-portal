@@ -1,7 +1,9 @@
 package impactservice;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import impactservice.GenericCart.DataLocator;
 import tools.Debug;
 
 public class AccessTokenStore {
@@ -23,38 +26,38 @@ public class AccessTokenStore {
    * Map of access_tokens, key is the access_token, value is the stringified JSONObject.
    */
   private static Map<String, String> access_tokens = Collections.synchronizedMap(new TreeMap<String,String>());
-  
+
   /**
    * Determines wether the store is already loaded from a file.
    */
   private static long isTokenStoreLoaded = -1;//Time at which store was loaded
-  
+
   public static class AccessTokenHasExpired extends Exception {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-  
+
   }
-  
+
   public static class AccessTokenIsNotYetValid extends Exception {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-  
+
   }
-  
-  public static void loadAccessTokens() throws  JSONException{
+
+  public static synchronized void loadAccessTokens() throws  JSONException{
     long currentDateMillis = tools.DateFunctions.getCurrentDateInMillis();
-    
-   if((currentDateMillis-isTokenStoreLoaded)/1000<10 && isTokenStoreLoaded!=-1){
+
+    if((currentDateMillis-isTokenStoreLoaded)/1000<10 && isTokenStoreLoaded!=-1){
       //Debug.println("Skipping loadAccessTokens, mssec: "+(currentDateMillis-isTokenStoreLoaded));
       return;
     }
-    
+    isTokenStoreLoaded = currentDateMillis;
     String fileName = Configuration.getImpactWorkspace()+"tokens.json";
     Debug.println("loadAccessTokens:"+fileName);
     String accessTokenData = null;
@@ -63,7 +66,7 @@ public class AccessTokenStore {
     }catch(IOException e){
       return;
     }
-    
+
     JSONObject a = (JSONObject) new JSONTokener(accessTokenData).nextValue();
     @SuppressWarnings("unchecked")
     Iterator<String> b = a.keys();
@@ -75,22 +78,23 @@ public class AccessTokenStore {
       access_tokens.put(c, d.toString());
     }
 
-    isTokenStoreLoaded = currentDateMillis;
+
   }
-  
-  public static void saveAccessTokens() throws JSONException, IOException{
+
+  public static synchronized void saveAccessTokens() throws JSONException, IOException{
     if(access_tokens.size()==0)return;
     String fileName = Configuration.getImpactWorkspace()+"tokens.json";
     Debug.print("saveAccessTokens:"+fileName+" found nr of tokens: "+access_tokens.size());
-      JSONObject a = new JSONObject();
-      for (Entry<String, String> param : access_tokens.entrySet()) {
-        a.put(param.getKey(),(JSONObject) new JSONTokener(param.getValue()).nextValue());
-      }
-      tools.Tools.writeFile(fileName, a.toString());
-      a = null;
+    JSONObject a = new JSONObject();
+    for (Entry<String, String> param : access_tokens.entrySet()) {
+      a.put(param.getKey(),(JSONObject) new JSONTokener(param.getValue()).nextValue());
+    }
+    tools.Tools.writeFile(fileName, a.toString());
+    a = null;
   }
-  
+
   public static JSONObject getAccessToken(ImpactUser user,long ageValidInSeconds) throws JSONException, IOException{
+    Debug.println("GetAccessToken");
     Vector<String> tokens = listtokens(user); 
     for(int j=0;j<tokens.size();j++){
       JSONObject a = (JSONObject) new JSONTokener(tokens.get(j)).nextValue();
@@ -110,14 +114,14 @@ public class AccessTokenStore {
     }
     return generateAccessToken(user);
   }
-  
+
   public static JSONObject generateAccessToken(ImpactUser user){
     UUID idOne = UUID.randomUUID();
     Debug.println("UUID :"+idOne);
     JSONObject jsonObject = new JSONObject();
     try {
       jsonObject.put("token", ""+idOne);
-      jsonObject.put("userid", ""+user.getId());
+      jsonObject.put("userid", ""+user.getUserId());
       if(user.getOpenId()!=null){
         jsonObject.put("openid", ""+user.getOpenId());
       }
@@ -134,7 +138,7 @@ public class AccessTokenStore {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      
+
     } catch (JSONException e) {
     }
     String token = jsonObject.toString();
@@ -154,20 +158,29 @@ public class AccessTokenStore {
 
   public static Vector<String> listtokens(ImpactUser user) throws JSONException, IOException{
     loadAccessTokens();
-    Vector<String> tokenList = new Vector<String>();
+    class TokenObject{
+      public TokenObject(JSONObject jsonTokenizedToken) throws JSONException {
+        token = jsonTokenizedToken.toString();
+        creationdate = jsonTokenizedToken.getString("creationdate");
+      }
+      String token;
+      String creationdate;
+    }
+    Vector<TokenObject> tokenObjectListUnsorted = new Vector<TokenObject>();
     Vector<String> tokensToRemove = new Vector<String>();
     for (Entry<String, String> param : access_tokens.entrySet()) {
-      JSONObject o = (JSONObject) new JSONTokener(param.getValue()).nextValue();
+      JSONObject jsonTokenizedToken = (JSONObject) new JSONTokener(param.getValue()).nextValue();
       try{
-        
+
         String token = null;
-      
+
         token = _checkIfTokenIsValid(param.getKey());
-      
+
         if(token!=null){
-          String userid = o.getString("userid");
-          if(userid.equals(user.getId())){
-            tokenList.add(o.toString());
+          String userid = jsonTokenizedToken.getString("userid");
+          if(userid.equals(user.getUserId())){
+            TokenObject tokenObj = new TokenObject(jsonTokenizedToken);
+            tokenObjectListUnsorted.add(tokenObj);
           }
         }else{
           tokensToRemove.add(param.getKey());
@@ -183,15 +196,29 @@ public class AccessTokenStore {
     }
     //Remove tokens:
     for(int j=0;j<tokensToRemove.size();j++){
-      Debug.println("Removing token "+tokensToRemove.get(j)+" for user "+user.getId());
+      Debug.println("Removing token "+tokensToRemove.get(j)+" for user "+user.getUserId());
       access_tokens.remove(tokensToRemove.get(j));
     }
     if(tokensToRemove.size()>0){
       saveAccessTokens();
     }
-    return tokenList;
+    
+    TokenObject[] tokenObjectArray = (TokenObject[]) tokenObjectListUnsorted.toArray(new TokenObject[tokenObjectListUnsorted.size()]);
+    
+    Arrays.sort(tokenObjectArray, new Comparator<TokenObject>(){
+      public int compare(TokenObject o1, TokenObject o2) {
+        return o2.creationdate.compareTo(o1.creationdate);
+      }
+    });
+
+    
+    Vector<String> tokenListSorted = new Vector<String>();
+    for(int j=0;j<tokenObjectArray.length;j++){
+      tokenListSorted.add(tokenObjectArray[j].token);
+    }
+    return tokenListSorted;
   }
-  
+
   private static String _checkIfTokenIsValid(String token){
     try {
       loadAccessTokens();
@@ -218,20 +245,20 @@ public class AccessTokenStore {
           throw new AccessTokenHasExpired();
         }
         //
-//        Debug.println("Token is valid, now check cert");
-//        ImpactUser user = LoginManager.getUser(a.getString("userid"), null);
-//        LoginManager.checkLogin(user);
-        
+        //        Debug.println("Token is valid, now check cert");
+        //        ImpactUser user = LoginManager.getUser(a.getString("userid"), null);
+        //        LoginManager.checkLogin(user);
+
         return v;
       } catch (Exception e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      
-      
+
+
       a = null;
     }
-    
+
     return null;
   }
 
@@ -241,7 +268,7 @@ public class AccessTokenStore {
     if(pathInfo!=null){
       String[] paths = pathInfo.split("/");
       String path  = null;
-     
+
       //Strip access code from path and build a new path
       for(int j=0;j<paths.length&&j<2;j++){
         if(path==null){
@@ -255,15 +282,15 @@ public class AccessTokenStore {
       if(path.indexOf(".")!=-1){
         return null;
       }
-      
-    
+
+
       try {
         String a = AccessTokenStore._checkIfTokenIsValid(path);
         if(a==null){
           Debug.println("[NOPE] Token is not Valid");
           return null;
         }
-        
+
         JSONObject props = (JSONObject) new JSONTokener(a).nextValue();
         String userID = props.getString("userid");
         if(debug)Debug.println("[OK] Token is Valid for user "+userID);
@@ -273,8 +300,47 @@ public class AccessTokenStore {
       } catch (Exception e) {
         Debug.println("[NOPE:EXECPTION] Token is not Valid");
       }
-      
+
     }
     return null;
+  }
+
+  public static JSONObject revokeAccessToken(ImpactUser user, String token) throws IOException {
+    JSONObject jsonObject = new JSONObject();
+    try{
+      try {
+        loadAccessTokens();
+      } catch (JSONException e1) {
+        jsonObject.put("message", "unable to load access tokens");
+        jsonObject.put("status", "failed");
+        return jsonObject;
+      }
+
+      String v = access_tokens.get(token);
+      if(v==null){
+        jsonObject.put("message", "token not found.");
+        jsonObject.put("status", "failed");
+      }else{
+        JSONObject props = null;
+        props = (JSONObject) new JSONTokener(v).nextValue();
+        String userID = null;
+        try {
+          userID = props.getString("userid");
+        } catch (JSONException e1) {
+        }
+
+        if(user.getUserId().equals(userID)==false){
+          jsonObject.put("message", "Token user ID does not match your user ID.");
+          jsonObject.put("status", "failed");
+        }else{
+          access_tokens.remove(token);
+          saveAccessTokens();
+          jsonObject.put("message", "Removed token for user ["+userID+"].");
+          jsonObject.put("status", "ok");
+        }
+      } 
+    } catch (JSONException e) {
+    }
+    return jsonObject;
   }
 }

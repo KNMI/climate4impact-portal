@@ -149,7 +149,7 @@ public class CLIPCTokenAPI extends HttpServlet {
       Debug.errprintln("Unable to find user in store ["+userId+"]");
       return -1; 
     }
-    Debug.println("Found user "+user.getInternalName());
+    Debug.println("Found user "+user.getUserId());
     try {
       jsonResponse.setMessage(AccessTokenStore.getAccessToken(user,60*60*8).toString());
     } catch (JSONException e) {

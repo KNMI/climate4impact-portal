@@ -34,13 +34,11 @@
       	%>
       	var impactservice='<%=impactservice.Configuration.getImpactServiceLocation()%>service=search&';
       	
-      	<%
-      		try{
-      			request.setAttribute("loggedInUser", LoginManager.getUser(request).getInternalName());
+      	<%try{
+      			request.setAttribute("loggedInUser", LoginManager.getUser(request).getUserId());
       		}catch(Exception e){
       			request.setAttribute("loggedInUser", null);
-      		}
-      	%>
+      		}%>
 		var loggedInUser = '${loggedInUser}';
       	var sortedKeys = ['variableType','variable','zone','predictand','downscalingType','downscalingMethod','datasetType','dataset', 'sYear', 'eYear', 'scenario'];
       	  
@@ -187,14 +185,14 @@
 			<h1>Load saved downscalings</h1>
 				<select id="select-saved-downscalings" value="empty">
 				    <option value="empty"> Select a saved config</option>
-				    <% 
-				    	String username = LoginManager.getUser(request).getInternalName();
-				    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
-				    	if(configsMap != null){
-				     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
-					     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
-					     	}
-				    	}
+				    <%
+				    	String username = LoginManager.getUser(request).getUserId();
+				    		    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
+				    		    	if(configsMap != null){
+				    		     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
+				    			     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
+				    			     	}
+				    		    	}
 				    %>
 				</select>
 			

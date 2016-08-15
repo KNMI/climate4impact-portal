@@ -11,6 +11,7 @@
     
     <script type="text/javascript" src="../js/jquery.blockUI.js"></script>    
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <script type="text/javascript" src="fileviewer/vkbeautify.js"></script>
     <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>

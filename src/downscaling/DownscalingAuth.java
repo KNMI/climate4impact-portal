@@ -191,7 +191,7 @@ public class DownscalingAuth{
   }
   
   public static boolean isUserSubscribed(ImpactUser user)throws ServletException, IOException{
-    if(getUser(user, user.getInternalName()) != null)
+    if(getUser(user, user.getUserId()) != null)
       return true;
     return false;
           
@@ -215,7 +215,7 @@ public class DownscalingAuth{
       String internalName;
       if(jsonResponse.getString("responseStatus").equals(responseStatus.OK.toString()) && jsonResponse.optJSONObject("value") != null){
         internalName = jsonResponse.getJSONObject("value").getString("username");
-        if(internalName.equals(user.getInternalName())){
+        if(internalName.equals(user.getUserId())){
           Debug.println("User found in DP: " + internalName);
           return user;
         }

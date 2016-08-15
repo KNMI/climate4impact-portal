@@ -58,6 +58,7 @@
     <script type="text/javascript" src="../js/components/basket/basket.js"></script>
 
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
+    <script type="text/javascript" src="fileviewer/vkbeautify.js"></script>
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     

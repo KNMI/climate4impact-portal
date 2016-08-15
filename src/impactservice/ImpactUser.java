@@ -3,6 +3,7 @@ package impactservice;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -10,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import tools.DateFunctions;
 import tools.Debug;
 import tools.HTTPTools;
 import tools.Tools;
@@ -20,7 +22,7 @@ import tools.Tools;
 public class ImpactUser {
   static boolean debug=false;
   private String id = null; // The unique ID of the user object
-  private String internalName = null;
+  private String _internalName = null;
   private String usersDir = null;
   private String loginInfo = null; /* String composed by checklogin function based on login params */
   private String certInfo = null;
@@ -60,7 +62,7 @@ public class ImpactUser {
 
   synchronized public GenericCart getProcessingJobList(){
     GenericCart processingJobsList = null;
-    Debug.println("getProcessingJobList for "+this.getInternalName());
+    Debug.println("getProcessingJobList for "+this.getUserId());
     try{
       processingJobsList = new GenericCart("processingJobsList",this);
       processingJobsList.loadFromStore();
@@ -106,16 +108,11 @@ public class ImpactUser {
   }
   
   
-  public String getInternalName() {
-//    String internalName= getId().replace("http://", "");
-//    internalName = internalName.replace("https://", "");
-//    internalName = internalName.replaceAll("/", ".");
-    return getId();//internalName;
-  }
+
 //  public void _setInternalName(String internalName) {
 //    this.internalName = internalName;
 //  }
-  public String getId(){
+  public String getUserId(){
     return id;
   }
   public String getEmailAddress() {
@@ -143,7 +140,7 @@ public class ImpactUser {
     return getEmailAddress();
   }
   public String getDataURL() {
-    String url = HTTPTools.makeCleanURL(Configuration.getHomeURLHTTPS()+"/DAP/"+internalName);
+    String url = HTTPTools.makeCleanURL(Configuration.getHomeURLHTTPS()+"/DAP/"+getUserId());
     url = url.replace("?","/");
     return url;
   }
@@ -156,7 +153,7 @@ public class ImpactUser {
     if(string.equals("admin")){
       String adminUsers[] = Configuration.Admin.getIdentifiers();
       
-      String id = getId();
+      String id = getUserId();
       Debug.println("HasRole ID "+id);
       for(int j=0;j<adminUsers.length;j++){
         //Debug.println(adminUsers[j]+" -- "+id);
@@ -252,12 +249,13 @@ public class ImpactUser {
   }
   
 
+
   /*Properties in a json file on disk can be loaded*/
   public void loadProperties() {
-    Debug.println("loadProperties");
+    //Debug.println("loadProperties");
     String userPropertiesFile = this.getWorkspace()+"/userprops.json";
     try {
-      String data = tools.Tools.readFile(userPropertiesFile);
+      String data = tools.LazyCaller.getInstance().readFile(userPropertiesFile);
       JSONObject searchResults =  (JSONObject) new JSONTokener(data).nextValue();
       try {
         this.openid = searchResults.getString("openid");
@@ -277,10 +275,8 @@ public class ImpactUser {
       } catch (JSONException e) {
       }
       
-    } catch (IOException e) {
-    } catch (JSONException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     } 
     
   }  
@@ -292,8 +288,8 @@ public class ImpactUser {
    * - certificateValidityNotAfter
    * */
   
-  public void saveProperties() {
-    Debug.println("saveProperties");
+  public void _saveProperties() {
+    //Debug.println("saveProperties");
     String userPropertiesFile = this.getWorkspace()+"/userprops.json";
     JSONObject userProps = new JSONObject();
     
@@ -310,7 +306,7 @@ public class ImpactUser {
     
     try {
       //Debug.println("Writing properties to " +userPropertiesFile);
-      tools.Tools.writeFile(userPropertiesFile, userProps.toString());
+      tools.LazyCaller.getInstance().writeFile(userPropertiesFile, userProps.toString());
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

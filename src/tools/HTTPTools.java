@@ -83,7 +83,7 @@ public class HTTPTools extends HttpServlet {
       'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
       'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '|', '&',
-      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')',';','%'};
+      '.', ',', '~', ' ','/',':','?','_','#','=' ,'(',')',';','%','[',']'};
   /**
    * Validates input for valid tokens, preventing XSS attacks. Throws Exception when invalid tokens are encountered.
    * @param input The string as input
@@ -187,8 +187,8 @@ public class HTTPTools extends HttpServlet {
   private static String _makeHTTPGetWithHeaderRequest(String url, String pemFile,
       String trustRootsFile, String trustRootsPassword,String basicAuthUserName,String basicAuthPassword, KVPKey headers, int timeOutMs)
       throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException, SSLException {
-    Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
-    Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
+   // Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
+    //Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
     String connectToURL = makeCleanURL(url);
  //   Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
@@ -359,6 +359,16 @@ public class HTTPTools extends HttpServlet {
     return param;
   }
 
+  public static String getHTTPParamNoExceptionButNull(HttpServletRequest request, String name){
+    try {
+      return getHTTPParam(request,name);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
   /**
    * Get values for a multiple keys with the same name in a URL, 
    * e.g. ?variable=psl&variable=tas means: key="variable" value="psl,tas" (as list) 
@@ -704,6 +714,12 @@ public class HTTPTools extends HttpServlet {
 
     body = stringBuilder.toString();
     return body;
+  }
+
+  public static boolean isURL(String url) {
+    if(url.startsWith("https://"))return true;
+    if(url.startsWith("http://"))return true;
+    return false;
   }
   
 }

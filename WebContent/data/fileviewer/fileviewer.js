@@ -302,6 +302,16 @@ var FileViewerInterface = function(options){
     
   };
   
+  //Use the browser's built-in functionality to quickly and safely escape
+  //the string
+  function escapeHtml(str) {
+     var div = document.createElement('div');
+     div.appendChild(document.createTextNode(str));
+     var value = div.innerHTML;
+     value=value.replaceAll("\n","<br/>");
+     value=value.replaceAll(" ","&nbsp;");
+     return value;
+  };
   
   function handleErrorMessage(data){
     
@@ -459,9 +469,15 @@ var FileViewerInterface = function(options){
         data[v].preview=preview;
       }
       
+      
       html+="      <table class=\"c4i-fileviewer-table\">";
       for(var j=0;j<data[v].attributes.length;j++){
-        html+="      <tr><td class=\"c4i-fileviewer-table-td-name\">"+data[v].attributes[j].name+"</td><td class=\"c4i-fileviewer-table-td-value\">"+ data[v].attributes[j].value+"</td></tr>";
+        var value =  data[v].attributes[j].value;
+        if(data[v].attributes[j].name == "bundle" || data[v].attributes[j].name == "lineage"){
+          value = vkbeautify.json(data[v].attributes[j].value,2);
+        }
+        value = escapeHtml(value);
+        html+="      <tr><td class=\"c4i-fileviewer-table-td-name\">"+data[v].attributes[j].name+"</td><td class=\"c4i-fileviewer-table-td-value\">"+ value+"</td></tr>";
       }
       html+="      </table>";
       html+='    </div>';

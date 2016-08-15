@@ -47,12 +47,12 @@
 					<td style="background-color:#DDD;"><b>X</b></td>
 				</tr>
 				<%
-				List<Job> jobs = DownscalingService.getUserJobs(LoginManager.getUser(request).getInternalName());
-				for(int i=0;i<jobs.size();i++){
-					Job job = jobs.get(i);
-					out.print("<tr><td>"+job.getId()+"</td>"+"<td>"+job.getType().trim()+"</td>"+"<td>"+job.getJobStatus()+"</td><td>none</td><td>none</td><td>none</td>"+"</tr>");
-				}
-				 %>
+					List<Job> jobs = DownscalingService.getUserJobs(LoginManager.getUser(request).getUserId());
+						for(int i=0;i<jobs.size();i++){
+							Job job = jobs.get(i);
+							out.print("<tr><td>"+job.getId()+"</td>"+"<td>"+job.getType().trim()+"</td>"+"<td>"+job.getJobStatus()+"</td><td>none</td><td>none</td><td>none</td>"+"</tr>");
+						}
+				%>
 			</table>
   		</div>
 	</c:if>	

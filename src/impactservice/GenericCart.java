@@ -612,7 +612,7 @@ public class GenericCart {
           String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
 
           if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
-            dataset.put("dapurl",dapLocationHTTPS+impactUser.getInternalName()+"/"+path+fileEntry[f].getName());
+            dataset.put("dapurl",dapLocationHTTPS+impactUser.getUserId()+"/"+path+fileEntry[f].getName());
             dataset.put("hasdap",true);
             dataset.put("iconCls", "typeOF");
           }
@@ -620,7 +620,7 @@ public class GenericCart {
             dataset.put("catalogurl",impactUser.getDataURL()+fileEntry[f].getName());
             dataset.put("catalog",true);
           }
-          dataset.put("httpurl",dapLocationHTTPS+impactUser.getInternalName()+"/"+path+fileEntry[f].getName());
+          dataset.put("httpurl",dapLocationHTTPS+impactUser.getUserId()+"/"+path+fileEntry[f].getName());
           dataset.put("hashttp",true);
           dataset.put("id",path+fileEntry[f].getName());
           dataset.put("type","file");

@@ -67,7 +67,7 @@ public class OpendapViewer {
    
       try{
         user=LoginManager.getUser(request);
-        Debug.println("INFO: User logged in: "+user.getInternalName());
+        Debug.println("INFO: User logged in: "+user.getUserId());
       }catch(Exception e){
         Debug.println("INFO: User NOT logged in");
       }

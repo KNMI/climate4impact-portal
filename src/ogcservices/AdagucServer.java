@@ -47,7 +47,7 @@ public class AdagucServer extends HttpServlet{
       ImpactUser user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
-      Debug.println("WMS for user: "+user.getId());
+      Debug.println("WMS for user: "+user.getUserId());
     }catch(Exception e){    
 //        /* This checks when a resource needs authentication and there is no user is signed in, 
 //         * the user is redirected to the login screen.

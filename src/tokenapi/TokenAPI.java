@@ -42,6 +42,7 @@ public class TokenAPI extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	  String serviceStr = null;
     JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
+    
 	  serviceStr=request.getParameter("service");
 	  if(serviceStr==null){
 	    serviceStr=request.getParameter("SERVICE");
@@ -75,28 +76,39 @@ public class TokenAPI extends HttpServlet {
 
     Debug.println("Service \"account\"");
     JSONResponse jsonResponse = new JSONResponse(request);
-    try {
-      String requestStr=HTTPTools.getHTTPParam(request, "request");
-      ImpactUser user = null;
-      user = LoginManager.getUser(request);
-      if(requestStr.equals("generatetoken")){
-        jsonResponse.setMessage(AccessTokenStore.generateAccessToken(user).toString());
-      }
-      if(requestStr.equals("listtokens")){
-        
-        JSONArray a = new JSONArray();
-        Vector<String> accessTokens = AccessTokenStore.listtokens(user);
-        for(int j=0;j<accessTokens.size();j++){
-          a.put((JSONObject) new JSONTokener(accessTokens.get(j)).nextValue());
-        }
-        jsonResponse.setMessage(a.toString());
-        a = null;
-      }
-    } catch(Exception e){
-      e.printStackTrace();
-      jsonResponse.setException("Service account failed",e);
-    }
     
+    if(request.isSecure() == false){
+      jsonResponse.setMessage("{\"error\":\"Webservice is not used over a secure connection.\"}");
+    }else{
+      
+      try {
+        String requestStr=HTTPTools.getHTTPParam(request, "request");
+        ImpactUser user = null;
+        user = LoginManager.getUser(request);
+        if(requestStr.equals("generatetoken")){
+          jsonResponse.setMessage(AccessTokenStore.generateAccessToken(user).toString());
+        }
+        if(requestStr.equals("listtokens")){
+          
+          JSONArray a = new JSONArray();
+          Vector<String> accessTokens = AccessTokenStore.listtokens(user);
+          for(int j=0;j<accessTokens.size();j++){
+            a.put((JSONObject) new JSONTokener(accessTokens.get(j)).nextValue());
+          }
+          jsonResponse.setMessage(a.toString());
+          a = null;
+        }
+        if(requestStr.equals("revoketoken")){
+          String token=HTTPTools.getHTTPParam(request, "token");
+          if(token!=null){
+            jsonResponse.setMessage(AccessTokenStore.revokeAccessToken(user,token).toString());
+          }
+        }
+      } catch(Exception e){
+        e.printStackTrace();
+        jsonResponse.setException("Service account failed",e);
+      }
+    }
     try {
       jsonResponse.print(response);
     } catch (Exception e1) {

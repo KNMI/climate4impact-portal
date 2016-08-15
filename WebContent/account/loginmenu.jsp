@@ -53,6 +53,7 @@
    	<li  <% if(highlightBasket)out.print("class=\"sel\""); %>><a href="<%=Home%>account/basket.jsp" ><code class="codeshoppingcarticon"></code>&nbsp;Basket <code id="baskettext2">(<%=numProductsString%>)</code></a></li>
    	<li  <% if(highlightProcessing)out.print("class=\"sel\""); %>><a href="<%=Home%>account/processing.jsp" ><code class="codejobsicon"></code>&nbsp;Processing</a></li>
   	<li  <% if(pageName.indexOf("jobs.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/jobs.jsp" ><code class="codejobsicon"></code>&nbsp;Monitor jobs&nbsp;<code id="jobnumber">(<%=numJobsString%>)</code></a></li>
+  	<li  <% if(pageName.indexOf("tokenapi.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/tokenapi.jsp" ><code class="codekeyicon"></code>&nbsp;Token API</a></li>
   	
   	<% if (isAdmin==1) {%>
   		<li  <% if(pageName.indexOf("admin.jsp")!=-1)out.print("class=\"sel\""); %>><a href="<%=Home%>account/admin.jsp" >Administration page</a></li>

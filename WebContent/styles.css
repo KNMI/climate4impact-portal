@@ -1492,6 +1492,44 @@ div.tnimagetext {
 	background-image: url("images/close.gif") !important;
 }
 
+.ext-ui-icon-arrowthickstop-1-s{
+ background-position: -224px -48px  !important;
+ background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
+.ext-ui-icon-arrowthickstop-1-n{
+ background-position: -192px -48px  !important;
+ background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
+.ext-ui-icon-trash{
+	 background-position: -176px -96px !important;
+	 background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
+.ext-ui-icon-search {
+    background-position: -160px -112px !important;;
+    background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
+.ext-ui-icon-refresh{
+	   background-position:  -64px -80px !important;;
+    background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+.ext-ui-icon-video{
+	 background-position:   -224px -128px !important;;
+    background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+.ext-ui-icon-link{
+	  background-position:  -240px -112px !important;;
+    background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
+.ext-ui-icon-cancel{
+	   background-position: 0 -128px !important;;
+    background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+}
+
 .icon-download {
 	background-image: url("images/save-icon.png") !important;
 }
@@ -1755,7 +1793,10 @@ ul.pager {
 
 .ui-state-default .ui-icon{
   background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
+
 }
+
+
 
 .ui-iconbutton {
 	color:black;
@@ -2134,6 +2175,13 @@ div.collapsiblecontent {
 	background-image: url("images/adagucviewerlogos.png") !important;
 	background-repeat: no-repeat;
 	background-position: -96px -32px !important;
+}
+
+.codekeyicon{
+ padding: 0px 0px 0px 16px;
+ margin: 0px;
+ background-position: -112px -128px !important;
+ background-image: url("/impactportal/js/jquery-ui-1.11.4/images/ui-icons_222222_256x240.png");
 }
 
 .fancybox a:link {

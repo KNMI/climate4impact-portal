@@ -14,6 +14,7 @@
     <script type="text/javascript" src="../js/ImpactJS.js"></script>
     
     <script type="text/javascript" src="/impactportal/data/catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="/impactportal/data/fileviewer/vkbeautify.js"></script>
     <script type="text/javascript" src="/impactportal/data/fileviewer/fileviewer.js"></script>
     <script type="text/javascript" src="/impactportal/data/esgfsearch/property_descriptions.js"></script>
     <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychooserconf.js"></script>
@@ -28,7 +29,7 @@
     var impactBase = '<%=Home%>';
     var impactService=impactBase+'ImpactService?';
     
-    var WPSURL='<%=Configuration.getHomeURLHTTP()+"/WPS?"%>';
+    var WPSURL='<%=Configuration.getHomeURLHTTPS()+"/WPS?"%>';
     
     
     </script>

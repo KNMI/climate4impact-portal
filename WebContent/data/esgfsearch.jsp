@@ -5,6 +5,7 @@
    
     <jsp:include page="../includes.jsp" />
     <script type="text/javascript" src="catalogbrowser/catalogbrowser.js"></script>
+    <script type="text/javascript" src="fileviewer/vkbeautify.js"></script>
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <script type="text/javascript" src="esgfsearch/property_descriptions.js"></script>

@@ -54,7 +54,7 @@ public class ImpactService extends HttpServlet {
   		  DebugConsole.println("SERVICE PROCESSOR: "+request.getQueryString());
   		}*/
 
-    String requestStr=request.getParameter("request");
+    String requestStr=HTTPTools.getHTTPParamNoExceptionButNull(request,"request");
     if(requestStr!=null){requestStr=URLDecoder.decode(requestStr,"UTF-8");}else{errorResponder.printexception("urlStr="+requestStr);return;}
 
     //Debug.println("PROCESSOR REQUEST="+requestStr);
@@ -69,7 +69,7 @@ public class ImpactService extends HttpServlet {
       JSONResponse jsonResponse = new JSONResponse(request);
       GenericCart jobList = null;
       try{
-        String procId=request.getParameter("id");
+        String procId=HTTPTools.getHTTPParam(request,"id");
         if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
         jobList = LoginManager.getUser(request).getProcessingJobList();
         jobList.removeDataLocator(procId);
@@ -141,7 +141,7 @@ public class ImpactService extends HttpServlet {
      * Describe processor
      */
     if(requestStr.equalsIgnoreCase("describeProcessor")){
-      String procId=request.getParameter("id");
+      String procId=HTTPTools.getHTTPParamNoExceptionButNull(request,"id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
       try {
         response.setContentType("application/json");
@@ -159,9 +159,9 @@ public class ImpactService extends HttpServlet {
     
       
       
-      String procId=request.getParameter("id");
+      String procId=HTTPTools.getHTTPParamNoExceptionButNull(request,"id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-      String dataInputs=request.getParameter("dataInputs");
+      String dataInputs=HTTPTools.getHTTPParamNoExceptionButNull(request,"dataInputs");
       if(dataInputs!=null){dataInputs=URLDecoder.decode(dataInputs,"UTF-8");}else{errorResponder.printexception("dataInputs="+dataInputs);return;}
       try {
         response.setContentType("application/json");
@@ -183,9 +183,9 @@ public class ImpactService extends HttpServlet {
      * Monitor processor
      */
     if(requestStr.equalsIgnoreCase("monitorProcessor")){
-      String procId=request.getParameter("id");
+      String procId=HTTPTools.getHTTPParamNoExceptionButNull(request,"id");
       if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
-      String statusLocation=request.getParameter("statusLocation");
+      String statusLocation=HTTPTools.getHTTPParamNoExceptionButNull(request,"statusLocation");
       if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
       try {
         response.setContentType("application/json");
@@ -200,9 +200,9 @@ public class ImpactService extends HttpServlet {
      */
     if(requestStr.equalsIgnoreCase("getimage")){
 
-      String statusLocation=request.getParameter("statusLocation");
+      String statusLocation=HTTPTools.getHTTPParamNoExceptionButNull(request,"statusLocation");
       if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
-      String outputId=request.getParameter("outputId");
+      String outputId=HTTPTools.getHTTPParamNoExceptionButNull(request,"outputId");
       if(outputId!=null){outputId=URLDecoder.decode(outputId,"UTF-8");}else{errorResponder.printexception("outputId="+outputId);return;}
       ServletOutputStream out = response.getOutputStream();
       try {
@@ -219,7 +219,7 @@ public class ImpactService extends HttpServlet {
      */
     if(requestStr.equalsIgnoreCase("getstatusreport")){
 
-      String statusLocation=request.getParameter("statusLocation");
+      String statusLocation=HTTPTools.getHTTPParamNoExceptionButNull(request,"statusLocation");
       if(statusLocation!=null){statusLocation=URLDecoder.decode(statusLocation,"UTF-8");}else{errorResponder.printexception("statusLocation="+statusLocation);return;}
 
 
@@ -337,7 +337,7 @@ public class ImpactService extends HttpServlet {
 
   private void handleCatalogBrowserRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
     Debug.println("SERVICE CATALOGBROWSER: "+request.getQueryString());
-    String format= request.getParameter("format");
+    String format= HTTPTools.getHTTPParamNoExceptionButNull(request,"format");
     JSONResponse jsonResponse = new JSONResponse(request);
     if(format==null)format="";
     boolean flat = false;
@@ -853,40 +853,82 @@ public class ImpactService extends HttpServlet {
           GenericCart shoppingCart = null;
           shoppingCart = LoginManager.getUser(request).getShoppingCart();
 
-          Debug.println("Adding data to basket"+request.getParameter("id"));
+          Debug.println("Adding data to basket "+HTTPTools.getHTTPParam(request,"id"));
 
           int currentNumProducts=shoppingCart.getNumProducts();
 
-          if(request.getParameter("id")!=null){
+          if(HTTPTools.getHTTPParam(request,"id")!=null){
             JSONObject el=new JSONObject();
-            el.put("id", request.getParameter("id"));
-            el.put("opendap", request.getParameter("opendap"));
-            el.put("httpserver", request.getParameter("httpserver"));
-            el.put("catalogURL", request.getParameter("catalogURL"));
-            el.put("filesize", request.getParameter("filesize"));
-            addFileToBasket(shoppingCart,el);
-          }
-
-
-          try{
-            JSONArray jsonData = (JSONArray) new JSONTokener(request.getParameter("json")).nextValue();
-            for(int j=0;j<jsonData.length();j++){
-
-              JSONObject el=((JSONObject)jsonData.get(j));
+            
+            String opendap = HTTPTools.getHTTPParamNoExceptionButNull(request,"opendap");
+            String httpserver = HTTPTools.getHTTPParamNoExceptionButNull(request,"httpserver");
+            String catalogURL = HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogURL");
+            if(opendap!=null){
+              if(opendap.equals("null")==false){
+                if(HTTPTools.isURL(opendap)==false){
+                  jsonResponse.setErrorMessage("{\"error\":\"Not a valid URL\"}",200);
+                }
+              }else{
+                opendap = null;
+              }
+            }
+            if(httpserver!=null){
+              if(httpserver.equals("null")==false){
+                if(HTTPTools.isURL(httpserver)==false){
+                  jsonResponse.setErrorMessage("{\"error\":\"Not a valid URL\"}",200);
+                }
+              }else{
+                httpserver = null;
+              }
+            }
+            if(catalogURL!=null){
+              if(catalogURL.equals("null")){
+                catalogURL = null;
+              }
+            }
+            
+            Debug.println("opendap="+opendap);
+            Debug.println("httpserver="+httpserver);
+            Debug.println("catalogURL="+catalogURL);
+            Debug.println("opendap="+(opendap==null));
+            Debug.println("httpserver="+(httpserver==null));
+            Debug.println("catalogURL="+(catalogURL==null));
+            
+            if(opendap == null && httpserver == null &&catalogURL == null){
+              jsonResponse.setErrorMessage("{\"error\":\"Not a valid URL found.\"}",200);
+            }
+            
+            if(jsonResponse.hasError() == false){
+              el.put("id", HTTPTools.getHTTPParamNoExceptionButNull(request,"id"));
+              el.put("opendap", HTTPTools.getHTTPParamNoExceptionButNull(request,"opendap"));
+              el.put("httpserver", HTTPTools.getHTTPParamNoExceptionButNull(request,"httpserver"));
+              el.put("catalogURL", HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogURL"));
+              el.put("filesize", HTTPTools.getHTTPParamNoExceptionButNull(request,"filesize"));
               addFileToBasket(shoppingCart,el);
             }
-          }catch(Exception e){}
-          String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
-          result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
-          Debug.println(result);
-          jsonResponse.setMessage(result);
+          }
+
+          if(jsonResponse.hasError() == false){
+            try{
+              JSONArray jsonData = (JSONArray) new JSONTokener(HTTPTools.getHTTPParam(request,"json")).nextValue();
+              for(int j=0;j<jsonData.length();j++){
+  
+                JSONObject el=((JSONObject)jsonData.get(j));
+                addFileToBasket(shoppingCart,el);
+              }
+            }catch(Exception e){}
+            String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
+            result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
+            Debug.println(result);
+            jsonResponse.setMessage(result);
+          }
         } catch(Exception e){
           jsonResponse.setException("Unable to add file to basket",e);
         }
         jsonResponse.print(response);
       }
     }catch(Exception e){
-
+      e.printStackTrace();
       return;
     }
   }
@@ -970,9 +1012,9 @@ public class ImpactService extends HttpServlet {
     JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
     String serviceStr = null;
 
-    serviceStr=request.getParameter("service");
+    serviceStr=HTTPTools.getHTTPParamNoExceptionButNull(request,"service");
     if(serviceStr==null){
-      serviceStr=request.getParameter("SERVICE");
+      serviceStr=HTTPTools.getHTTPParamNoExceptionButNull(request,"SERVICE");
     }
 
 

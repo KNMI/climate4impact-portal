@@ -3,17 +3,15 @@ var Basket = function(){
 	
 	var basketElement = undefined;
 	
-	this.removeId = function(id){
+	this.removeId = function(id,done){
 		var doneFunction = function(json){
 			if(json.error){
 				alert(json.error);
 		    }else{
 				adjustNumberOfDataSetsDisplayedInMenuBar(json);
 		    }
-/*			if(basketElement){
-			  t.populateBasketList(basketElement);
-			}
-*/		}
+			done(json);
+		};
 	
 		$.ajax({
 			type: "GET",

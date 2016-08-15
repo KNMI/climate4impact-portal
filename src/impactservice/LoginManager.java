@@ -33,6 +33,7 @@ import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
 import tools.JSONResponse;
+import tools.LazyCaller;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 
@@ -83,8 +84,8 @@ public class LoginManager {
     user.userMyProxyService = null;
     // String data2 = HTTPTools.makeHTTPGetRequest(user.id);
     XMLElement xmlParser = new XMLElement();
-    if (user.getId().startsWith("http") == true) {
-      xmlParser.parse(new URL(user.getId()));
+    if (user.getUserId().startsWith("http") == true) {
+      xmlParser.parse(new URL(user.getUserId()));
       // Debug.println(xmlParser.toString());
       Vector<XMLElement> services = xmlParser.getFirst().get("XRD")
           .getList("Service");
@@ -144,11 +145,11 @@ public class LoginManager {
       if (userName == null) {
         userName = user.getOpenId();
         if(userName == null){
-          userName = user.getInternalName();
+          userName = user.getUserId();
         }
       }
       if (userName == null) {
-        Debug.errprintln("No openid set for " + user.getId());
+        Debug.errprintln("No openid set for " + user.getUserId());
         throw new Exception("LoginManager: No openid set");
       }
 
@@ -187,7 +188,7 @@ public class LoginManager {
       Debug.printStackTrace(e);
       throw new Exception("LoginManager: " + msg);
     }
-    Debug.println("Credentials for user " + user.getId() + " retrieved");
+    Debug.println("Credentials for user " + user.getUserId() + " retrieved");
   }
 
   /**
@@ -274,7 +275,7 @@ public class LoginManager {
       } else {
 
         String message = "No user information available from either session, oauth2 or x509\n";
-        Debug.errprintln(message);
+        Debug.errprint(message);
         // response.setStatus(403);
         /*
          * response.getOutputStream().println(message); throw new
@@ -350,7 +351,7 @@ public class LoginManager {
  
     
     for (int j = 0; j < users.size(); j++) {
-      if (users.get(j).getId().equals(userId)) {
+      if (users.get(j).getUserId().equals(userId)) {
         ImpactUser user = users.get(j);
         //user.setSessionInfo(request);
         // Debug.println("Found existing user "+userId);
@@ -367,7 +368,7 @@ public class LoginManager {
     user.setAttributesFromHTTPRequestSession(request);
     
     try {
-      checkLogin(user);
+      _checkLogin(user);
     } catch (Exception e) {
     }
 
@@ -385,14 +386,14 @@ public class LoginManager {
    * @param session
    * @throws Exception
    */
-  public synchronized static void checkLogin(ImpactUser user) throws Exception {
+  private synchronized static void _checkLogin(ImpactUser user) throws Exception {
 
-    if(debug)Debug.println("Check login " + user.getId());
+    if(debug)Debug.println("Check login " + user.getUserId());
 
-    if(debug)Debug.println("internalName = " + user.getInternalName());
+    if(debug)Debug.println("internalName = " + user.getUserId());
     String workspace = Configuration.getImpactWorkspace();
     if(debug)Debug.println("Base workspace = " + workspace);
-    user.setWorkspace(workspace + user.getInternalName() + "/");
+    user.setWorkspace(workspace + user.getUserId() + "/");
     if(debug)Debug.println("User workspace = " + user.getWorkspace());
     try {
       if(debug)Debug.println("Making dir " + user.getWorkspace());
@@ -404,7 +405,7 @@ public class LoginManager {
       user.credentialError = true;
       throw new Exception(
           "Unable to create credential for user, server misconfiguration:"
-              + user.getId() + "\n" + e.getMessage());
+              + user.getUserId() + "\n" + e.getMessage());
     }
     
     user.loadProperties();
@@ -445,7 +446,7 @@ public class LoginManager {
           user.credentialError = true;
           // e.printStackTrace();
           user.setLoginInfo("Using " + loginMethod + ", unable to retrieve credential via impactportal MyProxy");
-          throw new Exception("Unable to get credential for user " + user.getId() + "\n" + e.getMessage());
+          throw new Exception("Unable to get credential for user " + user.getUserId() + "\n" + e.getMessage());
         }
       }
     } else {
@@ -461,8 +462,7 @@ public class LoginManager {
     _checkCertificate(user);
 
     createNCResourceFile(user);
-
-    user.saveProperties();
+    user._saveProperties();
     // createFontConfigFile(user);
     user.configured = true;
   }
@@ -480,7 +480,7 @@ public class LoginManager {
       user.certificateValidityNotAfter = date.getTime();
     } catch (CertificateException e) {
       throw new Exception("Unable to validate credential for user "
-          + user.getId() + "\n" + e.getMessage());
+          + user.getUserId() + "\n" + e.getMessage());
     }
   }
 
@@ -536,7 +536,7 @@ public class LoginManager {
     ImpactUser user = null;
     try {
       user = getUser(request);
-      jsonResponse.setUserId(user.getId());
+      jsonResponse.setUserId(user.getUserId());
     } catch (Exception e1) {
     }
     String msg = "";
@@ -651,6 +651,20 @@ public class LoginManager {
     request.getSession().setAttribute("login_method", null);
     //request.getSession().setAttribute("message", null);
     Debug.println("--- LOGOUT DONE --- ");
+  }
+
+  public static void checkLogin(ImpactUser user) throws Exception {
+    if(user == null){
+      _checkLogin(user);
+      return;
+    }
+    //_checkLogin(user);
+    //if(us)
+    String id = user.getUserId();
+    if(LazyCaller.getInstance().isCallable("lazyCheckLogin"+id,5000)){
+      Debug.println("lazyCheckLogin_"+id);
+      _checkLogin(user);     
+    }    
   }
 
 }

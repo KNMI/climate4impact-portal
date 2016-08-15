@@ -49,7 +49,7 @@ public class WebProcessingInterface {
   private static String getWPSURL() {
     //return WPSURL;
     //return "http://mouflon.dkrz.de/wps?";
-    return Configuration.getHomeURLHTTP()+"/WPS?";
+    return Configuration.getHomeURLHTTPS()+"/WPS?";
   }
   
   private static boolean isLocal(){

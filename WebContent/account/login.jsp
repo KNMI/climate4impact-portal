@@ -84,11 +84,11 @@
 			<div class="textstandardleft">
 				
 				
-				<!--  Your climate4impact identifier is:<br/><strong><%=user.getId()%></strong><br /><br/>-->
+				<!--  Your climate4impact identifier is:<br/><strong><%=user.getUserId()%></strong><br /><br/>-->
 				Your ESGF OpenId identifier is:<br/><strong><%=user.getOpenIdAsString()%></strong><br /><br/>
 				Your email is:<br/><strong><%=user.getEmailAddress()%></strong><br /> <br />
 				
-				Your climate4impact ID:<br/><strong><%=user.getId()%></strong><br />
+				Your climate4impact ID:<br/><strong><%=user.getUserId()%></strong><br />
 				
 	
 				

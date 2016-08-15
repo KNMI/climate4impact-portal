@@ -25,7 +25,7 @@ public class Configuration {
     return "impactportal";
   }
   
-  public static String getHomeURLHTTP(){
+  public static String _getHomeURLHTTP(){
     return GlobalConfig.getServerHTTPURL()+getHomeURLPrefix();
   }
   

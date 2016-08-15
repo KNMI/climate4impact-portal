@@ -56,20 +56,20 @@ public class PyWPSServer extends HttpServlet {
       user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
-      Debug.println("WPS for user: "+user.getId());
+      Debug.println("WPS for user: "+user.getUserId());
    
       
       if(userHomeDir.length()>0){
         environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
       }else{
-        throw new Exception("User : "+user.getId()+" has no home dir");
+        throw new Exception("User : "+user.getUserId()+" has no home dir");
       }
       
       String userDataDir = user.getDataDir();
       Tools.mksubdirs(userDataDir+"/WPS_Scratch/");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir+"/WPS_Scratch/");
       
-      String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getInternalName()+"/WPS_Scratch/";
+      String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getUserId()+"/WPS_Scratch/";
       pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
       pofOutputURL = pofOutputURL.replace("?", "");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);

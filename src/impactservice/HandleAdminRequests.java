@@ -29,7 +29,7 @@ public class HandleAdminRequests {
     }
     
     if(user != null){
-      Debug.println("User: "+user.getInternalName());
+      Debug.println("User: "+user.getUserId());
       if(user.hasRole("admin")==false){
         jsonResponse.setErrorMessage("Unauthorized", 403);
       }
@@ -51,8 +51,8 @@ public class HandleAdminRequests {
           Vector<ImpactUser>  userList = LoginManager.getUsers();
           for(int j=0;j<userList.size();j++){
             JSONObject jsonUser = new JSONObject();
-            jsonUser.put("id", userList.get(j).getId());
-            jsonUser.put("internalname", userList.get(j).getInternalName());
+            jsonUser.put("id", userList.get(j).getUserId());
+            jsonUser.put("internalname", userList.get(j).getUserId());
             jsonUser.put("openid", userList.get(j).getOpenId());
             jsonUser.put("email", userList.get(j).getEmailAddress());
             jsonUser.put("dataurl", userList.get(j).getDataURL());

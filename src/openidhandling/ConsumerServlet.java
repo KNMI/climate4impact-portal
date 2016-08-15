@@ -237,13 +237,13 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 	    Debug.println("Referrer was "+referrer);
       if(referrer.startsWith("/") == false){
         
-        if(referrer.startsWith(Configuration.getHomeURLHTTP())){
-          returnURL = referrer.substring(Configuration.getHomeURLHTTP().length());
+        if(referrer.startsWith(Configuration._getHomeURLHTTP())){
+          returnURL = referrer.substring(Configuration._getHomeURLHTTP().length());
         }else if(referrer.startsWith(Configuration.getHomeURLHTTPS())){
           returnURL = referrer.substring(Configuration.getHomeURLHTTPS().length());
         }else{
           Debug.errprintln("Invalid referer found in login dialog: "+referrer);
-          Debug.errprintln("Valid referer 1: "+Configuration.getHomeURLHTTP());
+          Debug.errprintln("Valid referer 1: "+Configuration._getHomeURLHTTP());
           Debug.errprintln("Valid referer 2: "+Configuration.getHomeURLHTTPS());
           Debug.errprintln("Probably the onlineresources are incorrectly configured.");
           String validReferrer = Configuration.getHomeURLHTTPS();
