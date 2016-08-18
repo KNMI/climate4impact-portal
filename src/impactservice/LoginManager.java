@@ -13,7 +13,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.net.ssl.SSLException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +32,7 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.Oid;
 import org.json.JSONObject;
 
+import impactservice.ImpactUser.UserSessionInfo;
 import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
@@ -75,8 +79,9 @@ import tools.Tools;
 public class LoginManager {
   static boolean debug=false;
   private static Vector<ImpactUser> users = new Vector<ImpactUser>();
-  
-  
+  public static String impactportal_userid_cookie="C4I_ID";
+  public static int impactportal_userid_cookie_durationsec = 3600*24*7;
+
   public static void getUserProxyService(ImpactUser user)
       throws MalformedURLException, WebRequestBadStatusException, Exception {
     // Test met openID URL
@@ -190,6 +195,34 @@ public class LoginManager {
     }
     Debug.println("Credentials for user " + user.getUserId() + " retrieved");
   }
+  
+  public static String getUserFromCookie(HttpServletRequest request){
+    long currentTime = tools.DateFunctions.getCurrentDateInMillis();
+    String foundUserId = null;
+    Debug.println("getUserFromCookie");
+    String userIdFromCookie = HTTPTools.getCookieValue(request, impactportal_userid_cookie); 
+    if(userIdFromCookie == null)return null;
+    String sessionUUID = userIdFromCookie;
+    for (int j = 0; j < users.size(); j++) {
+      Iterator<Map.Entry<String, UserSessionInfo>> iter = users.get(j).getSessionIds().entrySet().iterator();
+      while (iter.hasNext()) {
+        Entry<String, UserSessionInfo> entry = iter.next();
+        Debug.println(""+(currentTime-entry.getValue().accessTime));
+        
+        if((currentTime-entry.getValue().accessTime)>impactportal_userid_cookie_durationsec*1000){
+          Debug.println("Removing session, because too old: "+(currentTime-entry.getValue().accessTime));
+          iter.remove();
+        }else{
+          Debug.println("Comparing "+sessionUUID+" with "+entry.getValue().uniqueId.toString());
+          if(sessionUUID.equals(entry.getValue().uniqueId)){
+            Debug.println("found UserFromCookie");
+            foundUserId = users.get(j).getUserId();
+          }
+        }
+      }
+    }
+    return foundUserId;
+  }
 
   /**
    * Get the user object based on the http session, based on x509 cert, or access token
@@ -198,39 +231,43 @@ public class LoginManager {
    * @return The user object or null when a redirect is requested.
    * @throws Exception
    */
-  public static ImpactUser _getUser(HttpServletRequest request,
+  public static ImpactUser getUserAndRegisterCookie(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
-
-//    String doLogOut = tools.HTTPTools.getHTTPParam(request,"c4i_dologout");
-//    if(doLogOut.equals("true")==true){
-//      logout(request);
-//      return null;
-//    }
     
-    //Get user from session
-    HttpSession session = request.getSession();
-    String id = (String) session.getAttribute("user_identifier");
+    if(response!=null){
+      Debug.println("getUserAndRegisterCookie");
+    }
+    
+    String id = null;
+    String accessToken = null;
+
+    /* For development purposes and no idp is available, a user can configured bluntly by setting the id in the config */
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
       id = Configuration.GlobalConfig.getDefaultUser();
     }
-
-    //Get user from access token provided in the request
+    
+    /*Get user from access token provided in the request, usually commandline access*/
     if (id == null ) {
       try{
-       
         try{
           JSONObject token = AccessTokenStore.checkIfTokenIsValid(request);
+          accessToken= token.getString("token");
           if(token!=null){
-            //Debug.println("Valid token "+token.toString()+" obtained");
             id = token.getString("userid");
           }
         }catch(Exception e){
         }
       }catch(Exception e){
-        //e.printStackTrace();
       }
-   
     }
+    
+    /*Simply get user from browser session*/
+    if(id == null){
+      HttpSession session = request.getSession();
+      id = (String) session.getAttribute("user_identifier");
+    }
+    
+    /*Get user from OAuth2*/
     if (id == null) {
       try {
         OAuth2Handler.UserInfo userInfo = OAuth2Handler
@@ -249,10 +286,8 @@ public class LoginManager {
         e.printStackTrace();
       }
     }
-    
 
-
-    //"Trying to get user info from X509 cert"
+    /*Trying to get user info from X509 cert*/
     if (id == null) {
       String CertOpenIdIdentifier = null;
       // org.apache.catalina.authenticator.SSLAuthenticator
@@ -271,16 +306,6 @@ public class LoginManager {
                 + CNIndex);
           }
         }
-      
-      } else {
-
-        String message = "No user information available from either session, oauth2 or x509\n";
-        Debug.errprint(message);
-        // response.setStatus(403);
-        /*
-         * response.getOutputStream().println(message); throw new
-         * Exception("You are not logged in...");
-         */
       }
 
       if (CertOpenIdIdentifier != null) {
@@ -292,15 +317,26 @@ public class LoginManager {
         }
       }
     }
-    // }
-    // }
+    
+    /* Get user from climate4impact cookie */
+    if(id == null){
+      String userIdFromCookie = getUserFromCookie(request);
+      if(userIdFromCookie!=null){
+        id = userIdFromCookie;
+        Debug.println("Retrieved user_identifier from climate4impact cookie");
+        request.getSession().setAttribute("user_identifier",id);
+      }
+    }
 
-    // Debug.println("id == "+id);
+    /* Still no user found... */
     if (id == null) {
       throw new WebRequestBadStatusException(401,
           "Unauthorized user, you are not logged in.");
     }
-    ImpactUser user = getUser(id, request);
+
+    ImpactUser user = getUser(id);
+    user.setAttributesFromHTTPRequestSession(request,response,accessToken);
+
     return user;
   }
 
@@ -328,9 +364,34 @@ public class LoginManager {
   }
 
   public static ImpactUser getUser(HttpServletRequest request) throws Exception {
-    return _getUser(request, null);
+    return getUserAndRegisterCookie(request, null);
   }
 
+  
+  
+  public static String makeUserIdString(String userId){
+    if (userId == null)
+      return null;
+
+    userId = userId.replace("http://", "");
+    userId = userId.replace("https://", "");
+    userId = userId.replaceAll("/", ".");
+    return userId;
+  }
+
+  
+  public static ImpactUser doesUserExist(String userId) {
+    if (userId == null)return null;
+    userId = makeUserIdString(userId);
+    for (int j = 0; j < users.size(); j++) {
+      if (users.get(j).getUserId().equals(userId)) {
+        ImpactUser user = users.get(j);
+        return user;
+      }
+    }
+    return null;
+  }
+  
   /**
    * Get user based on his/hers userId
    * 
@@ -338,34 +399,17 @@ public class LoginManager {
    *          The userID, equal to the OpenID identifier
    * @return The user object
    */
-  public synchronized static ImpactUser getUser(String userId,
-      HttpServletRequest request) {
-    // Debug.println("Looking up user "+userId);
-    // Lookup the user in the vector list
-    if (userId == null)
-      return null;
-    
-    userId = userId.replace("http://", "");
-    userId = userId.replace("https://", "");
-    userId = userId.replaceAll("/", ".");
- 
-    
-    for (int j = 0; j < users.size(); j++) {
-      if (users.get(j).getUserId().equals(userId)) {
-        ImpactUser user = users.get(j);
-        //user.setSessionInfo(request);
-        // Debug.println("Found existing user "+userId);
-        return user;
-      }
+  public synchronized static ImpactUser getUser(String userId) {
+    userId = makeUserIdString(userId);
+    ImpactUser user = doesUserExist(userId);
+    if(user!=null){
+      return user;
     }
-    
     // The user was not found, so create a new user
     Debug.println("Creating new user object for " + userId);
-    ImpactUser user = new ImpactUser(userId);
-   
+    user = new ImpactUser(userId);
+
     users.add(user);
-    
-    user.setAttributesFromHTTPRequestSession(request);
     
     try {
       _checkLogin(user);
@@ -407,25 +451,25 @@ public class LoginManager {
           "Unable to create credential for user, server misconfiguration:"
               + user.getUserId() + "\n" + e.getMessage());
     }
-    
+
     user.loadProperties();
-    
+
     String certificate = user.getCertificate();
     String loginMethod = user.getLoginMethod();
-    
+
     if (certificate == null) {
       /* Certificate is not set in user object: obtain from local proxy server */
       boolean certNeedsRefresh = true;
-      
+
       try{
         _checkCertificate(user);
         if(user.certificateValidityNotAfter!=-1){
           if(debug)Debug.println("GetCredential: checking validity notafter: "+user.certificateValidityNotAfter);
           long currentMillis = tools.DateFunctions.getCurrentDateInMillis();
           long minValidityPeriodAfterMillis = 8*60*60*1000;
-//          Debug.println("currentMillis                     :["+currentMillis+"]");
-//          Debug.println("certificateValidityNotAfter       :["+user.certificateValidityNotAfter+"]");
-//          Debug.println("certificateValidityNotAfter min 8 :["+(user.certificateValidityNotAfter-(minValidityPeriodAfterMillis))+"]");
+          //          Debug.println("currentMillis                     :["+currentMillis+"]");
+          //          Debug.println("certificateValidityNotAfter       :["+user.certificateValidityNotAfter+"]");
+          //          Debug.println("certificateValidityNotAfter min 8 :["+(user.certificateValidityNotAfter-(minValidityPeriodAfterMillis))+"]");
           if(debug)Debug.println("remaining H                       :["+(((user.certificateValidityNotAfter-minValidityPeriodAfterMillis)-currentMillis)/(1000*60*60))+"]");
           if(user.certificateValidityNotAfter-minValidityPeriodAfterMillis>currentMillis){
             if(debug)Debug.println("Certificate is still valid");
@@ -433,15 +477,15 @@ public class LoginManager {
           }
         }
       }catch(Exception e){
-        
+
       }
-      
+
       user.setLoginInfo("Using " + loginMethod + ", credential retrieved via impactportal MyProxy.");
       if(certNeedsRefresh){
         Debug.println("Certificate not set, retrieving from MyProxy");
         try {
           _getCredential(user);
-          
+
         } catch (Exception e) {
           user.credentialError = true;
           // e.printStackTrace();
@@ -531,7 +575,7 @@ public class LoginManager {
    */
   public static JSONResponse identifyWhyGetRequestFailed(String requestStr,
       HttpServletRequest request)
-      throws WebRequestBadStatusException, IOException {
+          throws WebRequestBadStatusException, IOException {
     JSONResponse jsonResponse = new JSONResponse(request);
     ImpactUser user = null;
     try {
@@ -628,7 +672,7 @@ public class LoginManager {
 
   }
 
-  static public void logout(HttpServletRequest request) {
+  static public void logout(HttpServletRequest request,HttpServletResponse response) {
     Debug.println("--- LOGOUT --- "
         + request.getSession().getAttribute("user_identifier"));
     try {
@@ -636,10 +680,12 @@ public class LoginManager {
       user = getUser(request);
       if (user != null) {
 
-        user.removeSessionId(request.getSession().hashCode());
+        user.logoutAndRemoveSessionId(request,response);
       }
     } catch (Exception e) {
     }
+    
+    
 
     request.getSession().setAttribute("access_token", null);
     request.getSession().setAttribute("openid_identifier", null);
@@ -649,6 +695,7 @@ public class LoginManager {
     request.getSession().setAttribute("certificate", null);
     request.getSession().setAttribute("access_token", null);
     request.getSession().setAttribute("login_method", null);
+    request.getSession().invalidate();
     //request.getSession().setAttribute("message", null);
     Debug.println("--- LOGOUT DONE --- ");
   }

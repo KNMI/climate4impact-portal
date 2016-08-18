@@ -1,6 +1,16 @@
 ///* This redirect is a temporal workaround until HTTPS is forced by tomcat - updated 20160621 by mplieger*/
-//if (window.location.protocol != "https:")
-//    window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+try{
+  if(c4i_https){
+    if(c4i_https!="null"){
+      if (window.location.protocol != "https:"){
+        var newHome = c4i_https.replace("/impactportal","");
+        var newlocation= newHome+window.location.pathname;
+        window.location.href = newlocation;
+      }
+    }
+  }
+}catch(e){
+}
 
 var c4iconfigjs = {
   searchservice:"/impactportal/esgfsearch?",

@@ -188,7 +188,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
   private void processReturn(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
     Debug.println("Validating request...");
-		Identifier identifier = this.verifyResponse(req);
+		Identifier identifier = this.verifyResponse(req,resp);
 		Debug.println("identifier: " + identifier);
 		
 		
@@ -440,8 +440,8 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 
 	// --- processing the authentication response ---
 	@SuppressWarnings("unchecked")
-	public Identifier verifyResponse(HttpServletRequest httpReq) {
-	  impactservice.LoginManager.logout(httpReq);
+	public Identifier verifyResponse(HttpServletRequest httpReq,HttpServletResponse resp) {
+	  impactservice.LoginManager.logout(httpReq,resp);
 		try {
 			// extract the parameters from the authentication response
 			// (which comes in as a HTTP request from the OpenID provider)

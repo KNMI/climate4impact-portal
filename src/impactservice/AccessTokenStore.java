@@ -244,15 +244,8 @@ public class AccessTokenStore {
         if(notafterMillis<currentMillis){
           throw new AccessTokenHasExpired();
         }
-        //
-        //        Debug.println("Token is valid, now check cert");
-        //        ImpactUser user = LoginManager.getUser(a.getString("userid"), null);
-        //        LoginManager.checkLogin(user);
-
         return v;
       } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
       }
 
 
@@ -294,7 +287,7 @@ public class AccessTokenStore {
         JSONObject props = (JSONObject) new JSONTokener(a).nextValue();
         String userID = props.getString("userid");
         if(debug)Debug.println("[OK] Token is Valid for user "+userID);
-        ImpactUser user = LoginManager.getUser(userID, null);
+        ImpactUser user = LoginManager.getUser(userID);
         LoginManager.checkLogin(user);
         return props;
       } catch (Exception e) {

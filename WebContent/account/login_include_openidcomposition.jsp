@@ -1,4 +1,4 @@
-<div id="dialog-form" title="Compose OpenID identifier">
+<div id="dialog-form" style="display:none;" title="Compose OpenID identifier">
 <div class="c4i_openidcompositor_chooseprovider">
 	Please choose your openid provider
 	<div id="datanodebuttons"></div>

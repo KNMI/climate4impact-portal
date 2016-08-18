@@ -1005,10 +1005,10 @@ public class ImpactService extends HttpServlet {
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    if(request.getQueryString()!=null){
-      Debug.println("Query string:["+request.getQueryString()+"]");
-    }
-    
+//    if(request.getQueryString()!=null){
+//      Debug.println("Query string:["+request.getQueryString()+"]");
+//    }
+//    
     JSONMessageDecorator errorResponder = new JSONMessageDecorator (response);
     String serviceStr = null;
 

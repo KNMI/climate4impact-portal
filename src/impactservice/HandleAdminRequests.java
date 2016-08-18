@@ -3,16 +3,23 @@ package impactservice;
 
 import impactservice.ImpactUser.UserSessionInfo;
 
+import java.lang.reflect.AccessibleObject;
+import java.text.MessageFormat.Field;
 import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.Manager;
+import org.apache.catalina.session.StandardSession;
+import org.apache.catalina.session.StandardSessionFacade;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import tools.DateFunctions;
 import tools.Debug;
 import tools.JSONResponse;
 
@@ -35,7 +42,7 @@ public class HandleAdminRequests {
       }
     }
 
-   
+    int numSessions = 0;
     if(jsonResponse.hasError() == false){
       String requestParam = null;
       try {
@@ -52,7 +59,6 @@ public class HandleAdminRequests {
           for(int j=0;j<userList.size();j++){
             JSONObject jsonUser = new JSONObject();
             jsonUser.put("id", userList.get(j).getUserId());
-            jsonUser.put("internalname", userList.get(j).getUserId());
             jsonUser.put("openid", userList.get(j).getOpenId());
             jsonUser.put("email", userList.get(j).getEmailAddress());
             jsonUser.put("dataurl", userList.get(j).getDataURL());
@@ -62,11 +68,16 @@ public class HandleAdminRequests {
 
 
 
-            for (Entry<Integer, UserSessionInfo> entry : userList.get(j).getSessionIds().entrySet()){
+            for (Entry<String, UserSessionInfo> entry : userList.get(j).getSessionIds().entrySet()){
                 JSONObject sessionInfo = new JSONObject();
-                sessionInfo.put("id",entry.getKey());
-                sessionInfo.put("created",entry.getValue().creationTime);
-                sessionInfo.put("accessed",entry.getValue().accessTime);
+                //sessionInfo.put("id",entry.getKey());
+                sessionInfo.put("created",DateFunctions.getTimeStampInMillisToISO8601(entry.getValue().creationTime));
+                sessionInfo.put("accessed",DateFunctions.getTimeStampInMillisToISO8601(entry.getValue().accessTime));
+                sessionInfo.put("host",entry.getValue().host);
+                sessionInfo.put("useragent",entry.getValue().userAgent);
+                sessionInfo.put("sessiontype",entry.getValue().sessionType);
+                sessionInfo.put("hits",entry.getValue().hits);
+                numSessions++;
                 sessionIds.put(sessionInfo);
             }
             
@@ -78,6 +89,34 @@ public class HandleAdminRequests {
             jsonUserList.put(jsonUser);
           }
           json.put("users", jsonUserList);
+          json.put("numusers", jsonUserList.length());
+          json.put("numsessions", numSessions);
+
+          HttpSession session = request.getSession();
+          java.lang.reflect.Field facadeSessionField;
+          try {
+            facadeSessionField = StandardSessionFacade.class.getDeclaredField("session");
+            facadeSessionField.setAccessible(true);
+            StandardSession stdSession = (StandardSession) facadeSessionField.get(session);
+            Manager manager = stdSession.getManager();
+            
+            int a = manager.getActiveSessions();
+            json.put("numactivetomcatsessions", a);
+          } catch (NoSuchFieldException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (IllegalArgumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+      
+          
           
           jsonResponse.setMessage(json);
         }

@@ -243,7 +243,7 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
    */
   static void getCode(HttpServletRequest httpRequest,
       HttpServletResponse response) throws OAuthSystemException, IOException {
-    LoginManager.logout(httpRequest);
+    LoginManager.logout(httpRequest,response);
   
     
     Debug.println("getQueryString:"+httpRequest.getQueryString());

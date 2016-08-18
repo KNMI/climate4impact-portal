@@ -15,12 +15,21 @@
 	<jsp:include page="../header.jsp" />
 	<jsp:include page="login_include_openidcomposition.jsp" />
 	
+	
+	 <script type="text/javascript">
+      
+    var urlvars = getUrlVars();
+    if(urlvars.fromopenid){
+      window.location.replace("/impactportal/account/login.jsp");
+    };
+  </script>
+	
 	<!-- Contents -->
 	<%
 		String Home = "/impactportal/";
 		ImpactUser user = null;
 		try {
-			user = LoginManager.getUser(request);
+			user = LoginManager.getUserAndRegisterCookie(request,response);
 		} catch (Exception e) {
 		}
 

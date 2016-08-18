@@ -33,8 +33,10 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -719,5 +721,33 @@ public class HTTPTools extends HttpServlet {
     if(url.startsWith("http://"))return true;
     return false;
   }
+
+  public static String getCookieValue(HttpServletRequest request, String name) {
+      Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+          for (Cookie cookie : cookies) {
+              if (name.equals(cookie.getName())) {
+                  return cookie.getValue();
+              }
+          }
+      }
+      return null;
+  }
+
+  public static void setCookieValue(HttpServletResponse response, String name, String value, int maxAge) {
+      Cookie cookie = new Cookie(name, value);
+      cookie.setPath("/");
+      if(maxAge!=-1){
+        cookie.setMaxAge(maxAge);
+      }
+      cookie.setHttpOnly(true);
+      cookie.setSecure(true);
+      response.addCookie(cookie);
+  }
+  
+  public static void removeCookie(HttpServletResponse response, String name) {
+    setCookieValue(response, name, null, 0);
+}
+
   
 }

@@ -111,7 +111,7 @@ public class MyXMLParser {
 		 * @throws Exception
 		 */
 	  public void parseFile(String file) throws Exception {
-	    Debug.println("Loading "+file);
+	    //Debug.println("Loading "+file);
       try{
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();

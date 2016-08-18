@@ -3,14 +3,18 @@ package impactservice;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import impactservice.ImpactUser.UserSessionInfo;
 import tools.DateFunctions;
 import tools.Debug;
 import tools.HTTPTools;
@@ -32,6 +36,7 @@ public class ImpactUser {
   public String certificateFile = null;/*Pointer to the users credential */
   public boolean credentialError = false;
   public boolean configured = false;
+  
   private GenericCart shoppingCart = null;
   
   private String emailAddress;
@@ -62,7 +67,7 @@ public class ImpactUser {
 
   synchronized public GenericCart getProcessingJobList(){
     GenericCart processingJobsList = null;
-    Debug.println("getProcessingJobList for "+this.getUserId());
+    //Debug.println("getProcessingJobList for "+this.getUserId());
     try{
       processingJobsList = new GenericCart("processingJobsList",this);
       processingJobsList.loadFromStore();
@@ -76,7 +81,7 @@ public class ImpactUser {
     return processingJobsList;  
   }
   synchronized public GenericCart getShoppingCart() {
-    Debug.println("getShoppingCart");
+    //Debug.println("getShoppingCart");
     try{
       if(shoppingCart==null){
         shoppingCart = new GenericCart("shoppingCart",this);
@@ -154,7 +159,7 @@ public class ImpactUser {
       String adminUsers[] = Configuration.Admin.getIdentifiers();
       
       String id = getUserId();
-      Debug.println("HasRole ID "+id);
+      //Debug.println("HasRole ID "+id);
       for(int j=0;j<adminUsers.length;j++){
         //Debug.println(adminUsers[j]+" -- "+id);
         if(id.equals(adminUsers[j])){
@@ -168,36 +173,103 @@ public class ImpactUser {
 
   
   class UserSessionInfo{
-    String creationTime;
-    String accessTime;
+    long creationTime;
+    long accessTime;
+    String host;
+    String userAgent;
+    String uniqueId;
+    String sessionType;
+    int hits =0;
   }
 
-  Map<Integer,UserSessionInfo> sessions = java.util.Collections.synchronizedMap(new HashMap<Integer, UserSessionInfo>());
+  private Map<String,UserSessionInfo> sessions = java.util.Collections.synchronizedMap(new HashMap<String, UserSessionInfo>());
   
 
-  private void _addSessionId(int id, long creationTime,long accessTime) {
-    UserSessionInfo i = sessions.get(id);
-    if(i == null){i=new UserSessionInfo();sessions.put(id, i);}
+  private String _addSessionId(HttpServletRequest request, String accessToken) {
     
-    i.creationTime = ""+tools.DateFunctions.getTimeStampInMillisToISO8601(creationTime);
-    i.accessTime = ""+tools.DateFunctions.getTimeStampInMillisToISO8601(accessTime);
-  }
-  public void removeSessionId(int id) {
-    sessions.remove(id);
-  }
+    String id = null;
+    if(accessToken!=null){
+      id = accessToken; //Commandline access session
+    }else{
+      id = ""+request.getSession().hashCode(); //Browser session
+    }
+    
+    
+    String host = null;
+    String userAgent = null;
+    
+    try{
+      host = request.getRemoteHost();
+    }catch(Exception e){
+    }
+    try{
+      userAgent = request.getHeader("User-Agent");
+    }catch(Exception e){
+    }
 
-  Map<Integer, UserSessionInfo> getSessionIds(){
+    
+    UserSessionInfo i = sessions.get(id);
+    if(i == null){
+      i=new UserSessionInfo();
+      sessions.put(id, i);
+      i.uniqueId = UUID.randomUUID().toString();
+      i.creationTime = tools.DateFunctions.getCurrentDateInMillis();
+      i.hits = 0;
+      Debug.println("New session for id ["+id+"] for user ["+getUserId()+"] added with uniqueid ["+i.uniqueId+"]");
+    }
+    
+    long currentTime = tools.DateFunctions.getCurrentDateInMillis();
+    i.accessTime = currentTime;
+    i.host=host;
+    i.userAgent = userAgent;
+    i.hits++;
+    i.sessionType = accessToken!=null?"accesstoken":"browsersession";
+    
+    
+    return i.uniqueId; 
+  }
+  
+  
+  
+  
+
+  Map<String, UserSessionInfo> getSessionIds(){
     return sessions;
   }
   
+  /**
+   * Remove the session id from the users session list.
+   * @param id
+   */
+  public void logoutAndRemoveSessionId(HttpServletRequest request,HttpServletResponse response) {
+    String id = ""+request.getSession().hashCode();
+    Debug.println("Removing session info for user "+getUserId() +" with hash "+id);
+    HTTPTools.removeCookie(response, LoginManager.impactportal_userid_cookie);
+    sessions.remove(id);
+    
+  }
   
-//  public void setSessionInfo(HttpServletRequest request){
-//    try{
-//      _addSessionId(request.getSession().hashCode(),request.getSession().getCreationTime(),request.getSession().getLastAccessedTime());
-//    }catch(Exception e){
-//      e.printStackTrace();
-//    }
-//  }
+  /**
+   * Keeps track of user sessions, complementary to  to logoutAndRemoveSessionId. Is called by setAttributesFromHTTPRequestSession.
+   * @param request
+   */
+  private void setSessionInfo(HttpServletRequest request,HttpServletResponse response, String accessToken){
+    String uuid = null;
+    try{
+      uuid = _addSessionId(request, accessToken);
+      if(response!=null){
+        Debug.println("setCookieValue");
+        
+        HTTPTools.setCookieValue(response, LoginManager.impactportal_userid_cookie,uuid, LoginManager.impactportal_userid_cookie_durationsec);
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+    
+  }
+  
+
+  
   public void setLoginInfo(String loginMethod) {
     this.loginInfo = loginMethod;
   }
@@ -206,38 +278,40 @@ public class ImpactUser {
     
   }
   
-  public void setAttributesFromHTTPRequestSession(HttpServletRequest request) {
+  public void setAttributesFromHTTPRequestSession(HttpServletRequest request,HttpServletResponse response, String accessToken) {
     if(request == null){
       return;
     }
-    if(request.getSession()==null){
-      return;
-    }
-    if(getOpenId()==null){
-      String openid = (String) request.getSession().getAttribute("openid_identifier");
-      if(openid != null){
-        setOpenId(openid);
+    if(accessToken==null){// Do not fiddle with the session when a commandline accesstoken is used.
+      if(request.getSession()==null){
+        return;
       }
-    }
-  
-    oauth2certificate = (String) request.getSession().getAttribute("certificate");
-    loginMethod = (String) request.getSession().getAttribute("login_method");
-    
-    try {
-      String emailAddress = (String) request.getSession().getAttribute(
-          "emailaddress");
-      
-      if (emailAddress != null) {
-        if (emailAddress.length() > 0) {
-          setEmailAddress(emailAddress);
-      
-          Debug.println("Email: " + emailAddress);
+      if(getOpenId()==null){
+        String openid = (String) request.getSession().getAttribute("openid_identifier");
+        if(openid != null){
+          setOpenId(openid);
         }
       }
-  
-    } catch (Exception e) {
-      e.printStackTrace();
+    
+      
+      oauth2certificate = (String) request.getSession().getAttribute("certificate");
+      loginMethod = (String) request.getSession().getAttribute("login_method");
+      
+      try {
+        String emailAddress = (String) request.getSession().getAttribute(
+            "emailaddress");
+        
+        if (emailAddress != null) {
+          if (emailAddress.length() > 0) {
+            setEmailAddress(emailAddress);
+          }
+        }
+    
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
+    setSessionInfo(request,response, accessToken);
   }
   
   /* Returns The X509 credential is stored as string, not as file location */
@@ -252,10 +326,16 @@ public class ImpactUser {
 
   /*Properties in a json file on disk can be loaded*/
   public void loadProperties() {
-    //Debug.println("loadProperties");
-    String userPropertiesFile = this.getWorkspace()+"/userprops.json";
+    if(debug)Debug.println("loadProperties for "+getUserId());
+    
     try {
+      if(this.getWorkspace()==null){
+        Debug.errprintln("User workspace not initialized");
+        return ;
+      }
+      String userPropertiesFile = this.getWorkspace()+"/userprops.json";
       String data = tools.LazyCaller.getInstance().readFile(userPropertiesFile);
+      
       JSONObject searchResults =  (JSONObject) new JSONTokener(data).nextValue();
       try {
         this.openid = searchResults.getString("openid");

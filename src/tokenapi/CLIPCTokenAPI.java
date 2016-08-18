@@ -79,7 +79,7 @@ public class CLIPCTokenAPI extends HttpServlet {
                   try {
                     String userID=HTTPTools.getHTTPParam(request, "client_id");
                     Debug.println("Found generatetoken request for user "+userID);
-                    int status = getAccessToken(userID,request,jsonResponse);
+                    int status = getAccessToken(userID,jsonResponse);
                     if(status != 0){
                       errorMessage="Unable to find user id";
                     }
@@ -138,13 +138,12 @@ public class CLIPCTokenAPI extends HttpServlet {
   /**
    * Obtains an access token from the tokenstore. A token will be re-used if the token is at least 8 hours valid. Otherwise a new token is returned.
    * @param userId
-   * @param request
    * @param jsonResponse
    * @return
    */
-  private int getAccessToken(String userId,HttpServletRequest request,JSONResponse jsonResponse) {
+  private int getAccessToken(String userId,JSONResponse jsonResponse) {
     ImpactUser user = null;
-    user = LoginManager.getUser(userId, request);
+    user = LoginManager.getUser(userId);
     if(user == null){
       Debug.errprintln("Unable to find user in store ["+userId+"]");
       return -1; 
