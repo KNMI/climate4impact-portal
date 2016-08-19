@@ -178,22 +178,23 @@ var FileViewerInterface = function(options){
   };
   
   function checkForViewableVariable(variable){
-      if(variable.variable == "lon"){return "";}
-      if(variable.variable == "lat"){return "";}
-      if(variable.variable == "x"){return "";}
-      if(variable.variable == "y"){return "";}
-      if(variable.dimensions&&variable.isViewable==1){
-      if(variable.dimensions.length>1){
-        for(var d=0;d<variable.dimensions.length;d++){
-          if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
-        }
+//      if(variable.variable == "lon"){return "";}
+//      if(variable.variable == "lat"){return "";}
+//      if(variable.variable == "x"){return "";}
+//      if(variable.variable == "y"){return "";}
+      if(variable.isViewable==1){
+//      if(variable.dimensions&&variable.isViewable==1){
+//      if(variable.dimensions.length>1){
+//        for(var d=0;d<variable.dimensions.length;d++){
+//          if(variable.dimensions[d].name.indexOf("bnds")!=-1)return "";
+//        }
 
      
         var maxAllowedWidth=rootElement.width()-120;
         var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width="+maxAllowedWidth+"&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
         var html='<div class="c4i-fileviewer-previewstyle" name="'+variable.variable+'"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
-      }
+//      }
     }
     return "";
   };

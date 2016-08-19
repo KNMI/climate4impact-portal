@@ -150,15 +150,25 @@ public class OpendapViewer {
         }*/
           try{
   
-            String[] varDimensions = variables.get(j).getAttrValue("shape").split(" ");
-            if(varDimensions.length>=2){
-              if(variables.get(j).getAttrValue("name").indexOf("bnds")==-1){
+            String[] varDimensions = new String[0];
+            
+            try{
+            varDimensions = variables.get(j).getAttrValue("shape").split(" ");
+            }catch(Exception e){
+              
+            }
+            
+            String variableName = variables.get(j).getAttrValue("name");
+            Debug.println(variableName+" : varDimensions.length="+varDimensions.length);
+            if(varDimensions.length>=1)
+            {
+              //if(variableName.indexOf("bnds")==-1){
                 
-//                boolean show = true;
-//                for(String dim : varDimensions){
-//                  if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
-//                    show=false;break;
-//                  }
+                boolean show = true;
+                for(String dim : varDimensions){
+                  if(dim.equals("maxStrlen64")||dim.equals("ngrids")){
+                    show=false;break;
+                  }
 //                  boolean foundDim = false;
 //                  for(int i=0;i<variables.size();i++){
 //                    if(variables.get(i).getAttrValue("name").equals(dim)){
@@ -166,31 +176,35 @@ public class OpendapViewer {
 //                    }
 //                  }
 //                  if(foundDim==false){show=false;break;}
-//                }
-                
-                //if(show){
-                  if(variables.get(j).getAttrValue("name").equalsIgnoreCase("lon")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lat")==false&&
-                      variables.get(j).getAttrValue("name").indexOf("bnds")==-1&&
-                      variables.get(j).getAttrValue("name").indexOf("bounds")==-1&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("x")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("y")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("row")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("col")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("latitude")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lon_vertices")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("lat_vertices")==false&&
-                      variables.get(j).getAttrValue("name").equalsIgnoreCase("longitude")==false&&
-                      variables.get(j).getAttrValue("name").equals("Actual_latitude")==false&&
-                      variables.get(j).getAttrValue("name").equals("Actual_longitude")==false
+//                  
+                  if(dim.equals(variableName))show=false;
+                }
+//                
+                if(show){
+                  if(variableName.equalsIgnoreCase("lon")==false&&
+                      variableName.equalsIgnoreCase("lat")==false&&
+                      variableName.indexOf("bnds")==-1&&
+                      
+                      variableName.indexOf("bounds")==-1&&
+                      variableName.equalsIgnoreCase("time")==false&&
+                      variableName.equalsIgnoreCase("x")==false&&
+                      variableName.equalsIgnoreCase("y")==false&&
+                      variableName.equalsIgnoreCase("row")==false&&
+                      variableName.equalsIgnoreCase("col")==false&&
+                      variableName.equalsIgnoreCase("latitude")==false&&
+                      variableName.equalsIgnoreCase("lon_vertices")==false&&
+                      variableName.equalsIgnoreCase("lat_vertices")==false&&
+                      variableName.equalsIgnoreCase("longitude")==false&&
+                      variableName.equals("Actual_latitude")==false&&
+                      variableName.equals("Actual_longitude")==false
                       ){
                     jsonVariable1.put("isViewable",1);
                   }
-                //}
-              }
+                }
+              //}
             }
   
-           
+  
             JSONArray jsonDimensionArray = new JSONArray();
             for(int d=0;d<varDimensions.length;d++){
               JSONObject dimension = new JSONObject();
@@ -218,7 +232,7 @@ public class OpendapViewer {
             jsonVariable1.put("dimensions",jsonDimensionArray);
             //DebugConsole.println("dimensionArray: "+jsonDimensionArray.toString());
           }catch(Exception e){
-         
+            e.printStackTrace();
           }
         
   
