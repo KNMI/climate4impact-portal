@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import oauth2handling.OAuth2Handler;
+import stats.StatLogger;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.globus.myproxy.MyProxy;
@@ -289,13 +290,15 @@ public class LoginManager {
 
     /*Trying to get user info from X509 cert*/
     if (id == null) {
+      String uniqueId = null;
       String CertOpenIdIdentifier = null;
       // org.apache.catalina.authenticator.SSLAuthenticator
       X509Certificate[] certs = (X509Certificate[]) request
           .getAttribute("javax.servlet.request.X509Certificate");
       if (null != certs && certs.length > 0) {
         X509Certificate cert = certs[0];
-
+        
+        uniqueId = "x509_"+cert.getSerialNumber();
         String subjectDN = cert.getSubjectDN().toString();
         //Debug.println("getSubjectDN: " + subjectDN);
         String[] dnItems = subjectDN.split(", ");
@@ -311,6 +314,9 @@ public class LoginManager {
       if (CertOpenIdIdentifier != null) {
         id = CertOpenIdIdentifier;
         try{
+          
+          accessToken = uniqueId+"_"+CertOpenIdIdentifier;
+          //Debug.println("Unique id = ["+accessToken+"]");
           request.getSession().setAttribute("openid_identifier",id);
         }catch(Exception e){
           Debug.printStackTrace(e);
@@ -335,8 +341,14 @@ public class LoginManager {
     }
 
     ImpactUser user = getUser(id);
+    
     user.setAttributesFromHTTPRequestSession(request,response,accessToken);
-
+    
+    try {
+      checkLogin(user);
+    } catch (Exception e) {
+    }
+    
     return user;
   }
 
@@ -412,7 +424,7 @@ public class LoginManager {
     users.add(user);
     
     try {
-      _checkLogin(user);
+      checkLogin(user);
     } catch (Exception e) {
     }
 
@@ -430,7 +442,7 @@ public class LoginManager {
    * @param session
    * @throws Exception
    */
-  private synchronized static void _checkLogin(ImpactUser user) throws Exception {
+  private synchronized static void _directCheckLogin(ImpactUser user) throws Exception {
 
     if(debug)Debug.println("Check login " + user.getUserId());
 
@@ -679,8 +691,8 @@ public class LoginManager {
       ImpactUser user;
       user = getUser(request);
       if (user != null) {
-
         user.logoutAndRemoveSessionId(request,response);
+        tools.LazyCaller.getInstance().markDirty("lazyCheckLogin"+user.getUserId());
       }
     } catch (Exception e) {
     }
@@ -701,16 +713,10 @@ public class LoginManager {
   }
 
   public static void checkLogin(ImpactUser user) throws Exception {
-    if(user == null){
-      _checkLogin(user);
-      return;
-    }
-    //_checkLogin(user);
-    //if(us)
-    String id = user.getUserId();
-    if(LazyCaller.getInstance().isCallable("lazyCheckLogin"+id,5000)){
-      Debug.println("lazyCheckLogin_"+id);
-      _checkLogin(user);     
+    if(user == null)return;
+    if(LazyCaller.getInstance().isCallable("lazyCheckLogin"+user.getUserId(),2000)){
+      Debug.println("lazyCheckLogin_"+user.getUserId());
+      _directCheckLogin(user);     
     }    
   }
 

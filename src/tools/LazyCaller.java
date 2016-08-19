@@ -49,7 +49,7 @@ public class LazyCaller {
     long currentAge =DateFunctions.getCurrentDateInMillis();
     LazyObject fileObj = getLazyObject(file);
     if(fileObj!=null){
-      if(fileObj.age+1000>currentAge){
+      if(fileObj.age+10000>currentAge){
         return fileObj.data; 
       }
     }else{
@@ -58,7 +58,7 @@ public class LazyCaller {
       fileObj.name = file;
     }
     fileObj.age= currentAge;
-    Debug.println("LazyRead needs update: "+file);
+    //Debug.println("LazyRead needs update: "+file);
     
     fileObj.data = tools.Tools.readFile(fileObj.name);
     return fileObj.data;

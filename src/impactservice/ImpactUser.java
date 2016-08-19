@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import impactservice.ImpactUser.UserSessionInfo;
+import stats.StatLogger;
 import tools.DateFunctions;
 import tools.Debug;
 import tools.HTTPTools;
@@ -26,7 +27,7 @@ import tools.Tools;
 public class ImpactUser {
   static boolean debug=false;
   private String id = null; // The unique ID of the user object
-  private String _internalName = null;
+  //private String _internalName = null;
   private String usersDir = null;
   private String loginInfo = null; /* String composed by checklogin function based on login params */
   private String certInfo = null;
@@ -179,6 +180,7 @@ public class ImpactUser {
     String userAgent;
     String uniqueId;
     String sessionType;
+    String token;
     int hits =0;
   }
 
@@ -206,7 +208,8 @@ public class ImpactUser {
       userAgent = request.getHeader("User-Agent");
     }catch(Exception e){
     }
-
+    
+    
     
     UserSessionInfo i = sessions.get(id);
     if(i == null){
@@ -223,9 +226,20 @@ public class ImpactUser {
     i.host=host;
     i.userAgent = userAgent;
     i.hits++;
-    i.sessionType = accessToken!=null?"accesstoken":"browsersession";
+    if(accessToken!=null){
+      i.token = accessToken;
+      if(accessToken.startsWith("x509")==false){
+        i.sessionType = "accesstoken";  
+      }else{
+        i.sessionType = "x509cert";
+      }
+    }else{
+      i.token = i.uniqueId;
+      i.sessionType = "browsersession";
+    }
     
     
+    StatLogger.logger(request,i.sessionType,getUserId());
     return i.uniqueId; 
   }
   
@@ -259,8 +273,10 @@ public class ImpactUser {
       uuid = _addSessionId(request, accessToken);
       if(response!=null){
         Debug.println("setCookieValue");
-        
-        HTTPTools.setCookieValue(response, LoginManager.impactportal_userid_cookie,uuid, LoginManager.impactportal_userid_cookie_durationsec);
+        /*Access tokens are also set by the x509 certificate, so that the same session is reused by this ID. Dont' advertise this in the browser.*/
+        if(uuid.startsWith("x509")==false){
+          HTTPTools.setCookieValue(response, LoginManager.impactportal_userid_cookie,uuid, LoginManager.impactportal_userid_cookie_durationsec);
+        }
       }
     }catch(Exception e){
       e.printStackTrace();

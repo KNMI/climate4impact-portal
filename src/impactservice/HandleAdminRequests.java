@@ -77,6 +77,7 @@ public class HandleAdminRequests {
                 sessionInfo.put("useragent",entry.getValue().userAgent);
                 sessionInfo.put("sessiontype",entry.getValue().sessionType);
                 sessionInfo.put("hits",entry.getValue().hits);
+                sessionInfo.put("token",entry.getValue().token);
                 numSessions++;
                 sessionIds.put(sessionInfo);
             }

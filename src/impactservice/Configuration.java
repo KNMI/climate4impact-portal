@@ -124,6 +124,7 @@ public class Configuration {
     
     public static String offlineMode;
     public static String defaultUserInOfflineMode;
+    public static String statlogfile = "";
     
     //public static String getServerHomeURL(){readConfig();return serverURLHTTP;}
     public static void doConfig(XMLElement configReader) {
@@ -131,6 +132,7 @@ public class Configuration {
       serverURLHTTPS = configReader.getNodeValue("impactportal.serverurlhttps");
       offlineMode = configReader.getNodeValue("impactportal.offlinemode");
       defaultUserInOfflineMode= configReader.getNodeValue("impactportal.defaultuseropenid");
+      statlogfile= configReader.getNodeValue("impactportal.statlogfile");
     }
     public static String getServerHTTPURL(){
       readConfig();
@@ -149,6 +151,12 @@ public class Configuration {
       //Only used in case of offline mode
       readConfig();
       return defaultUserInOfflineMode;
+    }
+    public static String getStatLogfile() {
+      readConfig();
+      if(statlogfile==null)return null;
+      if(statlogfile.length()==0)return null;
+      return statlogfile;
     }
   }
   
@@ -446,5 +454,9 @@ public class Configuration {
       readConfig();
       return dpBaseRestUrl;
    }
+  }
+
+  public static String getStatLogfile() {
+    return GlobalConfig.getStatLogfile();
   }
 }
