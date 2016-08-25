@@ -102,7 +102,9 @@ public class OpendapServer {
   };
   
   
-
+  public static long getUnsignedInt(int x) {
+    return x & 0x00000000ffffffffL;
+  }
 
   static class DimInfo{
     int start[] = null;
@@ -557,19 +559,19 @@ public class OpendapServer {
           if(attrValue.length()>0)attrValue.append(",");
           switch(type){
           case BYTE:
-            attrValue.append((byte)Integer.toUnsignedLong(vals.getByte(j)));
+            attrValue.append(""+getUnsignedInt(vals.getByte(j)));
             break;
           case CHAR:
-            attrValue.append(Integer.toUnsignedString(vals.getChar(j)));
+            attrValue.append(""+getUnsignedInt(vals.getChar(j)));
             break;
           case SHORT:
-            attrValue.append(Integer.toUnsignedString(vals.getShort(j)));
+            attrValue.append(""+getUnsignedInt(vals.getShort(j)));
             break;
           case INT:
-            attrValue.append(Integer.toUnsignedString(vals.getInt(j)));
+            attrValue.append(""+getUnsignedInt(vals.getInt(j)));
             break;
           case LONG:
-            attrValue.append(Integer.toUnsignedLong((int) vals.getLong(j)));
+            attrValue.append(""+getUnsignedInt((int) vals.getLong(j)));
             break;
 
           default:
