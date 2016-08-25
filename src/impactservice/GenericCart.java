@@ -614,6 +614,7 @@ public class GenericCart {
           if(fileEntry[f].getName().endsWith(".nc")||
               fileEntry[f].getName().endsWith(".nc3")||
               fileEntry[f].getName().endsWith(".nc4")||
+              fileEntry[f].getName().endsWith(".json")||
               fileEntry[f].getName().endsWith(".geojson")){
             dataset.put("dapurl",dapLocationHTTPS+impactUser.getUserId()+"/"+path+fileEntry[f].getName());
             dataset.put("hasdap",true);

@@ -191,7 +191,8 @@ var FileViewerInterface = function(options){
 
      
         var maxAllowedWidth=rootElement.width()-120;
-        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width="+maxAllowedWidth+"&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true";
+        var url=options.adagucservice+"source="+URLEncode(options.prettyquery)+ "&service=WMS&request=getmap&format=image/png&layers=baselayer,"+variable.variable+",overlay&width="+maxAllowedWidth+"&CRS=EPSG:4326&STYLES=&EXCEPTIONS=INIMAGE&showlegend=true&";
+        url+=Math.random();
         var html='<div class="c4i-fileviewer-previewstyle" name="'+variable.variable+'"><span>Preview</span>: <img src="'+url+'"/></div>';
         return html;
 //      }
