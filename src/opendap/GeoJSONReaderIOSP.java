@@ -24,7 +24,11 @@ import ucar.nc2.util.CancelTask;
 import ucar.unidata.io.RandomAccessFile;
 
 /**
- * GeoJSONReader
+ * GeoJSONReaderIOSP
+ * 
+ * This class provides an IOServiceProvider for GeoJSON.
+ * It reads the GeoJSON into a CDM object, in a similar way as done in the ADAGUCServer. 
+ * The ADAGUCServer is able to visualize GeoJSON over OpenDAP by serving GeoJSON with this IOSP.
  *
  * @author Maarten Plieger, KNMI, 2016-08
  */
