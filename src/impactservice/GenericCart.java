@@ -611,7 +611,10 @@ public class GenericCart {
           //String dapLocationHTTP = Configuration.GlobalConfig.getServerHTTPURL()+Configuration.getHomeURL()+"/DAP/";
           String dapLocationHTTPS = (Configuration.getHomeURLHTTPS()+"/DAP/");
 
-          if(fileEntry[f].getName().lastIndexOf(".nc")>=0){
+          if(fileEntry[f].getName().endsWith(".nc")||
+              fileEntry[f].getName().endsWith(".nc3")||
+              fileEntry[f].getName().endsWith(".nc4")||
+              fileEntry[f].getName().endsWith(".geojson")){
             dataset.put("dapurl",dapLocationHTTPS+impactUser.getUserId()+"/"+path+fileEntry[f].getName());
             dataset.put("hasdap",true);
             dataset.put("iconCls", "typeOF");
