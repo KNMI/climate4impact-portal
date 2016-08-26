@@ -31,7 +31,9 @@
 		if (user != null) {
 %>
 <script>
-$(function () {
+$(".impactcontent").hide();
+$( document ).ready(function () {
+  	$(".impactcontent").show();
     'use strict';
     $('#showwhenuploading').hide();
     // Change this to the location of your server-side upload handler:
@@ -40,6 +42,8 @@ $(function () {
         url: url,
         dataType: 'json',
         done: function (e, data) {
+            //console.log("done");
+            $(".fileinput-button").show();
         	$('#showwhenuploading').show();
             $.each(data.result.files, function (index, file) {
             	if(!file.error){
@@ -48,13 +52,24 @@ $(function () {
             		$('#uploadedfileserror ul').append('<li>FAILED: '+file.name+", "+file.error+'</li>');
             	}
             });
+            $("#fileupload_info").html("");
+            $('#showwhenuploading').hide();
         },
         progressall: function (e, data) {
+            //console.log("progressall");
         	var progress = parseInt(data.loaded / data.total * 100, 10);
             $('#progress .progress-bar').css(
                 'width',
                 progress + '%'
             );
+            $("#fileupload_info").html("Uploading ...");
+        },
+        start: function(){
+          //console.log("fileuploadstart");
+          $('#showwhenuploading').show();
+          $(".fileinput-button").hide();
+          $("#fileupload_info").html("Start Upload ...");
+          $('#progress .progress-bar').css('width','1%');
         }
     }).prop('disabled', !$.support.fileInput)
         .parent().addClass($.support.fileInput ? undefined : 'disabled');
@@ -70,15 +85,19 @@ $(function () {
         <span>Select file(s)</span>
         <!-- The file input field used as target for the file upload widget -->
         <input id="fileupload" type="file" name="files[]" multiple ></input>
+        
     </span>
    
     <br/>
     <!-- The global progress bar -->
     <br/>
     <div id="showwhenuploading">
+    <span id="fileupload_info"></span>
     <div id="progress" class="progress">
         <div class="progress-bar progress-bar-success"></div>
     </div>
+    </div>
+    <div class="fileinput-button">
     <b>The following files have been uploaded:</b><br/>
     <div id="uploadedfiles" class="files">
     <ul></ul>	
@@ -87,16 +106,17 @@ $(function () {
     <ul></ul>	
 	</div>
 	
+	
 
 	<br/>
+	<div class="fileinput-button">
 	    <b>Actions:</b>  
 	       <ul>
-	       <li><a href="upload.jsp">Upload another file</a></li>
 	       <li><a href="basket.jsp">Go to your basket</a></li>
 	       <li><a href="../help/contactexpert.jsp">Having problems?</a></li>
 	       </ul>
 	       
-              
+    </div>          
     
     </div>
         </div>

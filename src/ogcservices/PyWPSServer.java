@@ -65,6 +65,11 @@ public class PyWPSServer extends HttpServlet {
         throw new Exception("User : "+user.getUserId()+" has no home dir");
       }
       
+      
+      environmentVariables=Tools.appendString( environmentVariables,"SERVICE_ADAGUCSERVER="+Configuration.getHomeURLHTTPS()+"/adagucserver?");
+      environmentVariables=Tools.appendString( environmentVariables,"CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation());
+     
+      
       String userDataDir = user.getDataDir();
       Tools.mksubdirs(userDataDir+"/WPS_Scratch/");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir+"/WPS_Scratch/");

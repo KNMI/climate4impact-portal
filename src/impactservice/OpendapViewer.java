@@ -136,9 +136,15 @@ public class OpendapViewer {
           
           JSONObject jsonVariable1 = new JSONObject();
   
-          String varName1= variables.get(j).getAttrValue("name");
-          jsonVariable1.put("variable",varName1);//.getName());
-          String longName=varName1;
+          String variableName= variables.get(j).getAttrValue("name");
+          
+          if(variableName.equals("jsoncontent")==false){
+            jsonVariable1.put("variable",variableName);//.getName());
+          }else{
+            //GeoJSON in ADAGUCServer has always a layer features
+            jsonVariable1.put("variable","features");//.getName());
+          }
+          String longName=variableName;
           jsonVariable1.put("variabletype", variables.get(j).getAttrValue("type"));
           jsonVariable1.put("service", requestStr);
   
@@ -158,7 +164,7 @@ public class OpendapViewer {
               
             }
             
-            String variableName = variables.get(j).getAttrValue("name");
+            
             Debug.println(variableName+" : varDimensions.length="+varDimensions.length);
             if(varDimensions.length>=1)
             {
@@ -180,6 +186,7 @@ public class OpendapViewer {
                   if(dim.equals(variableName))show=false;
                 }
 //                
+                if(variableName.equals("jsoncontent"))show=true;
                 if(show){
                   if(variableName.equalsIgnoreCase("lon")==false&&
                       variableName.equalsIgnoreCase("lat")==false&&
@@ -217,7 +224,7 @@ public class OpendapViewer {
                   dimension.put("length",dimensions.get(d).getAttrValue("length"));
                   jsonDimensionArray.put(dimension);
                   
-                  if(dimName.equals(varName1)){
+                  if(dimName.equals(variableName)){
                     JSONArray length = new JSONArray();
                     length.put((new JSONObject()).put("length",dimensions.get(rd).getAttrValue("length")));
                     jsonVariable1.put("isDimension",length);

@@ -17,6 +17,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 
 import tools.DateFunctions;
 import tools.Debug;
+import tools.Tools;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -68,15 +69,15 @@ public class OpendapServer {
     try {
       if(path.endsWith(".dds")){
         response.setContentType("text/plain");
-        ncFile = NetcdfFile.open(localNetCDFFileLocation);
+        ncFile = getNetCDFFile(localNetCDFFileLocation);
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,baseName,URLDecoder.decode(queryString,"UTF-8"),false));
       }else if(path.endsWith(".das")){
         response.setContentType("text/plain");
-        ncFile = NetcdfFile.open(localNetCDFFileLocation);
+        ncFile = getNetCDFFile(localNetCDFFileLocation);
         response.getOutputStream().print(getDASFromNetCDFFile(ncFile).toString());
       }else if(path.endsWith(".dods")){
         response.setContentType("application/octet");
-        ncFile = NetcdfFile.open(localNetCDFFileLocation);
+        ncFile = getNetCDFFile(localNetCDFFileLocation);
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,baseName,URLDecoder.decode(queryString,"UTF-8"),true));
       }else {
         streamFileToClient(response,localNetCDFFileLocation);
@@ -102,7 +103,24 @@ public class OpendapServer {
   };
   
   
+  private static NetcdfFile getNetCDFFile(String localNetCDFFileLocation) throws IOException {
+        try {
+          NetcdfFile.registerIOProvider(GeoJSONReaderIOSP.class);
+        } catch (IllegalAccessException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        } catch (InstantiationException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+    
+    return NetcdfFile.open(localNetCDFFileLocation);
+  }
 
+
+  public static long getUnsignedInt(int x) {
+    return x & 0x00000000ffffffffL;
+  }
 
   static class DimInfo{
     int start[] = null;
@@ -557,19 +575,19 @@ public class OpendapServer {
           if(attrValue.length()>0)attrValue.append(",");
           switch(type){
           case BYTE:
-            attrValue.append((byte)Integer.toUnsignedLong(vals.getByte(j)));
+            attrValue.append(""+getUnsignedInt(vals.getByte(j)));
             break;
           case CHAR:
-            attrValue.append(Integer.toUnsignedString(vals.getChar(j)));
+            attrValue.append(""+getUnsignedInt(vals.getChar(j)));
             break;
           case SHORT:
-            attrValue.append(Integer.toUnsignedString(vals.getShort(j)));
+            attrValue.append(""+getUnsignedInt(vals.getShort(j)));
             break;
           case INT:
-            attrValue.append(Integer.toUnsignedString(vals.getInt(j)));
+            attrValue.append(""+getUnsignedInt(vals.getInt(j)));
             break;
           case LONG:
-            attrValue.append(Integer.toUnsignedLong((int) vals.getLong(j)));
+            attrValue.append(""+getUnsignedInt((int) vals.getLong(j)));
             break;
 
           default:
