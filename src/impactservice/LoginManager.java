@@ -81,7 +81,7 @@ public class LoginManager {
   static boolean debug=false;
   private static Vector<ImpactUser> users = new Vector<ImpactUser>();
   public static String impactportal_userid_cookie="C4I_ID";
-  public static int impactportal_userid_cookie_durationsec = 3600*24*7;
+  public static int impactportal_userid_cookie_durationsec = 3600*24;
 
   public static void getUserProxyService(ImpactUser user)
       throws MalformedURLException, WebRequestBadStatusException, Exception {
