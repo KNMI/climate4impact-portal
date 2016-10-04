@@ -55,8 +55,20 @@ public class DownscalingService extends HttpServlet {
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {  
     String pathInfo = request.getPathInfo();
+    if(pathInfo.matches("/domains")){      
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo, "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");   
+      PrintWriter out = response.getWriter();
+      out.print(sb);
+      out.flush();
     
-    if(pathInfo.matches("/predictands")){      
+    }else if(pathInfo.matches("/predictands")){      
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" + request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
@@ -109,7 +121,7 @@ public class DownscalingService extends HttpServlet {
       out.flush();
     
     }else if(pathInfo.matches("/variables")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?variableType=" + request.getParameter("variableType"), "GET");
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?"+request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -135,8 +147,8 @@ public class DownscalingService extends HttpServlet {
       response.setContentType("application/pdf");
       response.setHeader("Content-Disposition", "attachment; filename=validation.pdf");
       
-    }else if(pathInfo.matches("/datasets")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?zone="+request.getParameter("zone")+"&username="+request.getParameter("username"), "GET");
+    }else if(pathInfo.matches("/models")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" +request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -148,8 +160,8 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
       
-    }else if(pathInfo.matches("/datasets/.*/scenarios")){
-      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?zone="+request.getParameter("zone") + "&sYear="+request.getParameter("sYear") + "&eYear="+request.getParameter("eYear"), "GET");
+    }else if(pathInfo.matches("/models/.*/experiments")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" +request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
       String inputLine;
@@ -240,7 +252,7 @@ public class DownscalingService extends HttpServlet {
   }
   
   public static List<Job> getUserJobs(String username) throws JSONException, IOException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/users/" + username + "/jobs", "GET");
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/jobs?username=" + username, "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -281,6 +293,48 @@ public class DownscalingService extends HttpServlet {
     return predictands;
   }
   
+  public static List<String> getDomainTypes() throws IOException, JSONException{
+//    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/domains/types", "GET");
+//    if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+//      return null;
+//    StringBuffer response = new StringBuffer();
+//    BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+//    String inputLine;
+//    while ((inputLine = in.readLine()) != null) {
+//      response.append(inputLine);
+//    }
+//    in.close();
+//    JSONObject myObject = new JSONObject(response.toString());
+//    JSONArray jsonVariableTypes = myObject.getJSONArray("values");
+    String[] domainTypes = {"VALUE",""};
+    List<String> domainTypesList = new ArrayList<String>();
+    for(int i=0; i< domainTypes.length; i++){
+      domainTypesList.add(domainTypes[i]);
+    }
+    return domainTypesList;
+  }
+  
+  public static List<String> getDatasetTypes() throws IOException, JSONException{
+//  HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/domains/types", "GET");
+//  if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
+//    return null;
+//  StringBuffer response = new StringBuffer();
+//  BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+//  String inputLine;
+//  while ((inputLine = in.readLine()) != null) {
+//    response.append(inputLine);
+//  }
+//  in.close();
+//  JSONObject myObject = new JSONObject(response.toString());
+//  JSONArray jsonVariableTypes = myObject.getJSONArray("values");
+  String[] domainTypes = {"Point","Grid"};
+  List<String> domainTypesList = new ArrayList<String>();
+  for(int i=0; i< domainTypes.length; i++){
+    domainTypesList.add(domainTypes[i]);
+  }
+  return domainTypesList;
+}
+  
   public static List<String> getVariableTypes()throws ServletException, IOException, JSONException{
     HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/variables/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
@@ -301,8 +355,8 @@ public class DownscalingService extends HttpServlet {
     return variableTypes;
   }
   
-  public static List<String> getDatasetTypes()throws ServletException, IOException, JSONException{
-    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/datasets/types", "GET");
+  public static List<String> getModelTypes()throws ServletException, IOException, JSONException{
+    HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + "/models/types", "GET");
     if(urlConn.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND)
       return null;
     StringBuffer response = new StringBuffer();
@@ -356,7 +410,7 @@ public class DownscalingService extends HttpServlet {
         user.put("username", request.getParameter("username"));
         user.put("password", "");
         user.put("email", request.getParameter("email"));
-        user.put("openID", "");
+        user.put("openID", request.getParameter("openID"));
       } catch (JSONException e) {
         e.printStackTrace();
       }
@@ -366,9 +420,10 @@ public class DownscalingService extends HttpServlet {
       wr.close();
       if(urlConn.getResponseCode() ==HttpURLConnection.HTTP_CREATED){
           Debug.print("201 - User subscribed");  
-          response.sendRedirect("../downscaling/downscaling.jsp");
+          response.sendRedirect("../downscaling/create.jsp");
       }else{
-          System.out.println(urlConn.getResponseMessage());  
+          Debug.print("Subscription error - " + urlConn.getResponseMessage());
+          response.sendRedirect("../downscaling/create.jsp?error=500");
       }  
       
     }else if(pathInfo.equals("/downscalings/downscale")){

@@ -15,7 +15,7 @@ $(document).on('click', '.link', function(event, ui){
 $(document).ready(function() {
   $("#date-range-start, #date-range-end").keyup(function (e) {
     if (e.keyCode == 13) {
-      reloadSlider();
+      updateSlider();
     }
   });
 });
@@ -24,9 +24,18 @@ $(document).on('change','#date-range-start, #date-range-end', function(event, ui
   reloadSlider();
 });
 
+
+function updateSlider(sYear, eYear){
+  $("#date-range-start").val(getValueFromHash("sYear"));
+  $("#date-range-end").val(getValueFromHash("eYear"));
+  reloadSlider();
+}
+
 function reloadSlider(){
   var textFieldStart = $("#date-range-start").val();
   var textFieldEnd = $("#date-range-end").val();
+  insertHashProperty("sYear", textFieldStart, sortedKeys);
+  insertHashProperty("eYear", textFieldEnd, sortedKeys);
   if( textFieldStart => $("#slider-range").slider("option", "min") && textFieldStart <= $("#slider-range").slider("option", "max")){
     $("#slider-range").slider("values",[textFieldStart,textFieldEnd]);
   }else{
@@ -37,12 +46,12 @@ function reloadSlider(){
 
 $(document).on('click', 'button', function(event, ui){
   var id = $(this).attr('id');
-  if(id == "button-load-scenarios"){
+  if(id == "button-load-experiments"){
     insertHashProperty("sYear", $('#date-range-start').val(), sortedKeys);
     insertHashProperty("eYear", $('#date-range-end').val(), sortedKeys);
-    loadScenarios();
+    loadExperiments();
   }else if(id=="button-downscale"){
-    if(getValueFromHash("scenario") != null)
+    if(getValueFromHash("experiment") != null)
       downscalingSubmit();
     else
       alert("You have to fill in the whole form to Downscale");
@@ -110,24 +119,28 @@ $(document).on('change', 'input:radio', function(event, ui){
       $('#validation').html("<a href='../DownscalingService/validation?zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"' download='report'>Download validation report</a>");
       $('#downscalingmethod-header').collapsible('open');
       loadValidationReport();
-      loadDatasets();
     }
-  }else if($(this).attr('name') == 'datasetType'){
-    var datasetType = encodeURIComponent($(this).attr('data-dataset-type'));
+  }else if($(this).attr('name') == 'modelProject'){
+    var modelProject = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('datasetType', datasetType, sortedKeys);
-      loadDatasets(); 
+      insertHashProperty('modelProject', modelProject, sortedKeys);
+      loadModels();
     }
-  }else if($(this).attr('name') == 'dataset'){
-    var dataset = encodeURIComponent($(this).attr('data-name'));
+  }else if($(this).attr('name') == 'model'){
+    var model = encodeURIComponent($(this).attr('data-name'));
     if($(this).is(':checked')){
-      insertHashProperty('dataset', dataset, sortedKeys);
-      loadScenarios();
+      insertHashProperty('model', model, sortedKeys);
+      loadExperiments();
     }
-  }else if($(this).attr('name') == 'scenario'){
-    var scenario = encodeURIComponent($(this).attr('data-name'));
+  }else if($(this).attr('name') == 'experiment'){
+    var experiment = encodeURIComponent($(this).attr('data-name'));
+    var sDate = encodeURIComponent($(this).attr('data-sDate'));
+    var eDate = encodeURIComponent($(this).attr('data-eDate'));
     if($(this).is(':checked')){
-      insertHashProperty('scenario', scenario, sortedKeys);
+      insertHashProperty('experiment', experiment, sortedKeys);
+      insertHashProperty('sYear', sDate, sortedKeys);
+      insertHashProperty('eYear', eDate, sortedKeys);
     }
+    loadPeriod();
   }
 });

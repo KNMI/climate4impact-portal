@@ -40,7 +40,7 @@
       			request.setAttribute("loggedInUser", null);
       		}%>
 		var loggedInUser = '${loggedInUser}';
-      	var sortedKeys = ['variableType','variable','zone','predictand','downscalingType','downscalingMethod','datasetType','dataset', 'sYear', 'eYear', 'scenario'];
+      	var sortedKeys = ['variableType','variable','zone','predictand','downscalingType','downscalingMethod','modelProject', 'model', 'run', 'experiment', 'sYear', 'eYear', ];
       	  
 
      		
@@ -58,38 +58,21 @@
 			console.debug("loading class removed");
 		});
 		
-		$(function() {
-		  $("#slider-range").slider({
-		    range : true,
-		    min : 1851,
-		    max: 2101,
-		    step: 1,
-		    values: [2001, 2010],
-		    slide: function( event, ui ) {
-	        	$("#date-range-start" ).val(ui.values[0]);
-	        	$("#date-range-end").val(ui.values[1]);
-		    }
-		  });
-		  $("#date-range-start" ).val($( "#slider-range" ).slider( "values", 0));
-		  $("#date-range-end" ).val($( "#slider-range" ).slider( "values", 1));    
-		});
-		
 		function downscalingSubmit(){
 			var zone = getValueFromHash("zone");
 			var variable = getValueFromHash("variable");
 			var predictand = getValueFromHash("predictand");
 			var downscalingMethod = getValueFromHash("downscalingMethod");
-			var datasetType = getValueFromHash("datasetType");
-			var dataset = getValueFromHash("dataset");
-			var scenario = getValueFromHash("scenario");
+			var modelType = "CLIMATE";
+			var model = getValueFromHash("model");
+			var experiment = getValueFromHash("experiment");
 		    var sYear = $('#date-range-start').val();
 		    var eYear = $('#date-range-end').val();
-		  	var cells = sYear+" "+eYear+" "+ dataset+" 0";
-		  	var params ="?username="+loggedInUser+"&zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"&dataset="+dataset+"&scenario="+scenario+"&sYear="+sYear+"&eYear="+eYear;
+		  	var params ="?username="+loggedInUser+"&zone="+zone+"&predictand="+predictand+"&downscalingMethod="+downscalingMethod+"&model="+model+"&experiment="+experiment+"&sYear="+sYear+"&eYear="+eYear;
 		  	var url="../DownscalingService/downscalings/downscale" + params;
 		  	showOKDialog("<p>Are you sure you want to Downscale this Downscaling configuration?<\p>" + "<p>Variable: "+variable +"<\p>" + 
-		  	    "<p>Predictand: "+predictand+"<\p>"+"<p>Downscaling method: "+downscalingMethod+"<\p>" + "<p>Dataset: "+ dataset+"<\p>"+
-		  	    "<p>Scenario: " + scenario + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
+		  	    "<p>Predictand: "+predictand+"<\p>"+"<p>Downscaling method: "+downscalingMethod+"<\p>" + "<p>Model: "+ model+"<\p>"+
+		  	    "<p>Experiment: " + experiment + "<\p>" + "<p>Period of interest: "+sYear+" - "+ eYear+"<\p>", url);
 		}
 		
 		function postData(url){
@@ -113,9 +96,9 @@
 			var predictand = getValueFromHash("predictand");
 			var downscalingType = getValueFromHash("downscalingType");
 			var downscalingMethod = getValueFromHash("downscalingMethod");
-			var datasetType = getValueFromHash("datasetType");
-			var dataset = getValueFromHash("dataset");
-			var scenario = getValueFromHash("scenario");
+			var modelType = "CLIMATE";
+			var model = getValueFromHash("model");
+			var experiment = getValueFromHash("experiment");
 		    var sYear = $('#date-range-start').val();
 		    var eYear = $('#date-range-end').val();
 			$.ajax({
@@ -130,9 +113,9 @@
 		    	  'predictand' : predictand,
 		    	  'downscalingType' : downscalingType,
 		    	  'downscalingMethod' : downscalingMethod,
-		    	  'datasetType' : datasetType,
-		    	  'dataset' : dataset,
-		    	  'scenario' : scenario,
+		    	  'modelType' : modelType,
+		    	  'model' : model,
+		    	  'experiment' : experiment,
 		    	  'sYear': sYear,
 		    	  'eYear': eYear,
 		    	},
@@ -147,7 +130,7 @@
 		}
 		
 		$(function() {
-		  	$("#button-load-scenarios").button({
+		  	$("#button-load-experiments").button({
     	  		icons: { primary: "ui-icon-arrowrefresh-1-e"}
    			});
 	    	$("#button-saveconfig").button({
@@ -196,8 +179,8 @@
 				    %>
 				</select>
 			
-			<h1>Configure your Downscaling</h1>
-				
+			<h1>Select your Downscaling</h1>
+								
 				<!-- Variable -->
 		      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
 		        	<table width="100%" >
@@ -229,8 +212,73 @@
 		      			<div id="variables"></div>
 		      		</div>
 	      		</div>
+	      		
+	      		<!-- Domain -->
+		      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
+		        	<table width="100%" >
+				        <tr>
+				        	<td class="collapsibletitle" >
+				        		Domain
+				        	</td>
+				        	<td  style="padding:0px;">
+								<table class="collapsibletable" width="100%">
+				  					<tr>
+				  						<div id="domain-types"> 
+					  						<%
+					  							for(String type : DownscalingService.getDomainTypes()){
+					  									out.print("<td><input type='radio' name='domainType' data-domain-type ='" + type + "' value = '" + type + "' class='input-domain-type'>"+type+"</input></td>");		
+					  							}
+					  						%>
+					  					</div>
+									</tr>
+		  						</table>
+							</td>
+							<td style="padding:2px;">
+								<span class="collapse-close"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+		      			<div id="domains"></div>
+		      		</div>
+	      		</div>
+	      		
+	      		<!-- Dataset -->
+		      	<div class="facetoverview collapsible" id="dataset-type-header" style="height:35px;"> 
+		        	<table width="100%" >
+				        <tr>
+				        	<td class="collapsibletitle" >
+				        		Dataset
+				        	</td>
+				        	<td  style="padding:0px;">
+								<table class="collapsibletable" width="100%">
+				  					<tr>
+				  						<div id="dataset-types"> 
+					  						<%
+					  							for(String type : DownscalingService.getDatasetTypes()){
+					  									out.print("<td><input type='radio' name='datasetType' data-dataset-type ='" + type + "' value = '" + type + "' class='input-dataset-type'>"+type+"</input></td>");		
+					  							}
+					  						%>
+					  					</div>
+									</tr>
+		  						</table>
+							</td>
+							<td style="padding:2px;">
+								<span class="collapse-close"/>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+		      			<div id="datasets"></div>
+		      		</div>
+	      		</div>
+	      		
   
-		      	<!-- Predictand -->
+		      	<!-- Predictand-->
 				<div class="facetoverview collapsible" id="predictand-type-header" style="height:35px;"> 
 		        	<table width="100%" >
 			        	<tr>
@@ -255,7 +303,7 @@
 				</div>
    						       
 				<!-- Downscaling methods -->
-		      	<div class="facetoverview collapsible" id="downscalingmethod-header" style="height:55px;"> 
+		      	<div class="facetoverview collapsible" id="downscaling-method-header" style="height:55px;"> 
 		        	<table width="100%" >
 		        		<tr>
 		        			<td class="collapsibletitle" >
@@ -264,11 +312,11 @@
 							<td  style="padding:0px;">
 		  						<table class="collapsibletable" width="100%">
 				  					<tr>
-					  					<div id="downscaling-method-types"> 
+					  					<div id="downscaling-types"> 
 						  					<%
-						  						out.print("<input type='radio' name='downscalingType' data-downscaling-method-type ='ALL' value = 'ALL' class='input-downscaling-method-type'>ALL</input>");
+						  						out.print("<input type='radio' name='downscalingType' data-downscaling-type ='ALL' value = 'ALL' class='input-downscaling-type'>ALL</input>");
 						  						for(String type : DownscalingService.getDownscalingMethodTypes()){
-													out.print("<input type='radio' name='downscalingType' data-downscaling-method-type='" + type + "' value = '" + type + "' class='input-downscaling-type'>"+type+"</input>");		
+													out.print("<input type='radio' name='downscalingType' data-downscaling-type='" + type + "' value = '" + type + "' class='input-downscaling-type'>"+type+"</input>");		
 					  							}
 						  					%>
 						  				</div>
@@ -284,28 +332,26 @@
 				<div class="collapsiblecontainer">
 					<div class="collapsiblecontent">
 		       			<div id="downscaling-methods"></div>
-		       			<div id="validation"></div>
 					</div>
 				</div>
+				
+				<div id="bottom-buttons">
+					<div id="validation"></div>
+				</div>
 
-				<!-- Dataset -->
-		      	<div class="facetoverview collapsible" id="dataset-header" style="height:35px;"> 
+				<h1>Run your Downscaling</h1>
+				
+				<!-- Models -->
+		      	<div class="facetoverview collapsible" id="model-header" style="height:35px;"> 
 					<table width="100%" >
 						<tr>
 			        		<td class="collapsibletitle" >
-			        			Dataset
+			        			Model
 			        		</td>
 			        		<td  style="padding:0px;">
 								<table class="collapsibletable" width="100%">
 				  					<tr>
-										<div id="dataset-types"> 
-					  						<%
-					  							for(String type : DownscalingService.getDatasetTypes()){
-					  								if(type.equals("CLIMATE"))
-					  									out.print("<td><input type='radio' name='dataset-type' data-dataset-type ='" + type + "' value = '" + type + "' class='input-variable-type'>"+type+"</input></td>");		
-					  							}
-					  						%>
-					  					</div>
+				  						<input type='radio' name='modelProject' data-model-project='CMIP5' value = 'CMIP5'>CMIP5</input>		
 				  					</tr>  			
 			  					</table>
 			        		</td>
@@ -318,32 +364,21 @@
 		       
 				<div class="collapsiblecontainer">
 					<div class="collapsiblecontent">
-						<div id="datasets"></div>
+						<div id="models"></div>
 		      		</div>
 				</div>
 	
-				<!-- Scenarios -->
-		      	<div class="facetoverview collapsible" id="scenario-header" style="height:35px;"> 
+				<!-- Experiments -->
+		      	<div class="facetoverview collapsible" id="experiment-header" style="height:35px;"> 
 		        	<table width="100%" >
 			        	<tr>
 			        		<td class="collapsibletitle" >
-			        			Scenario
+			        			Experiment/RCP
 			        		</td>
 			        		<td  style="padding:0px;">
 					  			<table class="collapsibletable" width="100%">
 				  					<tr>
-										<div id="period-selection">
-											<div>
-												<label for="date-range-start">Start year</label>
-												<input type="text" id="date-range-start" class="input-year"/>
-											</div>
-				      						<div id="slider-range"></div>
-				      						<div>
-				      							<label>End year</label>
-				      							<input type="text" id="date-range-end" class="input-year"></input>
-				      						</div>
-				      						<button id="button-load-scenarios" type="button"></button>
-										</div>
+						  				<input type='radio' name='experimentRun' data-experiment-run='1' value = 'Run 1'>Run 1</input>		
 									</tr>
 					  			</table>
 							</td>
@@ -356,9 +391,39 @@
 		       
 				<div class="collapsiblecontainer">
 					<div class="collapsiblecontent">
-						<div id="scenarios"></div>
+						<div id="experiments"></div>
 					</div>
 				</div>
+				
+				<!-- Downscaling methods -->
+		      	<div class="facetoverview collapsible" id="downscaling-period-header" style="height:35px;"> 
+		        	<table width="100%" >
+		        		<tr>
+		        			<td class="collapsibletitle" >
+		        			Period
+		        			</td>
+							<td  style="padding:0px;">
+		  						<table class="collapsibletable" width="100%">
+				  					<tr>
+				  					</tr>
+		  						</table>
+		        			</td>
+		        			<td style="padding:2px;">
+		        				<span class="collapse-close"/>
+	        				</td>
+        				</tr>
+       				</table>
+				</div>
+				<div class="collapsiblecontainer">
+					<div class="collapsiblecontent">
+	  					<div id="period-selection" style="height:30px;">
+							
+						</div>
+					</div>
+				</div>
+				
+				
+				
 				<div id="bottom-buttons">
 					<button id="button-saveconfig" type="button">Save</button>
 					<button id="button-downscale" type="button">Downscale</button>

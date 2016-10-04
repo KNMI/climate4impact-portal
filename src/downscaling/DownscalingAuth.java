@@ -112,7 +112,7 @@ public class DownscalingAuth{
           try {
             expiration = formatter.parse(parts[1]);
             Date now = new Date();
-            if(expiration.compareTo(now)<0) //now before expiration: valid
+            if(expiration.compareTo(now)>0) //now before expiration: valid
               isValid=true;
           } catch (ParseException e) {
             isValid = false;
