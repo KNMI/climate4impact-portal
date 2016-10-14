@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
-
-    <script type="text/javascript">
+    <script type="text/javascript" src="catalogbrowser/catalogbrowser.js"></script>
+  <script type="text/javascript">
   		  var c4iconfigjs = {
             searchservice:"/impactportal/esgfsearch?",
             impactservice:"/impactportal/ImpactService?",
@@ -52,108 +52,13 @@
         	
         	
         %>
-    
-	    var preventSubmit = function(event) {
-	        if(event.keyCode == 13) {
-	            event.preventDefault();
-	            setVarFilter();
-	            return false;
-	        }
-	    };
-		var baseName = '<%=baseName%>';
-		var variableFilter = undefined;
-		var textFilter = undefined;
-    	var setVarFilter = function(){
-    		variableFilter = '';
-    		$("form#varFilter :input[type=checkbox]").each(function(){
-    			 var input = $(this);
-    			 if(input.is(":checked")){
-    				 if(variableFilter.length>0)variableFilter+="|";
-    				 variableFilter+=input.attr('id');
-    			 }
-    			
-    		});
-    		if(variableFilter.length==0)variableFilter = undefined;
-    		
-    		textFilter = '';
-    		textFilter = $("#textfilter").val();
-    		if(textFilter.length<1)textFilter = undefined;
-    		
-    		loadCatalogDescription(variableFilter,textFilter);
-    	};
-    	
-	   
-	    
-  		var loadCatalogDescription = function(variableFilter,textFilter){   
-  		  if(errorMessage){
-  		    $('#datasetinfo').html(URLDecode(errorMessage));
-  		    return;
-  		  }
- 		  catalogURL = catalogURL.split("#")[0];
-  		  $('#datasetinfo').html('<br/><table class=\"basket\"><tr><td><img src="/impactportal/images/ajax-loader.gif"/></td></tr></table>');
-  		  var url='/impactportal/ImpactService?service=catalogbrowser&node='+encodeURI(catalogURL);
-  		  //$('#catalogasjson').html('<a target="_blank" href="'+url+'&format=text/json">json</a>');
-  		  $('#catalogasjson').html("<span class=\"shoppingbasketicon\" onclick=\"basket.postIdentifiersToBasket({id:'"+catalogURL+"',catalogURL:'"+catalogURL+"'})\"/>");
-  		  
-  		  var filters = "";
-  		  if(textFilter!=undefined){filters+="&filter="+encodeURIComponent(textFilter);}
-  		  
-  		 // alert(variableFilter);
-  		  
-  	  	  if(variableFilter!=undefined){filters+="&variables="+encodeURIComponent(variableFilter);}
-  		
-		  $.get(url+'&format=text/html'+filters, function(data) {
-			
-		  	$('#datasetinfo').html(data);
-		    $("#varFilter").keypress(preventSubmit);
-		    $("#varFilter").keydown(preventSubmit);
-		    $("#varFilter").keyup(preventSubmit);
-		    
-		  }); 
-  		}
-  		
-
-  
-  		$(document).ready(function(){
-  		  	var varFilter = window.location.hash.substring(1).split("#");
-  		  
-  		  	loadCatalogDescription(varFilter);
-  		  
-  		   //collapsible management
-            $('.collapsible').collapsible({
-            	defaultOpen: 'datasetcontainer'
-            });
-            
- 		  
-  		});
-	</script>
-	<style type="text/css">
-     .catalogbrowser{
-      	margin: 10px 0;
-    	width: 100%;
-	  }
-	  .catalogbrowser tr{
-	  	border-bottom:1px dashed #DDD;
-	  }
-	  
-	  #variableandtextfilter{
-		margin:4px;
-		padding:6px;
-		background-color: #DEEBFF;
-		
-	  }
-	  #datasetfilelist{
-	  	
-	  	margin:4px;
-	  	padding:0px;
-		
-	  }
-	  #datasetinfo{
-	  	background-color: white;
-	  }
-	  
-	  
-  	</style>
+    </script>
+<script type="text/javascript">
+$( document ).ready(function() {
+  $('#catalogasjson').html("<span class=\"shoppingbasketicon\" onclick=\"basket.postIdentifiersToBasket({id:'"+catalogURL+"',catalogURL:'"+catalogURL+"'})\"/>");
+renderCatalogBrowser({element:$("#datasetinfo"),url:catalogURL,service:c4iconfigjs.impactservice});
+});
+</script>
   </head>
  <body>
 	<jsp:include page="../header.jsp" />

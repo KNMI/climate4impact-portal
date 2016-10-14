@@ -71,7 +71,9 @@ var CatalogBrowser = function(options){
         
         options.element.find(".varFilter").find('input[type="checkbox"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});
         //options.element.find(".varFilter").find('input[type="checkbox"]').attr('onclick','').click(function(){applyCatalogFilters(options.element);});1
-        options.element.find('a').attr('target','_blank');
+        if(options.linktarget){
+          options.element.find('a').attr('target',options.linktarget);
+        }
       };
       var service = "/impactportal/ImpactService?";
       if(options.service)service=options.service;

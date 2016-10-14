@@ -406,6 +406,11 @@ var SearchInterface = function(options){
       html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
       html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogURL:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
       html+="  </span>";
+//      
+//      //Download dataset
+//      html+="  <span title=\"Download this dataset.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
+//      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogURL:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
+//      html+="  </span>";
       
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
        var id = data.response.results[r].esgfid;
@@ -578,7 +583,7 @@ var SearchInterface = function(options){
           }
           var service = impactCatalogBrowserEndPoint;
           
-          renderCatalogBrowser({element:el,url:catalogObject.url,variables:variableFilter,service:service});
+          renderCatalogBrowser({element:el,url:catalogObject.url,variables:variableFilter,service:service,linktarget:"_blank"});
         }
       }else{
         $(this).removeClass("c4i-esgfsearch-dataset-imgexpand");
