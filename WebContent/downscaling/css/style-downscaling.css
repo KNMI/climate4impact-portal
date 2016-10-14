@@ -1,10 +1,15 @@
+.predictand
+{
+	width: 250px;
+}
+
 .refreshinfo
 { 
 	display:inline;
 	float:left;
 	overflow:hidden;
 	width:740px;
-	height:20px;
+	height:20px;s
 }
 
 .link 
@@ -53,7 +58,7 @@ body.loading .modal {
 	height: 15px !important;
 }
 #period-selection{
-	margin-top: 2px;
+	padding: 8px;
 }
 #period-selection div{
 	float: left;
@@ -61,7 +66,7 @@ body.loading .modal {
 }
 
 #bottom-buttons{
-	margin: 5px 5px 5px 0;
+	margin: 5px 5px 5px 2px;
 }
 
 /*
