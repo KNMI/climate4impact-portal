@@ -41,26 +41,38 @@
     <script src="../adagucviewer/jquery/jquery-ui-timepicker-addon.js"></script>
     
        <!-- webmapjs -->
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTools.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSISO8601.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSProj4Definitions.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSJqueryprototypes.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WebMapJS.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSLayer.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSBBOX.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDimension.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSService.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSListener.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimer.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSlider.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSProcessing.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSCoverage.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImage.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImageStore.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDivBuffer.js"></script>
-    <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSelector.js"></script>
+ <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTools.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSISO8601.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSProj4Definitions.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSJqueryprototypes.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSLayer.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSBBOX.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDimension.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSService.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSListener.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimer.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSlider.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSProcessing.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSCoverage.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImage.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSImageStore.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDivBuffer.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSCanvasBuffer.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSTimeSelector.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJS_GFITimeElevation.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSAnimate.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WMJSDialog.js"></script>
+  <script type="text/javascript" src="../adagucviewer/webmapjs/WebMapJS.js"></script>
     <script type="text/javascript" src="../adagucviewer/configc4i.js"></script>
     
+     <!-- I18n -->
+  <script>
+    if ( typeof(defaultLanguage) === 'undefined' ) {
+      document.write('<script src="../adagucviewer/I18n/lang.en.js"><\/script>');
+    } else {
+      document.write('<script src="../adagucviewer/I18n/lang.' + defaultLanguage.language + '.js"><\/script>');
+    }
+  </script>
     
     <link rel="stylesheet" type="text/css" href="../adagucviewer/webmapjs/WMJSStyles.css" />
 
