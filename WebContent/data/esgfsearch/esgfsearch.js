@@ -421,7 +421,7 @@ var SearchInterface = function(options){
        //ESDOC
        if(data.response.results[r].esgfid.indexOf("cmip5")==0){
          html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
-         html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
+         html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+id+"\"></a>";
          html+="</span>";
        }
 
