@@ -3,11 +3,15 @@ package model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * @author c4m
+ *
+ */
 public class Downscaling {
 
 
   int jobId, status, zone, sYear, eYear;
-  String username, predictand, downscalingMethod, type, project, scenario, date;
+  String username, predictand, downscalingMethod, type, model, experiment, date;
   
   public Downscaling(){}
   
@@ -23,8 +27,8 @@ public class Downscaling {
       this.predictand = jsonObject.getString("predictand");
       this.downscalingMethod = jsonObject.getString("downscalingMethod");
       this.type = jsonObject.getString("type");
-      this.project = jsonObject.getString("project");
-      this.scenario = jsonObject.getString("scenario");
+      this.model = jsonObject.getString("model");
+      this.experiment = jsonObject.getString("experiment");
       this.date = jsonObject.getString("date");
     } catch (JSONException e) {
       e.printStackTrace();
@@ -82,18 +86,23 @@ public class Downscaling {
   public void setType(String type) {
     this.type = type;
   }
-  public String getProject() {
-    return project;
+ 
+  public String getModel() {
+    return model;
   }
-  public void setProject(String project) {
-    this.project = project;
+
+  public void setModel(String model) {
+    this.model = model;
   }
-  public String getScenario() {
-    return scenario;
+
+  public String getExperiment() {
+    return experiment;
   }
-  public void setScenario(String scenario) {
-    this.scenario = scenario;
+
+  public void setExperiment(String experiment) {
+    this.experiment = experiment;
   }
+
   public int getStatus() {
     return status;
   }

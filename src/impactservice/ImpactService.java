@@ -436,11 +436,13 @@ public class ImpactService extends HttpServlet {
               }
               html+="<br/><br/>";
             }
-            html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" />";
-            html+="<br/>";
+            html+="<b>Text filter:</b> <input type=\"textarea\" class=\"textfilter\" id=\"textfilter\" value=\""+textFilter+"\" ></input>";
+            
+            //html+="<br/>";
             //html+="&nbsp; <input style=\"float:right;\" type=\"button\" value=\"Go\" onclick=\"setVarFilter();\"/>";
     
             html+="</form></div>";
+            
           }catch(Exception e){
             e.printStackTrace();
           }

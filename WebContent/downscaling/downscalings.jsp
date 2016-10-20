@@ -42,28 +42,28 @@
 					<td style="background-color:#DDD;"><b>Type</b></td>
 					<td style="background-color:#DDD;"><b>Predictand</b></td>
 					<td style="background-color:#DDD;"><b>Downscaling Method</b></td>
-					<td style="background-color:#DDD;"><b>Dataset</b></td>
-					<td style="background-color:#DDD;"><b>Scenario</b></td>
+					<td style="background-color:#DDD;"><b>Model</b></td>
+					<td style="background-color:#DDD;"><b>Experiment</b></td>
 					<td style="background-color:#DDD;"><b>Start year</b></td>
 					<td style="background-color:#DDD;"><b>End year</b></td>
 					<td style="background-color:#DDD;"><b>Status</b></td>
 					<td style="background-color:#DDD;"><b>Operations</b></td>
 				</tr>
 				<%
-					List<Downscaling> downscalings = DownscalingService.getUserDownscalings(LoginManager.getUser(request).getUserId());
-						for(int i=0;i<downscalings.size();i++){
-							Downscaling d = downscalings.get(i);
-							out.print("<tr><td class='job-id'>"+d.getJobId()+"</td>"+"<td class='type'>"+d.getType()+"</td>"+"<td class='predictand'>"+d.getPredictand()+"</td><td class='d-method'>"+d.getDownscalingMethod()+
-									"</td><td class='project'>"+d.getProject()+"<td class='scenario'>"+d.getScenario()+"</td>"+"<td class='s-year'>"+d.getsYear()+"</td>"+"<td class='e-year'>"+d.geteYear()+"</td>");
-							if(d.getStatus() == 30){
-								out.print("<td>Finished</td><td><a download='downscaling-"+d.getJobId()+".zip' href='../DownscalingService/downscalings/download?jobId="+d.getJobId()+"&zone="+d.getZone()+"&predictand="+d.getPredictand()+"&downscalingMethod="+d.getDownscalingMethod()+"&project="+d.getProject()+"&scenario="+d.getScenario()+"&sYear="+d.getsYear()+"&eYear="+d.geteYear()+"&username="+LoginManager.getUser(request).getUserId()+"&type="+d.getType()+"'>Download</a></td>");						
-							}else if(d.getStatus() == 50){
-								out.print("<td>Failed</td><td>X</td>");
-							}else{
-								out.print("<td>Processing</td><td></td>");
-							}
-						}
-				%>
+				List<Downscaling> downscalings = DownscalingService.getUserDownscalings(LoginManager.getUser(request).getUserId());
+				for(int i=0;i<downscalings.size();i++){
+					Downscaling d = downscalings.get(i);
+					out.print("<tr><td class='job-id'>"+d.getJobId()+"</td>"+"<td class='type'>"+d.getType()+"</td>"+"<td class='predictand'>"+d.getPredictand()+"</td><td class='d-method'>"+d.getDownscalingMethod()+
+							"</td><td class='model'>"+d.getModel()+"<td class='experiment'>"+d.getExperiment()+"</td>"+"<td class='s-year'>"+d.getsYear()+"</td>"+"<td class='e-year'>"+d.geteYear()+"</td>");
+					if(d.getStatus() == 30){
+						out.print("<td>Finished</td><td><a download='downscaling-"+d.getJobId()+".zip' href='../DownscalingService/downscalings/download?jobId="+d.getJobId()+"&zone="+d.getZone()+"&predictand="+d.getPredictand()+"&downscalingMethod="+d.getDownscalingMethod()+"&model="+d.getModel()+"&experiment="+d.getExperiment()+"&sYear="+d.getsYear()+"&eYear="+d.geteYear()+"&username="+LoginManager.getUser(request).getUserId()+"&type="+d.getType()+"'>Download</a></td>");						
+					}else if(d.getStatus() == 50){
+						out.print("<td>Failed</td><td>X</td>");
+					}else{
+						out.print("<td>Processing</td><td></td>");
+					}
+				}
+				 %>
 			</table>
   		</div>
 	</c:if>	

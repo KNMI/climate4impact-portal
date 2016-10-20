@@ -194,7 +194,7 @@ public class GenericCart {
     try {
       catalogElement.parseFile(file);
     } catch (Exception e) {
-      Debug.errprintln(e.getMessage());
+      //Debug.errprintln(e.getMessage());
       return;
     }
 
