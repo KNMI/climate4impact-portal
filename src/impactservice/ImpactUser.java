@@ -355,6 +355,11 @@ public class ImpactUser {
       JSONObject searchResults =  (JSONObject) new JSONTokener(data).nextValue();
       try {
         this.openid = searchResults.getString("openid");
+        if(this.openid!=null){
+          if(this.openid.startsWith("google")){
+            this.openid=null;
+          }
+        }
       } catch (JSONException e) {
       }
       try {

@@ -500,7 +500,7 @@ public class LoginManager {
 
         } catch (Exception e) {
           user.credentialError = true;
-          // e.printStackTrace();
+          e.printStackTrace();
           user.setLoginInfo("Using " + loginMethod + ", unable to retrieve credential via impactportal MyProxy");
           throw new Exception("Unable to get credential for user " + user.getUserId() + "\n" + e.getMessage());
         }
