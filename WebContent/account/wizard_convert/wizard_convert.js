@@ -468,16 +468,19 @@ $(function() {
   mainWebmapJS.enableInlineGetFeatureInfo(false);
 
   var setLayer = function(service,n){
+    console.log("setlayer");
     activeLayer = n;
 
     mainWebmapJS.removeAllLayers();
 
     var layer = new WMJSLayer({service:service.service,name:n});
     layer.onReady = function(){
-      //console.log("Layer ready");
+      console.log("Layer ready");
       mainWebmapJS.draw();
+      console.log("Layer drawn");
       //showInfo('slfksl;fkasl;fkas;fkasfk');
       var failed = function(e){
+        console.log("error in layer: "+e);
         showInfo(e);
       }
 

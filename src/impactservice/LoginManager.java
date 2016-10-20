@@ -200,7 +200,7 @@ public class LoginManager {
   public static String getUserFromCookie(HttpServletRequest request){
     long currentTime = tools.DateFunctions.getCurrentDateInMillis();
     String foundUserId = null;
-    Debug.println("getUserFromCookie");
+    Debug.println("getUserFromCookie..");
     String userIdFromCookie = HTTPTools.getCookieValue(request, impactportal_userid_cookie); 
     if(userIdFromCookie == null)return null;
     String sessionUUID = userIdFromCookie;
@@ -288,10 +288,12 @@ public class LoginManager {
       }
     }
 
+    
     /*Trying to get user info from X509 cert*/
+    String CertOpenIdIdentifier = null;
     if (id == null) {
       String uniqueId = null;
-      String CertOpenIdIdentifier = null;
+      
       // org.apache.catalina.authenticator.SSLAuthenticator
       X509Certificate[] certs = (X509Certificate[]) request
           .getAttribute("javax.servlet.request.X509Certificate");
@@ -311,6 +313,7 @@ public class LoginManager {
         }
       }
 
+      
       if (CertOpenIdIdentifier != null) {
         id = CertOpenIdIdentifier;
         try{
@@ -341,6 +344,7 @@ public class LoginManager {
     }
 
     ImpactUser user = getUser(id);
+
     
     user.setAttributesFromHTTPRequestSession(request,response,accessToken);
     
@@ -538,6 +542,32 @@ public class LoginManager {
       throw new Exception("Unable to validate credential for user "
           + user.getUserId() + "\n" + e.getMessage());
     }
+    
+    /* Check if OpenID is same as ID from certificate */
+    String CertOpenIdIdentifier = null;
+    String[] dnItems = cert.getSubjectDN().toString().split(", ");
+    for (int j = 0; j < dnItems.length; j++) {
+      int CNIndex = dnItems[j].indexOf("CN");
+      if (CNIndex != -1) {
+        CertOpenIdIdentifier = dnItems[j].substring("CN=".length()
+            + CNIndex);
+      }
+    }
+    
+    if(user.getOpenId()!=null && CertOpenIdIdentifier!=null){
+      if(!user.getOpenId().equals(CertOpenIdIdentifier)){
+        Debug.errprintln("Certificate ID is different from OpenID:");
+        Debug.errprintln("  OpenID:              "+user.getOpenId());
+        Debug.errprintln("  CertOpenIdIdentifier:"+CertOpenIdIdentifier);
+        String myproxyserverusernameoverride = Configuration.LoginConfig.getMyProxyDefaultUserName();
+        if(myproxyserverusernameoverride != null){
+          Debug.errprintln("--- Please NOTE myproxyserverusernameoverride is set in config.xml, but is different from login ID ---");
+        }
+      }
+    }
+    
+  
+    
   }
 
   /**

@@ -124,8 +124,8 @@ public class MyXMLParser {
         Debug.errprintln(msg);
         throw new SAXException(msg);
     } catch (IOException e) {
-        String msg="IOException: "+e.getMessage();
-        Debug.errprintln(msg);
+        String msg="IOException:: "+e.getMessage();
+        //Debug.errprintln(msg);
         throw new IOException(msg);
     }catch(Exception e){
       String msg="Exception: "+e.getMessage();
