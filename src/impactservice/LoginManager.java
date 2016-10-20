@@ -114,7 +114,7 @@ public class LoginManager {
    * @throws Exception
    */
   private synchronized static void _getCredential(ImpactUser user) throws Exception {
-    Debug.println("GetCredential");
+    Debug.println("GetCredential for user "+user.getUserId());
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
       Debug.println("offline mode");
       return;

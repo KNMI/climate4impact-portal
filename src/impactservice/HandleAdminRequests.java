@@ -31,14 +31,26 @@ public class HandleAdminRequests {
     try {
       user = LoginManager.getUser(request);
     } catch (Exception e) {
-      jsonResponse.setErrorMessage("No user information", 401);
-      e.printStackTrace();
+      jsonResponse.setErrorMessage("No user authenticated, no user information available.", 401);
+      try {
+        jsonResponse.print(response);
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
+      return;
     }
+    
     
     if(user != null){
       Debug.println("User: "+user.getUserId());
       if(user.hasRole("admin")==false){
-        jsonResponse.setErrorMessage("Unauthorized", 403);
+        jsonResponse.setErrorMessage("Unauthorized, user is not an admin.", 403);
+        try {
+          jsonResponse.print(response);
+        } catch (Exception e1) {
+          e1.printStackTrace();
+        }
+        return;
       }
     }
 
@@ -120,7 +132,40 @@ public class HandleAdminRequests {
           
           
           jsonResponse.setMessage(json);
+        }//End of getusers
+        
+        if(requestParam.equalsIgnoreCase("login")){
+          String client_id = "";
+          try {
+            client_id = tools.HTTPTools.getHTTPParam(request, "client_id");
+          } catch (Exception e) {
+            jsonResponse.setException("No Request parameter", e);
+          }
+          if(jsonResponse.hasError()==false){
+            Debug.println("client_id = "+client_id);
+            
+
+            //
+            
+            
+            try {
+              LoginManager.logout(request, response);
+              user.logoutAndRemoveSessionId(request, response);
+              ImpactUser newUser = LoginManager.getUser(client_id);
+              newUser.setAttributesFromHTTPRequestSession(request,response,null);
+              try {
+                LoginManager.checkLogin(newUser);
+              } catch (Exception e) {
+              }
+              
+              jsonResponse.setMessage("{\"status\":\"ok\"}");
+            } catch (Exception e) {
+              jsonResponse.setException("unable to change user", e);
+            }
+            
+          }
         }
+        
       
       } catch (JSONException e) {
         jsonResponse.setException("JSON Error",e);

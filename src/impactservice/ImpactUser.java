@@ -302,6 +302,12 @@ public class ImpactUser {
       if(request.getSession()==null){
         return;
       }
+      
+      String defaultOpenID = Configuration.LoginConfig.getMyProxyDefaultUserName();
+      if(defaultOpenID!=null){
+        setOpenId(defaultOpenID);
+      }
+      
       if(getOpenId()==null){
         String openid = (String) request.getSession().getAttribute("openid_identifier");
         if(openid != null){
@@ -377,7 +383,7 @@ public class ImpactUser {
       }
       
     } catch (Exception e) {
-      e.printStackTrace();
+      Debug.errprintln("Unable to load user properties for "+this.getUserId());
     } 
     
   }  
