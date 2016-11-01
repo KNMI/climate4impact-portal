@@ -16,6 +16,11 @@
         font-size:10px !important;
         padding:2px !important;
       }
+      .c4i-admin-takeuser{
+        text-decoration:underline;
+        color:blue;
+        cursor:pointer;
+      }
      </style>
   </head>
   <body>

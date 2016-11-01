@@ -323,7 +323,7 @@ var processProgressMonitoring = function(status) {
 			}
 			// console.log(dump(json));
 			if (!json.ready) {
-				setTimeout(makeMonitorRequest, 2000);
+				setTimeout(makeMonitorRequest, 800);
 			} else {
 				results = json;
 				w.showResults(results);
