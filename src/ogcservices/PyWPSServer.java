@@ -114,7 +114,7 @@ public class PyWPSServer extends HttpServlet {
         output = output.substring(1);
         portalOutputPath = Tools.makeCleanPath(portalOutputPath);
         String fileName = portalOutputPath+"/"+output;
-        Debug.println("WPS GET status request: "+portalOutputPath+output);
+        Debug.println("WPS GET status request: "+fileName);
   
         Tools.checkValidCharsForFile(output);
         String data = Tools.readFile(fileName);
