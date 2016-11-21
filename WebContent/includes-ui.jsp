@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="impactservice.Configuration"%>   
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>C4I portal</title>
+    <title>climate4impact</title>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" >
     <meta charset="UTF-8">
     <meta name="description" content="The aim of Climate4impact (C4I) is to enhance the use of research data and to support other climate portals. It has been developed within the European projects IS-ENES, IS-ENES2 and CLIPC. Climate4impact is connected to the Earth System Grid Federation, using certificate based authentication, ESGF search, openid, opendap and thredds catalogs. Climate4impact offers web interfaces for searching, visualizing, analyzing, processing and downloading datasets.">
