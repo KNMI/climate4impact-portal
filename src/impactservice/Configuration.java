@@ -414,6 +414,7 @@ public class Configuration {
     private static String dateFormat;
     private static String dpBaseUrl;
     private static String dpBaseRestUrl;
+    private static String dpBaseSearchRestUrl;
     
     public static void doConfig(XMLElement  configReader){
       username = configReader.getNodeValue("impactportal.downscaling.credential.username");
@@ -423,6 +424,7 @@ public class Configuration {
       dateFormat = configReader.getNodeValue("impactportal.downscaling.token.dateformat");
       dpBaseUrl = configReader.getNodeValue("impactportal.downscaling.dpbaseurl");
       dpBaseRestUrl = configReader.getNodeValue("impactportal.downscaling.dprestbaseurl");
+      dpBaseSearchRestUrl = configReader.getNodeValue("impactportal.downscaling.dpbasesearchresturl");
     }
     
     public static String getUsername(){
@@ -454,6 +456,10 @@ public class Configuration {
       readConfig();
       return dpBaseRestUrl;
    }
+    public static String getDpBaseSearchRestUrl() {
+      readConfig();
+      return dpBaseSearchRestUrl;
+    }
   }
 
   public static String getStatLogfile() {

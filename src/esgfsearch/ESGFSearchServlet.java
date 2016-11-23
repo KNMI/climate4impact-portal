@@ -28,9 +28,7 @@ public class ESGFSearchServlet extends HttpServlet {
      */
     public ESGFSearchServlet() {
         super();
-        Debug.println("Creating new ESGF search instance with endpoint "+Configuration.VercSearchConfig.getEsgfSearchURL());
-        threadPool = Executors.newFixedThreadPool(4);
-        esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/",threadPool);
+        esgfSearch=getESGFSearchInstance();
     }
     
 
@@ -55,5 +53,15 @@ public class ESGFSearchServlet extends HttpServlet {
      threadPool.shutdown();
      esgfSearch = null;
    }
+
+
+
+  public static synchronized Search getESGFSearchInstance() {
+    if(esgfSearch!=null)return esgfSearch;
+    Debug.println("Creating new ESGF search instance with endpoint "+Configuration.VercSearchConfig.getEsgfSearchURL());
+    threadPool = Executors.newFixedThreadPool(4);
+    esgfSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/",threadPool);
+    return esgfSearch;
+  }
 
 }

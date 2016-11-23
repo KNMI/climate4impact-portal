@@ -105,12 +105,18 @@ public class THREDDSCatalogBrowser {
     
     MyXMLParser.XMLElement catalogElement = new MyXMLParser.XMLElement();
     try {
-      //Debug.println("Getting "+rootCatalog);
+      Debug.println("Getting "+rootCatalog);
+      Debug.println("Getting "+catalogURL);
 
       //Try to get from local storage:
       Search esgfSearch = ESGFSearchServlet.getESGFSearchInstance();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      if(esgfSearch==null){
+        Debug.println("esgfSearch==null");
+        return null;
+      }
       String result = esgfSearch.getCatalog(catalogURL,request);
       
+      Debug.println("Result: "+result);
       //Debug.println("catalogURL"+catalogURL);
       if(catalogURL.endsWith(".catalog")){
         //Debug.println("OK");
@@ -134,6 +140,7 @@ public class THREDDSCatalogBrowser {
    
       //MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
       Debug.errprintln("Unable to load catalog: invalid XML");//+e1.getMessage());
+      Debug.printStackTrace(e1);
       throw e1;
     }
     if(measureTime){
