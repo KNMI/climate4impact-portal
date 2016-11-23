@@ -335,8 +335,9 @@ public class LoginManager {
         Debug.println("Retrieved user_identifier from climate4impact cookie");
         request.getSession().setAttribute("user_identifier",id);
       }
+      Debug.errprintln("Get User from cooke: "+id);
     }
-
+    
     /* Still no user found... */
     if (id == null) {
       throw new WebRequestBadStatusException(401,

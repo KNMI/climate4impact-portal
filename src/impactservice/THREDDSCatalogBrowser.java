@@ -108,7 +108,7 @@ public class THREDDSCatalogBrowser {
       //Debug.println("Getting "+rootCatalog);
 
       //Try to get from local storage:
-      Search esgfSearch = ESGFSearchServlet.getSearch();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      Search esgfSearch = ESGFSearchServlet.getESGFSearchInstance();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
       String result = esgfSearch.getCatalog(catalogURL,request);
       
       //Debug.println("catalogURL"+catalogURL);

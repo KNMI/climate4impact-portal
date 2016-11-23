@@ -79,8 +79,8 @@ public class PyWPSServer extends HttpServlet {
       pofOutputURL = pofOutputURL.replace("?", "");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
     }catch(Exception e){
-      //OK no user info
-      Debug.println("Anonymous WPS request received");
+      //OK... no user info. Only doing statuslocation requests.
+      
     }
     //Try to get query string
     if(queryString == null){
@@ -94,7 +94,7 @@ public class PyWPSServer extends HttpServlet {
     }
   
     //  Check for status location first.
-    if(queryString!=null){      
+    if(queryString!=null){ 
       String output = HTTPTools.getKVPItem(queryString, "OUTPUT");
       if(output!=null){
         String env[] = Configuration.PyWPSServerConfig.getPyWPSEnvironment();
@@ -108,7 +108,7 @@ public class PyWPSServer extends HttpServlet {
           }
         }
   
-  
+        
   
         //Remove first "/" token;
         output = output.substring(1);
@@ -124,6 +124,13 @@ public class PyWPSServer extends HttpServlet {
         outputStream.write(data.getBytes());          
         return;
       }
+    }
+    
+    if(user == null){
+      Debug.println("Anonymous WPS request received, I am stopping");
+      if(response!=null)response.setStatus(401);
+      outputStream.write(new String("401: Unauthorized user\n").getBytes());
+      return;
     }
       
     //Get the pywps location

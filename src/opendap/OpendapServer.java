@@ -85,8 +85,10 @@ public class OpendapServer {
 
     } catch (IOException ioe) {
       Debug.errprintln("Error opening: " + localNetCDFFileLocation);
-      Debug.printStackTrace(ioe);
+      //Debug.printStackTrace(ioe);
       response.getOutputStream().print("Error opening: " + localNetCDFFileLocation);
+      //TODO more then 404,
+      Debug.println("404 set.");
       response.setStatus(404);
     } finally { 
       if (null != ncFile) try {

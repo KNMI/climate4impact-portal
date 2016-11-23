@@ -280,7 +280,7 @@ public class AccessTokenStore {
       try {
         String a = AccessTokenStore._checkIfTokenIsValid(path);
         if(a==null){
-          Debug.println("[NOPE] Token is not Valid");
+          Debug.println("[NOPE] Token is not Valid, path=["+path+"]");
           return null;
         }
 

@@ -101,9 +101,9 @@ public class AdagucServer extends HttpServlet{
       response.setStatus(401);
       try {
         out1.write(e.getMessage().getBytes());
-      } catch (IOException e1) {
+      } catch (Exception e1) {
         Debug.errprintln("Unable to write to stream");
-        //Debug.printStackTrace(e);
+        Debug.printStackTrace(e);
       }
     }    
   }
