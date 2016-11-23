@@ -3,13 +3,32 @@
  */
 
 $(document).on('click', '.link', function(event, ui){
-  showDialog('Predictand');
-  $('#predictand-details').appendTo('#dialog-content');
+  
   var firedInput = $(event.target).parent().prev('input');
-  var zone = $(firedInput).attr('data-zone');
-  var predictor = $(firedInput).attr('data-predictor');
-  var predictand = $(firedInput).attr('data-predictand');
-  loadPredictandDetails(zone,predictor,predictand);
+  var inputName = $(firedInput).attr('name');
+  if(inputName == 'predictand'){
+    showMapDialog('Predictand');
+    $('#predictand-details').appendTo('#dialog-content');
+    var firedInput = $(event.target).parent().prev('input');
+    var zone = $(firedInput).attr('data-zone');
+    var predictor = $(firedInput).attr('data-predictor');
+    var predictand = $(firedInput).attr('data-predictand');
+    loadPredictandDetails(zone,predictor,predictand);
+  }
+  if(inputName == 'domain'){
+    showMapDialog('Domain');
+    $('#domain-details').appendTo('#dialog-content');
+    var firedInput = $(event.target).parent().prev('input');
+    var domain = $(firedInput).attr('data-domain');
+    loadDomainDetails(domain);
+  }
+  if(inputName == 'model'){
+    showMapDialog('Model');
+    $('#domain-details').appendTo('#dialog-content');
+    var firedInput = $(event.target).parent().prev('input');
+    var model = $(firedInput).attr('data-model');
+    loadModelDetails(model)
+  }
 });
 
 $(document).ready(function() {
@@ -85,12 +104,30 @@ $(document).on('change', 'input:radio', function(event, ui){
       removeHashProperty("zone");
       removeHashProperty("predictand");
       removeHashProperty("downscalingMethod");
-      loadVariables();
+      loadVariables(false);
     }
   }else if($(this).attr('name') == 'variable'){
     var variable = encodeURIComponent($(this).attr('data-variable'));
     if($(this).is(':checked')){
       insertHashProperty('variable', variable, sortedKeys);
+      removeHashProperty("zone");
+      removeHashProperty("predictand");
+      removeHashProperty("downscalingMethod");
+      loadDomains(false);
+    }
+  }else if($(this).attr('name') == 'domain'){
+    var domain = encodeURIComponent($(this).attr('data-domain'));
+    if($(this).is(':checked')){
+      insertHashProperty('domain', domain, sortedKeys);
+      removeHashProperty("zone");
+      removeHashProperty("predictand");
+      removeHashProperty("downscalingMethod");
+      loadDatasets(false);
+    }
+  }else if($(this).attr('name') == 'dataset'){
+    var domain = encodeURIComponent($(this).attr('data-dataset'));
+    if($(this).is(':checked')){
+      insertHashProperty('dataset', domain, sortedKeys);
       removeHashProperty("zone");
       removeHashProperty("predictand");
       removeHashProperty("downscalingMethod");
@@ -121,13 +158,13 @@ $(document).on('change', 'input:radio', function(event, ui){
       loadValidationReport();
     }
   }else if($(this).attr('name') == 'modelProject'){
-    var modelProject = encodeURIComponent($(this).attr('data-name'));
+    var modelProject = encodeURIComponent($(this).attr('data-model-project'));
     if($(this).is(':checked')){
       insertHashProperty('modelProject', modelProject, sortedKeys);
       loadModels();
     }
   }else if($(this).attr('name') == 'model'){
-    var model = encodeURIComponent($(this).attr('data-name'));
+    var model = encodeURIComponent($(this).attr('data-model'));
     if($(this).is(':checked')){
       insertHashProperty('model', model, sortedKeys);
       loadExperiments();
