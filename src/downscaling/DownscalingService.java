@@ -67,7 +67,30 @@ public class DownscalingService extends HttpServlet {
       PrintWriter out = response.getWriter();
       out.print(sb);
       out.flush();
-    
+    }else if(pathInfo.matches("/domains/.*")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +  "?" + request.getQueryString(), "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");     
+      PrintWriter out = response.getWriter(); 
+      out.print(sb);
+      out.flush();
+    }else if(pathInfo.matches("/datasets")){      
+        HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo, "GET");
+        BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) 
+          sb.append(inputLine);
+        in.close();
+        response.setContentType("application/json");   
+        PrintWriter out = response.getWriter();
+        out.print(sb);
+        out.flush();
     }else if(pathInfo.matches("/predictands")){      
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" + request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
@@ -148,6 +171,19 @@ public class DownscalingService extends HttpServlet {
       response.setHeader("Content-Disposition", "attachment; filename=validation.pdf");
       
     }else if(pathInfo.matches("/models")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" +request.getQueryString(), "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");    
+      PrintWriter out = response.getWriter();
+      out.print(sb);
+      out.flush();
+      
+    }else if(pathInfo.matches("/models/.*")){
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" +request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
@@ -306,7 +342,7 @@ public class DownscalingService extends HttpServlet {
 //    in.close();
 //    JSONObject myObject = new JSONObject(response.toString());
 //    JSONArray jsonVariableTypes = myObject.getJSONArray("values");
-    String[] domainTypes = {"VALUE",""};
+    String[] domainTypes = {"VALUE"};
     List<String> domainTypesList = new ArrayList<String>();
     for(int i=0; i< domainTypes.length; i++){
       domainTypesList.add(domainTypes[i]);
