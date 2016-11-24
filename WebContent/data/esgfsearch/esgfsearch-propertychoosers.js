@@ -35,7 +35,12 @@ PropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,se
 			}
 		}
 
-		var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\"/>");
+    var tooltip="";
+      if (tileobj.hasOwnProperty('tooltip')){
+      tooltip="title=\""+tileobj.tooltip+"\" ";
+    }  
+
+		var d= $("<div class=\"esgfsearch-ppc-tile c4i-esgfsearch-property "+extraCls+"\" "+tooltip+"/>");
 		d.attr('name',name);
 		var title = name;
 		if(tileobj.shortname)name=tileobj.shortname;
