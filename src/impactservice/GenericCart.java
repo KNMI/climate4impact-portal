@@ -474,6 +474,7 @@ public class GenericCart {
           String httpURL = null;
           String catalogURL = null;
           String fileSize = "-";
+          String text = element.id;
           try {
             elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
             try{dapURL =elementProps.getString("dapurl");}catch(Exception e){}
@@ -490,6 +491,8 @@ public class GenericCart {
             
             try{catalogURL =elementProps.getString("catalogURL");}catch(Exception e){}
             try{fileSize =elementProps.getString("filesize");}catch(Exception e){}
+            
+            try{text =elementProps.getString("text");}catch(Exception e){}
           } catch (Exception e) {
             Debug.errprintln(e.getMessage()+" on \n"+element.cartData);
             catalogURL=element.cartData;
@@ -543,7 +546,9 @@ public class GenericCart {
           }
 
           dataset.put("id",element.id);
-          dataset.put("text",element.id);
+          String [] textEl = text.split("::");
+          if(textEl.length==2 && textEl[1].length()>0)text=textEl[1];
+          dataset.put("text",text);
           dataset.put("leaf",true);
           dataset.put("date",element.addDate);
           dataset.put("filesize",fileSize);
@@ -645,11 +650,11 @@ public class GenericCart {
           String fileSizeH = "-";
           if(fileSize>1000*1000*1000){
 
-            fileSizeH = ((double)Math.round(fileSizeF/(1000*1000)))/1000+"G";
+            fileSizeH = ((double)Math.round(fileSizeF/(1000*100000)))/10+"G";
           }else if(fileSize>1000*1000){
-            fileSizeH = ((double)Math.round(fileSizeF/(1000)))/1000+"M";
+            fileSizeH = ((double)Math.round(fileSizeF/(100000)))/10+"M";
           }else if(fileSize>1000){
-            fileSizeH = (fileSizeF/1000)+"K";
+            fileSizeH = ((double)Math.round(fileSizeF/(100)))/10+"K";
           }else{
             fileSizeH = fileSize+"B";
           }

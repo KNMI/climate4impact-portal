@@ -368,6 +368,21 @@ public class ImpactService extends HttpServlet {
       }
 
 
+      if(variableFilter.length()==0){
+        /* Try to obtain variable filter from catalog url */
+        try{
+          String catalogURL= HTTPTools.getHTTPParam(request, "node");
+          String[] s = catalogURL.split("#");
+          Debug.println(""+s.length);
+          if(s.length == 2){
+            if(s[1].length()>0)
+            variableFilter = s[1];
+          }
+        }catch(Exception e){
+          
+        }
+        
+      }
 
       HTTPTools.validateInputTokens(variableFilter);
       HTTPTools.validateInputTokens(textFilter);
@@ -410,6 +425,8 @@ public class ImpactService extends HttpServlet {
   
     
           String html="";
+          String catalogURL= HTTPTools.getHTTPParam(request, "node");
+          html+="<b>Catalog url:</b> <a target=\"_blank\" href=\""+catalogURL+"\">"+catalogURL+"</a></hr>";
           /*for(int j=0;j<treeElements.getJSONObject(0).getJSONArray("children").length();j++){
                 html+="j="+treeElements.getJSONObject(0).getString("text")+"<br/>"; 
               } */
@@ -506,8 +523,8 @@ public class ImpactService extends HttpServlet {
         
         if(flat == true){
           //Debug.println(treeElements.toString());
-          THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
-          JSONArray allFilesFlat = b.makeFlat(treeElements);
+          //THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
+          JSONArray allFilesFlat = THREDDSCatalogBrowser.makeFlat(treeElements);
           JSONObject data = new JSONObject();
           data.put("files",allFilesFlat);
           jsonResponse.setMessage(data);
@@ -909,12 +926,53 @@ public class ImpactService extends HttpServlet {
             }
             
             if(jsonResponse.hasError() == false){
+              String catalogitem = HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogurl");
+              el.put("catalogurl", catalogitem);
               el.put("id", HTTPTools.getHTTPParamNoExceptionButNull(request,"id"));
               el.put("dapurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"dapurl"));
               el.put("httpurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"httpurl"));
-              el.put("catalogurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogurl"));
+              
               el.put("filesize", HTTPTools.getHTTPParamNoExceptionButNull(request,"filesize"));
-              addFileToBasket(shoppingCart,el);
+//              if(catalogitem==null){
+                addFileToBasket(shoppingCart,el);
+//              }else{
+//                /* If this is a catalog, we will filter and extract the file links from the catalog and store the array of files to disk */
+//                JSONArray treeElements = null;
+//                String variableFilter = HTTPTools.getHTTPParamNoExceptionButNull(request,"variablefiter");
+//                String textFilter = HTTPTools.getHTTPParamNoExceptionButNull(request,"textfilter");
+//                try{
+//                  treeElements = THREDDSCatalogBrowser.browseThreddsCatalog(request,catalogitem, variableFilter,textFilter); 
+//                }catch(Exception e){
+//                  jsonResponse.setException("Unable to read catalog", e);
+//                  try {
+//                    jsonResponse.print(response);
+//                  } catch (Exception e1) {
+//                     e1.printStackTrace();
+//                  }
+//                  return;
+//                }
+//                //JSONArray flat = THREDDSCatalogBrowser.makeFlat(treeElements);
+//                JSONObject jsonresult = new JSONObject();
+//                jsonresult .put("query", "test");
+//                jsonresult.put("text", "test");
+//                jsonresult.put("numFiles", 1);
+//                jsonresult.put("numDap", 1);
+//                jsonresult.put("cls", "folder");
+//                jsonresult.put("fileSize", 1);
+//                jsonresult.put("children", treeElements);
+//                String message = jsonresult.toString();
+//                
+//                try {
+//                  ImpactUser user = LoginManager.getUser(request);
+//                  String dataDir = user.getDataDir();
+//                  tools.Tools.writeFile(dataDir+"/testnew2.catalog", message);
+//                } catch (Exception e) {
+//                  e.printStackTrace();
+//                }
+//                
+//                
+//               
+//              }
             }
           }
 

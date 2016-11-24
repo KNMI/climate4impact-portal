@@ -23,18 +23,17 @@ import esgfsearch.Search;
 
 public class THREDDSCatalogBrowser {
   static boolean measureTime = false;
-  static public class MakeFlat{
-    JSONArray result = null;
-   
-    public JSONArray makeFlat(JSONArray catalog) throws JSONException{
-      result = new JSONArray();
+  
     
-      _rec(catalog);
+   
+    public static JSONArray makeFlat(JSONArray catalog) throws JSONException{
+      JSONArray result = null;
+      result = new JSONArray();
+      _rec(catalog,result);
       return result;
-      
     }
 
-    void _rec(JSONArray catalog) throws JSONException{
+    private static void _rec(JSONArray catalog,JSONArray result) throws JSONException{
       for(int i=0;i<catalog.length();i++){
         JSONObject a=catalog.getJSONObject(i);
         JSONObject b = new  JSONObject();
@@ -50,13 +49,13 @@ public class THREDDSCatalogBrowser {
         result.put(b);
         
         try{
-          _rec(a.getJSONArray("children"));
+          _rec(a.getJSONArray("children"),result );
         } catch (JSONException e) {
          
         }
       }
     }
-  }
+  
   
   static class Service{
     String name;

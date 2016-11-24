@@ -269,7 +269,7 @@ var SearchInterface = function(options){
     
     getAllFacets();
     
-    propertyChooser["project"] = new PropertyChooser(esgfsearch_pc_project);
+    propertyChooser["project"] = new NestedPropertyChooser(esgfsearch_pc_project);
     propertyChooser["variable"] = new NestedPropertyChooser(esgfsearch_pc_variables);
     propertyChooser["experiment"] = new NestedPropertyChooser(esgfsearch_pc_experiments);
     propertyChooser["time_frequency"] = new PropertyChooser(esgfsearch_pc_time_frequency);
@@ -420,7 +420,7 @@ var SearchInterface = function(options){
       
       //Add catalog to Basket
       html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
-      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogurl:'"+data.response.results[r].url+"',filesize:'0',variable:'"+variableFilter+"'});\"></span>";
+      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"#"+variableFilter+"',catalogurl:'"+data.response.results[r].url+"#"+variableFilter+"',filesize:'0',variable:'"+variableFilter+"'});\"></span>";
       html+="  </span>";
 //      
 //      //Download dataset
@@ -582,7 +582,7 @@ var SearchInterface = function(options){
           }
           el = $(this).parent().find(".c4i-esgfsearch-dataset-expandedarea").first().show();
           el = $(this).parent().find(".c4i-esgfsearch-dataset-catalogurl");
-          el.html("<b>Catalog Url:</b> <a href=\""+catalogObject.url+"\">"+catalogObject.url+"</a>");
+          //el.html("<b>Catalog Url:</b> <a href=\""+catalogObject.url+"\">"+catalogObject.url+"</a>");
           el = $(this).parent().find(".c4i-esgfsearch-dataset-catalogdetails");
           
           var k = new ESGFSearch_KVP(query);

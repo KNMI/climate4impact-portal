@@ -92,8 +92,13 @@ NestedPropertyChooser.prototype.html = "<div class=\"esgfsearch-ppc\"></div>";
 
 NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,query,selectPropertyCallback){
 	var config = this.config;
-	var createTile = function(color,name,description,iconClass){
-		var d= $("<div class=\"esgfsearch-ppc-tile\" />");
+	var createTile = function(color,name,description,iconClass,tileobj){
+	  var tooltip="";
+    if (tileobj.hasOwnProperty('tooltip')){
+      tooltip="title=\""+tileobj.tooltip+"\" ";
+    }  
+
+    var d= $("<div class=\"esgfsearch-ppc-tile\""+tooltip+"/>");
 		if(config.tilewidth){
 			d.css({"width":config.tilewidth});
 		}
@@ -162,7 +167,7 @@ NestedPropertyChooser.prototype.init = function(parentEl, facetName,facetList,qu
 			}
 		}
 
-		main.append(createTile(this.config.properties[j].color,this.config.properties[j].shortname,tilehtml,this.config.properties[j].weathericon));
+		main.append(createTile(this.config.properties[j].color,this.config.properties[j].shortname,tilehtml,this.config.properties[j].weathericon,this.config.properties[j]));
 	}
 
 	parentEl.find(".esgfsearch-ppc").empty();

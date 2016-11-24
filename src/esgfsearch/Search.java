@@ -592,8 +592,8 @@ public class Search {
             JSONArray files = THREDDSCatalogBrowser.browseThreddsCatalog(request,url, variableFilter,null);
             //Debug.println(files.toString());
             catalogAggregation.put(files.getJSONObject(0));
-            THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
-            JSONArray flat = b.makeFlat(files);
+            
+            JSONArray flat = THREDDSCatalogBrowser.makeFlat(files);
             
             for(int i=0;i<flat.length();i++){
               
@@ -602,6 +602,8 @@ public class Search {
               String fileSize = "";
               JSONObject a=flat.getJSONObject(i);
   
+              try{openDAPURL = a.getString("dapurl");}catch (JSONException e) {}
+              try{httpURL = a.getString("httpurl");}catch (JSONException e) {}
               try{openDAPURL = a.getString("opendap");}catch (JSONException e) {}
               try{httpURL = a.getString("httpserver");}catch (JSONException e) {}
   
