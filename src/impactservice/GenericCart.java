@@ -476,10 +476,13 @@ public class GenericCart {
           String fileSize = "-";
           try {
             elementProps =  (JSONObject) new JSONTokener(element.cartData).nextValue();
-            try{dapURL =elementProps.getString("opendap");}catch(Exception e){}
-            try{httpURL =elementProps.getString("httpserver");}catch(Exception e){}
+            try{dapURL =elementProps.getString("dapurl");}catch(Exception e){}
+            try{httpURL =elementProps.getString("httpurl");}catch(Exception e){}
+            try{catalogURL =elementProps.getString("catalogurl");}catch(Exception e){}
             
             //For deprecated baskets:
+            try{dapURL =elementProps.getString("opendap");}catch(Exception e){}
+            try{httpURL =elementProps.getString("httpserver");}catch(Exception e){}
             try{dapURL =elementProps.getString("OpenDAP");}catch(Exception e){}
             try{httpURL =elementProps.getString("httpServer");}catch(Exception e){}
             try{dapURL =elementProps.getString("OPENDAP");}catch(Exception e){}

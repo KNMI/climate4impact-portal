@@ -95,91 +95,7 @@ var BasketWidget = function() {
       return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
 
-    var getSelectedFilesForUsage = function(){
-      if (tree.getSelectionModel().hasSelection()) {
-        var pendingRequests = 0;
-        var allFilesAssembled = function(selectedNode){
-          if(pendingRequests!=0){
-            console.log("Still some requests open");
-            return;
-          }else{
-            console.log("OK continue!");
-          }
 
-          if (_callbackFunction) {
-            if(selectedNode.length == 0){
-              Ext.MessageBox.alert('Error','No valid nodes selected.');
-            }
-            var doClose = _callbackFunction(selectedNode);
-            if (doClose === true) {
-              for(w in openedWindows){
-                w = openedWindows[w];
-                try{
-                  w.close();
-                  w.destroy();
-                }catch(e){
-                }
-              }
-              openedWindows = [];
-
-              basketWindow.close();
-            }
-          }else{
-            Ext.MessageBox.alert('Error','Nothing to apply to.');
-          }
-        };
-
-
-        var selectedNodesMixed = tree.getSelectionModel().getSelection();
-
-        var selectedNode = [];
-
-
-        //console.log(selectedNodesMixed);
-
-        for ( var j = 0; j < selectedNodesMixed.length || j < 1; j++) {
-          if(selectedNodesMixed[j].data.dapurl||selectedNodesMixed[j].data.httpurl){
-            selectedNode.push(selectedNodesMixed[j].data);
-          }
-          if(selectedNodesMixed[j].data.catalogurl){
-            pendingRequests++;
-            var urlRequest = c4iconfigjs.impactservice+"service=catalogbrowser&mode=flat&format=application/json&node="+ URLEncode(selectedNodesMixed[j].data.catalogurl);
-            console.log(urlRequest);
-            $.ajax({
-              url: urlRequest,
-            }).done(function(data) {
-
-              for(var j=0;j<data.files.length;j++){
-                if(data.files[j].opendap){
-                  if(endsWith(data.files[j].opendap,"aggregation")){
-                    console.log("Skipping (aggregation) "+data.files[j].opendap);
-                  }else{
-                    console.log("Pushing "+data.files[j].opendap);
-                    selectedNode.push({dapurl:data.files[j].opendap});
-                  }
-
-                }
-              }
-              pendingRequests--;
-              allFilesAssembled(selectedNode);
-            }).fail(function() {
-
-            }).always(function() {
-
-            });
-            //selectedNode.push({dapurl:selectedNodes[j].data.dapurl});
-          }
-        }
-        allFilesAssembled(selectedNode);
-
-
-        //
-        // alert(selectedNode[0].data.dapurl + ' was selected');
-
-      } else {
-        Ext.MessageBox.alert('Error','No selected files.');
-      }
-    };
 
     var getButtons = function(){
       var buttons =[{
@@ -367,14 +283,42 @@ var BasketWidget = function() {
         var useFileButton =  {
             text : 'Use file(s)',
             handler : function() {
-              getSelectedFilesForUsage();
+              console.log("Use files");
+              var selectedNodesMixed = tree.getSelectionModel().getSelection();
+              widgetExpandNodes(selectedNodesMixed,_callbackFunction);
+           
             }
 
         };
+    
         buttons.push(useFileButton);
       }
       return buttons;
     }
+    
+    var widgetExpandNodes = function(selectedNodesMixed,_callbackFunction){
+      
+      basket.expandNodes(selectedNodesMixed,
+          function(selectedNodes){
+            console.log("expand nodes ready");
+            var doClose = _callbackFunction(selectedNodes);
+            console.log("doClose: "+doClose);
+              if (doClose === true) {
+                for(w in openedWindows){
+                  w = openedWindows[w];
+                  try{
+                    w.close();
+                    w.destroy();
+                  }catch(e){
+                  }
+                }
+                openedWindows = [];
+    
+                basketWindow.close();
+              }
+          }
+      );
+    };
 
     var showFileInfo = function(record,frombutton){
       if (!record.get('dapurl')&&!record.get('catalogurl')) {
@@ -410,7 +354,7 @@ var BasketWidget = function() {
           adagucservice:c4iconfigjs.adagucservice,
           adagucviewer:c4iconfigjs.adagucviewer,
           provenanceservice:c4iconfigjs.provenanceservice,
-          //query:"http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
+          //query:"http://dapurl.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
           query:record.get('dapurl'),
           dialog:true
         });   
@@ -485,7 +429,8 @@ var BasketWidget = function() {
             itemdblclick:{
               fn:function(e,node,e){
                 if(_callbackFunction){
-                  getSelectedFilesForUsage();
+                  var selectedNodesMixed = tree.getSelectionModel().getSelection();
+                  widgetExpandNodes(selectedNodesMixed,_callbackFunction);
                 }else{
                   showFileInfo(node,false);
                 }
@@ -558,41 +503,41 @@ var BasketWidget = function() {
 
     var linkFile = function(){
       var input=Ext.getCmp('c4i-basket-linkfiletextfield').getValue().trim();
-      var httpserver="null";
-      var opendap = "null";
-      var catalogURL="null";
+      var httpurl="null";
+      var dapurl = "null";
+      var catalogurl="null";
 
       if(input.indexOf("fileServer")!=-1){
-        httpserver = input;
+        httpurl = input;
       }
       if(input.indexOf("dodsC")!=-1){
-        opendap= input;
+        dapurl= input;
       }
       if(input.endsWith(".xml")||input.endsWith(".html")){
-        catalogURL= input;
-        catalogURL = catalogURL.replace(".html",".xml");
+        catalogurl= input;
+        catalogurl = catalogurl.replace(".html",".xml");
       }
 
-      if(opendap == "null" && httpserver != "null"){
-        opendap = httpserver.replace("fileServer","dodsC");
-        alert("<h1>Info:</h1> You entered a URL with HTTP enabled.<br/>Automatically derived opendap by replacing fileServer by dodsC.");
+      if(dapurl == "null" && httpurl != "null"){
+        dapurl = httpurl.replace("fileServer","dodsC");
+        alert("<h1>Info:</h1> You entered a URL with HTTP enabled.<br/>Automatically derived dapurl by replacing fileServer by dodsC.");
       }
       
-      if(opendap == "null" &&httpserver == "null"&&catalogURL=="null"){
-        httpserver=input;
-        opendap=input;
+      if(dapurl == "null" &&httpurl == "null"&&catalogurl=="null"){
+        httpurl=input;
+        dapurl=input;
       }
 
       var id = input.substring(input.lastIndexOf("/")+1);
 //      console.log(id);
-//      console.log(httpserver);
-//      console.log(opendap);
-//      console.log(catalogURL);
-      //http://opendap.knmi.nl/knmi/thredds/dodsC/CLIPC/tudo/tier3/WATER_LUISA_2010-2050.nc
+//      console.log(httpurl);
+//      console.log(dapurl);
+//      console.log(catalogurl);
+      //http://dapurl.knmi.nl/knmi/thredds/dodsC/CLIPC/tudo/tier3/WATER_LUISA_2010-2050.nc
       basket.postIdentifiersToBasket({id:id,
-        httpserver:httpserver,
-        opendap:opendap,
-        catalogURL:catalogURL});
+        httpurl:httpurl,
+        dapurl:dapurl,
+        catalogurl:catalogurl});
       linkDialog.close();
     };
 

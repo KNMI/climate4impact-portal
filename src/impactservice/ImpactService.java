@@ -256,9 +256,16 @@ public class ImpactService extends HttpServlet {
         String fileSize = "";
         JSONObject a=array.getJSONObject(j);
         nodeText = a.getString("text");
+        try{opendapURL = a.getString("dapurl");}catch (JSONException e) {}
+        try{httpserverURL = a.getString("httpurl");}catch (JSONException e) {}
+        try{catalogURL = a.getString("catalogurl");}catch (JSONException e) {}
+        
         try{opendapURL = a.getString("opendap");}catch (JSONException e) {}
         try{httpserverURL = a.getString("httpserver");}catch (JSONException e) {}
         try{catalogURL = a.getString("catalogURL");}catch (JSONException e) {}
+        
+        try{httpserverURL = a.getString("httpurl");}catch (JSONException e) {}
+        try{catalogURL = a.getString("catalogurl");}catch (JSONException e) {}
         try{hrefURL = a.getString("href");}catch (JSONException e) {}
         try{fileSize = a.getString("dataSize");}catch (JSONException e) {}
 
@@ -309,7 +316,7 @@ public class ImpactService extends HttpServlet {
            //html+="</td><td>-";  
            html.append("<td></td>");
          }else{
-           html.append("<td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',httpserver:'"+httpserverURL+"',opendap:'"+opendapURL+"',catalogURL:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/></td>\n");
+           html.append("<td><span onclick=\"basket.postIdentifiersToBasket({id:'"+nodeText+"',httpurl:'"+httpserverURL+"',dapurl:'"+opendapURL+"',catalogurl:'"+catalogURL+"',"+"filesize:'"+fileSize+"'});\" class=\"shoppingbasketicon\"/></td>\n");
          }
 
 
@@ -498,12 +505,13 @@ public class ImpactService extends HttpServlet {
         }
         
         if(flat == true){
+          //Debug.println(treeElements.toString());
           THREDDSCatalogBrowser.MakeFlat b = new THREDDSCatalogBrowser.MakeFlat();
           JSONArray allFilesFlat = b.makeFlat(treeElements);
           JSONObject data = new JSONObject();
           data.put("files",allFilesFlat);
           jsonResponse.setMessage(data);
-          Debug.println("Found "+allFilesFlat.length());
+          //Debug.println("Found "+allFilesFlat.length());
   
           try {
             jsonResponse.print(response);
@@ -862,9 +870,9 @@ public class ImpactService extends HttpServlet {
           if(HTTPTools.getHTTPParam(request,"id")!=null){
             JSONObject el=new JSONObject();
             
-            String opendap = HTTPTools.getHTTPParamNoExceptionButNull(request,"opendap");
-            String httpserver = HTTPTools.getHTTPParamNoExceptionButNull(request,"httpserver");
-            String catalogURL = HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogURL");
+            String opendap = HTTPTools.getHTTPParamNoExceptionButNull(request,"dapurl");
+            String httpserver = HTTPTools.getHTTPParamNoExceptionButNull(request,"httpurl");
+            String catalogURL = HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogurl");
             if(opendap!=null){
               if(opendap.equals("null")==false){
                 if(HTTPTools.isURL(opendap)==false){
@@ -902,9 +910,9 @@ public class ImpactService extends HttpServlet {
             
             if(jsonResponse.hasError() == false){
               el.put("id", HTTPTools.getHTTPParamNoExceptionButNull(request,"id"));
-              el.put("opendap", HTTPTools.getHTTPParamNoExceptionButNull(request,"opendap"));
-              el.put("httpserver", HTTPTools.getHTTPParamNoExceptionButNull(request,"httpserver"));
-              el.put("catalogURL", HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogURL"));
+              el.put("dapurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"dapurl"));
+              el.put("httpurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"httpurl"));
+              el.put("catalogurl", HTTPTools.getHTTPParamNoExceptionButNull(request,"catalogurl"));
               el.put("filesize", HTTPTools.getHTTPParamNoExceptionButNull(request,"filesize"));
               addFileToBasket(shoppingCart,el);
             }
@@ -965,21 +973,21 @@ public class ImpactService extends HttpServlet {
     Debug.println("Adding dataset "+el.getString("id")+" with date "+addDate);
     JSONObject fileInfo = new JSONObject();
     try{
-      String str=el.getString("opendap");
+      String str=el.getString("dapurl");
       if(str.length()>0){
-        fileInfo.put("opendap",str);
+        fileInfo.put("dapurl",str);
       }
     }catch(Exception e){}
     try{
-      String str=el.getString("httpserver");
+      String str=el.getString("httpurl");
       if(str.length()>0){
-        fileInfo.put("httpserver",str);
+        fileInfo.put("httpurl",str);
       }
     }catch(Exception e){}
     try{
-      String str=el.getString("catalogURL");
+      String str=el.getString("catalogurl");
       if(str.length()>0){
-        fileInfo.put("catalogURL",str);
+        fileInfo.put("catalogurl",str);
       }
     }catch(Exception e){}
     try{

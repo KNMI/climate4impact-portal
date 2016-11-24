@@ -686,7 +686,7 @@ public class Search {
               if(mode == 0){
                 if(files.length()>0){
                   numdatasets++;
-                  result.append("catalog;");result.append(text);result.append(";");result.append(catalogURL);result.append("\n");
+                  result.append("catalogurl;");result.append(text);result.append(";");result.append(catalogURL);result.append("\n");
                 }else{
                   throw new Exception("No records for this set.");
                 }
@@ -697,7 +697,7 @@ public class Search {
                   //httpserver
                   try{
                     String file = files.getJSONObject(i).getString("httpserver");
-                    result.append("httpserver;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    result.append("httpurl;");result.append(text);result.append(";");result.append(file);result.append("\n");
                     numhttpserver++;
                   }catch(Exception e){
                   }
@@ -706,7 +706,7 @@ public class Search {
                   //opendap
                   try{
                     String file = files.getJSONObject(i).getString("opendap");
-                    result.append("opendap;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    result.append("dapurl;");result.append(text);result.append(";");result.append(file);result.append("\n");
                     numopendap++;
                   }catch(Exception e){
                   }

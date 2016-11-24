@@ -476,6 +476,11 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 			showBasketWidget = true;
 		}
 	}
+	console.log(input);
+	if(input.Identifier.value.indexOf("wpsnetcdfinput_files")==0){
+	  showBasketWidget = true;
+	}
+	
 	
 	if(input.LiteralData.AllowedValues){
 		if(input.LiteralData.AllowedValues.Value){

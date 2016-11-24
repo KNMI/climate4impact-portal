@@ -677,15 +677,15 @@ public class ESGFSearch {
                     }
                     
                     
-                    if(arrValue2.toLowerCase().indexOf("application/xml")>0){product.put("catalogURL",arrValue2.split("\\|")[0]);}
-                    if(arrValue2.toLowerCase().indexOf("|opendap")>0){product.put("opendap",dapURL);opendapFound = true;}
+                    if(arrValue2.toLowerCase().indexOf("application/xml")>0){product.put("catalogurl",arrValue2.split("\\|")[0]);}
+                    if(arrValue2.toLowerCase().indexOf("|opendap")>0){product.put("dapurl",dapURL);opendapFound = true;}
                     if(arrValue2.toLowerCase().indexOf("|gridftp")>0){product.put("gridftp",arrValue2.split("\\|")[0]);}
-                    if(arrValue2.toLowerCase().indexOf("|httpserver")>0){httpserver = arrValue2.split("\\|")[0]; product.put("httpserver",httpserver);}
+                    if(arrValue2.toLowerCase().indexOf("|httpserver")>0){httpserver = arrValue2.split("\\|")[0]; product.put("httpurl",httpserver);}
                     
                   }
                   if(!opendapFound){
                     if(httpserver!=null){
-                      product.put("opendap",httpserver.replace("/fileserver/","/dodsC/")+"#derivedfromhttpserver");
+                      product.put("dapurl",httpserver.replace("/fileserver/","/dodsC/")+"#derivedfromhttpserver");
                     }
                   }
                 }

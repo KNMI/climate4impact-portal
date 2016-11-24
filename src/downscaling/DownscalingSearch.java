@@ -34,8 +34,7 @@ public class DownscalingSearch extends HttpServlet {
       super();
       String searchService=Configuration.DownscalingConfig.getDpBaseSearchRestUrl();
       Debug.println("Creating new ESGF search instance with endpoint "+searchService);
-      downscalingThreadPool = Executors.newFixedThreadPool(4);
-      downscalingSearch = new Search(searchService,Configuration.getImpactWorkspace()+"/diskCache/",downscalingThreadPool);
+      downscalingSearch=getESGFSearchInstance();
   }
   
   
@@ -63,8 +62,12 @@ public class DownscalingSearch extends HttpServlet {
   
   
   
-  public static Search getESGFSearchInstance() {
-    return downscalingSearch;
-  }
+   public static synchronized Search getESGFSearchInstance() {
+     if(downscalingSearch!=null)return downscalingSearch;
+     Debug.println("Creating new ESGF search instance with endpoint "+Configuration.VercSearchConfig.getEsgfSearchURL());
+     downscalingThreadPool = Executors.newFixedThreadPool(4);
+     downscalingSearch = new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/",downscalingThreadPool);
+     return downscalingSearch;
+   }
 
 }
