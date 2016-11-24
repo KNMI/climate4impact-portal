@@ -39,33 +39,77 @@ var esgfsearch_pc_project={
    "tilewidth":"200px",
   "properties":[
     {
-      "name":      "CMIP5",
-      "longname":  "Coupled Model Intercomparison Project Phase 5<br/>Long term global climate change runs<br/></br><a target=\"_blank\" href=\"http://cmip-pcmdi.llnl.gov/cmip5/\">CMIP5 project page</a>",
       "shortname": "CMIP5",
       "color":     esgfsearch_currentcolorscheme.color1,
-      "tooltip":   "global climate projection data used for latest IPCC report (AR5 2014)"
+      "tooltip":   "global relatively low resolution climate projection data",
+      "children": [
+                   {
+                     "name":      "CMIP5",
+                     "longname":  "Coupled Model Intercomparison Project Phase 5",
+                     "shortname": "GCM data <a target=\"_blank\" href=\"http://cmip-pcmdi.llnl.gov/cmip5/\">CMIP5 project page</a>",
+                     "tooltip":   "global climate projection data used for latest IPCC report (AR5 2014) "
+                   },
+                   {
+                     /* can we insert a blank line so as to create two groups within the temperature box */
+                   },
+                   {
+                     "name":      "NEXGDDP",
+                     "longname":  "Daily Minimum Near-Surface Air Temperature",
+                     "shortname": "GCM data <a target=\"_blank\" href=\"https://nex.nasa.gov/nex/projects/1356/\">NEXGDDP project page</a>",
+                     "tooltip":   "bias adjusted CMIP5 data "
+                   }
+                 ]
     },
     {
-      "name":      "CORDEX",
-      "longname":  "Coordinated Regional Climate Downscaling Experiment<br/>Long term regional climate change runs<br/></br><a target=\"_blank\" href=\"http://www.cordex.org/\">CORDEX project page</a>",
       "shortname": "CORDEX",
       "color":     esgfsearch_currentcolorscheme.color2,
-      "tooltip":   "regionally downscaled data (using Regional Climate Models);organised by continent"
+      "tooltip":   "regional high resolution climate projection data (using RCMs);organised by continent",
+      "children": [
+                   {
+                     "name":      "CORDEX",
+                     "shortname": "RCM data <a target=\"_blank\" href=\"http://www.cordex.org/\">CORDEX</a>",
+                     "tooltip":   "regional dynamically downscaled data; organised by continent"
+                   },
+                   {
+                     /* can we insert a blank line so as to create two groups within the temperature box */
+                   },
+                   {
+                     "name":      "CORDEX-Adjust",
+                     "shortname": "RCM data <a target=\"_blank\" href=\"http://www.cordex.org/index.php?option=com_content&view=article&id=275&Itemid=785/\">CORDEX-Adjust</a>",
+                     "tooltip":   "bias adjusted CORDEX data; organised by continent "
+                   }
+                 ]
     },
     {
-      "name":      "specs",
-      "longname":  "Seasonal-to-decadal climate Prediction for the improvement of European Climate Services<br/></br></br><a target=\"_blank\" href=\"http://www.specs-fp7.eu/\">SPECS project page</a>",
-      "shortname": "SPECS",
-      "color":     esgfsearch_currentcolorscheme.color3,
-      "tooltip":   "seasonal forecasting data (hindcasts actually, for verification purposes)"
-    },
-    {
-      "name":      "clipc",
-      "longname":  "Climate Information Platform for Copernicus</br></br></br><br/><br/><a target=\"_blank\" href=\"http://www.clipc.eu/\">CLIPC project page</a>",
-      "shortname": "CLIPC",
-      "color":     esgfsearch_currentcolorscheme.color4,
-      "tooltip":   "more data and especially more viewing / processing tools"
-      }
+    "shortname": "OBSERVATIONS",
+    "color":     esgfsearch_currentcolorscheme.color3,
+    "tooltip":   "gridded observational data for model validation purposes, or to force impact models",
+    "children": [
+                 {
+                   "name":      "obs4MIPs",
+                   "longname":  "Observations for Model Intercomparison Projects<br/>Long term regional climate change runs</br>",
+                   "shortname": "satellite data <a target=\"_blank\" href=\"http://https://www.earthsystemcog.org/projects/obs4mips/\">obs4MIPs project page</a>",
+                   "tooltip":   "gridded observational data (mostly for model validation purposes)"
+                 },
+                 {
+                   /* can we insert a blank line so as to create two groups within the temperature box */
+                 },
+                 {
+                   "name":      "clipc",
+                   "longname":  "Climate Information Platform for Copernicus<br/></br><br/>Historic observed climate</br><br/>",
+                   "shortname": "station data <a target=\"_blank\" href=\"http://www.clipc.eu/\">CLIPC project page</a>",
+                   "tooltip":   "gridded observational near surface data for model validation purposes, or to force impact models"
+                 }
+               ]
+  },
+    /*{
+    "name":      "specs",
+    "longname":  "Seasonal-to-decadal climate Prediction for the improvement of European Climate Services<br/></br><a target=\"_blank\" href=\"http://www.specs-fp7.eu/\">SPECS project page</a>",
+    "shortname": "SPECS",
+    "color":     esgfsearch_currentcolorscheme.color3,
+    "tooltip":   "seasonal forecasting data (hindcasts actually, for verification purposes)"
+  },*/
+  /* specs hidden for now since data here are NOT suitable for S2D impact studies (relevant for S2D development only)*/
   ]
 };
 
@@ -76,27 +120,32 @@ var esgfsearch_pc_time_frequency={
       "name":      "3hr",
       "longname":  "Instantaneous states every 3 hours",
       "shortname": "3hr",
-      "color":     esgfsearch_currentcolorscheme.color1
+      "color":     esgfsearch_currentcolorscheme.color1,
+      "tooltip":   "can be used as sub-daily forcing data, or for advanced change assessments"
     },{
       "name":      "6hr",
       "longname":  "Instantaneous states every 6 hours",
       "shortname": "6hr",
-      "color":     esgfsearch_currentcolorscheme.color2
+      "color":     esgfsearch_currentcolorscheme.color2,
+      "tooltip":   "can be used as sub-daily forcing data, or for advanced change assessments"
     },{
       "name":      "day",
       "longname":  "Daily averages",
       "shortname": "daily",
-      "color":     esgfsearch_currentcolorscheme.color3
+      "color":     esgfsearch_currentcolorscheme.color3,
+      "tooltip":   "mostly used as forcing data, or for advanced change assessments"
     },{
       "name":      "mon",
       "longname":  "Monthly averages",
       "shortname": "monthly",
-      "color":     esgfsearch_currentcolorscheme.color5
+      "color":     esgfsearch_currentcolorscheme.color5,
+      "tooltip":   "can be used for basic change assessments"
     },{
       "name":      "year",
       "longname":  "Annual averages",
       "shortname": "yearly",
-      "color":     esgfsearch_currentcolorscheme.color6
+      "color":     esgfsearch_currentcolorscheme.color6,
+      "tooltip":   "can be for basic change assessments"
     }
   ]
 };

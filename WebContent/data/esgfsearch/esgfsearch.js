@@ -269,7 +269,7 @@ var SearchInterface = function(options){
     
     getAllFacets();
     
-    propertyChooser["project"] = new PropertyChooser(esgfsearch_pc_project);
+    propertyChooser["project"] = new NestedPropertyChooser(esgfsearch_pc_project);
     propertyChooser["variable"] = new NestedPropertyChooser(esgfsearch_pc_variables);
     propertyChooser["experiment"] = new NestedPropertyChooser(esgfsearch_pc_experiments);
     propertyChooser["time_frequency"] = new PropertyChooser(esgfsearch_pc_time_frequency);
