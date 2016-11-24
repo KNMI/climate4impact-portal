@@ -302,6 +302,12 @@ public class ImpactUser {
       if(request.getSession()==null){
         return;
       }
+      
+      String defaultOpenID = Configuration.LoginConfig.getMyProxyDefaultUserName();
+      if(defaultOpenID!=null){
+        setOpenId(defaultOpenID);
+      }
+      
       if(getOpenId()==null){
         String openid = (String) request.getSession().getAttribute("openid_identifier");
         if(openid != null){
@@ -355,6 +361,11 @@ public class ImpactUser {
       JSONObject searchResults =  (JSONObject) new JSONTokener(data).nextValue();
       try {
         this.openid = searchResults.getString("openid");
+        if(this.openid!=null){
+          if(this.openid.startsWith("google")){
+            this.openid=null;
+          }
+        }
       } catch (JSONException e) {
       }
       try {
@@ -372,7 +383,7 @@ public class ImpactUser {
       }
       
     } catch (Exception e) {
-      e.printStackTrace();
+      Debug.errprintln("Unable to load user properties for "+this.getUserId());
     } 
     
   }  

@@ -323,7 +323,7 @@ var processProgressMonitoring = function(status) {
 			}
 			// console.log(dump(json));
 			if (!json.ready) {
-				setTimeout(makeMonitorRequest, 2000);
+				setTimeout(makeMonitorRequest, 800);
 			} else {
 				results = json;
 				w.showResults(results);
@@ -476,6 +476,11 @@ var createLiteralDataStringGrid = function(input, preConfiguredInput) {
 			showBasketWidget = true;
 		}
 	}
+	console.log(input);
+	if(input.Identifier.value.indexOf("wpsnetcdfinput_files")==0){
+	  showBasketWidget = true;
+	}
+	
 	
 	if(input.LiteralData.AllowedValues){
 		if(input.LiteralData.AllowedValues.Value){

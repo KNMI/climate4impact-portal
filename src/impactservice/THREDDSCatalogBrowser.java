@@ -67,9 +67,14 @@ public class THREDDSCatalogBrowser {
     }
     void addAccessType(String serviceType,String base){
       serviceType = serviceType.toLowerCase();
+      if(serviceType.equals("opendap"))serviceType="dapurl";
+      if(serviceType.equals("httpserver"))serviceType="httpurl";
+      if(serviceType.equals("catalog"))serviceType="catalogurl";
       AccesType accesType = new AccesType();
       accesType.serviceType=serviceType;
       accesType.base=base;
+      //Debug.println("serviceType:"+serviceType);
+      //Debug.println("base:"+base);
       accesTypes.add(accesType);
     }
   }
@@ -105,11 +110,17 @@ public class THREDDSCatalogBrowser {
     
     MyXMLParser.XMLElement catalogElement = new MyXMLParser.XMLElement();
     try {
-      //Debug.println("Getting "+rootCatalog);
+      Debug.println("Getting "+rootCatalog);
+      Debug.println("Getting "+catalogURL);
 
       //Try to get from local storage:
-      Search esgfSearch = ESGFSearchServlet.getSearch();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      Search esgfSearch = ESGFSearchServlet.getESGFSearchInstance();//new Search(Configuration.VercSearchConfig.getEsgfSearchURL(),Configuration.getImpactWorkspace()+"/diskCache/");
+      if(esgfSearch==null){
+        Debug.println("esgfSearch==null");
+        return null;
+      }
       String result = esgfSearch.getCatalog(catalogURL,request);
+      
       
       //Debug.println("catalogURL"+catalogURL);
       if(catalogURL.endsWith(".catalog")){
@@ -134,6 +145,7 @@ public class THREDDSCatalogBrowser {
    
       //MessagePrinters.emailFatalErrorMessage("Unable to load catalog: "+e1.getMessage(),rootCatalog);
       Debug.errprintln("Unable to load catalog: invalid XML");//+e1.getMessage());
+      Debug.printStackTrace(e1);
       throw e1;
     }
     if(measureTime){
@@ -251,7 +263,7 @@ public class THREDDSCatalogBrowser {
           
           try{
             serviceName = dataset.get("serviceName").getValue();
-            //DebugConsole.println("--serviceName:"+serviceName);
+            //Debug.println("--serviceName:"+serviceName);
             service = getServiceByName(serviceName,supportedServices);
           }catch(Exception e){
             service = supportedServices.get(0);
@@ -261,7 +273,7 @@ public class THREDDSCatalogBrowser {
             for(int i=0;i<service.accesTypes.size();i++){
               try{
                 leaf.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
-                //DebugConsole.println("--serviceType:"+service.accesTypes.get(i).serviceType);
+                //Debug.println("--serviceType:"+service.accesTypes.get(i).serviceType);
                 if(supportedServicesString.length()>0)supportedServicesString+=",";
                 supportedServicesString+=service.accesTypes.get(i).serviceType;
               }catch(Exception e){
@@ -275,6 +287,8 @@ public class THREDDSCatalogBrowser {
             Vector<XMLElement> access = dataset.getList("access");
             for(int k=0;k<access.size();k++){
               serviceName = access.get(k).getAttrValue("serviceName");
+              
+              //Debug.println("serviceName:"+serviceName);
               service = getServiceByName(serviceName,supportedServices);
               if(service!=null){
                 for(int i=0;i<service.accesTypes.size();i++){
@@ -282,7 +296,7 @@ public class THREDDSCatalogBrowser {
                   leaf.put(service.accesTypes.get(i).serviceType, hostPath+service.accesTypes.get(i).base+dataset.getAttrValue("urlPath"));
                   if(supportedServicesString.length()>0)supportedServicesString+=",";
                   supportedServicesString+=service.accesTypes.get(i).serviceType;
-                  //DebugConsole.println("--accessServiceName:"+service.accesTypes.get(i).serviceType);
+                  //Debug.println("--accessServiceName:"+service.accesTypes.get(i).serviceType);
                 }
               }
             }
@@ -386,13 +400,13 @@ public class THREDDSCatalogBrowser {
           b.put("cls", "folder");
           b.put("leaf", false);
           b.put("href",  "?catalog="+url);
-          b.put("catalogURL",url);
+          b.put("catalogurl",url);
         }else{
           String url = HTTPTools.makeCleanURL(hostPath+href);
           b.put("cls", "file");
           b.put("leaf", false);
           b.put("href", "?catalog="+url);
-          b.put("catalogURL",url);
+          b.put("catalogurl",url);
         }
       }
      

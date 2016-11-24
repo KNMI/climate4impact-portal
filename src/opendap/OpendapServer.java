@@ -85,8 +85,10 @@ public class OpendapServer {
 
     } catch (IOException ioe) {
       Debug.errprintln("Error opening: " + localNetCDFFileLocation);
-      Debug.printStackTrace(ioe);
+      //Debug.printStackTrace(ioe);
       response.getOutputStream().print("Error opening: " + localNetCDFFileLocation);
+      //TODO more then 404,
+      Debug.println("404 set.");
       response.setStatus(404);
     } finally { 
       if (null != ncFile) try {
@@ -103,9 +105,12 @@ public class OpendapServer {
   };
   
   
-  private static NetcdfFile getNetCDFFile(String localNetCDFFileLocation) throws IOException {
+  private static synchronized NetcdfFile getNetCDFFile(String localNetCDFFileLocation) throws IOException {
         try {
-          NetcdfFile.registerIOProvider(GeoJSONReaderIOSP.class);
+          if(NetcdfFile.iospRegistered(GeoJSONReaderIOSP.class)==false){
+            Debug.println("Registering GeoJSONReaderIOSP");
+            NetcdfFile.registerIOProvider(GeoJSONReaderIOSP.class);
+          }
         } catch (IllegalAccessException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();

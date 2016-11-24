@@ -165,7 +165,7 @@ public class OpendapViewer {
             }
             
             
-            Debug.println(variableName+" : varDimensions.length="+varDimensions.length);
+            //Debug.println(variableName+" : varDimensions.length="+varDimensions.length);
             if(varDimensions.length>=1)
             {
               //if(variableName.indexOf("bnds")==-1){

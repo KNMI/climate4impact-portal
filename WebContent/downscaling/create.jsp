@@ -18,6 +18,7 @@
 	<script src="js/libraries/spin/spin.min.js"></script>
 	<link rel="stylesheet" href="js/libraries/leaflet-0.7.3/leaflet.css" />
 	<link rel="stylesheet" href="css/style-downscaling.css" />
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	
 	<style>
 		
@@ -40,7 +41,7 @@
       			request.setAttribute("loggedInUser", null);
       		}%>
 		var loggedInUser = '${loggedInUser}';
-      	var sortedKeys = ['variableType','variable','zone','predictand','downscalingType','downscalingMethod','modelProject', 'model', 'run', 'experiment', 'sYear', 'eYear', ];
+      	var sortedKeys = ['variableType','variable','domain', 'dataset', 'zone', 'predictand','downscalingType','downscalingMethod','modelProject', 'model', 'run', 'experiment', 'sYear', 'eYear', ];
       	  
 
      		
@@ -90,6 +91,8 @@
 		}
 		
 		function saveConfig(configName){
+		  	var domain = getValueFromHash("domain");
+		  	var dataset = getValueFromHash("dataset");
 		  	var zone = getValueFromHash("zone");
 		  	var variableType = getValueFromHash("variableType");
 			var variable = getValueFromHash("variable");
@@ -97,6 +100,7 @@
 			var downscalingType = getValueFromHash("downscalingType");
 			var downscalingMethod = getValueFromHash("downscalingMethod");
 			var modelType = "CLIMATE";
+			var modelProject = getValueFromHash("modelProject");
 			var model = getValueFromHash("model");
 			var experiment = getValueFromHash("experiment");
 		    var sYear = $('#date-range-start').val();
@@ -107,13 +111,15 @@
 		    	data: {
 		    	  'configName' : configName,
 		    	  'username' : loggedInUser,
-		    	  'variableType':variableType,
-		    	  'variable':variable,
+		    	  'variableType': variableType,
+		    	  'variable': variable,
+		    	  'domain' : domain,
+		    	  'dataset' : dataset,
 		    	  'zone' : zone, 
 		    	  'predictand' : predictand,
 		    	  'downscalingType' : downscalingType,
 		    	  'downscalingMethod' : downscalingMethod,
-		    	  'modelType' : modelType,
+		    	  'modelProject' : modelProject,
 		    	  'model' : model,
 		    	  'experiment' : experiment,
 		    	  'sYear': sYear,
@@ -155,10 +161,10 @@
 	   		</div>
 	    </div>
 	    
-	    <div id="predictand-details">
-	    	<div id="predictand-info"></div>
-	    	<div id="map"></div>
-	    </div>
+<!-- 	    <div id="element-details"> -->
+<!-- 	    	<div id="element-info"></div> -->
+<!-- 	    	<div id="map"></div> -->
+<!-- 	    </div> -->
 	    
 	    <div id="test">
 	    </div>
@@ -166,20 +172,20 @@
 		<div class="impactcontent">
 			<div id="info"></div>
 			<h1>Load saved downscalings</h1>
-				<select id="select-saved-downscalings" value="empty">
-				    <option value="empty"> Select a saved config</option>
-				    <%
-				    	String username = LoginManager.getUser(request).getUserId();
-				    		    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
-				    		    	if(configsMap != null){
-				    		     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
-				    			     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
-				    			     	}
-				    		    	}
-				    %>
-				</select>
+			<select id="select-saved-downscalings" value="empty">
+			    <option value="empty"> Select a saved config</option>
+			    <%
+			    	String username = LoginManager.getUser(request).getUserId();
+			    		    	Map<String, String> configsMap = DownscalingService.getUserConfigurations(username);
+			    		    	if(configsMap != null){
+			    		     		for(String key : DownscalingService.getUserConfigurations(username).keySet()){
+			    			     		out.print("<option value='"+configsMap.get(key)+"'> "+key+"</option>");
+			    			     	}
+			    		    	}
+			    %>
+			</select>
 			
-			<h1>Select your Downscaling</h1>
+			<h1>Select your Predictand</h1>
 								
 				<!-- Variable -->
 		      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
@@ -214,7 +220,7 @@
 	      		</div>
 	      		
 	      		<!-- Domain -->
-		      	<div class="facetoverview collapsible" id="variable-type-header" style="height:35px;"> 
+		      	<div class="facetoverview collapsible" id="domain-type-header" style="height:35px;"> 
 		        	<table width="100%" >
 				        <tr>
 				        	<td class="collapsibletitle" >
@@ -223,13 +229,6 @@
 				        	<td  style="padding:0px;">
 								<table class="collapsibletable" width="100%">
 				  					<tr>
-				  						<div id="domain-types"> 
-					  						<%
-					  							for(String type : DownscalingService.getDomainTypes()){
-					  									out.print("<td><input type='radio' name='domainType' data-domain-type ='" + type + "' value = '" + type + "' class='input-domain-type'>"+type+"</input></td>");		
-					  							}
-					  						%>
-					  					</div>
 									</tr>
 		  						</table>
 							</td>
@@ -255,13 +254,6 @@
 				        	<td  style="padding:0px;">
 								<table class="collapsibletable" width="100%">
 				  					<tr>
-				  						<div id="dataset-types"> 
-					  						<%
-					  							for(String type : DownscalingService.getDatasetTypes()){
-					  									out.print("<td><input type='radio' name='datasetType' data-dataset-type ='" + type + "' value = '" + type + "' class='input-dataset-type'>"+type+"</input></td>");		
-					  							}
-					  						%>
-					  					</div>
 									</tr>
 		  						</table>
 							</td>
@@ -279,29 +271,15 @@
 	      		
   
 		      	<!-- Predictand-->
-				<div class="facetoverview collapsible" id="predictand-type-header" style="height:35px;"> 
-		        	<table width="100%" >
-			        	<tr>
-			        		<td class="collapsibletitle" >
-			        			Predictand
-			        		</td>
-				        	<td  style="padding:0px;">
-				  				<table class="collapsibletable" width="100%">
-				  				</table>
-				        	</td>
-				        	<td style="padding:2px;">
-				        		<span class="collapse-close"/>
-				        	</td>
-			        	</tr>
-			        </table>
-				</div>
 		       
-				<div class="collapsiblecontainer">
+				<div class="collapsiblecontainer" style="display : block;  border-top: 1px solid #bbb; margin-top: 30px;">
 					<div class="collapsiblecontent">
-		      			<div id="predictands"></div>
+		      			<div id="predictands"> No predictand selected</div>
 		      		</div>
 				</div>
-   						       
+ 
+ 			<h1>Validate your Predictand</h1>
+ 			  						       
 				<!-- Downscaling methods -->
 		      	<div class="facetoverview collapsible" id="downscaling-method-header" style="height:55px;"> 
 		        	<table width="100%" >
@@ -351,7 +329,7 @@
 			        		<td  style="padding:0px;">
 								<table class="collapsibletable" width="100%">
 				  					<tr>
-				  						<input type='radio' name='modelProject' data-model-project='CMIP5' value = 'CMIP5'>CMIP5</input>		
+				  						<input class='input-model-project' type='radio' name='modelProject' data-model-project='CMIP5' value = 'CMIP5'>CMIP5</input>		
 				  					</tr>  			
 			  					</table>
 			        		</td>

@@ -106,7 +106,7 @@ var FileViewerInterface = function(options){
 
       basket.postIdentifiersToBasket({
         id : id,
-        opendap : url
+        dapurl : url
       });
     }
   };

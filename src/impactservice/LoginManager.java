@@ -114,7 +114,7 @@ public class LoginManager {
    * @throws Exception
    */
   private synchronized static void _getCredential(ImpactUser user) throws Exception {
-    Debug.println("GetCredential");
+    Debug.println("GetCredential for user "+user.getUserId());
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
       Debug.println("offline mode");
       return;
@@ -335,8 +335,9 @@ public class LoginManager {
         Debug.println("Retrieved user_identifier from climate4impact cookie");
         request.getSession().setAttribute("user_identifier",id);
       }
+      Debug.errprintln("Get User from cooke: "+id);
     }
-
+    
     /* Still no user found... */
     if (id == null) {
       throw new WebRequestBadStatusException(401,
@@ -504,7 +505,7 @@ public class LoginManager {
 
         } catch (Exception e) {
           user.credentialError = true;
-          // e.printStackTrace();
+          e.printStackTrace();
           user.setLoginInfo("Using " + loginMethod + ", unable to retrieve credential via impactportal MyProxy");
           throw new Exception("Unable to get credential for user " + user.getUserId() + "\n" + e.getMessage());
         }

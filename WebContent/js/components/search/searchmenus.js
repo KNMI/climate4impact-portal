@@ -119,7 +119,7 @@ var addSearchSelectionToBasket = function(){
     var id=selection[j].get('id'); ;
     var url=selection[j].get('url');
     el['id']=id;
-    el['catalogURL']=url;
+    el['catalogurl']=url;
     if(url==undefined||url=='None'){
       skipMessage+=(id+'\n');
     }else{

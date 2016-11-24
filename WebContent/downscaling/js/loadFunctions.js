@@ -1,3 +1,13 @@
+/**
+ * MAPS
+ * @param startLat
+ * @param startLon
+ * @param endLat
+ * @param endLon
+ * @param zone
+ * @param predictand
+ */
+
 function loadMap(startLat, startLon, endLat, endLon, zone, predictand){
         var a = [startLat, startLon];
         var b = [startLat, endLon];
@@ -15,13 +25,20 @@ function loadMap(startLat, startLon, endLat, endLon, zone, predictand){
           layer.bindPopup(feature.properties.popupContent);
       }
     }
-    $.get( "../DownscalingService/zones/"+zone+"/predictands/"+predictand+"/stations", function( data ) {
-       L.geoJson(data, {onEachFeature: onEachFeature}).addTo(map);
-  });
-
+    if(zone != null && predictand != null){ 
+      $.get( "../DownscalingService/zones/"+zone+"/predictands/"+predictand+"/stations", function( data ) {
+         L.geoJson(data, {onEachFeature: onEachFeature}).addTo(map);
+      });
+    }
 }
 
-function showDialog(title){
+
+/****
+ * DIALOGS
+ * @param title
+ */
+
+function showMapDialog(title){
   $("#dialog").dialog({
     dialogClass: 'custom-dialog', 
     height: 600,
@@ -30,14 +47,13 @@ function showDialog(title){
     resizable: true,
     title: title,
     open: function(event, ui){
-      $('#dialog-content').empty()
+      $('#dialog-content').empty();
+      $('#dialog-content').append('<div id="element-details"><div id="element-info"></div><div id="map"></div></div>');
       $('#map').css('height','500px');
     },
     close: function( event, ui ) {
       $('#dialog').remove();
       $('body').append('<div id="dialog"><div id="dialog-content"></div></div>');
-      $('body').append('<div id="predictand-details"><div id="predictand-info"></div><div id="map"></div></div>');
-      $('#map').css('height','');
     }
   });
  }
@@ -91,110 +107,148 @@ function showMessageDialog(message){
       title: 'System message',  
     });
 }
-function loadDatasets(){
-  var domainType = getValueFromHash("datasetType");
-  $("#datasets").html('');
-  //if(domainType != null){
-    $.get( "../DownscalingService/datasets", function( data ) {
-      $.each(data.values, function(index, value){
-        $('#datasets').append("<td><input class='input-domain' + data-dataset="+value.code+" type='radio' name='dataset' value='"+value.code+"'/><abbr title='"+value.description+"'><span >"+value.alias+"</span></abbr></td>");
-          var defaultDatasetName = getValueFromHash("datasetName");
-          if(defaultDatasetName != null && defaultDatasetName == value.code){
-              $('#datasets').find("[data-dataset='" + value.code + "']").prop('checked',true);
-          }
-      });
-    });
-    $('#dataset-type-header').collapsible('open');
-  //}else{
- //   $('#domain-type-header').collapsible('close');
- // }
 
-}
 
-function loadDomains(){
-  var domainType = getValueFromHash("domainType");
-  $("#domains").html('');
-  //if(domainType != null){
-    $.get( "../DownscalingService/domains", function( data ) {
-      $.each(data.values, function(index, value){
-        $('#domains').append("<td><input class='input-domain' + data-domain="+value.code+" type='radio' name='domain' value='"+value.code+"'/><abbr title='"+value.description+"'><span >"+value.alias+"</span></abbr></td>");
-          var defaultDomainName = getValueFromHash("domainName");
-          if(defaultDomainName != null && defaultDomainName == value.code){
-              $('#domains').find("[data-domain='" + value.code + "']").prop('checked',true);
-          }
-      });
-    });
-    $('#domain-type-header').collapsible('open');
-  //}else{
- //   $('#domain-type-header').collapsible('close');
- // }
-}
+/**
+ * LOADS OF CONTENT
+ */
+
 function loadVariableTypes(){
   var defaultVariableType = getValueFromHash("variableType");
-  if(defaultVariableType != null)
-    $(".input-variable-type[data-variable-type='"+defaultVariableType+"']").attr('checked',true);
-  
+  var variableName = getValueFromHash("variableType");
+  setTimeout(function(){
+      $(".input-variable-type[data-variable-type='"+defaultVariableType+"']").attr('checked',true);
+      if(variableName != null)
+        loadVariables();
+  },0);
 }
 
 function loadVariables(){
   var variableType = getValueFromHash("variableType");
+  var defaultVariableName = getValueFromHash("variable");
   $("#variables").html('');
-  if(variableType != null){
-    $.get( "../DownscalingService/variables?variableType="+variableType, function( data ) {
-      $.each(data.values, function(index, value){
-        $('#variables').append("<td><input class='input-variable' + data-variable="+value.code+" type='radio' name='variable' value='"+value.code+"'/><abbr title='"+value.description+"\nUnits: "+value.units+"'><span >"+value.code+"</span></abbr></td>");
-          var defaultVariableName = getValueFromHash("variableName");
-          if(defaultVariableName != null && defaultVariableName == value.code){
-              $('#variables').find("[data-variable='" + value.code + "']").prop('checked',true);
-          }
-      });
+  $.get( "../DownscalingService/variables?variableType="+variableType, function( data ) {
+    $.each(data.values, function(index, value){
+      $('#variables').append("<td><input class='input-variable' + data-variable="+value.code+" type='radio' name='variable' value='"+value.code+"'/><abbr title='"+value.description+"\nUnits: "+value.units+"'><span >"+value.code+"</span></abbr></td>");
+        if(defaultVariableName != null && defaultVariableName == value.code){
+            $('#variables').find("[data-variable='" + value.code + "']").prop('checked',true);
+        }
     });
+  });
+  setTimeout(function(){
     $('#variable-type-header').collapsible('open');
-  }else{
-    $('#variable-type-header').collapsible('close');
+    if(getValueFromHash("domain") != null)
+      loadDomains();
+  },0);
+}
+
+function loadDomains(){
+  var domainType = getValueFromHash("domainType");
+  var defaultDomainName = getValueFromHash("domain");
+  $("#domains").html('');
+  $.get( "../DownscalingService/domains", function( data ) {
+    $.each(data.values, function(index, value){
+      $('#domains').append("<td><input class='input-domain' + data-domain="+value.code+" type='radio' name='domain' value='"+value.code+"'/><abbr title='"+value.description+"'><a class='link'>"+value.alias+"<i class='material-icons'>room</a></span></abbr></td>");
+        if(defaultDomainName != null && defaultDomainName == value.code){
+            $('#domains').find("[data-domain='" + value.code + "']").prop('checked',true);
+        }
+    });
+  });
+  setTimeout(function(){
+    $('#domain-type-header').collapsible('open');
+    if(getValueFromHash("dataset") != null)
+      loadDatasets();
+  },0);
+}
+
+function loadDatasets(){
+  var domainType = getValueFromHash("datasetType");
+  var defaultDatasetName = getValueFromHash("dataset");
+  $("#datasets").html('');
+  $.get( "../DownscalingService/datasets", function( data ) {
+    $.each(data.values, function(index, value){
+      $('#datasets').append("<td><input class='input-domain' + data-dataset="+value.name+" type='radio' name='dataset' value='"+value.name+"'/><abbr title='"+value.metadata+"'><span >"+value.name+"</span></abbr></td>");
+        if(defaultDatasetName != null && defaultDatasetName == value.name){
+            $('#datasets').find("[data-dataset='" + value.name + "']").prop('checked',true);
+        }
+    });
+  })
+  setTimeout(function(){
+    $('#dataset-type-header').collapsible('open');
+    if(getValueFromHash("predictand") != null)
+      loadPredictands();
+  },0);
   }
 
-}
 
   
 function loadPredictands(){
   var URL = '../DownscalingService/predictands?username=' + loggedInUser;
   var variableName = getValueFromHash("variable");
+  var domain = getValueFromHash("domain");
+  var dataset = getValueFromHash("dataset");
+  
   if(variableName === "Tmax")
     variableName = "TX";
+  
   if(variableName === "Tmin")
-    variableName === "TN";
+    variableName = "TN";
+  
   if(variableName === "Precip")
     variableName = "RR";
   var defaultpredictand = getValueFromHash("predictand");
-  $("#predictands").html('');
-  if(variableName != null){
-    URL += '&variable=' + variableName;
-    $.get( URL, function( data ) {
-      $.each(data.values, function(index, value){
-          $('#predictands').append("<td><div class='predictand'><input class='input-predictand' data-predictand='"+value.predictand+"' data-zone='"+value.zone+"' data-predictor='"+ value.predictor+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><span class='link'>"+value.predictand+"</span></abbr></div></td>");
-          if(defaultpredictand != null && defaultpredictand == value.predictand)
-            $('#predictands').find("[data-predictand='" + value.predictand + "']").prop('checked',true);
-      });
-    });
-    $('#predictand-type-header').collapsible('open');
-    }else{
-      $('#predictand-type-header').collapsible('close'); 
-    }
   
+  $("#predictands").html('');
+  
+  if(variableName != null)
+    URL += '&variable=' + variableName;
+  
+  if(domain != null)
+    URL += '&domain=' + domain;
+  
+  if(dataset != null)
+    URL += '&dataset=' + dataset;
+  
+  $.get( URL, function( data ) {
+    $.each(data.values, function(index, value){
+        $('#predictands').append("<td><div class='predictand'><input class='input-predictand' data-predictand='"+value.predictand+"' data-zone='"+value.zone+"' data-predictor='"+ value.predictor+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><a class='link'>"+value.predictand+"<i class='material-icons'>room</i></a></abbr></div></td>");
+        if(defaultpredictand != null && defaultpredictand == value.predictand)
+          $('#predictands').find("[data-predictand='" + value.predictand + "']").prop('checked',true);
+    });
+  });
+  setTimeout(function(){
+    $('#predictand-type-header').collapsible('open');
+    if(getValueFromHash("downscalingMethod") != null)
+      loadDownscalingMethods();
+  },0);
 }
 
 function loadPredictandDetails(zone,predictor,predictand){
   $.get( "../DownscalingService/zones/"+zone+"/predictands/"+predictand+"?username=" + loggedInUser, function( data ) {
-        $('#predictand-info').html('Name: ' + data.value.predictand +'</br> Variable: ' + data.value.variable + ' </br> Variable type: ' + data.value.variableType + '</br> Model: ' + data.value.model);
-        loadMap(data.value.startLat, data.value.startLon, data.value.endLat, data.value.endLon,zone,predictand);
+        $('#element-info').html('Name: ' + data.value.predictand +'</br> Variable: ' + data.value.variable + ' </br> Variable type: ' + data.value.variableType);
+        loadMap(data.value.domain.startLat, data.value.domain.startLon, data.value.domain.endLat, data.value.domain.endLon,zone,predictand);
       });
 }
+
+function loadDomainDetails(domainCode){
+  $.get( "../DownscalingService/domains/"+domainCode, function( data ) {
+        $('#element-info').html('Name: ' + data.value.alias);
+        loadMap(data.value.startLat, data.value.startLon, data.value.endLat, data.value.endLon,"","");
+      });
+}
+
+function loadModelDetails(modelName){
+  $.get( "../DownscalingService/models/"+modelName, function( data ) {
+    $('#element-info').html('Name: ' + data.value.alias);
+    loadMap(data.value.domain.startLat, data.value.domain.startLon, data.value.domain.endLat, data.value.domain.endLon,"","");
+  });
+}
+
 
 function loadDownscalingMethods(){
   var zone = getValueFromHash("zone");
   var predictand = getValueFromHash("predictand");
-  var defaultDownscalingMethod = getValueFromHash("downscalingMethod");
+  var defaultDownscalingMethod = decodeURI(getValueFromHash('downscalingMethod'));
   var downscalingType = getValueFromHash("downscalingType");
   var parameters = "";
   $('#downscaling-methods').html('');
@@ -214,10 +268,13 @@ function loadDownscalingMethods(){
               loadValidationReport();
           }
         });
-        $('#downscaling-method-header').collapsible('open');
     });
-  }else{
-    $('#downscaling-method-header').collapsible('close');
+    setTimeout(function(){
+      $('#downscaling-method-header').collapsible('open');
+      if(getValueFromHash("model") != null)
+        loadModelProject();
+        loadValidationReport();
+    },0);
   }
 }
 
@@ -231,19 +288,36 @@ function loadValidationReport(){
   }
 }
 
+function loadModelProject(){
+  var defaultModelProject = getValueFromHash("modelProject");
+  var modelName = getValueFromHash("model");
+  setTimeout(function(){
+      $(".input-model-project[data-model-project='"+defaultModelProject+"']").attr('checked',true);
+      if(modelName != null)
+        loadModels();
+  },0);
+}
+
 function loadModels(){
     var zone = getValueFromHash("zone");
     var defaultModelValue = getValueFromHash("model");
     $('#models').html('');
     if(zone != null){
-    $.get( "../DownscalingService"+"/models?username=" + loggedInUser + "&zone=" + zone, function( data ) {
-        $.each(data.values, function(index, value){
-          $('#models').append("<td><input class='input-model' data-name='"+value.name+"' type='radio' name='model' value='"+value.name+"'/><abbr title='"+ "Name: " + value.name + "&#10;Description: " +value.description + "&#10;Metadata: " + value.metadata + "'><span>"+value.name+"</span></abbr></td>");
-          if(defaultModelValue == value.name)
-            $("input[name=model][value='"+value.name+"']").prop('checked',true);
-        });
-    });
-    $('#model-header').collapsible('open');
+      $.get( "../DownscalingService"+"/models?username=" + loggedInUser + "&zone=" + zone, function( data ) {
+          $.each(data.values, function(index, value){
+            $('#models').append("<td><input class='input-model' data-model='"+value.name+"' type='radio' name='model' value='"+value.name+"'/>" +
+                "<abbr title='Name: " + value.name + "&#10;Description: " +value.description + "&#10;Metadata: " + value.metadata + "&#10;&#10;Click to see more info'><a class='link'>"+
+                value.name+"<i class='material-icons'>room</i></a><a href='http://view.es-doc.org/?client_id=climate4impact_esgfsearch&renderMethod=name&project=cmip5&type=cim.1.software.modelcomponent&name="+value.name+"' title='Show ESDOC dataset metadata' target='_blank'>ES-DOC</a></abbr>");
+            
+            if(defaultModelValue == value.name)
+              $("input[name=model][value='"+value.name+"']").prop('checked',true);
+          });
+      });
+      setTimeout(function(){
+        $('#model-header').collapsible('open');
+        if(getValueFromHash("experiment") != null)
+          loadExperiments();
+      },0);
     }
 }
 
@@ -266,18 +340,22 @@ function loadExperiments(){
     $("input:radio[name='experimentRun'][value='Run 1']").prop('checked', true);
     $('#experiments').html('');
     if(run != null && model != null){
-    $.get( "../DownscalingService"+"/models/"+model+"/experiments", function( data ) {
-        $.each(data.values, function(index, value){
-          var sDate = value.metadata.split(';')[1].split('=')[1];
-          var eDate = value.metadata.split(';')[2].split('=')[1]; 
-          $('#experiments').append("<td><input class='input-experiment' data-name='"+value.name+"' data-sDate='"+ sDate + "' data-eDate='"+eDate+"' type='radio' name='experiment' value='"+value.name+"'/><abbr title='"+ "Name: " + value.name + "&#10;Description: " + value.description +"&#10;Period: " + sDate+" - "+ eDate +"'><span >"+ value.name +"</span></abbr></td>");
-          if(defaultExperimentValue == value.name)
-            $("input[name=experiment][value='"+value.name+"']").prop('checked',true);
-        });
-    });
-    $('#experiment-header').collapsible('open');
+      $.get( "../DownscalingService"+"/models/"+model+"/experiments", function( data ) {
+          $.each(data.values, function(index, value){
+            var sDate = value.metadata.split(';')[1].split('=')[1];
+            var eDate = value.metadata.split(';')[2].split('=')[1]; 
+            $('#experiments').append("<td><input class='input-experiment' data-name='"+value.name+"' data-sDate='"+ sDate + "' data-eDate='"+eDate+"' type='radio' name='experiment' value='"+value.name+"'/><abbr title='"+ "Name: " + value.name + "&#10;Description: " + value.description +"&#10;Period: " + sDate+" - "+ eDate +"'><span >"+ value.name +"</span></abbr></td>");
+            if(defaultExperimentValue == value.name)
+              $("input[name=experiment][value='"+value.name+"']").prop('checked',true);
+          });
+      });
+      setTimeout(function(){
+        $('#experiment-header').collapsible('open');
+        if(getValueFromHash("sYear") != null && getValueFromHash("eYear") != null)
+          loadPeriod();
+      },0);
     }
-    $('#experiments').html('').triggerHandler('contentChanged');
+    //$('#experiments').html('').triggerHandler('contentChanged');
 }
 
 function loadPeriod(){
@@ -307,6 +385,7 @@ function loadPeriod(){
 }
 
 function loadContent(){
+//loadVariables();
   loadVariableTypes();
-  loadVariables();loadPredictands();loadDownscalingMethods();loadModels();loadExperiments();
+//  loadVariables();loadPredictands();loadDownscalingMethods();loadModels();loadExperiments();
 }

@@ -19,7 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -683,7 +686,7 @@ public class Search {
               if(mode == 0){
                 if(files.length()>0){
                   numdatasets++;
-                  result.append("catalog;");result.append(text);result.append(";");result.append(catalogURL);result.append("\n");
+                  result.append("catalogurl;");result.append(text);result.append(";");result.append(catalogURL);result.append("\n");
                 }else{
                   throw new Exception("No records for this set.");
                 }
@@ -694,7 +697,7 @@ public class Search {
                   //httpserver
                   try{
                     String file = files.getJSONObject(i).getString("httpserver");
-                    result.append("httpserver;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    result.append("httpurl;");result.append(text);result.append(";");result.append(file);result.append("\n");
                     numhttpserver++;
                   }catch(Exception e){
                   }
@@ -703,7 +706,7 @@ public class Search {
                   //opendap
                   try{
                     String file = files.getJSONObject(i).getString("opendap");
-                    result.append("opendap;");result.append(text);result.append(";");result.append(file);result.append("\n");
+                    result.append("dapurl;");result.append(text);result.append(";");result.append(file);result.append("\n");
                     numopendap++;
                   }catch(Exception e){
                   }
@@ -774,6 +777,105 @@ public class Search {
 
     return result;
   }
+
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    
+    try {
+      String service=HTTPTools.getHTTPParam(request,"service");
+      String mode=HTTPTools.getHTTPParam(request,"request");
+      
+      String jsonp = null;
+      try{
+        jsonp=HTTPTools.getHTTPParam(request,"jsonp");
+      }catch (Exception e) {
+        try{
+          jsonp=HTTPTools.getHTTPParam(request,"callback");
+        }catch(Exception e2){
+        }
+      }
+      
+      String query = null;
+      try{
+        query=HTTPTools.getHTTPParam(request,"query");
+      }catch (Exception e) {
+      }
+      
+      String facets = null;
+      try{
+        facets=HTTPTools.getHTTPParam(request,"facet");
+      }catch (Exception e) {
+      }
+      
+
+      int pageLimit = 25;
+      try{
+        String pageLimitStr=HTTPTools.getHTTPParam(request,"pagelimit");
+        if(pageLimitStr!=null){
+          pageLimit=Integer.parseInt(pageLimitStr);
+        }
+      }catch (Exception e) {
+      }
+      
+      int pageNr = 0;
+      try{
+        String pageNrStr=HTTPTools.getHTTPParam(request,"pagenumber");
+        if(pageNrStr!=null){
+          pageNr=Integer.parseInt(pageNrStr);
+        }
+      }catch (Exception e) {
+      }
+      
+      if(service.equalsIgnoreCase("search")){
+        //Thread.sleep(100);
+
+        if(mode.equalsIgnoreCase("getfacets")){
+          HttpSession session=request.getSession();
+          String savedQuery=(String)session.getAttribute("savedquery");
+          
+          if (query.equals("clear=clear")){
+            query="";
+          } else if (query.equals("clear=onload")){
+            query=savedQuery!=null?savedQuery:"";
+          }
+          session.setAttribute("savedquery", query);
+
+          JSONResponse jsonresponse = this.getFacets(facets,query,pageNr,pageLimit);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
+        if(mode.equalsIgnoreCase("checkurl")){
+          JSONResponse jsonresponse = this.checkURL(query,request);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
+        if(mode.equalsIgnoreCase("addtobasket")){
+          JSONResponse jsonresponse = this.addtobasket(query,request);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
+        if(mode.equalsIgnoreCase("getSearchResultAsJSON")){
+          JSONResponse jsonresponse = this.getSearchResultAsJSON(query,request);
+          jsonresponse.setJSONP(jsonp);
+          response.setContentType(jsonresponse.getMimeType());
+          response.getOutputStream().print(jsonresponse.getMessage());
+        }
+        if(mode.equalsIgnoreCase("getSearchResultAsCSV")){
+          String responseString = this.getSearchResultAsCSV(query,request);
+          
+          response.setContentType("text/plain");
+          response.getOutputStream().print(responseString);
+        }
+        
+      }
+      
+    } catch (Exception e) {
+    }
+  }
+
 
 
 }

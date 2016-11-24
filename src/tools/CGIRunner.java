@@ -21,7 +21,18 @@ public class CGIRunner {
    */
   public static void runCGIProgram(String[] commands,String[] environmentVariables,String directory,final HttpServletResponse response,OutputStream outputStream,String postData) throws Exception{
     Debug.println("Working Directory: "+directory);
-    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{public void print(byte[] message,int bytesRead) {Debug.errprint(new String(message,0,bytesRead));}      public void setError(String message) {}public String getError() {      return null;    }}
+    
+    class StderrPrinter implements ProcessRunner.StatusPrinterInterface{
+      StringBuffer errorMessages = new StringBuffer();
+      public void print(byte[] message,int bytesRead) {
+        errorMessages.append(new String(message,0,bytesRead));
+      }
+      public void setError(String message) {
+      }
+      public String getError() { 
+        return errorMessages.toString();   
+      }
+    }
     class StdoutPrinter implements ProcessRunner.StatusPrinterInterface{
       boolean headersSent = false;
       boolean foundLF = false;
@@ -151,6 +162,25 @@ public class CGIRunner {
         String msg="Internal server error: CGI returned code "+processRunner.exitValue();
         Debug.errprintln(msg);
         outputStream.write(msg.getBytes());
+      }
+      if(processRunner.exitValue()!=0){
+        String errors = stderrPrinter.getError();
+        Debug.errprintln("Errors during CGI execution: "+errors);
+        if(errors!=null){
+          if(errors.indexOf("401")!=-1){
+            response.setStatus(401);
+            outputStream.write(errors.getBytes());
+          }else  if(errors.indexOf("403")!=-1){
+            response.setStatus(403);
+            outputStream.write(errors.getBytes());
+          }else if(errors.indexOf("404")!=-1){
+            response.setStatus(404);
+            outputStream.write(errors.getBytes());
+          }else if(errors.indexOf("Error opening")!=-1){
+            response.setStatus(415);
+            outputStream.write(errors.getBytes());
+          }
+        }
       }
     }
     

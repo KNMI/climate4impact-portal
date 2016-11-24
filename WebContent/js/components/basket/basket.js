@@ -139,6 +139,91 @@ var Basket = function(){
 			dataType: 'json'
 			});
 	};
+	
+  function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  }
+  
+  this.expandNodes = function(selectedNodesMixed,_callbackFunction){
+    var hasSelection = (selectedNodesMixed.length>0);
+
+    if (hasSelection) {
+      
+      var pendingRequests = 0;
+      var allFilesAssembled = function(selectedNode){
+        if(pendingRequests!=0){
+          console.log("Still some requests open");
+          return;
+        }else{
+          console.log("OK continue!");
+        }
+
+        if (_callbackFunction) {
+          if(selectedNode.length == 0){
+            Ext.MessageBox.alert('Error','No valid nodes selected.');
+          }
+          console.log("calling callbackfunction on selectedNode: "+selectedNode);  
+          _callbackFunction(selectedNode);
+          
+        }else{
+          Ext.MessageBox.alert('Error','Nothing to apply to.');
+        }
+        return true;
+      };
+
+
+      
+
+      var selectedNode = [];
+
+
+      //console.log(selectedNodesMixed);
+
+      for ( var j = 0; j < selectedNodesMixed.length; j++) {
+        
+        if(selectedNodesMixed[j].data.dapurl||selectedNodesMixed[j].data.httpurl){
+          selectedNode.push(selectedNodesMixed[j].data);
+        }
+        if(selectedNodesMixed[j].data.catalogurl&&selectedNodesMixed[j].data.catalogurl!="null"){
+          pendingRequests++;
+          var urlRequest = c4iconfigjs.impactservice+"service=catalogbrowser&mode=flat&format=application/json&node="+ URLEncode(selectedNodesMixed[j].data.catalogurl);
+          console.log(urlRequest);
+          $.ajax({
+            url: urlRequest,
+          }).done(function(data) {
+            //console.log(data);
+            for(var j=0;j<data.files.length;j++){
+              
+              if(data.files[j].dapurl){
+                if(endsWith(data.files[j].dapurl,"aggregation")){
+                  console.log("Skipping (aggregation) "+data.files[j].dapurl);
+                }else{
+                  console.log("Pushing "+data.files[j].dapurl);
+                  selectedNode.push({dapurl:data.files[j].dapurl});
+                }
+
+              }
+            }
+            pendingRequests--;
+            allFilesAssembled(selectedNode);
+          }).fail(function() {
+
+          }).always(function() {
+
+          });
+          //selectedNode.push({dapurl:selectedNodes[j].data.dapurl});
+        }
+      }
+      return allFilesAssembled(selectedNode);
+
+
+      //
+      // alert(selectedNode[0].data.dapurl + ' was selected');
+
+    } else {
+      Ext.MessageBox.alert('Error','No selected files.');
+    }
+  };
 };
 
 //Singleton basket is always there...

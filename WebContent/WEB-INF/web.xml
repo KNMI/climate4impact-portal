@@ -183,7 +183,6 @@
   <session-config>
     <session-timeout>720</session-timeout>
   </session-config>
-  
   <servlet>
     <description></description>
     <display-name>PROV</display-name>
@@ -193,5 +192,15 @@
   <servlet-mapping>
     <servlet-name>PROV</servlet-name>
     <url-pattern>/PROV</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DownscalingSearch</display-name>
+    <servlet-name>DownscalingSearch</servlet-name>
+    <servlet-class>downscaling.DownscalingSearch</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DownscalingSearch</servlet-name>
+    <url-pattern>/DownscalingSearch</url-pattern>
   </servlet-mapping>
 </web-app>

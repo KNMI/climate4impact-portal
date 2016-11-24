@@ -5,7 +5,7 @@
 <%
     String Home="/impactportal/";
 		String[] menuElements={"help/howto.jsp","help/faq.jsp","help/contactexpert.jsp"};
-		String[] menuNames   ={"HowTo","FAQ","Contact us"};
+		String[] menuNames   ={"Getting started","FAQ","Contact us"};
 				
 		String pageName=request.getServletPath();
 		

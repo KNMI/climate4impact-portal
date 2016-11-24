@@ -404,12 +404,12 @@ var SearchInterface = function(options){
       
       //Add catalog to Basket
       html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
-      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogURL:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
+      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogurl:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
       html+="  </span>";
 //      
 //      //Download dataset
 //      html+="  <span title=\"Download this dataset.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
-//      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogURL:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
+//      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogurl:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
 //      html+="  </span>";
       
        html+="<span class=\"c4i-esgfsearch-resultitem-content\">";
@@ -421,7 +421,7 @@ var SearchInterface = function(options){
        //ESDOC
        if(data.response.results[r].esgfid.indexOf("cmip5")==0){
          html+="<span class=\"c4i-esgfsearch-resultitem-esdoc\">";
-         html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+data.response.results[r].id+"\"></a>";
+         html+="<a target=\"_blank\" title=\"Show ESDOC dataset metadata\" href=\""+esdocurl+"renderMethod=datasetid&project=cmip5&id="+id+"\"></a>";
          html+="</span>";
        }
 
