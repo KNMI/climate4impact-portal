@@ -396,6 +396,22 @@ var SearchInterface = function(options){
       return filename;          
     };
     html+="<div class=\"c4i-esgfsearch-resultlist\">";
+    
+    /*Get the variable filter to be put to the catalog posttobasket function*/
+    var k = new ESGFSearch_KVP(query);
+    var selectedFacets = k.getKeyValues();  
+    var selectedPropertiesForFacet = selectedFacets["variable"];
+    var variableFilter='';
+    if(selectedPropertiesForFacet){
+      //console.log(selectedPropertiesForFacet);
+  
+      for(var j=0;j<selectedPropertiesForFacet.length;j++){
+        if(variableFilter.length>0)variableFilter+="|";
+        variableFilter+=selectedPropertiesForFacet[j];
+      }
+    }
+  
+    
     for(var r in data.response.results){
      // html+="<span  name=\""+data.response.results[r].id+"\">";
       html+="<span class=\"c4i-esgfsearch-resultitem c4i-esgfsearch-resultitem-checking\" name=\""+data.response.results[r].url+"\">";
@@ -404,7 +420,7 @@ var SearchInterface = function(options){
       
       //Add catalog to Basket
       html+="  <span title=\"Link this catalog to your basket. It will appear under Remote data in your basket.\" class=\"c4i-esgfsearch-resultitem-addtobasket-content\">";
-      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogurl:'"+data.response.results[r].url+"',filesize:'0'});\"></span>";
+      html+="  <span class=\"c4i-esgfsearch-dataset-baseimage c4i-esgfsearch-dataset-addtobasket\" onclick=\"basket.postIdentifiersToBasket({id:'"+data.response.results[r].id+"',catalogurl:'"+data.response.results[r].url+"',filesize:'0',variable:'"+variableFilter+"'});\"></span>";
       html+="  </span>";
 //      
 //      //Download dataset
