@@ -10,7 +10,7 @@
 		String numProductsString="-";
 		
 		try{
-			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts();
+			numProducts = LoginManager.getUser(request).getShoppingCart().getNumFiles();
 		}catch(Exception e){				
 		}
 		if(numProducts!=0){

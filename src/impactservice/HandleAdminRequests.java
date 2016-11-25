@@ -24,7 +24,7 @@ import tools.Debug;
 import tools.JSONResponse;
 
 public class HandleAdminRequests {
-  public static void handleAdminRequests(HttpServletRequest request, HttpServletResponse response) {
+  public static void handleAdminRequests(HttpServletRequest request, HttpServletResponse response) throws Exception {
     JSONResponse jsonResponse = new JSONResponse(request);
 
     ImpactUser user = null;
@@ -96,9 +96,9 @@ public class HandleAdminRequests {
             
             jsonUser.put("sessions", sessionIds);
             ImpactUser infoUser = userList.get(j);
-            jsonUser.put("basketsize", infoUser.getShoppingCart().getNumProducts());
-            jsonUser.put("processingjobsize", infoUser.getProcessingJobList().getNumProducts());
             
+            jsonUser.put("processingjobsize", infoUser.getProcessingJobList().getNumJobs());
+            jsonUser.put("basketsize", infoUser.getShoppingCart().getNumFiles());
             jsonUserList.put(jsonUser);
           }
           json.put("users", jsonUserList);

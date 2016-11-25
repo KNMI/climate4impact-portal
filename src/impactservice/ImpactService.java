@@ -73,7 +73,7 @@ public class ImpactService extends HttpServlet {
         if(procId!=null){procId=URLDecoder.decode(procId,"UTF-8");}else{errorResponder.printexception("id="+procId);return;}
         jobList = LoginManager.getUser(request).getProcessingJobList();
         jobList.removeDataLocator(procId);
-        jsonResponse.setMessage("{\"numproducts\":\""+(jobList.getNumProducts())+"\"}");
+        jsonResponse.setMessage("{\"numproducts\":\""+(jobList.getNumJobs())+"\"}");
       }catch(Exception e){
         jsonResponse.setException("Processor: removefromlist failed", e);
       }
@@ -863,7 +863,7 @@ public class ImpactService extends HttpServlet {
         basketList = LoginManager.getUser(request).getShoppingCart();
         basketList.removeDataLocators(procId);
         response.setContentType("application/json");
-        response.getWriter().println("{\"numproducts\":\""+(basketList.getNumProducts())+"\"}");
+        response.getWriter().println("{\"numproducts\":\""+(basketList.getNumFiles())+"\"}");
       }catch(Exception e){
         response.getWriter().println(e.getMessage());
       }
@@ -882,7 +882,7 @@ public class ImpactService extends HttpServlet {
 
           Debug.println("Adding data to basket "+HTTPTools.getHTTPParam(request,"id"));
 
-          int currentNumProducts=shoppingCart.getNumProducts();
+          int currentNumProducts=shoppingCart.getNumFilesDirect();
 
           if(HTTPTools.getHTTPParam(request,"id")!=null){
             JSONObject el=new JSONObject();
@@ -985,8 +985,8 @@ public class ImpactService extends HttpServlet {
                 addFileToBasket(shoppingCart,el);
               }
             }catch(Exception e){}
-            String result = "{\"numproductsadded\":\""+(shoppingCart.getNumProducts()-currentNumProducts)+"\",";
-            result += "\"numproducts\":\""+(shoppingCart.getNumProducts())+"\"}";
+            String result = "{\"numproductsadded\":\""+(shoppingCart.getNumFilesDirect()-currentNumProducts)+"\",";
+            result += "\"numproducts\":\""+(shoppingCart.getNumFilesDirect())+"\"}";
             Debug.println(result);
             jsonResponse.setMessage(result);
           }
@@ -1056,7 +1056,7 @@ public class ImpactService extends HttpServlet {
     }catch(Exception e){}
     Debug.println("Data="+fileInfo.toString());
 
-    shoppingCart.addDataLocator(el.getString("id"),fileInfo.toString(), addDate, addDateMilli,true);
+    shoppingCart.addDataLocator(el.getString("id"),fileInfo.toString(), addDate, addDateMilli);
 
   }
 
@@ -1109,7 +1109,12 @@ public class ImpactService extends HttpServlet {
      * Handle Admin requests 
      */
     if(serviceStr.equalsIgnoreCase("ADMIN")){
-      HandleAdminRequests.handleAdminRequests(request,response);
+      try {
+        HandleAdminRequests.handleAdminRequests(request,response);
+      } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
 
 

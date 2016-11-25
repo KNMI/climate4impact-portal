@@ -11,7 +11,7 @@ public class LazyCaller {
     long age = 0;
     String data;
   }
-  private static Vector<LazyObject> lazyObjects = new Vector<LazyObject>();
+  static private  Vector<LazyObject> lazyObjects = new Vector<LazyObject>();
   
   public boolean isCallable(String id,int timeOutMs){
     long currentAge = DateFunctions.getCurrentDateInMillis();
@@ -29,14 +29,14 @@ public class LazyCaller {
     return true;
   };
   
-  public void markDirty(String id){
+  static public void markDirty(String id){
     LazyObject fileObj = getLazyObject(id);
     if(fileObj!=null){
       fileObj.age=0;      
     }
   }
   
-  private static LazyObject getLazyObject(String file){
+  static private LazyObject getLazyObject(String file){
     for(int j=0;j<lazyObjects.size();j++){
       if(lazyObjects.get(j).name.equals(file)){
         return lazyObjects.get(j);
@@ -84,7 +84,7 @@ public class LazyCaller {
   }
 
   static LazyCaller lazyFileReaderWriter = null;
-  public static LazyCaller getInstance() {
+  public static synchronized LazyCaller getInstance() {
     if(lazyFileReaderWriter == null){
       Debug.println("Creating new instance");
       lazyFileReaderWriter = new LazyCaller();

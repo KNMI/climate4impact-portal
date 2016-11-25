@@ -11,7 +11,7 @@
 		String numProductsString="-",numJobsString = "-";
 		
 		try{
-			numProducts = LoginManager.getUser(request).getShoppingCart().getNumProducts();
+			numProducts = LoginManager.getUser(request).getShoppingCart().getNumFiles();
 		}catch(Exception e){				
 		} 
 		if(numProducts!=0){
@@ -19,7 +19,7 @@
 		}
 		
 		try{
-			numJobs = LoginManager.getUser(request).getProcessingJobList().getNumProducts();
+			numJobs = LoginManager.getUser(request).getProcessingJobList().getNumJobs();
 		}catch(Exception e){				
 		}
 		if(numJobs!=0){

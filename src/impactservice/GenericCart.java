@@ -10,7 +10,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
@@ -24,24 +23,32 @@ import org.json.JSONTokener;
 
 import tools.Debug;
 import tools.HTTPTools;
+import tools.LazyCaller;
 import tools.MyXMLParser.XMLElement;
 import tools.Tools;
 import wps.WebProcessingInterface;
 
 
-
+/* This class is part of the user object */
 
 public class GenericCart {
-  
+  private LazyCaller lazyCaller = new LazyCaller();
   public Vector<DataLocator> dataLocatorList = new Vector<DataLocator>();
-  
+  int numCustomFiles = 0;
   private ImpactUser user = null;
   private  String genericId = "";
+  private String lazyId= "";
+  GenericCart() throws Exception{
+    super();
+    loadFromStore();
+  }
 
-  public  GenericCart(String id,ImpactUser user){
-    //Debug.println("Creating new GenericCart with id "+id+" for user "+user.getId());
+  public  GenericCart(String id,ImpactUser user) throws Exception{
+    //Debug.println("Creating new GenericCart with id "+id+" for user "+user.getUserId());
     this.genericId=id;
     this.user=user;
+    this.lazyId=id+"_"+user.getUserId();
+    loadFromStore();
 
   }
 
@@ -108,7 +115,11 @@ public class GenericCart {
     saveToStore();
   }
 
-  public synchronized void addDataLocator(String id, String fileInfo,String addDate,long addDateMillis,boolean saveToStore) {
+  public synchronized void addDataLocator(String id, String fileInfo,String addDate,long addDateMillis) {
+    addDataLocator(id,fileInfo,addDate,addDateMillis,true);
+  
+  }
+  private synchronized void addDataLocator(String id, String fileInfo,String addDate,long addDateMillis,boolean saveToStore) {
     // DebugConsole.println("Adding "+id+" with date "+addDate);
     //dataLocation=dataLocation.replace("http://cmip-dn.badc.rl.ac.uk", "http://cmip-dn1.badc.rl.ac.uk");
     DataLocator d = new DataLocator(id,fileInfo,addDate,addDateMillis);
@@ -180,15 +191,51 @@ public class GenericCart {
     }
   }
 
-  public int getNumProducts(){
-    //Debug.println("GetNumProducts" );
-    int numCustomFiles = 0;
-    return dataLocatorList.size()+numCustomFiles;
+  public static int getFilesCount(File file) {
+    File[] files = file.listFiles();
+    int count = 0;
+    for (File f : files)
+      if (f.isDirectory())
+        count += getFilesCount(f);
+      else
+        count++;
+
+    return count;
+  }
+  
+  public int getNumJobs() throws Exception{
+    loadFromStore();
+    //Debug.println("getNumJobs" );
+    
+   
+    return dataLocatorList.size();
   }
 
 
+  int lazygetNumFiles=0;
+  public int getNumFiles() throws Exception{
+    if(lazyCaller.isCallable("getNumFiles"+this.lazyId, 5000)){
+      //Debug.println("getNumFiles load" );
+      loadFromStore();
+      String dataDir = user.getDataDir();
+      numCustomFiles = getFilesCount(new File(dataDir));
+      lazygetNumFiles =  dataLocatorList.size()+numCustomFiles;
+    }
+    return lazygetNumFiles;
+  }
+
+  public int getNumFilesDirect() throws Exception {
+    LazyCaller.markDirty("_loadFromStore"+this.lazyId);
+    LazyCaller.markDirty("getNumFiles"+this.lazyId);
+    
+    return getNumFiles();
+  }
   public synchronized void  loadFromStore() throws Exception {
-    //Debug.println("Loading from store");
+    if(!lazyCaller.isCallable("_loadFromStore"+this.lazyId, 5000)){
+      Debug.println("Lazy: Skipping loading from store");
+      return;
+    }
+    Debug.println("Loading from store for id "+this.genericId+" for user "+user.getUserId());
     String file=user.getWorkspace()+"/"+genericId+".xml";
     XMLElement catalogElement = new XMLElement();
     try {
@@ -207,12 +254,17 @@ public class GenericCart {
     Vector<XMLElement>elements=sc.getList("element");
     for(int j=0;j<elements.size();j++){
       addDataLocator(elements.get(j).getAttrValue("id"),URLDecoder.decode(elements.get(j).getAttrValue("data"),"UTF-8"),elements.get(j).getAttrValue("adddate"),Long.parseLong(elements.get(j).getAttrValue("adddatemillis")),false);
-      //DebugConsole.println("j: "+j+" "+Long.parseLong(elements.get(j).getAttrValue("adddatemillis")));
+      //Debug.println("j: "+j+" "+Long.parseLong(elements.get(j).getAttrValue("adddatemillis")));
     }
 
-
+//    String dataDir = user.getDataDir();
+//    numCustomFiles = getFilesCount(new File(dataDir));
   }
   private synchronized void saveToStore(){
+//    LazyCaller.markDirty("_loadFromStore"+this.lazyId);
+//    LazyCaller.markDirty("getNumFiles"+this.lazyId);
+    Debug.println("Save to store for user "+user.getUserId());
+    
     Debug.println("Saving to store");
     String file=user.getWorkspace()+"/"+genericId+".xml";
     String data = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
@@ -244,7 +296,8 @@ public class GenericCart {
      * @throws Exception 
      */
     public static JSONObject showJobList(GenericCart genericCart,HttpServletRequest request) throws Exception{
-      Debug.println("Show joblist");
+      genericCart.loadFromStore();
+      //Debug.println("Show joblist");
       
       DataLocator[] dataLocatorListArray = (DataLocator[]) genericCart.dataLocatorList.toArray(new DataLocator[genericCart.dataLocatorList.size()]);
       
@@ -437,7 +490,8 @@ public class GenericCart {
     };
 
     public static JSONObject showDataSetList(GenericCart genericCart,HttpServletRequest request) throws Exception{
-      Debug.println("Show datasetlist");
+      genericCart.loadFromStore();
+     // Debug.println("Show datasetlist");
       JSONObject datasetList = new JSONObject();
 
       JSONArray datasets = new JSONArray();
@@ -669,6 +723,10 @@ public class GenericCart {
     }
 
   }
+
+
+
+
 
 
 }

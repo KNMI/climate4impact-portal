@@ -5,7 +5,7 @@
 		String numProductsString = "-";
 		try {
 			int numProducts = LoginManager.getUser(request)
-					.getShoppingCart().getNumProducts();
+					.getShoppingCart().getNumFiles();
 			if (numProducts != 0) {
 				numProductsString = "" + numProducts;
 			}

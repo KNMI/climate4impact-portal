@@ -19,12 +19,14 @@ import stats.StatLogger;
 import tools.DateFunctions;
 import tools.Debug;
 import tools.HTTPTools;
+import tools.LazyCaller;
 import tools.Tools;
 
 
 
 
 public class ImpactUser {
+  LazyCaller lazyLoader = new LazyCaller();
   static boolean debug=false;
   private String id = null; // The unique ID of the user object
   //private String _internalName = null;
@@ -39,6 +41,7 @@ public class ImpactUser {
   public boolean configured = false;
   
   private GenericCart shoppingCart = null;
+  private GenericCart processingJobsList = null;
   
   private String emailAddress;
   public String userMyProxyService = null;
@@ -64,14 +67,16 @@ public class ImpactUser {
       return "Cert info:"+"\n"+certInfo;
     }
   }
+  
 
 
   synchronized public GenericCart getProcessingJobList(){
-    GenericCart processingJobsList = null;
-    //Debug.println("getProcessingJobList for "+this.getUserId());
+    
+   // Debug.println("getProcessingJobList for "+this.getUserId());
     try{
-      processingJobsList = new GenericCart("processingJobsList",this);
-      processingJobsList.loadFromStore();
+      if(processingJobsList==null){
+        processingJobsList = new GenericCart("processingJobsList",this);
+      }
     }catch(Throwable e){
       try {
         MessagePrinters.emailFatalErrorException("getProcessingJobList",e);
@@ -81,13 +86,15 @@ public class ImpactUser {
     }
     return processingJobsList;  
   }
+  
+  
+  
   synchronized public GenericCart getShoppingCart() {
     //Debug.println("getShoppingCart");
     try{
       if(shoppingCart==null){
         shoppingCart = new GenericCart("shoppingCart",this);
       }
-      shoppingCart.loadFromStore();
     }catch(Throwable e){
       try {
         MessagePrinters.emailFatalErrorException("getShoppingCart",e);
@@ -137,6 +144,7 @@ public class ImpactUser {
     return this.openid ;
   }
   public void setOpenId(String openid) {
+    Debug.println("Setopenid to "+openid);
     this.openid = openid;
   }
   public String getUserName() {
@@ -303,10 +311,10 @@ public class ImpactUser {
         return;
       }
       
-      String defaultOpenID = Configuration.LoginConfig.getMyProxyDefaultUserName();
-      if(defaultOpenID!=null){
-        setOpenId(defaultOpenID);
-      }
+//      String defaultOpenID = Configuration.LoginConfig.getMyProxyDefaultUserName();
+//      if(defaultOpenID!=null){
+//        setOpenId(defaultOpenID);
+//      }
       
       if(getOpenId()==null){
         String openid = (String) request.getSession().getAttribute("openid_identifier");

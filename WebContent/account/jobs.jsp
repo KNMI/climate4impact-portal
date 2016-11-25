@@ -68,6 +68,7 @@
     	
     	/* Set loading gif */
     	element.html('<div class="c4i-joblist-loader"></div>');
+    	var currentList;
     	
     	/* Generate table based on json data callback */
     	var httpCallback = function(data){
@@ -80,15 +81,16 @@
     	    element.html(html);
     	    return;
     	  }
+    	  currentList=data;
     	  
     	  if(data.jobs.length==0){
     	    element.html("No jobs available");
     	    return ;
     	  }
-    	  
+    	  //console.log("Dupdateing "+data.jobs.length);
     	  var html="<table class=\"c4i-joblist-table\"><tr><th>Created at</th><th>Name</th><th>Status location</th><th>Progress</th><th>View</th><th>X</th></tr>";
     	  for(var j=0;j<data.jobs.length;j++){
-    	    html+="<tr>";
+    	    html+="<tr name=\""+data.jobs[j].processid+"\">";
     	    html+="<td>"+data.jobs[j].creationdate+"</td>";
     	    html+="<td>"+data.jobs[j].wpsid+"</td>";
     	    html+="<td><a href=\""+data.jobs[j].statuslocation+"\">"+data.jobs[j].processid+"</a></td>";
@@ -98,8 +100,12 @@
     	    html+="</tr>";
     	  }
     	  html+="</table>";
-    	  element.html(html);
+    	  //console.log("Clearing element");
+    	  element.empty();
+    	  //console.log("setting html");
     	  
+    	  element.html(html);
+    	  //console.log("setting html done");
     	  /* View Job details buttons */
     	  element.find(".c4i-joblist-viewbutton").button().attr('onclick','').click(function(t){
     	    var found = false;
@@ -115,25 +121,32 @@
     	    }
         });
     	  
+    	  
+    	  
     	  /* Remove Job from list buttons */
         element.find(".c4i-joblist-deletebutton").button().attr('onclick','').click(function(t){
-          var removeJobDoneCallback = function(d){
-            adjustNumberOfJobsDisplayedInMenuBar(d);//Located in ImpactJS.js
-          };
-          
-          $.ajax({
-            url: impactService+"service=processor&request=removeFromList&id="+this.name,
-            crossDomain:true,
-            dataType:"jsonp"
-          }).done(function(d) {
-            removeJobDoneCallback(d)
-          }).fail(function() {
-            alert("Failed for "+arg);
-          }).always(function(){
-            getJobListFromServer();
-          });
+          var foundIndex =-1;
+          for(var j=0;j<currentList.jobs.length;j++){
+            if(currentList.jobs[j].processid==this.name){
+              foundIndex=j;
+              break;
+            }
+          }
+          if(foundIndex==-1)return;
+          currentList.jobs.splice(foundIndex, 1);
+          adjustNumberOfJobsDisplayedInMenuBar({'numproducts':currentList.jobs.length});//Located in ImpactJS.js
+          $("#joblist").find('tr[name=\"'+this.name+'\"]').remove();
+                    
+           $.ajax({
+             url: impactService+"service=processor&request=removeFromList&id="+this.name,
+             crossDomain:true,
+             dataType:"jsonp"
+           }).done(function(d) {
+           }).fail(function() {
+           }).always(function(){
+           });
         });
-    	
+    		console.log("done");
     	};
 
     	
@@ -146,19 +159,24 @@
 	   	    dataType:"jsonp"
 	   	  }).done(function(d) {
 	   	    try{
-	   	      httpCallback(d)
+	   	      httpCallback(d);
+	   	     
 	   	    }catch(e){
 	   	      element.html("Error obtaining joblist: "+e);
 	   	    };
 	 	    }).fail(function() {
 	 	      alert("Failed for "+arg);
 	 	    }).always(function(){
-	 	      console.log("Always");
-	 	      setTimeout(function(){getJobListFromServer();},10000);
+	 	      
 	 	    });
     	};
     	
-    	getJobListFromServer();
+    	function loop(){
+    	  getJobListFromServer();
+ 	      setTimeout(function(){loop();},10000);
+    	};
+    	loop();
+    	
     });
     
     </script>
