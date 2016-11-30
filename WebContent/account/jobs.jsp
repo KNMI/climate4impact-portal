@@ -25,6 +25,12 @@
       <link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
     
+          <script type="text/javascript" src="/impactportal/data/c4i-processing/c4i-processing.js"></script>
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSProcessing.js"></script> 
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSTimer.js"></script> 
+    <link rel="stylesheet" href="/impactportal/data/c4i-processing/c4i-processing.css" />
+  
+    
     
     <style>
 		.c4i-joblist-loader{
@@ -115,7 +121,22 @@
     	      }
     	    }
     	    if(found!==false){
-            showStatusReport(found);
+            //showStatusReport(found);
+            console.log(found);
+            var el=jQuery('<div/>');
+            renderProcessingInterface(
+              {
+                element:el,
+                wpsservice:'<%=Configuration.getHomeURLHTTPS()%>/WPS?',
+                identifier:found.wpsid,
+                inputdata:found.wpspostdata,
+                statuslocation:found.statuslocation,
+                adagucservice:"http://climate4impact.eu/impactportal/adagucserver?",
+                adagucviewer:"http://climate4impact.eu//impactportal/adagucviewer/",
+                dialog:true
+              }
+            );
+            
     	    }else{
     	      alert("Process ID "+this.name+" not found");
     	    }

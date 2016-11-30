@@ -34,26 +34,30 @@ import wps.WebProcessingInterface;
  * Servlet implementation class AdagucViewer
  */
 public class AdagucViewer extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public AdagucViewer() {
-        super();
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * @see HttpServlet#HttpServlet()
+   */
+  public AdagucViewer() {
+    super();
+  }
+
+  /**
+   * This function converts XML to JSON for the ADAGUC viewer, similar to the original xml2jsonrequest.php function
+   * It also determines whether the request is meant for a remote WMS server or for our local ADAGUC impactportal server.
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+   */
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    String serviceStr = null;
+    try {
+      serviceStr = HTTPTools.getHTTPParam(request, "SERVICE");
+    } catch (Exception e1) {
     }
 
-	/**
-	 * This function converts XML to JSON for the ADAGUC viewer, similar to the original xml2jsonrequest.php function
-	 * It also determines whether the request is meant for a remote WMS server or for our local ADAGUC impactportal server.
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-    String serviceStr=request.getParameter("SERVICE");
-    
 
-    
+
     //Get outputstream
     OutputStream out1 = null;
     try {
@@ -62,7 +66,7 @@ public class AdagucViewer extends HttpServlet {
       Debug.errprint(e.getMessage());
       return;
     }
-    
+
     if(serviceStr==null){
       String msg="SERVICE param missing";
       Debug.errprintln(msg);
@@ -70,32 +74,32 @@ public class AdagucViewer extends HttpServlet {
       return;
     }
 
-    if(serviceStr.equals("XML2JSON")){
+    if(serviceStr.equalsIgnoreCase("XML2JSON")){
       XML2JSON(request,out1,response);
       return;
     }
-    if(serviceStr.equals("KML")){
+    if(serviceStr.equalsIgnoreCase("KML")){
       MakeKML(request,out1,response);
       return;
     }
-   
+
   }
 
-	
-	private String getKVP(HttpServletRequest request, OutputStream out1,String key) throws IOException{
-	  String value=null;
-	  try {value=URLDecoder.decode(request.getParameter(key),"UTF-8"); } catch (Exception e) {out1.write((key+" missing").getBytes());}
-	  return value;
-	}
-	
-	private void MakeKML(HttpServletRequest request, OutputStream out1,     HttpServletResponse response) throws IOException {
+
+  private String getKVP(HttpServletRequest request, OutputStream out1,String key) throws IOException{
+    String value=null;
+    try {value=URLDecoder.decode(request.getParameter(key),"UTF-8"); } catch (Exception e) {out1.write((key+" missing").getBytes());}
+    return value;
+  }
+
+  private void MakeKML(HttpServletRequest request, OutputStream out1,     HttpServletResponse response) throws IOException {
     Debug.println("MakeKML "+request.getQueryString());
-   
+
     //String srs = getKVP(request,out1,"srs");
     String bbox = getKVP(request,out1,"bbox");
-    
+
     String[] bboxList=bbox.split(",");
-    
+
     String service = getKVP(request,out1,"service");
     String layers = getKVP(request,out1,"layer");
     //String selected = getKVP(request,out1,"selected");
@@ -108,7 +112,7 @@ public class AdagucViewer extends HttpServlet {
     //Compose a list of layers
     String[] layerList=layers.split(",");
 
-    
+
     //Clean dims: Replace all dims except TIME and ELEVATION by DIM_$dim
     dims = dims.replaceAll("$","=");
     String[] dimList = dims.replaceAll("\\$","=").split(",");
@@ -131,7 +135,7 @@ public class AdagucViewer extends HttpServlet {
     kml +="<Folder>\n";
     kml +="<name>ADAGUC WMS</name>\n";
     kml +="<open>1</open>\n";
-    
+
     for(int j=0;j<layerList.length;j++){
       String[] layerProperties = layerList[j].split("\\$");
       String layer=URLEncoder.encode(layerProperties[0],"UTF-8");
@@ -140,14 +144,14 @@ public class AdagucViewer extends HttpServlet {
       String styles=URLEncoder.encode(layerProperties[3],"UTF-8");;
       //String opacity=layerProperties[4];
       String serviceIndex=layerProperties[5];
-      
+
       String layerService=serviceList[Integer.parseInt(serviceIndex)];
       if(layerService.indexOf("/")==0){
         String hostname =request.getRequestURL()+"/../..";
         layerService=hostname+layerService.replaceAll("&", "&amp;");
       }
       Debug.println("layerService=\n"+layerService);
-      
+
 
       if(enabled.equals("true")){
         kml +="<GroundOverlay>\n";
@@ -169,7 +173,7 @@ public class AdagucViewer extends HttpServlet {
         kml +="</GroundOverlay>\n";
       }
     }
-    
+
     kml +="</Folder>\n";
     kml +="</kml>\n";
     response.setContentType("application/vnd.google-earth.kml+xml");
@@ -181,23 +185,17 @@ public class AdagucViewer extends HttpServlet {
   }
 
   /**
-	 * Converts XML file pointed with request to JSON file
-	 * @param requestStr
-	 * @param out1
-	 * @param response
-	 */
-	private void XML2JSON(HttpServletRequest request, OutputStream out1, HttpServletResponse response) {
-	  Debug.println("XML2JSON "+request.getQueryString());
-	  boolean thisIsWPSExecuteRequest = false;
+   * Converts XML file pointed with request to JSON file
+   * @param requestStr
+   * @param out1
+   * @param response
+   */
+  static void XML2JSON(HttpServletRequest request, OutputStream out1, HttpServletResponse response) {
+    Debug.println("XML2JSON "+request.getQueryString());
+    boolean thisIsWPSExecuteRequest = false;
     String requestStr=request.getParameter("request");
-    if(requestStr==null){
-      requestStr=request.getParameter("REQUEST");
-    }
     String callbackStr=request.getParameter("callback");
-    if(callbackStr==null){
-      callbackStr=request.getParameter("CALLBACK");
-    }
-
+   
     try {
       if(requestStr==null ){
         String msg="REQUEST param missing";
@@ -205,15 +203,15 @@ public class AdagucViewer extends HttpServlet {
         out1.write(msg.getBytes());
         return;
       }
-     
+
       requestStr=URLDecoder.decode(requestStr,"UTF-8");
       MyXMLParser.XMLElement rootElement = new MyXMLParser.XMLElement();
-      
+
       Debug.println("Making XML to JSON request for "+requestStr);
 
       boolean isLocalADAGUC = false;
       boolean isLocalWPS = false;
-      
+
       //Determine whether the request is to the ADAGUC server in our impactportal or to any other WMS server?
       if(requestStr.indexOf("impactportal/ImpactService?")!=-1){
         Debug.errprintln("DEPRECATED: LOCAL ADAGUCSERVER Detected via /ImpactService: should be via /adagucserver");
@@ -245,50 +243,77 @@ public class AdagucViewer extends HttpServlet {
           throw new Exception("Unable to parse XML at "+requestStr);
         }
       }else if(isLocalWPS){
-        ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
-        //Remove /impactportal/ImpactService? from the requeststring
-        int beginningOfUrl = requestStr.indexOf("?");
-        if(beginningOfUrl!=-1){
-          requestStr = requestStr.substring(beginningOfUrl+1);
-          Debug.println("Truncated URL to "+requestStr);
-        }
-        PyWPSServer.runPyWPS(request, null, stringOutputStream, requestStr, null);
-        
-            String jsonData = null;
-            try{
-              MyXMLParser.XMLElement  b = new MyXMLParser.XMLElement();
-              b.parseString(stringOutputStream.toString());
-              jsonData  = b.toJSON(tools.MyXMLParser.Options.NONE);
-            }catch(SSLException e){
-              Debug.printStackTrace(e);
-              JSONObject o = new JSONObject();
-              o.put("error", e.getMessage());
-              jsonData=o.toString();
-            }catch(Exception e){
-              Debug.printStackTrace(e);
-              JSONObject o = new JSONObject();
-              o.put("error", e.getMessage());
-              jsonData=o.toString();
-            }
-            response.setContentType("application/json");
-            //Output JSON using JSONP
-            if(callbackStr!=null){
-              out1.write((callbackStr+"("+jsonData+");").getBytes());
-            }else{
-              out1.write(jsonData.getBytes());
-            }
-            rootElement = null;
-            return;
+        String jsonData = null;
+        int maxTries = 4;
+        boolean hasError = true; 
+        MyXMLParser.XMLElement  b = null;
+        while(maxTries>0 && hasError == true){
+          Debug.println("Making request "+maxTries+" for "+requestStr);
+          maxTries--;
+          ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
+          //Remove /impactportal/ImpactService? from the requeststring
+          int beginningOfUrl = requestStr.indexOf("?");
+          if(beginningOfUrl!=-1){
+            requestStr = requestStr.substring(beginningOfUrl+1);
+            Debug.println("Truncated URL to "+requestStr);
+          }
+          PyWPSServer.runPyWPS(request, null, stringOutputStream, requestStr, null);
+          b = new MyXMLParser.XMLElement();
           
-        
+          try{
+            b.parseString(stringOutputStream.toString());  
+            hasError = false;
+          }catch(SSLException e){
+            if(maxTries == 0){
+              hasError = true;
+              Debug.printStackTrace(e);
+              JSONObject o = new JSONObject();
+              o.put("error", e.getMessage());
+              jsonData=o.toString();
+            }
+          }catch(Exception e){
+            if(maxTries == 0){
+              hasError = true;
+              Debug.printStackTrace(e);
+              JSONObject o = new JSONObject();
+              o.put("error", e.getMessage());
+              jsonData=o.toString();
+            }
+          }
+          if(hasError){
+            Debug.errprintln("Retrying "+maxTries+" for "+requestStr);
+            Thread.sleep(1000);
+          }
+        }
+        if(hasError == false){
+          try{
+            jsonData  = b.toJSON(tools.MyXMLParser.Options.NONE);
+          }catch(Exception e){
+            Debug.printStackTrace(e);
+            JSONObject o = new JSONObject();
+            o.put("error", e.getMessage());
+            jsonData=o.toString();
+          }
+        }
+        response.setContentType("application/json");
+        //Output JSON using JSONP
+        if(callbackStr!=null){
+          out1.write((callbackStr+"("+jsonData+");").getBytes());
+        }else{
+          out1.write(jsonData.getBytes());
+        }
+        rootElement = null;
+        return;
+
+
       }else{
         //Remote XML2JSON request to external WMS service
         Debug.println("Converting XML to JSON for "+requestStr);
         rootElement.parse(new URL(requestStr));
       }
-     
+
       response.setContentType("application/json");
-      
+
       try{
         if(thisIsWPSExecuteRequest){
           WebProcessingInterface.trackJobForUser( LoginManager.getUser(request), rootElement, null);
@@ -296,8 +321,8 @@ public class AdagucViewer extends HttpServlet {
       }catch(Exception e){
         e.printStackTrace();
       }
-      
-      
+
+
       //Output JSON using JSONP
       if(callbackStr!=null){
         out1.write((callbackStr+"("+rootElement.toJSON(Options.NONE)+");").getBytes());
@@ -306,39 +331,39 @@ public class AdagucViewer extends HttpServlet {
       }
       rootElement = null;
       return;
-      
-    } catch (Exception e) {
-      
-      if(e.getMessage()!=null){
-        
-          response.setContentType("application/json");
 
-          JSONResponse r = new JSONResponse(request);
-          if(callbackStr!=null)r.setJSONP(callbackStr);
-          
-          if(e.getClass() == WebRequestBadStatusException.class){
-            r.setErrorMessage(((WebRequestBadStatusException)e).getResult(), ((WebRequestBadStatusException)e).getStatusCode());
-          }else{
-            r.setErrorMessage(e.getMessage(),200);
-          }
-          Debug.println("Exception "+e.getMessage());
-          
-          try {
-            out1.write(r.getMessage().getBytes());
-          } catch (IOException e1) {
-            e1.printStackTrace();
-          }
-        
+    } catch (Exception e) {
+
+      if(e.getMessage()!=null){
+
+        response.setContentType("application/json");
+
+        JSONResponse r = new JSONResponse(request);
+        if(callbackStr!=null)r.setJSONP(callbackStr);
+
+        if(e.getClass() == WebRequestBadStatusException.class){
+          r.setErrorMessage(((WebRequestBadStatusException)e).getResult(), ((WebRequestBadStatusException)e).getStatusCode());
+        }else{
+          r.setErrorMessage(e.getMessage(),200);
+        }
+        Debug.println("Exception "+e.getMessage());
+
+        try {
+          out1.write(r.getMessage().getBytes());
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+
       }
       return;
     }
   }
 
   /**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	  doGet(request,response);
-	}
+   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+   */
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doGet(request,response);
+  }
 
 }

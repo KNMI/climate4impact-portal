@@ -101,7 +101,7 @@ var esgfsearch_pc_project={
                    "tooltip":   "gridded observational near surface data for model validation purposes, or to force impact models"
                  }
                ]
-  },
+  }
     /*{
     "name":      "specs",
     "longname":  "Seasonal-to-decadal climate Prediction for the improvement of European Climate Services<br/></br><a target=\"_blank\" href=\"http://www.specs-fp7.eu/\">SPECS project page</a>",

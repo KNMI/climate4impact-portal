@@ -13,6 +13,7 @@ try{
 }
 
 var c4iconfigjs = {
+  processingservice:"/impactportal/wps?",
   searchservice:"/impactportal/esgfsearch?",
   impactservice:"/impactportal/ImpactService?",
   provenanceservice:"/impactportal/PROV?",
@@ -21,6 +22,7 @@ var c4iconfigjs = {
   adagucviewer:"/impactportal/adagucviewer/",
   howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
   contactexpertlink:"/impactportal/help/contactexpert.jsp",
+  xml2jsonservice:"/impactportal/wps?"
 }; 
 
 var mouseXPosition;

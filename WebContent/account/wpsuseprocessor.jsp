@@ -45,113 +45,24 @@
   <link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
     
-    <style>
-     .x-toolbar-footer{
-     background:none;
-     }
-      .c4i-wpsuseprocessor-table  {
-          border-collapse: collapse;
-          width: 100%;
-      
-          border-spacing: 0;
-      }
-      
-      .c4i-wpsuseprocessor-table th, .c4i-wpsuseprocessor-table td {
-        border: 1px solid #ddd;
-        padding: 3px 8px 3px 8px;
-        text-align: left;
-          text-align: left;
-          padding: 8px;
-      }
-      .c4i-wpsuseprocessor-table tr:nth-child(even){background-color: #f5f5f5}
-      
-      /*.c4i-wpsuseprocessor-table tr:hover {background-color: #f0f0f0 !important}*/
-      
-      .c4i-wpsuseprocessor-table th{
-        background: none repeat scroll 0 0 #428bca;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
-      }
-      
-      .x-panel-default-framed{
-        border-radius: 0px !important;
-      }
-     </style>  
-        
+          <script type="text/javascript" src="/impactportal/data/c4i-processing/c4i-processing.js"></script>
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSProcessing.js"></script> 
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSTimer.js"></script> 
+    <link rel="stylesheet" href="/impactportal/data/c4i-processing/c4i-processing.css" />
+  
+    
+ 
     <script type="text/javascript">
-    var impactService = '/impactportal/ImpactService?';
-    Ext.Loader.setConfig({
-        enabled: true
-    });
-    /*Ext.Loader.setPath('Ext.ux', '../js/ux');
-
-    Ext.require([
-        'Ext.selection.CellModel',
-        'Ext.grid.*',
-        'Ext.data.*',
-        'Ext.util.*',
-        'Ext.state.*',
-        'Ext.form.*',
-        'Ext.ux.CheckColumn',
-        'Ext.ux.ButtonColumn'
-    ]);*/
-    Ext.QuickTips.init();
-
-
-    Ext.onReady(function(){
-       
-       	var container = Ext.create('Ext.container.Container', {
-  	        layout: 'fit',
-  			renderTo:'container',
-  		   	
-  		   	border:false,
-  		    scripts:true,
-  		    autoScroll:false,
-
-  		    items:[{
-  				region:'center',
-  				xtype:'panel',
-  				layout:'form',
-  				//minHeight:800,
-  				border:false,
-  				//padding:'4 4 4 4',
-  				//margin:'4 4 4 4',
-  				items:[{
-  			   		
-  			   			xtype:'panel',
-  			   			//title:'Processor '+processorIding details and options' ,
-  			   			id:'wpsstart',
-  			   			//height:220, 
-  			   			frame:false,
-  			   			border:false,
-  			   			//padding:2,
-  			  			margin:'0 0 14 0',
-  			   			buttons:[{iconCls:'codejobsicon',text:'Start processing',handler:function(){startProcessing(configuredWPSItems,currentWPSId);}}],
-  			   		
-  			   			
-  			   				html:'<div id="wpsdivdescription" ><h2>... Loading Web Processing Service description...</h2></div><div id="wpsdivresult"/>'
-  			   				
-  			   		
-  		    		},{
-  		    		//	xtype:'panel',
-  		    
-  		    		
-  						//title:'Settings',
-  						id:'wpsparams',
-  						layout: {
-  						    type: 'vbox',
-  						    align : 'stretch'
-  						},
-  						frame:false,border:false//,  						buttons:[{text:'Load preset',handler:function(){alert("not yet implemented");}},{text:'Save preset',handler:function(){alert("not yet implemented");}}]
-  					}			
-  				]
-  	            
-  	   		}]//,  		    padding:'10 10 10 10'
-       	});
-    	
-        
-    	wpsProcessorDetails('<%=processorId%>');
+    $( document ).ready(function() {
+      renderProcessingInterface(
+        {
+          element:$('#content2'),
+          wpsservice:'<%=Configuration.getHomeURLHTTPS()%>/WPS?',
+          identifier:'<%=processorId%>',
+          adagucservice:c4iconfigjs.adagucservice,
+          adagucviewer:c4iconfigjs.adagucviewer
+        }
+      );
     });
     </script>
     	 <%

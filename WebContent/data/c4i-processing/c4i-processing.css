@@ -1,0 +1,267 @@
+html{
+  margin:5px;
+}
+/*.simplecomponent-body {
+background:none !important;
+
+}*/
+
+.c4i-processing-loader-box{
+ 
+  height:40px;
+  box-shadow: 0px 0px 5px #888888;
+  line-height:40px;
+  vertical-align:middle;
+  padding:10px;
+  margin:0px;
+  display:block;
+  background-color:none;
+}
+.c4i-processing-loader-animation{
+  background-image:url("/impactportal/images/ajax-loader.gif") !important;
+  width:32px;
+  height:32px;
+  vertical-align:middle;
+  display:inline-block;
+}
+
+.c4i-processing-loader-animationsmall{
+  background-image:url("/impactportal/images/ajax-loader-small.gif") !important;
+  width:16px;
+  height:16px;
+  vertical-align:middle;
+  display:inline-block;
+}
+
+
+.c4i-processing-loader-message{
+  margin:20px;
+  font-weight:bold;
+  font-size:15px;
+  display:inline;
+  vertical-align:middle;
+}
+
+
+.c4i-processing-table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width:99%;
+
+    background:white;
+    margin:4px;
+    
+}
+.c4i-processing-table th, .c4i-processing-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.c4i-processing-table tr:nth-child(2n) {
+    background-color: #f5f5f5;
+}
+.c4i-processing-table th {
+    background: #428bca none repeat scroll 0 0;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.c4i-processing-shadow{
+   box-shadow: 0px 0px 4px #666;
+}
+
+
+.c4i-processing-table-inputtitle{
+  width:100px;
+}
+
+.c4i-processing-input-tile-span{
+  padding:0px 4px 1px 4px;
+  width:100%;
+  
+  display:block;
+}
+
+.c4i-processing-input-tile-title{
+    color: #0c3762;
+    font-size: 16px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: bold;
+    line-height: 20px;
+    display:inline;
+  
+    
+}
+
+.c4i-processing-input-tile-identifier{
+    color: #0c3762;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    line-height: 20px;
+    vertical-align:middle;
+    display:inline;
+}
+
+
+.c4i-processing-input-tile-abstract{
+  font-style:italic;
+  width:100%;
+  padding:4px;
+  margin-bottom:4px;
+  display:block;
+  color:#333;
+}
+
+.c4i-processing-input-tile{
+  margin:8px 4px 12px 4px;
+  padding:4px 4px 4px 4px;
+  display:block;
+  background:white;
+    box-shadow: 0px 0px 4px #666;
+  
+}
+
+.c4i-processing-input-tile-inputs{
+  padding:4px;
+    width:100%;
+    display:block;
+    min-height:32px;
+}
+
+.c4i-processing-literalinput-input{
+ width:75%;
+ margin:0px 5px 2px 5px;
+}
+
+
+.c4i-processing-literalinput-select{
+ width:75%;
+ margin:0px 5px 2px 5px;
+}
+
+
+.c4i-processing-start-span{
+  text-align:right;
+  display:block;
+  padding:5px;
+}
+
+.c4i-processing-startbutton{
+  
+}
+
+.c4i-processing-showbasket-button{
+     width:24px;
+  height:32px;
+  display:inline-block;
+}
+
+.codeshoppingcarticon{
+  width:24px;
+  height:24px;
+}
+
+.c4i-processing-showpreview-button, .c4i-processing-report-table-value-viewablebutton{
+   width:24px;
+  height:32px;
+  display:inline-block;
+}
+
+.c4i-processing-input-moreless-buttonplus {
+  width:24px;
+  height:32px;
+  display:inline-block;
+}
+
+.c4i-processing-input-moreless-buttonmin{
+  width:24px;
+  height:32px;
+  display:inline-block;
+  
+}
+
+.c4i-processing-input-moreless-buttonremoveall{
+  width:24px;
+  height:32px;
+  display:inline-block;
+  
+}
+
+.c4i-processing-hidewpserrorreport{
+  width:32px;
+  height:32px;
+  float:right;
+}
+
+.c4i-processing-input-moreless{
+ float:right;
+  margin-right:5px;
+  height:32px;
+  
+}
+
+.c4i-processing-errormessage-container{
+  padding:20px;
+  display:block;
+}
+.c4i-processing-errormessage-header{
+  
+  color:333;
+  font-size:18px;
+  font-weight:bold;
+}
+
+
+.c4i-processing-errormessage{
+  color:red;
+  font-size:14px;
+}
+
+
+.ui-progressbar {
+  position: relative;
+}
+
+.c4i-processing-progresslabel {
+  position: absolute;
+  left: 36%;
+  top: 4px;
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.c4i-processing-report-container{
+  padding:3px;
+  margin:0px;
+}
+.c4i-processing-report-table{
+  width:99%;
+
+ 
+
+}
+
+.c4i-processing-report-table td{
+
+}
+
+.c4i-processing-report-table-identifier{
+}
+.c4i-processing-report-table-title{
+}
+.c4i-processing-report-table-type{
+}
+.c4i-processing-report-table-value{
+  width:75%;
+   word-wrap: break-word;
+ word-break: break-all ;
+}
+
+.c4i-processing-report-table-value-viewable{
+  color:blue;
+  text-decoration: underline;
+  cursor: pointer
+}

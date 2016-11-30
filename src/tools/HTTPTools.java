@@ -24,6 +24,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -351,14 +353,26 @@ public class HTTPTools extends HttpServlet {
    */
   public static String getHTTPParam(HttpServletRequest request, String name)
       throws Exception {
-    String param = request.getParameter(name);
-    if (param != null) {
-      param = URLDecoder.decode(param, "UTF-8");
-      param = validateInputTokens(param);
-    } else {
+    //String param = request.getParameter(name);
+    
+    Map<String, String[]> paramMap= request.getParameterMap();
+    String [] value = null;
+    for (Entry<String, String[]> entry : paramMap.entrySet()){
+      String key = entry.getKey();
+      if(key.equalsIgnoreCase(name)){
+        value = entry.getValue();
+        break;
+      }
+    }
+    
+    if(value==null||value[0]==null||value.length==0){
       throw new Exception("UnableFindParam " + name);
     }
-    return param;
+    
+    String paramValue = value[0];
+    paramValue = URLDecoder.decode(paramValue, "UTF-8");
+    paramValue = validateInputTokens(paramValue);
+    return paramValue;
   }
 
   public static String getHTTPParamNoExceptionButNull(HttpServletRequest request, String name){

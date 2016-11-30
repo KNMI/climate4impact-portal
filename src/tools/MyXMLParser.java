@@ -378,7 +378,7 @@ public class MyXMLParser {
             name = name.substring(name.indexOf(":")+1);
           }
           name  =jsonEncode(name);
-          data+="\""+name+"\": \""+jsonEncode(el.getAttributes().get(j).value)+"\"";
+          data+="\""+name+"\":\""+jsonEncode(el.getAttributes().get(j).value)+"\"";
         }
         data+="}";
       }

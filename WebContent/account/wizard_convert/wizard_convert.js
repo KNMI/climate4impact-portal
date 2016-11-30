@@ -267,8 +267,6 @@ $(function() {
         httpCallback({"error":"Request failed for "+url});
       });
 
-      //https://bhw485.knmi.nl:9443/impactportal/basket?&service=basket&request=getfile&file=https%3A%2F%2Fbhw485.knmi.nl%3A9443%2Fimpactportal%2FDAP%2Fceda.ac.uk.openid.Maarten.Plieger%2Ftest.wpssettings
-
 
 
       return true;

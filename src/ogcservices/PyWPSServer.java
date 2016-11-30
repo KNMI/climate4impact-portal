@@ -27,12 +27,12 @@ import wps.WebProcessingInterface;
 
 public class PyWPSServer extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * @see HttpServlet#HttpServlet()
    */
   public PyWPSServer() {
-      super();
+    super();
   }
 
 
@@ -51,48 +51,48 @@ public class PyWPSServer extends HttpServlet {
     //Try to get homedir
     String userHomeDir="";
     ImpactUser user = null;
- 
+
     try{
       user = LoginManager.getUser(request);
       if(user == null)return;
       userHomeDir=user.getWorkspace();
       Debug.println("WPS for user: "+user.getUserId());
-   
-      
+
+
       if(userHomeDir.length()>0){
         environmentVariables=Tools.appendString( environmentVariables,"HOME="+userHomeDir);
       }else{
         throw new Exception("User : "+user.getUserId()+" has no home dir");
       }
-      
-      
+
+
       environmentVariables=Tools.appendString( environmentVariables,"SERVICE_ADAGUCSERVER="+Configuration.getHomeURLHTTPS()+"/adagucserver?");
       environmentVariables=Tools.appendString( environmentVariables,"CAPATH="+ Configuration.LoginConfig.getTrustRootsLocation());
-     
-      
+
+
       String userDataDir = user.getDataDir();
       Tools.mksubdirs(userDataDir+"/WPS_Scratch/");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_PATH="+userDataDir+"/WPS_Scratch/");
-      
+
       String pofOutputURL = Configuration.getHomeURLHTTPS()+"/DAP/"+user.getUserId()+"/WPS_Scratch/";
       pofOutputURL = HTTPTools.makeCleanURL(pofOutputURL);
       pofOutputURL = pofOutputURL.replace("?", "");
       environmentVariables=Tools.appendString( environmentVariables,"POF_OUTPUT_URL="+pofOutputURL);
     }catch(Exception e){
       //OK... no user info. Only doing statuslocation requests.
-      
+
     }
     //Try to get query string
     if(queryString == null){
       queryString = request.getQueryString();
     }
-                            
+
     if(queryString!=null){
       if(queryString.length()>0){
         environmentVariables=Tools.appendString( environmentVariables,"QUERY_STRING="+queryString);
       }
     }
-  
+
     //  Check for status location first.
     if(queryString!=null){ 
       String output = HTTPTools.getKVPItem(queryString, "OUTPUT");
@@ -107,15 +107,15 @@ public class PyWPSServer extends HttpServlet {
             }
           }
         }
-  
-        
-  
+
+
+
         //Remove first "/" token;
         output = output.substring(1);
         portalOutputPath = Tools.makeCleanPath(portalOutputPath);
         String fileName = portalOutputPath+"/"+output;
         Debug.println("WPS GET status request: "+fileName);
-  
+
         Tools.checkValidCharsForFile(output);
         String data = Tools.readFile(fileName);
         if(response!=null){
@@ -125,30 +125,30 @@ public class PyWPSServer extends HttpServlet {
         return;
       }
     }
-    
+
     if(user == null){
       Debug.println("Anonymous WPS request received, I am stopping");
       if(response!=null)response.setStatus(401);
-      outputStream.write(new String("401: Unauthorized user\n").getBytes());
-      return;
+      outputStream.close();
+      throw new HTTPTools.WebRequestBadStatusException(401,"401: Unauthorized user\n");
     }
-      
+
     //Get the pywps location
     String commands[] = Configuration.PyWPSServerConfig.getPyWPSExecutable();
     Debug.println("PyWPSExec:"+Configuration.PyWPSServerConfig.getPyWPSExecutable()[0]);
     Debug.println("queryString:"+queryString);
-    
-    
-    
+
+
+
     ByteArrayOutputStream os = new ByteArrayOutputStream();
-    
+
     CGIRunner.runCGIProgram(commands,environmentVariables,userHomeDir,response,os,dataToPost);
-    
+
     _saveJobSettingsForUser(dataToPost,queryString,user,os);
-    
+
     outputStream.write(os.toByteArray());
   }
-  
+
   private static void _saveJobSettingsForUser(String dataToPost, String queryString, ImpactUser user, ByteArrayOutputStream os) {
     //Try to convert a GET Execute into post, because this is how we store it in the joblist.
     try{
@@ -169,7 +169,7 @@ public class PyWPSServer extends HttpServlet {
     }catch(Exception e){
       Debug.printStackTrace(e);
     }
-    
+
     //If this is an execute, store the job!
     if(dataToPost!=null){
       try{
@@ -182,23 +182,39 @@ public class PyWPSServer extends HttpServlet {
         Debug.printStackTrace(e);
       }
     }
-    
+
   }
 
 
   private static void _handleWPSRequests(HttpServletRequest request, HttpServletResponse response) {
     Debug.println("Handle WPS requests");
     OutputStream out1 = null;
-    //response.setContentType("application/json");
+
     try {
       out1 = response.getOutputStream();
     } catch (IOException e) {
       Debug.errprint(e.getMessage());
       return;
     }
-  
+
+    /*Capture XML to JSON request*/
+
     try {
-      
+      String serviceStr=HTTPTools.getHTTPParam(request, "SERVICE");
+
+      if(serviceStr.equalsIgnoreCase("XML2JSON")){
+        AdagucViewer.XML2JSON(request,out1,response);
+        return;
+      }
+    } catch (Exception e2) {
+
+    }
+
+
+
+
+    try {
+
       String postData = null;
       StringBuffer jb = new StringBuffer();
       String line = null;
@@ -225,25 +241,25 @@ public class PyWPSServer extends HttpServlet {
       }
     }    
   }
-  
+
   /**
    * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
    */
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     Debug.println("WPS POST request received");
-    
+
     _handleWPSRequests(request,response);
   }
-  
+
   protected void  doGet(HttpServletRequest request, HttpServletResponse response) {
     Debug.println("WPS GET request received");
     _handleWPSRequests(request,response);
   }
-  
+
 
   private static String _addLiteralData(String identifier,String value){
     String data="";
-    
+
     if(value!=null){
       String [] values = value.split(",");
       for(int j=0;j<values.length;j++){
@@ -263,23 +279,23 @@ public class PyWPSServer extends HttpServlet {
     }
     return data;
   }
-  
+
   public static String convertQueryStringToPost(String dataInputs,String procId) throws Exception {
     String postData = "";
     postData+=URLEncoder.encode("service","UTF-8")+"="+URLEncoder.encode("WPS","UTF-8");
     postData+="&"+URLEncoder.encode("version","UTF-8")+"="+URLEncoder.encode("3.5","UTF-8");
     //URLEncoder.encode("service=WPS&version=1.0.0&request=execute&identifier="+procId+"&datainputs=[startIndex=1;stopIndex=100]","UTF-8")
-    
+
     postData
-       ="<wps:Execute service=\"WPS\" version=\"1.0.0\" xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">\n"
-       +"      <ows:Identifier>"+procId+"</ows:Identifier>\n"
-       +"      <wps:ResponseForm>\n"
-       +"        <wps:ResponseDocument storeExecuteResponse=\"true\" status=\"true\">\n"
-       //+"          <wps:Output asReference=\"false\">\n"
-       //+"            <ows:Identifier>"+procId+"</ows:Identifier>\n"
-       //+"          </wps:Output>\n"
-       +"        </wps:ResponseDocument>\n"
-       +"      </wps:ResponseForm>\n";
+    ="<wps:Execute service=\"WPS\" version=\"1.0.0\" xmlns:wps=\"http://www.opengis.net/wps/1.0.0\" xmlns:ows=\"http://www.opengis.net/ows/1.1\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.opengis.net/wps/1.0.0/wpsExecute_request.xsd\">\n"
+        +"      <ows:Identifier>"+procId+"</ows:Identifier>\n"
+        +"      <wps:ResponseForm>\n"
+        +"        <wps:ResponseDocument storeExecuteResponse=\"true\" status=\"true\">\n"
+        //+"          <wps:Output asReference=\"false\">\n"
+        //+"            <ows:Identifier>"+procId+"</ows:Identifier>\n"
+        //+"          </wps:Output>\n"
+        +"        </wps:ResponseDocument>\n"
+        +"      </wps:ResponseForm>\n";
 
     String trimmedInput=dataInputs.trim();
     Debug.println("DataInputs="+trimmedInput);
@@ -297,20 +313,20 @@ public class PyWPSServer extends HttpServlet {
       String [] dataInputArray=trimmedInput.substring(startBracket,stopBracket).split(";");
       for(int j=0;j<dataInputArray.length;j++){
         //KVP key=value
-        
-        
+
+
         dataInputArray[j] = dataInputArray[j].split("#")[0];
         //Debug.println(dataInputArray[j]);
         try{
           int equalSignIndex = dataInputArray[j].indexOf('=');
           String key = dataInputArray[j].substring(0,equalSignIndex);
-          
+
           if(equalSignIndex==-1){
             postData+=_addLiteralData(key,"");
           }else{
             String value =  dataInputArray[j].substring(equalSignIndex+1);;
-//            String v= URLEncoder.encode(value,"utf-8");
-//            Debug.println(value);
+            //            String v= URLEncoder.encode(value,"utf-8");
+            //            Debug.println(value);
             postData+=_addLiteralData(key,value);
           }
         }catch(Exception e){
