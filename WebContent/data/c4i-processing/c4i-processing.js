@@ -18,6 +18,12 @@ var c4iProcessingIndexOf = function(thisobj,obj, start) {
   return -1;
 }
 
+function c4iProcessingStartsWith(str, prefix) {
+  return str.indexOf(prefix) === 0;
+};
+
+
+
 var c4iProcessingGetKeys = function(obj){
   if (!Object.keys) {
     var keys = [],
@@ -135,11 +141,21 @@ var C4IProcessingInterface = function(options){
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
     
     if(options.dialog){
-      options.element.dialog({
-        title:options.identifier,
+      var title = options.identifier;
+      if(options.statuslocation){
+        title+=" - ";
+        title+=options.statuslocation.replace(/\\/g,'/').replace( /.*\//, '' );
+      }
+      options.element.css({zIndex:1000}).dialog({
+        title:title,
         width:975,
         height:600,
+        zIndex: 1000,
         dialogClass:'c4i-processing-containerdialog'
+      }).dialogExtend({
+        "maximizable" : true,
+        "dblclick" : "maximize",
+        "icons" : { "maximize" : "ui-icon-arrow-4-diag" }
       });
     }else{
       options.element.addClass("c4i-processing-container");
@@ -227,26 +243,31 @@ var C4IProcessingInterface = function(options){
       });
       wps.parseStatuslocation(options.statuslocation);
     };
+    
+    if(options.inputdata){
+      describeProcess(options.inputdata,url)
+    }else{
  
     
-    rootElement.block();
+      rootElement.block();
     
-    $.ajax({
-      url: url,
-      crossDomain:true,
-      dataType:"jsonp"
-    }).done(function(d) {
-      describeProcess(d,url)
-    }).fail(function(d) {
-      //alert("fail 154");
-      console.log("Ajax call failed: "+url);
-      error(d,url);
-      
-      
-    }).always(function(){
-      rootElement.unblock();
-
-    });
+      $.ajax({
+        url: url,
+        crossDomain:true,
+        dataType:"jsonp"
+      }).done(function(d) {
+        describeProcess(d,url)
+      }).fail(function(d) {
+        //alert("fail 154");
+        console.log("Ajax call failed: "+url);
+        error(d,url);
+        
+        
+      }).always(function(){
+        rootElement.unblock();
+  
+      });
+    }
     
   };
   
@@ -323,15 +344,15 @@ var C4IProcessingInterface = function(options){
               .replace(/\n/g, '<br/>');
   }
   
-  var checkifHasBasket = function(inputname,abstract){
-    if(inputname.startsWith("wpsnetcdfinput")){
+  var checkifHasBasket = function(inputname,myabstract){
+    if(c4iProcessingStartsWith(inputname,"wpsnetcdfinput")){
       return true;
     }
     
-    if(!isDefined(abstract)){
-      abstract="";
+    if(!isDefined(myabstract)){
+      myabstract="";
     }
-    if(abstract.indexOf("application/netcdf")!=-1){
+    if(myabstract.indexOf("application/netcdf")!=-1){
       return true;
     }
     return false;
@@ -359,12 +380,13 @@ var C4IProcessingInterface = function(options){
     rootElement.find(".c4i-processing-input-moreless-buttonplus").empty().button({text: false,icons: {primary: "ui-icon-plus"}}).unbind('click').click(function(){
       var name = $(this).parent().parent().find(".c4i-processing-literalinput-span").attr("name");
       var hasBasket=checkifHasBasket(name);
-      var html=createLiteralInput(name,"",hasBasket);
+      var html=createLiteralInput(name,"",hasBasket,true);
       $(this).parent().parent().find(".c4i-processing-literalinput-span").append(html);
       initializeLiteralInputButtons();
     }).attr('title','Add an extra input field');
     
     rootElement.find(".c4i-processing-input-moreless-buttonmin").button({text: false,icons: {primary: "ui-icon-trash"}}).unbind('click').click(function(){
+      //console.log( $(this).parent().parent().parent().find(".c4i-processing-inputfieldspanner").size());
       $(this).parent().remove();
     }).attr('title','Remove this input field');
     
@@ -372,14 +394,19 @@ var C4IProcessingInterface = function(options){
       $(this).parent().parent().parent().find(".c4i-processing-literalinput-span").empty();
     }).attr('title','Remove all input fields');
     
+    //Disable remove buttons if only one is left
+    
+    
   };
   
-  var createLiteralInput = function(inputname,defaulttext,hasBasket){
+  var createLiteralInput = function(inputname,defaulttext,hasBasket,showMinButton){
     var html="<span class=\"c4i-processing-inputfieldspanner\" name=\""+inputname+"\"><input class=\"c4i-processing-literalinput-input\" name=\""+inputname+"\" value=\""+defaulttext+"\"/>";
     if(hasBasket){
       html+="<button class=\"c4i-processing-showbasket-button\"></button><button class=\"c4i-processing-showpreview-button\"></button><button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
     }else{
-      html+="<button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
+      if(showMinButton){
+        html+="<button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
+      }
     }
     html+="</span>";
     return html;
@@ -395,7 +422,7 @@ var C4IProcessingInterface = function(options){
             $(el).find(".c4i-processing-literalinput-input").val(selectedNodes[j].dapurl);
           }else{
            
-            $(el).parent().append(createLiteralInput($(el).attr("name"),selectedNodes[j].dapurl,true));
+            $(el).parent().append(createLiteralInput($(el).attr("name"),selectedNodes[j].dapurl,true,true));
           }
           num++;
         }
@@ -466,7 +493,7 @@ var C4IProcessingInterface = function(options){
         value = item.Data.LiteralData.value;
       }
       
-      if(value.startsWith("base64:")){
+      if(c4iProcessingStartsWith(value,"base64:")){
         value = decodeBase64(value.substring("base64:".length));
       }
       var literalDataValueLowerCase = value.toLowerCase();
@@ -568,14 +595,21 @@ var C4IProcessingInterface = function(options){
     var overview = rootElement.find(".c4i-processing-overview").find(".simplecomponent-body").first();
     var inputs = rootElement.find(".c4i-processing-inputs").find(".simplecomponent-body").first();
     
-    var ProcessDescription = describeProcessDoc.ProcessDescriptions.ProcessDescription;
+    var ProcessDescription;
+    if(describeProcessDoc.ProcessDescriptions){
+      ProcessDescription = describeProcessDoc.ProcessDescriptions.ProcessDescription;
+    }
+    if(describeProcessDoc.Execute){
+      ProcessDescription = describeProcessDoc.Execute;
+    }
+    
     
     var html="<span class=\"c4i-processing-input-tile\">";
-    html+="<h1>Processor "+ProcessDescription.Title.value+"</h1>";
+    if(isDefined(ProcessDescription.Title)){html+="<h1>Processor "+ProcessDescription.Title.value+"</h1>";}
     html+="<table class=\"c4i-processing-table\">";
-    html+="<tr><th>Title</th><th>"+ProcessDescription.Title.value+"</th></tr>";
-    html+="<tr><td>Identifier</td><td>"+ProcessDescription.Identifier.value+"</td></tr>";
-    html+="<tr><td>Abstract</td><td>"+ProcessDescription.Abstract.value+"</td></tr>";
+    if(isDefined(ProcessDescription.Title)){html+="<tr><th>Title</th><th>"+ProcessDescription.Title.value+"</th></tr>";}
+    if(isDefined(ProcessDescription.Identifier)){html+="<tr><td>Identifier</td><td>"+ProcessDescription.Identifier.value+"</td></tr>";}
+    if(isDefined(ProcessDescription.Abstract)){html+="<tr><td>Abstract</td><td>"+ProcessDescription.Abstract.value+"</td></tr>";}
     html+="<tr><td>Location</td><td><a target=\"_blank\" href=\""+WPSDescribeCoverageURL+"\">"+WPSDescribeCoverageURL+"</a></td></tr>";
     html+="</table>";
     
@@ -619,31 +653,42 @@ var C4IProcessingInterface = function(options){
     var createDataInput = function(DataInput){
       //console.log(DataInput);
       var inputname = DataInput.Identifier.value;
-      var abstract="";
+      var myabstract="";
       
       var minOccurs = 0;var maxOccurs = 1;var defaulttext="";
       if(DataInput.attr && isDefined(DataInput.attr.minOccurs))minOccurs = DataInput.attr.minOccurs;
       if(DataInput.attr && isDefined(DataInput.attr.maxOccurs))maxOccurs = DataInput.attr.maxOccurs;
       
+      if(DataInput.Data && DataInput.Data.LiteralData && DataInput.Data.LiteralData.value)defaulttext = DataInput.Data.LiteralData.value;
       if(DataInput.LiteralData && DataInput.LiteralData.DefaultValue && isDefined(DataInput.LiteralData.DefaultValue.value))defaulttext = DataInput.LiteralData.DefaultValue.value;
       
+      
+      
 
-      
-      if(minOccurs==0)minOccurs=1;
-      
-      var html="<span class=\"c4i-processing-input-tile\">";
-      html+="<span class=\"c4i-processing-input-tile-span\"><span class=\"c4i-processing-input-tile-title\">"+DataInput.Title.value+"</span> <span class=\"c4i-processing-input-tile-identifier\">("+inputname+")</span>";
-      html+="</span>";
-      
-      if(DataInput.Abstract && isDefined(DataInput.Abstract.value)){
-        abstract = DataInput.Abstract.value;
-        html+="<span class=\"c4i-processing-input-tile-abstract\">"+DataInput.Abstract.value+"</span>";
+      var counter = minOccurs;
+      if(counter==0)counter=1;
+      var title=inputname;
+      if(DataInput.Title){
+       title = DataInput.Title.value;
       }
-      
+      var html="<span class=\"c4i-processing-input-tile\">";
+      html+="<span class=\"c4i-processing-input-tile-span\"><span class=\"c4i-processing-input-tile-title\">"+title+"</span> <span class=\"c4i-processing-input-tile-identifier\">("+inputname+")</span>";
+      html+="<span class=\"c4i-processing-input-tile-cardinality\">min:"+minOccurs+" / max: "+maxOccurs+"</span>";
+      html+="</span>";
+      if(DataInput.Abstract && isDefined(DataInput.Abstract.value)){
+        myabstract = DataInput.Abstract.value;
+        html+="<span class=\"c4i-processing-input-tile-abstract\">"+myabstract+"</span>";
+      }
+//      if(defaulttext.length>0){
+//        html+="<span class=\"c4i-processing-input-tile-default\">Default: ";
+//        html+="<span class=\"c4i-processing-input-tile-defaultvalue\">"+defaulttext+"</span></span>";
+//      }
+//  
+ 
      
 
       
-      var hasBasket = checkifHasBasket(inputname,abstract);
+      var hasBasket = checkifHasBasket(inputname,myabstract);
     
 
       var isCombo = false;
@@ -653,7 +698,7 @@ var C4IProcessingInterface = function(options){
       
    
       html+="<span class=\"c4i-processing-input-tile-inputs\">";
-      for(var j=0;j<minOccurs;j++){
+      for(var j=0;j<counter;j++){
         html+="<span class=\"c4i-processing-literalinput-span\" name=\""+inputname+"\">";
         if(isCombo){
           html+="<span class=\"c4i-processing-inputfieldspanner\" name=\""+inputname+"\">";
@@ -672,7 +717,7 @@ var C4IProcessingInterface = function(options){
         }else{
           var defaulttexts = defaulttext.split(",");
           for(var i=0;i<defaulttexts.length;i++){
-            html+=createLiteralInput(inputname,defaulttexts[i],hasBasket);
+            html+=createLiteralInput(inputname,defaulttexts[i],hasBasket,minOccurs!=0);
           }
           
         }
@@ -682,6 +727,7 @@ var C4IProcessingInterface = function(options){
       if(maxOccurs>1){
         html+="<span class=\"c4i-processing-input-moreless\"></button><button class=\"c4i-processing-input-moreless-buttonremoveall\"></button><button class=\"c4i-processing-input-moreless-buttonplus\"></button></span>";
       }
+  
 
       html+="</span>";
       
@@ -690,13 +736,17 @@ var C4IProcessingInterface = function(options){
       return html
     };
     
-    var DataInputs = ProcessDescription.DataInputs.Input;
+    
+    var DataInputs;
+    if(ProcessDescription.DataInputs){
+      DataInputs = ProcessDescription.DataInputs.Input;
+    }else{
+      DataInputs = ProcessDescription.Execute.DataInputs.Input;
+    }
     var keys = c4iProcessingGetKeys(DataInputs);
     keys=keys.sort();
     
-    if(options.inputdata){
-      console.log(options.inputdata);
-    }
+    
     
     for(var j=0;j<keys.length;j++){
       html+=createDataInput(DataInputs[keys[j]]);//.Identifier.value+"</br>";

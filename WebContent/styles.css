@@ -2498,5 +2498,9 @@ a img {
 
 .c4i-catalogbrowser-downloaddatasetbutton{
 	float:right;
-	
+}
+
+
+.ui-dialog .ui-dialog-content{
+	padding:0;
 }

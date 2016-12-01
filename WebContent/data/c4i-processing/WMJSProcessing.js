@@ -48,6 +48,7 @@ var WMJSProcessing = function(options){
     }
   }
   
+
       
   /* Called on successfull statuslocation polling */
   var WPSMonitorSuccess = function(_data,statusLocation){

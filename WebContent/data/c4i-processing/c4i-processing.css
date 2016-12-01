@@ -101,7 +101,8 @@ background:none !important;
     font-style: normal;
     font-variant: normal;
     line-height: 20px;
-    vertical-align:middle;
+    font-style:italic;
+    padding-left:5px;
     display:inline;
 }
 
@@ -109,11 +110,33 @@ background:none !important;
 .c4i-processing-input-tile-abstract{
   font-style:italic;
   width:100%;
-  padding:4px;
-  margin-bottom:4px;
+  padding-left:6px;
+ margin-top:3px;
+ margin-bottom:3px;
   display:block;
   color:#333;
 }
+
+.c4i-processing-input-tile-cardinality{
+	font-size: 11px;
+  
+  padding-right:5px;
+  float:right;
+  color:#666;
+}
+
+.c4i-processing-input-tile-default{
+  width:100%;
+  padding-left:6px;
+  margin-top:6px;
+  color:#444;
+  display:inline-block;
+}
+.c4i-processing-input-tile-defaultvalue{
+  width:100%;
+  color:#333;
+}
+
 
 .c4i-processing-input-tile{
   margin:8px 4px 12px 4px;
@@ -264,4 +287,11 @@ background:none !important;
   color:blue;
   text-decoration: underline;
   cursor: pointer
+}
+
+
+.c4i-processing-containerdialog{
+	z-index:1000 !important;
+	
+	
 }
