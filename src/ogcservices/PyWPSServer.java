@@ -128,9 +128,10 @@ public class PyWPSServer extends HttpServlet {
 
     if(user == null){
       Debug.println("Anonymous WPS request received, I am stopping");
-      if(response!=null)response.setStatus(401);
-      outputStream.close();
-      throw new HTTPTools.WebRequestBadStatusException(401,"401: Unauthorized user\n");
+//TODO TODO TODO TODO This needs to be enabled when the CLIPC portal is updated.      
+//      if(response!=null)response.setStatus(401);
+//      outputStream.close();
+//      throw new HTTPTools.WebRequestBadStatusException(401,"401: Unauthorized user\n");
     }
 
     //Get the pywps location
@@ -197,18 +198,18 @@ public class PyWPSServer extends HttpServlet {
       return;
     }
 
-    /*Capture XML to JSON request*/
-
-    try {
-      String serviceStr=HTTPTools.getHTTPParam(request, "SERVICE");
-
-      if(serviceStr.equalsIgnoreCase("XML2JSON")){
-        AdagucViewer.XML2JSON(request,out1,response);
-        return;
-      }
-    } catch (Exception e2) {
-
-    }
+//    /*Capture XML to JSON request*/
+//
+//    try {
+//      String serviceStr=HTTPTools.getHTTPParam(request, "SERVICE");
+//
+//      if(serviceStr.equalsIgnoreCase("XML2JSON")){
+//        AdagucViewer.XML2JSON(request,out1,response);
+//        return;
+//      }
+//    } catch (Exception e2) {
+//
+//    }
 
 
 

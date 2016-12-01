@@ -22,7 +22,7 @@ var c4iconfigjs = {
   adagucviewer:"/impactportal/adagucviewer/",
   howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
   contactexpertlink:"/impactportal/help/contactexpert.jsp",
-  xml2jsonservice:"/impactportal/wps?"
+  xml2jsonservice:"/impactportal/AdagucViewer/?"
 }; 
 
 var mouseXPosition;
