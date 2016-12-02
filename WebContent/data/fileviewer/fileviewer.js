@@ -340,7 +340,7 @@ var FileViewerInterface = function(options){
     html+=
       //'<li><span class="c4i-fileviewer-error-reloadbutton c4i-fileviewer-spanlink" >Reload</span></li>'+
       '<li><a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.contactexpertlink+'">Request help</a></li>';
-    html+='<li><span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >Open this file directly in your browser to get a hint</span>./li>';
+    html+='<li><span class="c4i-fileviewer-error-downloadbutton c4i-fileviewer-spanlink" >Open this file directly in your browser to get a hint</span>.</li>';
 
     html+=
       '<li>If you are signed in but still cannot view the data, make sure your account is registered to the right group: <a class="c4i-fileviewer-spanlink" target="_blank" href="'+options.howtologinlink+'">-> HowTo</a>.</li>';

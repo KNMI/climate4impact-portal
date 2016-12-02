@@ -135,7 +135,7 @@ var C4IProcessingInterface = function(options){
   };
   
   this.renderProcessingInterface = function(options){
-    console.log("renderProcessingInterface");
+    //console.log("renderProcessingInterface");
     $.blockUI.defaults.message='<div class="c4i-processing-loader-box"><div class="c4i-processing-loader-animation"></div><div class="c4i-processing-loader-message">Loading ...</div></div>';
     $.blockUI.defaults.css.border='none';
     $.blockUI.defaults.overlayCSS.backgroundColor="white";
@@ -741,18 +741,25 @@ var C4IProcessingInterface = function(options){
     if(ProcessDescription.DataInputs){
       DataInputs = ProcessDescription.DataInputs.Input;
     }else{
-      DataInputs = ProcessDescription.Execute.DataInputs.Input;
+      if(ProcessDescription.Execute){
+        DataInputs = ProcessDescription.Execute.DataInputs.Input;
+      }
     }
-    var keys = c4iProcessingGetKeys(DataInputs);
-    keys=keys.sort();
-    
-    
-    
-    for(var j=0;j<keys.length;j++){
-      html+=createDataInput(DataInputs[keys[j]]);//.Identifier.value+"</br>";
+    if(DataInputs){
+      var keys = c4iProcessingGetKeys(DataInputs);
+      keys=keys.sort();
+      for(var j=0;j<keys.length;j++){
+        html+=createDataInput(DataInputs[keys[j]]);//.Identifier.value+"</br>";
+      }
+    }else{
+      html+="<span class=\"c4i-processing-input-tile\">";
+      html+="<span class=\"c4i-processing-input-tile-span\"><span class=\"c4i-processing-input-tile-title\">";
+      html+="No inputs defined for this process";
+      html+="</span>";
+      html+="</span>";
+        
     }
     inputs.html(html);
-    
     initializeLiteralInputButtons();
   
     

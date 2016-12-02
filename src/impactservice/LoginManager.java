@@ -700,7 +700,11 @@ public class LoginManager {
       } else if (e.getStatusCode() == 404) {
         msg += "File not found (404)\n";
         if (user != null) {
-          msg += "\nYou are logged in as " + user.getOpenId() + "\n";
+          String u = user.getOpenId();
+          if(u==null){
+            u = user.getUserId();
+          }
+          msg += "\nYou are signed in as " + u + "\n";
         }
       } else {
         msg = "WebRequestBadStatusException: " + e.getStatusCode() + "\n";
