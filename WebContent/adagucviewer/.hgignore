@@ -1,0 +1,8 @@
+syntax: glob
+
+./builds/WMJS.min.js
+./builds/WMJSExt.min.js
+./builds/jquery-addons.min.js
+./config.js_backup
+./config.php_backup
+*~
