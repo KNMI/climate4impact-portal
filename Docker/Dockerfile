@@ -1,7 +1,7 @@
-FROM centos:latest
+FROM centos:7
 
 RUN yum update -y && yum install -y \
-    epel-release \
+    epel-release
 
 RUN yum clean all && yum groupinstall -y "Development tools"
 
@@ -22,7 +22,12 @@ RUN yum update -y && yum install -y \
     libxml2-devel \
     cairo-devel \
     gd-devel \
-    postgresql-devel
+    postgresql-devel \
+    # java dependencies
+    ant \
+    tomcat \
+
+
 
 RUN mkdir /scr
 WORKDIR /src
@@ -81,3 +86,11 @@ RUN tar xvf adaguc-server.tar.gz
 WORKDIR /src/adaguc-server-master
 ENV ADAGUCCOMPONENTS="-DENABLE_CURL -DADAGUC_USE_POSTGRESQL"
 RUN bash compile.sh
+
+# install impact portal
+WORKDIR /src
+RUN curl -L https://github.com/KNMI/climate4impact-portal/archive/master.tar.gz > climate4impact.tar.gz
+RUN tar xvf climate4impact.tar.gz
+WORKDIR /src/climate4impact-portal-master
+ENV TOMCAT_LIBS=/usr/share/java/tomcat
+RUN ant
