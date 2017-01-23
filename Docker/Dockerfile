@@ -99,3 +99,7 @@ RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
 RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
 RUN cp /src/climate4impact-portal-master/impactportal.war /usr/share/tomcat/webapps/
 ENV IMPACTPORTAL_CONFIG=/config/config.xml
+
+EXPOSE 443
+
+CMD /usr/libexec/tomcat/server start
