@@ -69,6 +69,9 @@
     </path>
     <path id="EAR Libraries.libraryclasspath"/>
     <path id="Apache Tomcat v7.0 [Apache Tomcat v7.0].libraryclasspath">
+      
+      <fileset dir="${env.TOMCAT_LIBS}" includes="*.jar" />
+      <!--<pathelement location="${env.CATALINA_HOME}/lib/*jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/tomcat-coyote.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/jasper.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/catalina.jar"/>
@@ -80,15 +83,15 @@
         <pathelement location="${env.CATALINA_HOME}/lib/annotations-api.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/catalina-tribes.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/catalina-ha.jar"/>
-        <pathelement location="${env.CATALINA_HOME}/lib/tomcat-i18n-ja.jar"/>
+        <pathelement location="${env.CATALINA_HOME}/lib/tomcat-i118n-ja.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/tomcat-i18n-fr.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/ecj-3.6.2.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/el-api.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/servlet-api.jar"/>
         <pathelement location="${env.CATALINA_HOME}/lib/jsp-api.jar"/>
-        <pathelement location="${env.CATALINA_HOME}/lib/tomcat-dbcp.jar"/>
+        <pathelement location="${env.CATALINA_HOME}/lib/tomcat-dbcp.jar"/>-->
     </path>
-    <path id="Server Library [Apache Tomcat v8.0] (unbound).libraryclasspath"/>
+    
     <path id="impactportal.classpath">
         <path refid="Web App Libraries.libraryclasspath"/>
         <pathelement location="build/classes"/>
