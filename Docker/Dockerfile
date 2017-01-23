@@ -94,3 +94,8 @@ RUN tar xvf climate4impact.tar.gz
 WORKDIR /src/climate4impact-portal-master
 ENV TOMCAT_LIBS=/usr/share/java/tomcat
 RUN ant
+# configure server
+RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
+RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
+RUN cp /src/climate4impact-portal-master/impactportal.war /usr/share/tomcat/webapps/
+ENV IMPACTPORTAL_CONFIG=/config/config.xml
