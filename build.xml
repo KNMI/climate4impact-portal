@@ -97,7 +97,6 @@
         <pathelement location="build/classes"/>
         <path refid="EAR Libraries.libraryclasspath"/>
         <path refid="Apache Tomcat v7.0 [Apache Tomcat v7.0].libraryclasspath"/>
-        <path refid="Server Library [Apache Tomcat v8.0] (unbound).libraryclasspath"/>
     </path>
     <target name="init">
         <mkdir dir="build/classes"/>
