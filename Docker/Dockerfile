@@ -109,16 +109,11 @@ RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4im
 RUN tar xvf climate4impactwpsscripts.tar.gz
 
 # Install certificates
-RUN  mkdir /root/.globus/certificates
-WORKDIR /root/.globus/certificates
+RUN  mkdir -p /root/.globus/
+WORKDIR /root/.globus/
 RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
 RUN tar -xvf esg_trusted_certificates.tar
 RUN mv esg_trusted_certificates certificates
-
-# Insert local instance trustroot into  truststore
-RUN keytool  -export -alias tomcat -rfc -file ~/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
-RUN keytool -import -v -trustcacerts -alias tomcat -file ~/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
-RUN c_rehash ~/.globus/certificates
 
 
 # Create impactportal workspace 
@@ -132,7 +127,15 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 EXPOSE 443
 
+
+# Insert local instance trustroot into  truststore
+#CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
+#CMD keytool -import -v -trustcacerts -alias tomcat -file /root/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
+#CMD c_rehash /root/.globus/certificates
+
+#CMD /bin/bash
 CMD /usr/libexec/tomcat/server start
 
 #Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
 #This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
+#Visit https://192.168.99.100/impactportal/ to go to the portal
