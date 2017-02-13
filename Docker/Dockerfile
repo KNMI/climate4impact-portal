@@ -57,6 +57,7 @@ RUN conda update -y conda && conda install -y \
 RUN pip install python-magic
 
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
+#RUN conda install icu
 RUN conda install icu=56.1
 
 # install icclim (will be conda in the future)
@@ -134,7 +135,7 @@ EXPOSE 443
 #CMD c_rehash /root/.globus/certificates
 
 #CMD /bin/bash
-CMD /usr/libexec/tomcat/server start
+#CMD /usr/libexec/tomcat/server start
 
 #Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
 #This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
