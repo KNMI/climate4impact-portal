@@ -135,8 +135,11 @@ EXPOSE 443
 #CMD c_rehash /root/.globus/certificates
 
 #CMD /bin/bash
-#CMD /usr/libexec/tomcat/server start
+CMD /usr/libexec/tomcat/server start
 
+RUN mkdir -p /config
+RUN chmod 777 /config
+VOLUME /config
 #Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
 #This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
 #Visit https://192.168.99.100/impactportal/ to go to the portal
