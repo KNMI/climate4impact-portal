@@ -58,7 +58,7 @@ RUN pip install python-magic
 
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
 #RUN conda install icu
-RUN conda install icu=56.1
+RUN conda install icu=56.1 -y
 
 # install icclim (will be conda in the future)
 RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
@@ -128,6 +128,8 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 EXPOSE 443
 
+# TODO check why this is needed
+RUN conda install icu -y
 
 # Insert local instance trustroot into  truststore
 #CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
@@ -136,6 +138,7 @@ EXPOSE 443
 
 #CMD /bin/bash
 CMD /usr/libexec/tomcat/server start
+
 
 RUN mkdir -p /config
 RUN chmod 777 /config
