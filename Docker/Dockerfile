@@ -26,6 +26,7 @@ RUN yum update -y && yum install -y \
     # java dependencies
     ant \
     tomcat \
+    gdal-devel
 
 
 
@@ -54,6 +55,10 @@ RUN conda update -y conda && conda install -y \
     pydotplus
 
 RUN pip install python-magic
+
+# PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
+#RUN conda install icu
+RUN conda install icu=56.1 -y
 
 # install icclim (will be conda in the future)
 RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
@@ -84,8 +89,10 @@ WORKDIR /src
 RUN curl -L  https://github.com/KNMI/adaguc-server/archive/master.tar.gz > adaguc-server.tar.gz
 RUN tar xvf adaguc-server.tar.gz
 WORKDIR /src/adaguc-server-master
-ENV ADAGUCCOMPONENTS="-DENABLE_CURL -DADAGUC_USE_POSTGRESQL"
+ENV ADAGUCCOMPONENTS="-DENABLE_CURL -DADAGUC_USE_POSTGRESQL -DADAGUC_USE_SQLITE -DADAGUC_USE_GDAL"
 RUN bash compile.sh
+# Copy adaguc binaries to /usr/bin
+RUN cp bin/* /usr/bin/
 
 # install impact portal
 WORKDIR /src
@@ -94,6 +101,25 @@ RUN tar xvf climate4impact.tar.gz
 WORKDIR /src/climate4impact-portal-master
 ENV TOMCAT_LIBS=/usr/share/java/tomcat
 RUN ant
+
+# install impactportal wps scripts
+RUN mkdir /wpsprocesses
+RUN mkdir /wpsoutputs
+WORKDIR /wpsprocesses
+RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4impactwpsscripts.tar.gz
+RUN tar xvf climate4impactwpsscripts.tar.gz
+
+# Install certificates
+RUN  mkdir -p /root/.globus/
+WORKDIR /root/.globus/
+RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
+RUN tar -xvf esg_trusted_certificates.tar
+RUN mv esg_trusted_certificates certificates
+
+
+# Create impactportal workspace 
+RUN mkdir -p /data/c4i/climate4impact-portal/impactspace
+
 # configure server
 RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
 RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
@@ -102,4 +128,21 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 EXPOSE 443
 
+# TODO check why this is needed
+RUN conda install icu -y
+
+# Insert local instance trustroot into  truststore
+#CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
+#CMD keytool -import -v -trustcacerts -alias tomcat -file /root/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
+#CMD c_rehash /root/.globus/certificates
+
+#CMD /bin/bash
 CMD /usr/libexec/tomcat/server start
+
+
+RUN mkdir -p /config
+RUN chmod 777 /config
+VOLUME /config
+#Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
+#This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
+#Visit https://192.168.99.100/impactportal/ to go to the portal
