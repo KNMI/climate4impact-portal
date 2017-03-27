@@ -432,6 +432,10 @@ var C4IProcessingInterface = function(options){
         var el=jQuery('<div/>');
         renderFileViewerInterface({
           element:el,
+          service:c4iconfigjs.impactservice,
+          adagucservice:c4iconfigjs.adagucservice,
+          adagucviewer:c4iconfigjs.adagucviewer,
+          provenanceservice:c4iconfigjs.provenanceservice,
           query:value,
           dialog:true
         });   
@@ -591,17 +595,6 @@ var C4IProcessingInterface = function(options){
     rootElement.find(".c4i-processing-hidewpserrorreport").button({icons: {primary: "ui-icon-circle-close"}}).unbind('click').click(function(){rootElement.find(".c4i-processing-report").hide();})
   }
 
-
-//           var el=jQuery('<div/>');
-//         renderFileViewerInterface({
-//           element:el,
-//           service:c4iconfigjs.impactservice,
-//           adagucservice:c4iconfigjs.adagucservice,
-//           adagucviewer:c4iconfigjs.adagucviewer,
-//           provenanceservice:c4iconfigjs.provenanceservice,
-//           query:value,
-//           dialog:true
-//         });   
   
   var makeWPSSuccessReport = function(data,url){
     rootElement.find(".c4i-processing-report").show();
@@ -668,8 +661,9 @@ var C4IProcessingInterface = function(options){
     html+="</span>";
     reportEl = rootElement.find(".c4i-processing-report").find(".simplecomponent-body");
     reportEl.html(html);
+    
     reportEl.find(".c4i-processing-report-table-value-viewablebutton").button({text: false,icons: {primary: "ui-icon-video"}}).unbind('click').click(function(){
-        var literalinput = $(this).parent().find(".c4i-processing-report-table-value-viewable");
+        var literalinput = $(this).parent().parent().find(".c4i-processing-report-table-value-viewable");
         var value = literalinput.html();
         var el=jQuery('<div/>');
         renderFileViewerInterface({
@@ -681,7 +675,7 @@ var C4IProcessingInterface = function(options){
           query:value,
           dialog:true
         });   
-    }).attr('title','Show file information');
+    }).attr('title','Show file information 1');
     
     reportEl.find(".c4i-processing-report-table-value-viewable").unbind('click').click(function(){
         var literalinput = $(this).parent().find(".c4i-processing-report-table-value-viewable");
@@ -696,7 +690,7 @@ var C4IProcessingInterface = function(options){
           query:value,
           dialog:true
         });   
-    }).attr('title','Show file information');
+    }).attr('title','Show file information 2');
   };
   
   var wpsComplete = function(data,url){
