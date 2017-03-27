@@ -1,10 +1,12 @@
 package downscaling;
 
 import impactservice.Configuration;
+import impactservice.LoginManager;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +30,7 @@ import model.Downscaling;
 import model.Job;
 import model.Predictand;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -196,7 +199,7 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
       
-    }else if(pathInfo.matches("/models/.*/experiments")){
+    }else if(pathInfo.matches("/models/.*/scenarios")){
       HttpURLConnection urlConn = DownscalingAuth.prepareQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo + "?" +request.getQueryString(), "GET");
       BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
       StringBuilder sb = new StringBuilder();
@@ -222,8 +225,6 @@ public class DownscalingService extends HttpServlet {
       out.print(sb);
       out.flush();
       
-    }else if(pathInfo.equals("/downscalings")){
-    
     }else if(pathInfo.matches("/downscalings/download")){
       HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+request.getQueryString(), "GET");
       OutputStream out = response.getOutputStream();
@@ -238,6 +239,35 @@ public class DownscalingService extends HttpServlet {
       response.setContentType("application/zip");
       response.setHeader("Content-Disposition", "attachment; filename=downscaling-"+request.getParameter("jobId")+".zip");
       
+    }else if(pathInfo.matches("/downscalings/download4")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+request.getQueryString(), "GET");
+      File ncFile;
+      try {
+        ncFile = new File(LoginManager.getUser(LoginManager.getUserFromCookie(request)).getDataDir() + "/test.nc");
+        OutputStream out = new FileOutputStream(ncFile);
+        InputStream in = urlConn.getInputStream();
+        byte[] buffer = new byte[4096];
+        int length;
+        while ((length = in.read(buffer)) > 0){
+            out.write(buffer, 0, length);
+        }
+        IOUtils.closeQuietly(in);
+        IOUtils.closeQuietly(out);
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }else if(pathInfo.equals("/downscalings")){
+      HttpURLConnection urlConn = DownscalingAuth.prepareSimpleQuery(Configuration.DownscalingConfig.getDpBaseRestUrl() + pathInfo +"?"+request.getQueryString(), "GET");
+      BufferedReader in = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+      StringBuilder sb = new StringBuilder();
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) 
+        sb.append(inputLine);
+      in.close();
+      response.setContentType("application/json");     
+      PrintWriter out = response.getWriter();
+      out.print(sb);
+      out.flush();
     }else{
       response.setStatus(HttpStatus.SC_BAD_REQUEST);
     }
@@ -467,7 +497,7 @@ public class DownscalingService extends HttpServlet {
       response.getWriter().print(urlConn.getResponseMessage());
       response.setStatus(urlConn.getResponseCode());
       
-    }else if(pathInfo.equals("/downscalings")){
+    }else if(pathInfo.equals("/config")){
       
       Map<String, String[]> parameterMap = request.getParameterMap();
       String username = parameterMap.get("username")[0];

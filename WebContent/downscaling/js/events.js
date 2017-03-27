@@ -65,17 +65,18 @@ function reloadSlider(){
 
 $(document).on('click', 'button', function(event, ui){
   var id = $(this).attr('id');
-  if(id == "button-load-experiments"){
-    insertHashProperty("sYear", $('#date-range-start').val(), sortedKeys);
-    insertHashProperty("eYear", $('#date-range-end').val(), sortedKeys);
-    loadExperiments();
-  }else if(id=="button-downscale"){
+  if(id=="button-downscale"){
     if(getValueFromHash("experiment") != null)
       downscalingSubmit();
     else
       alert("You have to fill in the whole form to Downscale");
   }else if(id=="button-saveconfig"){
     showSaveConfigDialog("Do you want to save this configuration?");
+  }else if(id=="button-localSearch"){
+    insertHashProperty('project', $('#selectProject').val() , sortedKeys);
+    insertHashProperty('experiment', $('#selectExperiment').val() , sortedKeys);
+    insertHashProperty('ensemble', $('#selectEnsemble').val() , sortedKeys);
+    loadModels();
   }
 });
 
@@ -110,19 +111,19 @@ $(document).on('change', 'input:radio', function(event, ui){
     var variable = encodeURIComponent($(this).attr('data-variable'));
     if($(this).is(':checked')){
       insertHashProperty('variable', variable, sortedKeys);
-      removeHashProperty("zone");
-      removeHashProperty("predictand");
+      removeHashProperty("domain");
+      removeHashProperty("dataset");
       removeHashProperty("downscalingMethod");
-      loadDomains(false);
+      loadDomains();
     }
   }else if($(this).attr('name') == 'domain'){
     var domain = encodeURIComponent($(this).attr('data-domain'));
     if($(this).is(':checked')){
       insertHashProperty('domain', domain, sortedKeys);
       removeHashProperty("zone");
+      removeHashProperty("dataset");
       removeHashProperty("predictand");
-      removeHashProperty("downscalingMethod");
-      loadDatasets(false);
+      loadDatasets();
     }
   }else if($(this).attr('name') == 'dataset'){
     var domain = encodeURIComponent($(this).attr('data-dataset'));
@@ -146,7 +147,7 @@ $(document).on('change', 'input:radio', function(event, ui){
   }else if($(this).attr('name') == 'downscalingType'){
       var downscalingType = encodeURIComponent($(this).attr('data-downscaling-type'));
       insertHashProperty('downscalingType', downscalingType, sortedKeys);
-      loadDownscalingMethods(); //send type
+      loadDownscalingMethods(); 
   }else if($(this).attr('name') == 'downscalingMethod'){
     var zone = encodeURIComponent($(this).attr('data-zone'));
     var predictand = encodeURIComponent($(this).attr('data-predictand'));
@@ -157,27 +158,11 @@ $(document).on('change', 'input:radio', function(event, ui){
       $('#downscalingmethod-header').collapsible('open');
       loadValidationReport();
     }
-  }else if($(this).attr('name') == 'modelProject'){
-    var modelProject = encodeURIComponent($(this).attr('data-model-project'));
-    if($(this).is(':checked')){
-      insertHashProperty('modelProject', modelProject, sortedKeys);
-      loadModels();
-    }
   }else if($(this).attr('name') == 'model'){
     var model = encodeURIComponent($(this).attr('data-model'));
     if($(this).is(':checked')){
       insertHashProperty('model', model, sortedKeys);
-      loadExperiments();
+      loadScenarios();
     }
-  }else if($(this).attr('name') == 'experiment'){
-    var experiment = encodeURIComponent($(this).attr('data-name'));
-    var sDate = encodeURIComponent($(this).attr('data-sDate'));
-    var eDate = encodeURIComponent($(this).attr('data-eDate'));
-    if($(this).is(':checked')){
-      insertHashProperty('experiment', experiment, sortedKeys);
-      insertHashProperty('sYear', sDate, sortedKeys);
-      insertHashProperty('eYear', eDate, sortedKeys);
-    }
-    loadPeriod();
   }
 });

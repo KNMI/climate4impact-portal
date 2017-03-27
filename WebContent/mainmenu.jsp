@@ -111,6 +111,7 @@
 
 <div class="impacttopmenu mainmenu">
 	<ul>
+	<li class="mainmenu-firstli"></li>
 		<li <%if (highLightHome)
 				out.print("class=\"sel\"");%>><a
 			href="<%=Home%>general/index.jsp">Home</a></li>

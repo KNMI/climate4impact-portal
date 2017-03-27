@@ -16,7 +16,7 @@
 		for(int j=0;j<menuElements.length;j++){
 			if(pageName.indexOf(menuElements[j])!=-1)highLighted[j]=true;else highLighted[j]=false;
 		}
-			out.print("<ul>");
+			out.print("<ul><li class=\"impacttopmenu-firstli\"></li>");
 		for(int j=0;j<menuElements.length;j++){
 			out.print("<li ");
 			if(highLighted[j])out.print("class=\"sel\"");

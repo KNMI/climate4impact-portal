@@ -48,9 +48,11 @@
           <script type="text/javascript" src="/impactportal/data/c4i-processing/c4i-processing.js"></script>
     <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSProcessing.js"></script> 
     <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSTimer.js"></script> 
-    <link rel="stylesheet" href="/impactportal/data/c4i-processing/c4i-processing.css" />
-  
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/climate_indices_DEF.js"></script>
     
+    <link rel="stylesheet" href="/impactportal/data/c4i-processing/c4i-processing.css" />
+     
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
  
     <script type="text/javascript">
     $( document ).ready(function() {
@@ -60,7 +62,8 @@
           wpsservice:'<%=Configuration.getHomeURLHTTPS()%>/WPS?',
           identifier:'<%=processorId%>',
           adagucservice:c4iconfigjs.adagucservice,
-          adagucviewer:c4iconfigjs.adagucviewer
+          adagucviewer:c4iconfigjs.adagucviewer,
+          adagucviewerservice:c4iconfigjs.adagucviewerservice
         }
       );
     });

@@ -11,17 +11,19 @@ public class Downscaling {
 
 
   int jobId, status, zone, sYear, eYear;
-  String username, predictand, downscalingMethod, type, model, experiment, date;
+  String username, predictand, downscalingMethod, type, model, experiment, project, ensemble, sDate, eDate, date;
   
   public Downscaling(){}
   
   public Downscaling(JSONObject jsonObject){
+    
     try {
+      
       this.jobId = jsonObject.getInt("jobId");
       this.status = jsonObject.getInt("status");
       this.zone = jsonObject.getInt("zone");
-      this.sYear = jsonObject.getInt("sYear");
-      this.eYear = jsonObject.getInt("eYear");
+      this.sDate = jsonObject.getString("sDate");
+      this.eDate = jsonObject.getString("eDate");
       
       this.username = jsonObject.getString("username");
       this.predictand = jsonObject.getString("predictand");
@@ -30,6 +32,9 @@ public class Downscaling {
       this.model = jsonObject.getString("model");
       this.experiment = jsonObject.getString("experiment");
       this.date = jsonObject.getString("date");
+      this.project = jsonObject.getString("project");
+      this.ensemble = jsonObject.getString("ensemble");
+      
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -115,6 +120,37 @@ public class Downscaling {
   public void setDate(String date) {
     this.date = date;
   }
-  
+
+  public String getProject() {
+    return project;
+  }
+
+  public void setProject(String project) {
+    this.project = project;
+  }
+
+  public String getEnsemble() {
+    return ensemble;
+  }
+
+  public void setEnsemble(String ensemble) {
+    this.ensemble = ensemble;
+  }
+
+  public String getsDate() {
+    return sDate;
+  }
+
+  public void setsDate(String sDate) {
+    this.sDate = sDate;
+  }
+
+  public String geteDate() {
+    return eDate;
+  }
+
+  public void seteDate(String eDate) {
+    this.eDate = eDate;
+  }
   
 }

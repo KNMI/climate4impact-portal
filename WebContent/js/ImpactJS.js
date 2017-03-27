@@ -20,6 +20,7 @@ var c4iconfigjs = {
   basketservice:"/impactportal/basket?",
   adagucservice:"/impactportal/adagucserver?",
   adagucviewer:"/impactportal/adagucviewer/",
+  adagucviewerservice:"/impactportal/AdagucViewer?",
   howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
   contactexpertlink:"/impactportal/help/contactexpert.jsp",
   xml2jsonservice:"/impactportal/AdagucViewer/?"

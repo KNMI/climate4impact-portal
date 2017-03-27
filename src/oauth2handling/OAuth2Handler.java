@@ -348,16 +348,35 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
       Configuration.Oauth2Config.Oauth2Settings settings = Configuration.Oauth2Config
           .getOAuthSettings(currentProvider);
       Debug.println("  OAuth2 Step 2 OAuthz:  Using " + settings.id);
+      // Debug.println("  OAuth2 Step 2 OAuthz:  OAuthTokenLoc " + settings.OAuthTokenLoc);
+      
+      
+//      Debug.println(settings.OAuthTokenLoc);
+//      Debug.println(settings.OAuthClientSecret);
+      
       OAuthClientRequest tokenRequest = OAuthClientRequest
           .tokenLocation(settings.OAuthTokenLoc)
           .setGrantType(GrantType.AUTHORIZATION_CODE)
-          .setClientId(settings.OAuthClientId).setCode(oar.getCode())
-          .setScope(settings.OAuthClientScope)
-          .setClientSecret(settings.OAuthClientSecret)
           .setRedirectURI(Configuration.getHomeURLHTTPS() + oAuthCallbackURL)
+          .setCode(oar.getCode())
+          .setScope(settings.OAuthClientScope)
+          .setClientId(settings.OAuthClientId)
+          .setClientSecret(settings.OAuthClientSecret)
+          
           .buildBodyMessage();
 
       OAuthClient oauthclient = new OAuthClient(new URLConnectionClient());
+      
+//      Debug.println(tokenRequest.getBody());
+//      
+//      Map<String, String> map = tokenRequest.getHeaders();
+//      
+//      for (Map.Entry<String, String> entry : map.entrySet()) {
+//        System.out.println("Key : " + entry.getKey() +
+//                       " ,Value : " + entry.getValue());
+//      }
+
+      
       OAuthAccessTokenResponse oauth2Response = oauthclient
           .accessToken(tokenRequest);
 

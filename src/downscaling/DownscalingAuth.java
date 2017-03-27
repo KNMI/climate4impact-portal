@@ -84,7 +84,6 @@ public class DownscalingAuth{
     url = new URL(URI);
     urlConn = (HttpURLConnection)url.openConnection();
     urlConn.setRequestMethod(type);
-    urlConn.setRequestProperty("Accept", "application/pdf");
     urlConn.setRequestProperty("token", getToken());
     urlConn.setDoOutput(true);
     return urlConn;

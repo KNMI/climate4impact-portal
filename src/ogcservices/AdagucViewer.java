@@ -244,7 +244,7 @@ public class AdagucViewer extends HttpServlet {
         }
       }else if(isLocalWPS){
         String jsonData = null;
-        int maxTries = 4;
+        int maxTries = 8;
         boolean hasError = true; 
         MyXMLParser.XMLElement  b = null;
         while(maxTries>0 && hasError == true){
@@ -282,7 +282,7 @@ public class AdagucViewer extends HttpServlet {
           }
           if(hasError){
             Debug.errprintln("Retrying "+maxTries+" for "+requestStr);
-            Thread.sleep(1000);
+            Thread.sleep(4000);
           }
         }
         if(hasError == false){

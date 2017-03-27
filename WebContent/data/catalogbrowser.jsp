@@ -14,18 +14,12 @@
     <script type="text/javascript" src="fileviewer/vkbeautify.js"></script>
     <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>
     <script type="text/javascript" src="/impactportal/js/components/basket/basket.js"></script> 
     <script type="text/javascript" src="catalogbrowser/catalogbrowser.js"></script>
   <script type="text/javascript">
-  		  var c4iconfigjs = {
-            searchservice:"/impactportal/esgfsearch?",
-            impactservice:"/impactportal/ImpactService?",
-            adagucservice:"/impactportal/adagucserver?",
-            adagucviewer:"/impactportal/adagucviewer/",
-            howtologinlink:"/impactportal/help/howto.jsp?q=create_esgf_account",
-            contactexpertlink:"/impactportal/help/contactexpert.jsp",
-          }; 
+
         var catalogURL = '';
         var errorMessage = '';
         <% 

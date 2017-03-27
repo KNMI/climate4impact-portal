@@ -427,10 +427,16 @@ public class LoginManager {
     user = new ImpactUser(userId);
 
     users.add(user);
+
     
-    try {
-      checkLogin(user);
-    } catch (Exception e) {
+    /* NOTE CHECKLOGIN SHOULD NOT YET BE CALLED, AS USER ATTRIBUTES FROM SESSION OR NOT YET RETRIEVED. E.G. OpenID is not yet known */
+    /* We do this for google accounts, to allow x509 cert creation for CLIPC */
+    if(user.getUserId().startsWith("google")){
+      Debug.println("************** IS GOOGLE ***************");
+      try {
+        checkLogin(user);
+      } catch (Exception e) {
+      }
     }
 
     return user;

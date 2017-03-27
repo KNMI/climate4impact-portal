@@ -1,7 +1,4 @@
-.predictand
-{
-	width: 250px;
-}
+
 
 .refreshinfo
 { 
@@ -15,6 +12,20 @@
 .link 
 { 
 	cursor: pointer; 
+}
+
+a.esdoc{
+    background-image: url("../../data/images/es-doc-logo_32.png") !important;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: inline-block;
+    float: right;
+    height: 32px;
+    line-height: 32px;
+    margin: 1px 0 0;
+    overflow: hidden;
+    padding: 0;
+    width: 115px;
 }
 
 #predictand_info 

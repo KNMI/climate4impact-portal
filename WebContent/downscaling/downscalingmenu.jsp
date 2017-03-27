@@ -33,7 +33,8 @@
 		//out.print(header); //returns file name and path
 	%>
 
-  <ul style="height:20px;">
+  <ul>
+  <li class="impacttopmenu-firstli"></li>
 	<li <% if(highLightDocumentation)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingdocs.jsp" >Documentation</a></li>
 	<li <% if(highLightDownscaling)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/create.jsp" >Create <span class="text-small"> beta</span></a> </li>
 	<li <% if(highLightDownscalingJobs)out.print("class=\"sel\""); %>><a href="<%=Home%>downscaling/downscalingjobs.jsp" >Jobs <span class="text-small"> beta</span></a> </li>

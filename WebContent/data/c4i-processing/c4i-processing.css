@@ -283,6 +283,9 @@ background:none !important;
  word-break: break-all ;
 }
 
+.c4i-processing-report-table-noborder{
+  border:none !important;
+}
 .c4i-processing-report-table-value-viewable{
   color:blue;
   text-decoration: underline;
@@ -294,4 +297,16 @@ background:none !important;
 	z-index:1000 !important;
 	
 	
+}
+
+.c4i-processing-input-tile-linkmetadata-span{
+	margin-left:10px;
+}
+
+.c4i-processing-input-tile-linkmetadata-container{
+	margin:4px 4px 4px 4px;
+	padding:4px 4px 4px 20px;
+	background-color:#CDE1A4;
+	overflow:scroll;
+	max-height:200px;
 }
