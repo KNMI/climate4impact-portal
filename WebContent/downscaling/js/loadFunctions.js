@@ -74,20 +74,73 @@ function showSaveConfigDialog(message){
     });
 }
 
-function showOKDialog(message, url){
-  showMessageDialog(message);
+function showLaunchDialog(message, url){
+  $('#dialog-content').empty().append(message);
   $("#dialog").dialog({
       buttons: { 
-      Launch: function() {
-        postData(url);
-        $( this ).dialog( "close" );
+        "Cancel" : {
+          text : "Cancel",
+          id : "buttonCancel",
+          click: function() {
+                  $( this ).dialog( "close" );
+          }
+        },
+        "Launch": {
+          text: "Launch",
+          id : "buttonLaunch",
+          click : function() {
+                    postData(url);
+                    $( this ).dialog( "close" );
+                  }
+        },
+        "Download" : {
+          text : "Download",
+          id : "buttonDownload",
+          click : function(){
+            }
+          }
       },
-      Cancel: function() {
+      create: function (event, ui) {
+        $('#dialog-content').empty().append(message);
+        var zone = getValueFromHash("zone");
+        var predictand = getValueFromHash("predictand");
+        var downscalingMethod = getValueFromHash("downscalingMethod");
+        var downscalingType = "CLIMATE_CHANGE";
+        var model = getValueFromHash("model");
+        var project = getValueFromHash("project");
+        var experiment = getValueFromHash("experiment");
+        var ensemble = getValueFromHash("ensemble");
+        var parameters = "?zone=" + zone + "&predictand=" + predictand + "&downscalingMethod=" + downscalingMethod + "&downscalingType=" + downscalingType + "&model=" + model  + "&project=" + project +  "&experiment=" + experiment + "&ensemble=" + ensemble;
+        $.get( "../DownscalingService/downscalings" + parameters, function( data ) {
+          if(data.values.length > 0 ){
+            $(".ui-dialog").find(".ui-button#buttonLaunch").hide();
+            var value = data.values[0];
+            var fileName = value.predictand+"_"+value.model+"_"+value.experiment+"_"+value.ensemble+".nc";
+            $('#dialog-content').empty().append("Your selection has been launched before. In DP service the downscalings are shared among users. Click on Download to download the NetCDF file: "+fileName);
+            parameters = "?jobId="+value.jobId+"&zone="+value.zone+"&predictand="+value.predictand+"&downscalingMethod="+value.downscalingMethod+"&model="+value.model+"&experiment="+value.experiment+"&sYear="+value.sYear+"&eYear="+value.eYear+"&username="+loggedInUser+"&type="+value.type;
+          }else{
+            $(".ui-dialog").find(".ui-button#buttonDownload").hide();
+          }
+           $(".ui-dialog").find(".ui-button#buttonDownload").click(function() {
+            $.get( "../DownscalingService/downscalings/download4" + parameters, function( data ) {
+              showMessageDialog("Your downscaling is available at your shopping cart.");
+            });
+          });
+        });
+      },
+      close: function(event, ui){
         $( this ).dialog( "close" );
-      }
-    }
-    });
+        $('#dialog').remove();
+        $('body').append('<div id="dialog"><div id="dialog-content"></div></div>');
+      },
+      resizable: false,
+      height: 350,
+      width: 500,
+      modal: true,
+      title: 'Downscaling'
+  });
 }
+
 
 function showMessageDialog(message){
   $('#dialog-content').empty().append(message);
@@ -211,7 +264,7 @@ function loadPredictands(){
   
   $.get( URL, function( data ) {
     $.each(data.values, function(index, value){
-        $('#predictands').append("<td><div class='predictand'><input class='input-predictand' data-predictand='"+value.predictand+"' data-zone='"+value.zone+"' data-predictor='"+ value.predictor+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><a class='link'>"+value.predictand+"<i class='material-icons'>room</i></a></abbr></div></td>");
+        $('#predictands').append("<td><div class='predictand'><input class='input-predictand' data-predictand='"+value.predictand+"' data-zone='"+value.zone+"' data-predictor='"+ value.predictor+"' type='radio' name='predictand' value='"+value.name+"'/><abbr title='Click to see more info'><a class='link'>Predictand: "+value.predictand+"<i class='material-icons'>room</i></a></abbr></div></td>");
         if(defaultpredictand != null && defaultpredictand == value.predictand)
           $('#predictands').find("[data-predictand='" + value.predictand + "']").prop('checked',true);
     });
@@ -300,14 +353,17 @@ function loadModelProject(){
 
 function loadModels(){
     var zone = getValueFromHash("zone");
+    var project = getValueFromHash("project");
+    var experiment = getValueFromHash("experiment");
+    var ensemble = getValueFromHash("ensemble");
     var defaultModelValue = getValueFromHash("model");
     $('#models').html('');
-    if(zone != null){
-      $.get( "../DownscalingService"+"/models?username=" + loggedInUser + "&zone=" + zone, function( data ) {
+    if(zone != null && project != null && experiment != null && ensemble != null){
+        $.get( "../DownscalingService"+"/models?username=" + loggedInUser + "&zone=" + zone, function( data ) {
           $.each(data.values, function(index, value){
             $('#models').append("<td><input class='input-model' data-model='"+value.name+"' type='radio' name='model' value='"+value.name+"'/>" +
-                "<abbr title='Name: " + value.name + "&#10;Description: " +value.description + "&#10;Metadata: " + value.metadata + "&#10;&#10;Click to see more info'><a class='link'>"+
-                value.name+"<i class='material-icons'>room</i></a><a href='http://view.es-doc.org/?client_id=climate4impact_esgfsearch&renderMethod=name&project=cmip5&type=cim.1.software.modelcomponent&name="+value.name+"' title='Show ESDOC dataset metadata' target='_blank'>ES-DOC</a></abbr>");
+                "<abbr title='Name: " + value.name + "&#10;Description: " +value.description + "&#10;Metadata: " + value.metadata + "'>"+
+                value.name+"<a class='esdoc' href='http://view.es-doc.org/?client_id=climate4impact_esgfsearch&renderMethod=name&project=cmip5&type=cim.1.software.modelcomponent&name="+value.name+"' title='Show ESDOC dataset metadata' target='_blank'></a></abbr>");
             
             if(defaultModelValue == value.name)
               $("input[name=model][value='"+value.name+"']").prop('checked',true);
@@ -315,74 +371,27 @@ function loadModels(){
       });
       setTimeout(function(){
         $('#model-header').collapsible('open');
-        if(getValueFromHash("experiment") != null)
-          loadExperiments();
       },0);
     }
 }
 
-function loadExperiments(){
-    var run = getValueFromHash("run");
-    var model = getValueFromHash("model");
-    var defaultExperimentValue = getValueFromHash("experiment");
-    var sYear = getValueFromHash("sYear");
-    var eYear = getValueFromHash("eYear");
-    if(run==null)
-      run=1;
-    if(sYear != null){
-      $('#date-range-start').val(sYear);
-      $('#date-range-start').change();
-    }
-    if(eYear != null){
-      $('#date-range-end').val(eYear);
-      $('#date-range-end').change();
-    }
-    $("input:radio[name='experimentRun'][value='Run 1']").prop('checked', true);
-    $('#experiments').html('');
-    if(run != null && model != null){
-      $.get( "../DownscalingService"+"/models/"+model+"/experiments", function( data ) {
-          $.each(data.values, function(index, value){
-            var sDate = value.metadata.split(';')[1].split('=')[1];
-            var eDate = value.metadata.split(';')[2].split('=')[1]; 
-            $('#experiments').append("<td><input class='input-experiment' data-name='"+value.name+"' data-sDate='"+ sDate + "' data-eDate='"+eDate+"' type='radio' name='experiment' value='"+value.name+"'/><abbr title='"+ "Name: " + value.name + "&#10;Description: " + value.description +"&#10;Period: " + sDate+" - "+ eDate +"'><span >"+ value.name +"</span></abbr></td>");
-            if(defaultExperimentValue == value.name)
-              $("input[name=experiment][value='"+value.name+"']").prop('checked',true);
-          });
-      });
-      setTimeout(function(){
-        $('#experiment-header').collapsible('open');
-        if(getValueFromHash("sYear") != null && getValueFromHash("eYear") != null)
-          loadPeriod();
-      },0);
-    }
-    //$('#experiments').html('').triggerHandler('contentChanged');
-}
-
-function loadPeriod(){
-  $("#period-selection").append('<div><label for="date-range-start">Start year</label><input type="text" id="date-range-start" class="input-year"/></div><div id="slider-range"></div><div><label>End year</label><input type="text" id="date-range-end" class="input-year"></input></div>');
-  var sYear = parseInt(getValueFromHash("sYear"))
-  var eYear = parseInt(getValueFromHash("eYear"))
-  $(function() { 
-    $("#slider-range").slider({
-      range : true,
-      min : sYear,
-      max: eYear,
-      step: 1,
-      values: [sYear, eYear],
-      slide: function( event, ui ) {
-          $("#date-range-start" ).val(ui.values[0]);
-          $("#date-range-end").val(ui.values[1]);
-          insertHashProperty("sYear", ui.values[0], sortedKeys);
-          insertHashProperty("eYear", ui.values[1], sortedKeys);
+function loadScenarios(){
+  var model = getValueFromHash("model");
+  var defaultExperimentValue = getValueFromHash("experiment");
+  var sYear = getValueFromHash("startYear");
+  var eYear = getValueFromHash("endYear");
+  $.get( "../DownscalingService"+"/models/"+model+"/scenarios", function( data ) {
+    $.each(data.values, function(index, value){
+      if(value.experiment == getValueFromHash("experiment") && value.ensemble == getValueFromHash("ensemble")){
+        insertHashProperty('startYear', value.startYear, sortedKeys);
+        insertHashProperty('endYear', value.endYear, sortedKeys);
       }
     });
-    $("#date-range-start" ).val($( "#slider-range" ).slider( "values", 0));
-    $("#date-range-end" ).val($( "#slider-range" ).slider( "values", 1));    
   });
-  
-  updateSlider();
-  $('#downscaling-period-header').collapsible('open');
 }
+
+
+
 
 function loadContent(){
 //loadVariables();

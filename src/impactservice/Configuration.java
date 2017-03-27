@@ -315,6 +315,11 @@ public class Configuration {
       myProxyDefaultUserName = configReader.getNodeValue("impactportal.loginconfig.myproxyserverusernameoverride");
       myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
       trustRootsLocation = configReader.getNodeValue("impactportal.loginconfig.trustrootslocation");
+      
+      Debug.println("Setting javax.net.ssl.trustStore to "+trustStoreFile);
+      System.setProperty("javax.net.ssl.trustStore",trustStoreFile);
+      System.setProperty("javax.net.ssl.truststorePassword",trustStorePassword);
+
     }
     
     public static String getMyProxyServerHost(){readConfig();return myProxyServerHost;}

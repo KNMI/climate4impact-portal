@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.json.JSONArray;
+
 /**
  *  @author Maarten Plieger - KNMI
  *  
@@ -149,13 +151,19 @@ public class JSONResponse {
   public void setMessage(JSONObject json) {
     setMessage(json.toString());    
   }
+  public void setMessage(JSONArray json) {
+    setMessage(json.toString());    
+  }
   public boolean hasError(){
     return hasError;
   }
   
   public void print(HttpServletResponse response) throws IOException{
     response.setContentType(getMimeType());
-    response.getOutputStream().print(getMessage());
+    byte[] msg = getMessage().getBytes();
+    response.setHeader("Content-Length", String.valueOf(msg.length));
+    response.getOutputStream().write(msg);
+    response.flushBuffer();
   }
   public void printNE(HttpServletResponse response) throws IOException{
     try {

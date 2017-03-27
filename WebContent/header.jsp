@@ -7,7 +7,7 @@
     ImpactUser user = null;
     try{
     	user = LoginManager.getUser(request);
-    	loginStr = "<a href=\""+Home+"account/login.jsp\">Account</a>&nbsp;<a href=\""+Home+"account/basket.jsp\"><code class=\"codeshoppingcarticon\"></code></a>&nbsp;<a href=\""+Home+"account/processing.jsp\"><code class=\"codejobsicon\"></code></a>";
+    	loginStr = "<a href=\""+Home+"account/login.jsp\">Account</a>&nbsp;| <a href=\""+Home+"account/basket.jsp\"><code class=\"codeshoppingcarticon\"></code></a>&nbsp;| <a href=\""+Home+"account/processing.jsp\"><code class=\"codejobsicon\"></code></a>&nbsp;";
     }catch(Exception e){
     
     }

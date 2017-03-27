@@ -80,7 +80,7 @@
       }; 
     
       $( document ).ready(function() {
-        var floating=false;/* YOu can choose either as floating dialog element or as embedded element */
+        var floating=true;/* YOu can choose either as floating dialog element or as embedded element */
         if(floating){
 	        var el=jQuery('<div/>');
 	        renderSearchInterface({
@@ -95,7 +95,7 @@
 	        renderSearchInterface({
 	          element:el,
 	          service:c4iconfigjs.searchservice,
-	          query:"project=clipc&variable=tas",//<-- Optional, prefill the search with a custom query.
+	          //query:"project=clipc&variable=tas",//<-- Optional, prefill the search with a custom query.
 	          catalogbrowserservice:c4iconfigjs.impactservice
 	        });
         }

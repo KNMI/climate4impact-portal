@@ -17,7 +17,7 @@
 		if(pageName.indexOf("sendfeedback")!=-1){
 			highLighted[2]=true;
 		}
-			out.print("<ul style=\"height:20px;\">");
+			out.print("<ul style=\"height:20px;\"><li class=\"impacttopmenu-firstli\"></li>");
 		for(int j=0;j<menuElements.length;j++){
 			out.print("<li ");
 			if(highLighted[j])out.print("class=\"sel\"");

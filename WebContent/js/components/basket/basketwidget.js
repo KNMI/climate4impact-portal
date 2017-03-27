@@ -321,33 +321,17 @@ var BasketWidget = function() {
     };
 
     var showFileInfo = function(record,frombutton){
-      if (!record.get('dapurl')&&!record.get('catalogurl')) {
+      if (!record.get('dapurl')&&!record.get('httpurl')&&!record.get('catalogurl')) {
         if(record.get('leaf')==false){
           if(frombutton==true){
             alert("There is no information available for this entry");
           }
         }else{
-          alert("There is no information available for this entry");
+          alert("There is no information available for this file");
         }
         return;
       }
-      if(record.get('dapurl')){
-//      var fileViewer = new ExtFileViewer();
-//      var w = Ext.create('Ext.Window', {
-//      width : 900,
-//      height : 680,
-//      autoScroll : true,
-//      autoDestroy : true,
-//      closeAction : 'destroy',
-//      frame : false,
-//      title : 'NetCDF metadata',
-//      layout : 'fit',
-//      items : fileViewer.getViewer()
-//      });
-//      w.show();
-//      openedWindows.push(w);
-//      fileViewer.load(record.get('dapurl'));
-
+      if(record.get('dapurl')||record.get('httpurl')){
         var el=jQuery('<div/>');
         renderFileViewerInterface({element:el,
           service:c4iconfigjs.impactservice,
@@ -355,7 +339,7 @@ var BasketWidget = function() {
           adagucviewer:c4iconfigjs.adagucviewer,
           provenanceservice:c4iconfigjs.provenanceservice,
           //query:"http://dapurl.knmi.nl/knmi/thredds/dodsC/CLIPC/jrc/tier2/SPI3.nc",
-          query:record.get('dapurl'),
+          query:record.get('dapurl')?record.get('dapurl'):record.get('httpurl'),
           dialog:true
         });   
       }else if(record.get('catalogurl')){

@@ -11,69 +11,6 @@ var renderProcessingInterface = function(options){
   return new C4IProcessingInterface(options);
 };
 
-var c4iProcessingIndexOf = function(thisobj,obj, start) {
-  for (var i = (start || 0), j = thisobj.length; i < j; i++) {
-    if (thisobj[i] === obj) { return i; }
-  }
-  return -1;
-}
-
-function c4iProcessingStartsWith(str, prefix) {
-  return str.indexOf(prefix) === 0;
-};
-
-
-
-var c4iProcessingGetKeys = function(obj){
-  if (!Object.keys) {
-    var keys = [],
-    k;
-    for (k in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, k)) { 
-        keys.push(k);
-      }
-    }
-    return keys;
-  }else{
-    return Object.keys(obj);
-  }
-};
-
-/**
- * Splits a url into key value pairs.
- */
-function C4iProcessingKVP(query){
-  var kvplist = [];
-  function parse(query){
-    var splittedKVP = query.split("&");
-    if(splittedKVP){
-      for(var kvpkey in splittedKVP){
-        var kvp = splittedKVP[kvpkey];
-        var kvps=kvp.split("=");
-        if(kvps.length==2){
-          var key = kvps[0];
-          var value = kvps[1];
-          if(!(kvplist[key] instanceof Array))kvplist[key] = [];
-          kvplist[key].push(value);
-        }
-      }
-    }
-  };
-  this.getKeys = function(){
-    var keys = new MySet();
-    for(key in kvplist){
-      keys.add(key);
-    }
-    return keys;
-  };
-  this.getValues = function(key){
-    return kvplist[key];
-  }
-  this.getKeyValues = function(){
-    return kvplist;
-  };
-  parse(query);
-};
 var xml2jsonrequestURL;
 
 var C4IProcessingInterface = function(options){
@@ -94,12 +31,131 @@ var C4IProcessingInterface = function(options){
   //query="variable=tas";
   
   /**
+   * Cross browser indexOf function
+   */
+  var c4iProcessingIndexOf = function(thisobj,obj, start) {
+    for (var i = (start || 0), j = thisobj.length; i < j; i++) {
+      if (thisobj[i] === obj) { return i; }
+    }
+    return -1;
+  }
+  /**
+   * Cross browser startsWth function
+   */
+  
+  function c4iProcessingStartsWith(str, prefix) {
+    return str.indexOf(prefix) === 0;
+  };
+  
+
+  /**
+   * Cross browser compatible endsWith function 
+   */
+  function c4iProcessingEndsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  }
+  
+  /**
+   * Cross browser method to return keys for an object
+   */
+  
+  var c4iProcessingGetKeys = function(obj){
+    if (!Object.keys) {
+      var keys = [],
+      k;
+      for (k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k)) { 
+          keys.push(k);
+        }
+      }
+      return keys;
+    }else{
+      return Object.keys(obj);
+    }
+  };
+  
+  /**
+   * Splits a url into key value pairs.
+   */
+  function C4iProcessingKVP(query){
+    var kvplist = [];
+    function parse(query){
+      var splittedKVP = query.split("&");
+      if(splittedKVP){
+        for(var kvpkey in splittedKVP){
+          var kvp = splittedKVP[kvpkey];
+          var kvps=kvp.split("=");
+          if(kvps.length==2){
+            var key = kvps[0];
+            var value = kvps[1];
+            if(!(kvplist[key] instanceof Array))kvplist[key] = [];
+            kvplist[key].push(value);
+          }
+        }
+      }
+    };
+    this.getKeys = function(){
+      var keys = new MySet();
+      for(key in kvplist){
+        keys.add(key);
+      }
+      return keys;
+    };
+    this.getValues = function(key){
+      return kvplist[key];
+    }
+    this.getKeyValues = function(){
+      return kvplist;
+    };
+    parse(query);
+  };
+  var inputMappings = {
+    sliceMode:{
+      None:'Use the same period as selected time range',
+      year:'Yearly time period',
+      month:'Monthly time period',
+      ONDJFM:'Half year winter period from October till March',
+      AMJJAS:'Half year summer period from April till September',
+      DJF:'Winter weather season in December, January & February',
+      MAM:'Spring weather season in March, April & May',
+      JJA:'Summer weather season in June, July & August',
+      SON:'Autumn weather season in September, October & November'
+    }
+  };
+  
+  var getInputNameMapping = function(inputname,value){
+    //inputmappings
+    if(inputname == 'indiceName'){
+      var found = false;
+      for(var j=0;j<climate_indices_DEF.length;j++){
+        if(climate_indices_DEF[j].varname.toLowerCase() == value.toLowerCase()){
+          try{
+            return value+" - "+climate_indices_DEF[j].output.long_name+' calculated from '+climate_indices_DEF[j].input[0].known_variables;
+          }catch(e){
+            try{
+              return value+" - "+climate_indices_DEF[j].output.long_name;
+            }catch(e){
+            }
+          }
+        }
+      }
+    }
+    if(inputMappings[inputname] ){
+      var newValue = inputMappings[inputname][value];
+      if(newValue) return value+" - "+newValue;
+    }
+    return value;
+  };
+  
+  
+  /**
    * A normal unordered set, e.g. a list containing no duplicates.
    */
   var MySet = function() {}
   MySet .prototype.add = function(o) { this[o] = true; }
   MySet .prototype.remove = function(o) { delete this[o]; }
 
+  
   /*
    * Function to pass errors from ajax calls to
    */
@@ -182,6 +238,11 @@ var C4IProcessingInterface = function(options){
     '    <div class="simplecomponent-body"></div>'+
     '    <div class="simplecomponent-footer"></div>'+
     '  </div>'+
+    '  <div class="simplecomponent c4i-processing-footer">'+
+    '    <div class="simplecomponent-body"></div>'+
+    '    <div class="simplecomponent-footer"></div>'+
+    '  </div>'+
+    ''+
 //     ''+
 //     '  <div class="simplecomponent c4i-processing-results">'+
 //     '    <div class="simplecomponent-header">Results</div>'+
@@ -352,6 +413,9 @@ var C4IProcessingInterface = function(options){
     if(!isDefined(myabstract)){
       myabstract="";
     }
+    if(!isDefined(myabstract.indexOf)){
+      myabstract="";
+    }
     if(myabstract.indexOf("application/netcdf")!=-1){
       return true;
     }
@@ -359,7 +423,7 @@ var C4IProcessingInterface = function(options){
   };
     
   var initializeLiteralInputButtons = function(){
-    rootElement.find(".c4i-processing-showbasket-button").button({text: false,icons: {primary: "ui-icon-cart"}}).unbind('click').click(function(){showBasketWidget($(this).parent());}).attr('title','Show your personal basket');
+    rootElement.find(".c4i-processing-showbasket-button").button({text: false,icons: {primary: "ui-icon-cart"}}).unbind('click').click(function(){showBasketWidget($(this).parent());}).attr('title','Open your basket and select files');
     
    
     rootElement.find(".c4i-processing-showpreview-button").button({text: false,icons: {primary: "ui-icon-video"}}).unbind('click').click(function(){
@@ -368,24 +432,24 @@ var C4IProcessingInterface = function(options){
         var el=jQuery('<div/>');
         renderFileViewerInterface({
           element:el,
-          service:c4iconfigjs.impactservice,
-          adagucservice:c4iconfigjs.adagucservice,
-          adagucviewer:c4iconfigjs.adagucviewer,
-          provenanceservice:c4iconfigjs.provenanceservice,
           query:value,
           dialog:true
         });   
-    }).attr('title','Show file information');
+    }).attr('title','Show file metadata and information');
     
     rootElement.find(".c4i-processing-input-moreless-buttonplus").empty().button({text: false,icons: {primary: "ui-icon-plus"}}).unbind('click').click(function(){
       var name = $(this).parent().parent().find(".c4i-processing-literalinput-span").attr("name");
-      var hasBasket=checkifHasBasket(name);
+      var thisabstractText = $(this).parent().parent().parent().find(".c4i-processing-input-tile-abstract").html();
+      var hasBasket=checkifHasBasket(name,thisabstractText);
+      var cardinality = $(this).parent().parent().parent().find(".c4i-processing-input-tile-cardinality").attr("name");
+      var max = cardinality.split(',')[1];
+      var min = cardinality.split(',')[0];
       var html=createLiteralInput(name,"",hasBasket,true);
       $(this).parent().parent().find(".c4i-processing-literalinput-span").append(html);
       initializeLiteralInputButtons();
     }).attr('title','Add an extra input field');
     
-    rootElement.find(".c4i-processing-input-moreless-buttonmin").button({text: false,icons: {primary: "ui-icon-trash"}}).unbind('click').click(function(){
+    rootElement.find(".c4i-processing-input-moreless-buttonmin").button({text: false,icons: {primary: "ui-icon-minus"}}).unbind('click').click(function(){
       //console.log( $(this).parent().parent().parent().find(".c4i-processing-inputfieldspanner").size());
       $(this).parent().remove();
     }).attr('title','Remove this input field');
@@ -394,15 +458,91 @@ var C4IProcessingInterface = function(options){
       $(this).parent().parent().parent().find(".c4i-processing-literalinput-span").empty();
     }).attr('title','Remove all input fields');
     
-    //Disable remove buttons if only one is left
+    //TODO Disable remove buttons if only one is left
     
+    
+    rootElement.find(".c4i-processing-input-tile-linkmetadata").button().unbind('click').click(function(){
+      /* Show available option for an input */
+      var inputname = $(this).attr('name');
+      var inputatype = inputname.split("~")[0].split("_")[0]; 
+      var inputaname = inputname.split("~")[0].split("_")[1];
+      var inputb = inputname.split("~")[1];
+      var settings = getInputSettings();
+      var inputvalues = settings[inputb];
+      var newEl = $(this).parent().find(".c4i-processing-input-tile-linkmetadata-info");
+      newEl.empty();
+      
+      
+      for(var j=0;j<inputvalues.length;j++){
+        var value = inputvalues[j];
+        function fillInLayerNames(value,el){
+          var WMSGetCapabiltiesURL = options.adagucservice+ 'source='+URLEncode(value);
+          xml2jsonrequestURL = options.adagucviewerservice+'SERVICE=XML2JSON&';
+          var service = WMJSgetServiceFromStore(WMSGetCapabiltiesURL);
+          service.getLayerNames(function(layerNames){
+            for(var j=0;j<layerNames.length;j++){
+              if(layerNames[j].indexOf('baselayer') ==-1 &&
+                  layerNames[j].indexOf('overlay') ==-1 &&
+                  layerNames[j].indexOf('features') ==-1 &&
+                  layerNames[j].indexOf('grid') ==-1
+                  ){
+                el.html("done");
+                if(inputatype == 'wpsvariable'){
+                  var html = "Variables for "+value.substring(value.lastIndexOf("/")+1);
+                  html+="<ul><li>"+layerNames[j]+"</ul></li>";
+                  el.html(html);  
+                }
+                if(inputatype == 'wpstimerange' || inputatype == 'wpstime' ||inputatype == 'wpsnlevel'){
+                  var showLayerInfo = function(layer){
+                    var html = "No info found.";
+                    for(var j=0;j<layer.dimensions.length;j++){
+                      if(layer.dimensions[j].name === 'time' && (inputatype == 'wpstimerange' || inputatype == 'wpstime')){
+                        html= "Dates for "+value.substring(value.lastIndexOf("/")+1);
+                        html+="<ul><li>number of steps: "+layer.dimensions[j].size()+"</li>";
+                        html+="<li>Start: "+layer.dimensions[j].getValueForIndex(0)+"</li>";
+                        html+="<li>Stop: "+layer.dimensions[j].getValueForIndex(layer.dimensions[j].size()-1)+"</li>";
+                        html+="</ul>";
+                        html+="All timesteps:";
+                        html+="<ul>";
+                        for(var i=0;i<layer.dimensions[j].size();i++){
+                          html+="<li>"+i+") "+layer.dimensions[j].getValueForIndex(i)+"</li>";
+                        }
+                        
+                        html+="</ul>";
+                      }
+                      if(layer.dimensions[j].name === 'elevation' && inputatype == 'wpsnlevel'){
+                        html= "Levels for "+value.substring(value.lastIndexOf("/")+1);
+                        html+="<ul>";
+                        for(var i=0;i<layer.dimensions[j].size();i++){
+                          html+="<li>Pressure level "+i+" with value "+layer.dimensions[j].getValueForIndex(i)+" "+layer.dimensions[j].units+"</li>";
+                        }
+                      }
+                    }
+                    el.html(html);
+                  };
+                  new WMJSLayer({service:WMSGetCapabiltiesURL,name:layerNames[0],onReady:showLayerInfo});
+                };
+                
+              }
+            }
+          },
+          function(error){alert(error);});
+        };
+        
+        
+        newEl.append("<div class=\"c4i-processing-input-tile-linkmetadata-container\">Reading info ... </div>");
+        fillInLayerNames(value,newEl.children().last());
+      }
+    }).attr('title','Get metadata for this input');
     
   };
   
   var createLiteralInput = function(inputname,defaulttext,hasBasket,showMinButton){
     var html="<span class=\"c4i-processing-inputfieldspanner\" name=\""+inputname+"\"><input class=\"c4i-processing-literalinput-input\" name=\""+inputname+"\" value=\""+defaulttext+"\"/>";
     if(hasBasket){
-      html+="<button class=\"c4i-processing-showbasket-button\"></button><button class=\"c4i-processing-showpreview-button\"></button><button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
+      html+="<button class=\"c4i-processing-showbasket-button\"></button>"
+      html+="<button class=\"c4i-processing-showpreview-button\"></button>"
+      html+="<button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
     }else{
       if(showMinButton){
         html+="<button class=\"c4i-processing-input-moreless-buttonmin\"></button>";
@@ -465,7 +605,7 @@ var C4IProcessingInterface = function(options){
   
   var makeWPSSuccessReport = function(data,url){
     rootElement.find(".c4i-processing-report").show();
-    rootElement.find(".c4i-processing-report").find(".simplecomponent-header").css({"backgroundColor":"green"}).html("Processing succeeded! Showing report:");
+    rootElement.find(".c4i-processing-report").find(".simplecomponent-header").css({"backgroundColor":"#0A0"}).html("Processing succeeded! Showing report:");
     var html="<span class=\"c4i-processing-input-tile\">"
     
     html+="<span class=\"c4i-processing-report-container\">";
@@ -481,6 +621,7 @@ var C4IProcessingInterface = function(options){
     
     for(var j=0;j<keys.length;j++){
       var item = data[keys[j]];
+      console.log(item);
       html+="<tr><td class=\"c4i-processing-report-table-identifier\">"+item.Identifier.value+"</td><td class=\"c4i-processing-report-table-title\">"+htmlEncode(item.Title.value)+"</td>";
       
       var type="";
@@ -501,13 +642,24 @@ var C4IProcessingInterface = function(options){
       
       
       html+="<td class=\"c4i-processing-report-table-type\">"+type+"</td>";
-      if(literalDataValueLowerCase.indexOf("dap")!=-1&&literalDataValueLowerCase.indexOf("http")!=-1&&literalDataValueLowerCase.indexOf(".nc")!=-1){
+      
+      if( (literalDataValueLowerCase.indexOf("dap")!=-1&&
+          literalDataValueLowerCase.indexOf("http")!=-1 &&
+          literalDataValueLowerCase.indexOf(".nc")!=-1) ||
+          
+          (literalDataValueLowerCase.indexOf("http")!=-1 &&
+          (c4iProcessingEndsWith(literalDataValueLowerCase,"csv")||
+           c4iProcessingEndsWith(literalDataValueLowerCase,"png")||
+           c4iProcessingEndsWith(literalDataValueLowerCase,"txt")))
+      ){
+        /* NetCDF viewable file */
         html+="<td class=\"c4i-processing-report-table-value\">";
-        html+="<span class=\"c4i-processing-report-table-value-viewable\">"+htmlEncode(value)+"</span>";
-        html+="<button class=\"c4i-processing-report-table-value-viewablebutton\">Show</button></td>";
-      }else{
+        html+="<table><tr><td class=\"c4i-processing-report-table-noborder\"><span class=\"c4i-processing-report-table-value-viewable\">"+htmlEncode(value)+"</span></td>";
+        html+="<td class=\"c4i-processing-report-table-noborder\"><button class=\"c4i-processing-report-table-value-viewablebutton\">Show</button></td></tr></table></td>";
+      } else{
         html+="<td class=\"c4i-processing-report-table-value\">"+htmlEncode(value)+"</td>";
       }
+      
       
       html+="</tr>";
     }
@@ -581,6 +733,30 @@ var C4IProcessingInterface = function(options){
     wps.execute(WPSIdentifier,data);
   };
   
+  var getInputSettings = function(){
+    var settings = {};
+    var inputs = rootElement.find(".c4i-processing-inputs").find(".simplecomponent-body").first().find(".c4i-processing-inputfieldspanner");
+    for(var j=0;j<inputs.length;j++){
+      var inputfield=$(inputs[j]);
+      var literalinput = inputfield.find(".c4i-processing-literalinput-input");
+      var literalinputcombo = inputfield.find(".c4i-processing-literalinput-select");
+      //console.log(literalinput);
+      if(literalinput.length==1){
+        var name = inputfield.attr("name");
+        var value = literalinput.first().val();
+        if(!settings[name])settings[name]=[value];else settings[name].push(value);
+        
+      }
+      if(literalinputcombo.length==1){
+        //console.log(literalinputcombo);
+        var name = inputfield.attr("name");
+        var value = literalinputcombo.val();
+        if(!settings[name])settings[name]=[value];else settings[name].push(value);
+      }
+    }
+    return settings;
+  }
+  
   /*Called on succesfull describeprocess callback*/
   var describeProcess = function(data,url){
     if(data.error || data.exception){
@@ -593,6 +769,7 @@ var C4IProcessingInterface = function(options){
     //console.log(describeProcessDoc);
     
     var overview = rootElement.find(".c4i-processing-overview").find(".simplecomponent-body").first();
+    var footer = rootElement.find(".c4i-processing-footer").find(".simplecomponent-body").first();
     var inputs = rootElement.find(".c4i-processing-inputs").find(".simplecomponent-body").first();
     
     var ProcessDescription;
@@ -618,33 +795,17 @@ var C4IProcessingInterface = function(options){
     
     overview.html(html);
     
+//    html="<span class=\"c4i-processing-start-span\"><button class=\"c4i-processing-startbutton\">Start processing</button></span>";
+//    html+="<div class=\"c4i-processing-progressbar\" style=\"display:none\"><div class=\"c4i-processing-progresslabel\"></div></div>";
+//    footer.html(html);
     rootElement.find(".c4i-processing-startbutton").button({
       icons: {
         primary: "codejobsicon"
       },
     }).unbind('click').click(function(){
       //alert("StartProc");
-      var settings = {};
-      var inputs = rootElement.find(".c4i-processing-inputs").find(".simplecomponent-body").first().find(".c4i-processing-inputfieldspanner");
-      for(var j=0;j<inputs.length;j++){
-        var inputfield=$(inputs[j]);
-        var literalinput = inputfield.find(".c4i-processing-literalinput-input");
-        var literalinputcombo = inputfield.find(".c4i-processing-literalinput-select");
-        //console.log(literalinput);
-        if(literalinput.length==1){
-          var name = inputfield.attr("name");
-          var value = literalinput.first().val();
-          if(!settings[name])settings[name]=[value];else settings[name].push(value);
-          
-        }
-        if(literalinputcombo.length==1){
-          //console.log(literalinputcombo);
-          var name = inputfield.attr("name");
-          var value = literalinputcombo.val();
-          if(!settings[name])settings[name]=[value];else settings[name].push(value);
-        }
-      }
-      executeProcess(settings,WPSServiceURL);
+
+      executeProcess(getInputSettings(),WPSServiceURL);
     })
     
     html="</span>";
@@ -671,9 +832,9 @@ var C4IProcessingInterface = function(options){
       if(DataInput.Title){
        title = DataInput.Title.value;
       }
-      var html="<span class=\"c4i-processing-input-tile\">";
+      var html="<span class=\"c4i-processing-input-tile\" name=\""+inputname+"\">";
       html+="<span class=\"c4i-processing-input-tile-span\"><span class=\"c4i-processing-input-tile-title\">"+title+"</span> <span class=\"c4i-processing-input-tile-identifier\">("+inputname+")</span>";
-      html+="<span class=\"c4i-processing-input-tile-cardinality\">min:"+minOccurs+" / max: "+maxOccurs+"</span>";
+      html+="<span class=\"c4i-processing-input-tile-cardinality\" name="+minOccurs+","+maxOccurs+">min:"+minOccurs+" / max: "+maxOccurs+"</span>";
       html+="</span>";
       if(DataInput.Abstract && isDefined(DataInput.Abstract.value)){
         myabstract = DataInput.Abstract.value;
@@ -684,8 +845,8 @@ var C4IProcessingInterface = function(options){
 //        html+="<span class=\"c4i-processing-input-tile-defaultvalue\">"+defaulttext+"</span></span>";
 //      }
 //  
- 
-     
+      
+
 
       
       var hasBasket = checkifHasBasket(inputname,myabstract);
@@ -710,29 +871,41 @@ var C4IProcessingInterface = function(options){
             var value = values[keys[i]].value;
             var selected = "";
             if(value == defaulttext)selected="selected";
-            html+="<option value=\""+value+"\" "+selected+" >"+value+"</option>";
+            html+="<option value=\""+value+"\" "+selected+" >"+getInputNameMapping(inputname,value)+"</option>";
           }
           html+="</select>";
           html+="</span>";
         }else{
           var defaulttexts = defaulttext.split(",");
           for(var i=0;i<defaulttexts.length;i++){
-            html+=createLiteralInput(inputname,defaulttexts[i],hasBasket,minOccurs!=0);
+            html+=createLiteralInput(inputname,defaulttexts[i],hasBasket,true);
           }
           
         }
         html+="</span>";
       }
             
-      if(maxOccurs>1){
-        html+="<span class=\"c4i-processing-input-moreless\"></button><button class=\"c4i-processing-input-moreless-buttonremoveall\"></button><button class=\"c4i-processing-input-moreless-buttonplus\"></button></span>";
+      //if(counter<maxOccurs)
+      {
+        html+="<span class=\"c4i-processing-input-moreless\"></button>"+
+          //"<button class=\"c4i-processing-input-moreless-buttonremoveall\">"+
+          "</button><button class=\"c4i-processing-input-moreless-buttonplus\"></button></span>";
       }
   
-
+      if(inputname.indexOf("~")!=-1){
+        var inputatype = inputname.split("~")[0].split("_")[0]; 
+        var inputaname = inputname.split("~")[0].split("_")[1];
+        var inputb = inputname.split("~")[1];
+        html+="<span class=\"c4i-processing-input-tile-linkmetadata-span\">";
+        html+="<button class=\"c4i-processing-input-tile-linkmetadata\" name=\""+inputname+"\">Show options based on "+inputb+"</button>";
+        html+="<span class=\"c4i-processing-input-tile-linkmetadata-info\"></span>";
+        html+="</span>";
+      }
       html+="</span>";
       
       html+="</span>";
-     
+
+      
       return html
     };
     

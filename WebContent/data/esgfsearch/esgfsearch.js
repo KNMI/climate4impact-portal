@@ -109,12 +109,15 @@ var SearchInterface = function(options){
       "data_node": "Generally not relevant, but for large downloads you may wish to choose the one closest to you",
       "time_frequency": "Frequency at which model data are archived (is not equal to model time step). Note that for some (high) frequencies instantaneous model states are stored, generally for daily and longer periods average states over that period are stored. See respective netcdf metadata for exact details."
  };
-  
-  var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
-  query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
-  if (query.length==0) {
-	  query="clear=onload";
+  var query = options.query;
+  if(query == null){
+    var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
+    query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+    if (query.length==0) {
+      query="clear=onload";
+    }
   }
+  query= query.replace("#","");
   query = query.replaceAll("&amp;","&");
  //query="variable=tas";
   var currentFacetList = undefined;
@@ -221,11 +224,7 @@ var SearchInterface = function(options){
     '  </div>'+
     ''+
     '</div>');
-    
-    if(options.query){
-      query = options.query;
-    }
-    
+
     if(options.service){
       impactESGFSearchEndPoint = options.service;
     }
@@ -244,20 +243,20 @@ var SearchInterface = function(options){
     }).click(function(){
       userHasSignedInOrOut();
       return;
-      var el = jQuery('<div title="Search help" class="headerhelpdiv"></div>', {}).dialog({
-        width:800,
-        height:400,
-        modal:true
-      });
-      el.html('<div class="c4i-esgfsearch-loader"></div>');
-      var helpReturned = function(data){
-        el.html(data);    
-      }
-      $.ajax({
-        url: "esgfsearch/esgfsearchhelp.html"     
-      }).done(function(d) {
-        helpReturned(d)
-      })
+//      var el = jQuery('<div title="Search help" class="headerhelpdiv"></div>', {}).dialog({
+//        width:800,
+//        height:400,
+//        modal:true
+//      });
+//      el.html('<div class="c4i-esgfsearch-loader"></div>');
+//      var helpReturned = function(data){
+//        el.html(data);    
+//      }
+//      $.ajax({
+//        url: "esgfsearch/esgfsearchhelp.html"     
+//      }).done(function(d) {
+//        helpReturned(d)
+//      })
     });
     
 //    $(".c4i-esgfsearch-clear").attr('onclick','').click(function(t){

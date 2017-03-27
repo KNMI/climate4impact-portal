@@ -62,7 +62,7 @@ public class FileUploadHandler extends HttpServlet {
       Debug.println("Start upload for user "+user.getUserId());
       
       long BASKET_UPLOAD_MAX_FILE_SIZE = 100000000;
-      String [] allowedExtensions = {".nc",".shp",".sbx",".shx",".dbf",".sbn",".xml",".prj",".csv",".h5",".json",".geojson"};
+      String [] allowedExtensions = {".nc",".shp",".sbx",".shx",".dbf",".sbn",".xml",".prj",".csv",".h5",".json",".geojson",".png",".txt"};
       
       //request.get
       String UPLOAD_DIRECTORY = null;

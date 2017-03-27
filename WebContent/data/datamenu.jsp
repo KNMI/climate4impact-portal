@@ -50,7 +50,8 @@
 		//out.print(header); //returns file name and path
 		%>
 
-  <ul style="height:20px;">
+  <ul>
+  <li class="impacttopmenu-firstli"></li>
   <!-- 	<li <% if(highLightHome)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Overview</a></li>-->
   <!-- >li <% if(highLightBasicSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/basicsearch.jsp" >Search</a></li>-->
   <li <% if(highLightESGFSearch)out.print("class=\"sel\""); %>><a href="<%=Home%>data/esgfsearch.jsp" >Search</a></li>

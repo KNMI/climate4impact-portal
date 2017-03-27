@@ -22,10 +22,10 @@
     <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch-propertychoosers.js"></script>
     <script type="text/javascript" src="/impactportal/data/esgfsearch/esgfsearch.js"></script>
     <link rel="stylesheet"        href="/impactportal/data/esgfsearch/esgfsearch.css" />
-      <link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
+    <link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
-    
-          <script type="text/javascript" src="/impactportal/data/c4i-processing/c4i-processing.js"></script>
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
+    <script type="text/javascript" src="/impactportal/data/c4i-processing/c4i-processing.js"></script>
     <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSProcessing.js"></script> 
     <script type="text/javascript" src="/impactportal/data/c4i-processing/WMJSTimer.js"></script> 
     <link rel="stylesheet" href="/impactportal/data/c4i-processing/c4i-processing.css" />
@@ -131,8 +131,9 @@
                 identifier:found.wpsid,
                 inputdata:found.wpspostdata,
                 statuslocation:found.statuslocation,
-                adagucservice:"http://climate4impact.eu/impactportal/adagucserver?",
-                adagucviewer:"http://climate4impact.eu//impactportal/adagucviewer/",
+                adagucservice:"/impactportal/adagucserver?",
+                adagucviewer:"/impactportal/adagucviewer/",
+                adagucviewerservice:"/impactportal/AdagucViewer?",
                 dialog:true
               }
             );

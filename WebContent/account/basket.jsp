@@ -26,6 +26,7 @@
    	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/esgfsearch.css" />
 	<link rel="stylesheet"        href="/impactportal/data/esgfsearch/simplecomponent.css" />
     <link rel="stylesheet"        href="/impactportal/data/fileviewer/fileviewer.css"></link>
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
     
 	
     <script type="text/javascript" src="/impactportal/account/js/login.js"></script>

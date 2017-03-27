@@ -62,6 +62,8 @@
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
     <link rel="stylesheet" href="esgfsearch/simplecomponent.css" />
     
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
+    
     <script type="text/javascript">
 
 

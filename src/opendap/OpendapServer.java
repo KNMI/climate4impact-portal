@@ -2,6 +2,7 @@ package opendap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,9 +15,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 
 import tools.DateFunctions;
 import tools.Debug;
+import tools.HTTPTools;
+import tools.JSONResponse;
 import tools.Tools;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
@@ -25,6 +31,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Tiny OpenDAP server used for the basket from climate4impact
@@ -80,7 +87,7 @@ public class OpendapServer {
         ncFile = getNetCDFFile(localNetCDFFileLocation);
         response.getOutputStream().write(getDatasetDDSFromNetCDFFile(ncFile,baseName,URLDecoder.decode(queryString,"UTF-8"),true));
       }else {
-        streamFileToClient(response,localNetCDFFileLocation);
+        streamFileToClient(request,response,localNetCDFFileLocation);
       }
 
     } catch (IOException ioe) {
@@ -644,8 +651,64 @@ public class OpendapServer {
 
   
   
-  private static void streamFileToClient(HttpServletResponse response,String filename) throws IOException {
+  private static void streamFileToClient(HttpServletRequest request, HttpServletResponse response,String filename) throws IOException {
     Debug.println("Streaming file "+filename);
+    
+    /* Check if JSON */
+    
+    String format = HTTPTools.getHTTPParamNoExceptionButNull(request, "format");
+    
+    if(format != null && format.equals("application/json")){
+      Debug.println("Streaming to JSON");
+      JSONResponse jsonResponse = new JSONResponse(request);
+      try{
+        File input = new File(filename);
+        if(input!=null){
+          if(input.length() > 10000000){
+            throw new Exception("File to big for JSON");
+          }
+          try {
+            String contents = FileUtils.readFileToString(input, "UTF-8");
+            
+            if(filename.toLowerCase().endsWith(".csv")){
+              JSONArray CSV = new JSONArray();
+              String [] lines = contents.split("\n");
+              String [] headers = lines[0].split(";");
+              for(int j=1;j<lines.length;j++){
+                String [] cols = lines[j].split(";");
+                JSONObject line = new JSONObject();
+                for(int c=0;c<cols.length;c++){
+                  if(c<headers.length){
+                    line.put(headers[c], cols[c]);
+                  }
+                }
+                CSV.put(line);
+              }
+              
+              jsonResponse.setMessage(CSV);
+            }else{
+              jsonResponse.setMessage(new JSONObject().put("data", contents));
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+            response.setStatus(404);
+            jsonResponse.setErrorMessage("Unable to stream file (404) ",404);
+          }
+        }
+      } catch(Exception e){
+        e.printStackTrace();
+        jsonResponse.setException("Unable to stream file",e);
+      }
+      
+      try {
+        jsonResponse.print(response);
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
+      return;
+    }
+
+    
     ServletOutputStream outputStream = response.getOutputStream();
     FileInputStream input = null;
     try{

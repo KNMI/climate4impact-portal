@@ -8,6 +8,7 @@
     <script type="text/javascript" src="fileviewer/vkbeautify.js"></script>
     <script type="text/javascript" src="fileviewer/fileviewer.js"></script>
     <link rel="stylesheet" href="fileviewer/fileviewer.css" />
+    <jsp:include page="../includes-adaguc-webmapjs.jsp" />
     <script type="text/javascript" src="esgfsearch/property_descriptions.js"></script>
     <script type="text/javascript" src="esgfsearch/esgfsearch-propertychooserconf.js"></script>
     <script type="text/javascript" src="esgfsearch/esgfsearch-propertychoosers.js"></script>
