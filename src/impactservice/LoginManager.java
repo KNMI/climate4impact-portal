@@ -162,6 +162,14 @@ public class LoginManager {
       Debug.println("Setting username to " + userName + ":"
           + Configuration.LoginConfig.getMyProxyDefaultPassword());
 
+      
+      
+      String identAuth = Configuration.LoginConfig.getMyProxyServerIdendityAuthorization();
+      if(identAuth != null){
+        Debug.println("Setting myproxy identity authorization to " + identAuth);
+        myProxy.setAuthorization(new org.globus.gsi.gssapi.auth.IdentityAuthorization(identAuth));
+      }
+
       ExtendedGSSCredential cred = (ExtendedGSSCredential) myProxy.get(
           userName, Configuration.LoginConfig.getMyProxyDefaultPassword(),
           60 * 60 * 24 * 7);
