@@ -298,6 +298,7 @@ public class Configuration {
   public static class LoginConfig{
     
     private static String myProxyServerHost = "<proxyhost>";
+    private static String myProxyServerIdendityAuthorization = "/O=Grid/OU=Globus/OU=climate4impact.eu/CN=host/climate4impact.eu";
     private static int myProxyServerPort = 7512;
     private static String trustStoreFile = null;
     private static String trustStorePassword= null;
@@ -309,6 +310,7 @@ public class Configuration {
     private static String myProxyDefaultUserName = null;
     public static void doConfig(XMLElement  configReader){
       myProxyServerHost=configReader.getNodeValue("impactportal.loginconfig.myproxyserverhost");
+      myProxyServerIdendityAuthorization=configReader.getNodeValue("impactportal.loginconfig.myproxyserveridentityauthorization");
       myProxyServerPort=Integer.parseInt(configReader.getNodeValue("impactportal.loginconfig.myproxyserverport"));
       trustStoreFile=configReader.getNodeValue("impactportal.loginconfig.truststorefile");
       trustStorePassword=configReader.getNodeValue("impactportal.loginconfig.truststorepassword");
@@ -323,6 +325,7 @@ public class Configuration {
     }
     
     public static String getMyProxyServerHost(){readConfig();return myProxyServerHost;}
+    public static String getMyProxyServerIdendityAuthorization(){readConfig();return myProxyServerIdendityAuthorization;}
     public static int getMyProxyServerPort(){readConfig();return myProxyServerPort;}
     public static String getTrustStoreFile(){readConfig();return trustStoreFile;}
     public static String getTrustStorePassword(){readConfig();return trustStorePassword;}
