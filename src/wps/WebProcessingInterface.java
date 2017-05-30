@@ -51,12 +51,12 @@ public class WebProcessingInterface {
   private static String getWPSURL() {
     //return WPSURL;
     //return "http://mouflon.dkrz.de/wps?";
-    return "https://compute-test.c3s-magic.eu:9000/wps?";
-    //return Configuration.getHomeURLHTTPS()+"/WPS?";
+    //return "https://compute-test.c3s-magic.eu:9000/wps?";
+    return Configuration.getHomeURLHTTPS()+"/WPS?";
   }
   
   private static boolean isLocal(){
-    return false;
+    return true;
   }
   
   
