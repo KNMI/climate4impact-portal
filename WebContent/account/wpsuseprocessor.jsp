@@ -8,11 +8,20 @@
   
   <%
     	String processorId = null;
+  		String wpsEndpoint = Configuration.getHomeURLHTTPS() + "/WPS?";
   		try{
   			processorId = HTTPTools.getHTTPParam(request, "processor");
   		}catch(Exception e){
-  			processorId = null;
   		}
+  		try{
+  			wpsEndpoint = HTTPTools.getHTTPParam(request, "service");
+  		}catch(Exception e){
+  		}
+  		
+  		if(wpsEndpoint.endsWith("&") == false && wpsEndpoint.endsWith("?") == false){
+  			wpsEndpoint += "?";
+  		}
+  		
       	ImpactUser user = null;
     	try{
     		user = LoginManager.getUser(request);
@@ -59,7 +68,7 @@
       renderProcessingInterface(
         {
           element:$('#content2'),
-          wpsservice:'<%=Configuration.getHomeURLHTTPS()%>/WPS?',
+          wpsservice:'<%=wpsEndpoint%>',
           identifier:'<%=processorId%>',
           adagucservice:c4iconfigjs.adagucservice,
           adagucviewer:c4iconfigjs.adagucviewer,
