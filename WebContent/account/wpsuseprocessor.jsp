@@ -15,6 +15,7 @@
   		}
   		try{
   			wpsEndpoint = HTTPTools.getHTTPParam(request, "service");
+  			Debug.println("wpsEndpoint = "+wpsEndpoint);
   		}catch(Exception e){
   		}
   		
