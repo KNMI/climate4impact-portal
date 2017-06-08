@@ -15,29 +15,7 @@
     	if(user!=null){
     %>
     
-    <script type="text/javascript" src="../js/components/processors/wpsOverview.js"></script>
-    
-    <script type="text/javascript">
-    Ext.Loader.setConfig({
-      enabled: true
-  });
-
-  Ext.QuickTips.init();
-  jQuery(document).ready(function($) {
-    Ext.onReady(function(){
-      var wpsOverViewItems = wpsOverView();
-    	var container = Ext.create('Ext.container.Container', {
- 	        layout: 'fit',
- 			renderTo:'container',
- 		   	//minHeight:500,
- 		    scripts:true,
- 		    autoScroll:false, 
- 		    items:[wpsOverViewItems]
-    	});
-    });
-  });
-    </script>
-    <% } %>
+      <% } %>
      <script type="text/javascript">
     jQuery(document).ready(function($) {
 	    $(".clickable-row").click(function() {
@@ -71,6 +49,7 @@
 		%>
 			<h1>Processing wizards</h1>
 			<!-- <a href="/impactportal/account/logout.jsp?redirect=%2Fimpactportal%2Faccount%2Fprocessing.jsp%23">logout</a>-->
+			
 			<p>Choose a wizard to help you guide through processing, analysis and data extraction options.</p>
 			<div class="drupal">
 			<table class="drupal"><tr><th>Name</th><th>Description</th></tr>
@@ -84,10 +63,8 @@
 			</table>
 			</div>
 		
-			<h1>Web Processing Services</h1>
-			<p>Web processing services are processing services are used by the wizard but can be controlled manually.</p>
-			<div id="container"></div>
-		
+		<p>
+		<a href="wpsclient.jsp">WPSClient</a></p>
 		<%} %>
 	
 		</div>
