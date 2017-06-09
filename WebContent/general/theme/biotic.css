@@ -1,0 +1,28 @@
+.sticky-header {
+    top:0;
+}
+
+.sticky {
+    position: fixed;
+    top:0; left:0;
+    width: 100%;
+    z-index: 10;
+}
+
+.admin-menu .sticky {
+    position: fixed;
+    top:28px; 
+    left:0;
+    width: 100%;
+    z-index: 10;
+}
+
+*[data-animation] {
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+    opacity: 0;
+}
+
+*[data-animation].animated {
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+    opacity: 1;
+}
