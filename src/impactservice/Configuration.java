@@ -8,7 +8,16 @@ import tools.MyXMLParser.XMLElement;
 
 public class Configuration {
 
-
+  static String portalMode = "c4i";
+  public static String getPortalMode(){
+    Debug.println("portalModea = [" + portalMode+"]");
+    
+    readConfig();
+    Debug.println("portalMode = [" + portalMode+"]");
+    //portalMode = "c3s-magic";
+    return portalMode;//"c3s-magic";//c4i
+  }
+  
   static long readConfigPolInterval = 0;;
   
   private static String impactWorkspace=null;//"/home/visadm/impactspace/";
@@ -70,7 +79,10 @@ public class Configuration {
     }
 
     impactWorkspace=configReader.getNodeValue("impactportal.impactworkspace");
-    
+    String _portalMode = configReader.getNodeValue("impactportal.portalmode");
+    if(_portalMode!=null){
+      portalMode=_portalMode;
+    }
     GlobalConfig.doConfig(configReader);
     DrupalConfig.doConfig(configReader);
     VercSearchConfig.doConfig(configReader);

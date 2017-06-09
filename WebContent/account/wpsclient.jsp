@@ -15,9 +15,11 @@
 
 		String wpsServices[] = Configuration.WPSServicesConfig.getWPSServices();
 		out.print("<script type=\"text/javascript\">var otherURLs = [");
-		for(int j=0;j<wpsServices.length;j++){
-			if(j>0)out.println(",");
-			out.print(wpsServices[j]);
+		if(wpsServices!=null){
+			for(int j=0;j<wpsServices.length;j++){
+				if(j>0)out.println(",");
+				out.print(wpsServices[j]);
+			}
 		}
 		out.print("];</script>");
 
