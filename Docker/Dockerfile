@@ -96,7 +96,7 @@ RUN cp bin/* /usr/bin/
 
 # install impact portal
 WORKDIR /src
-RUN curl -L https://github.com/KNMI/climate4impact-portal/archive/master.tar.gz > climate4impact.tar.gz
+RUN curl -L https://github.com/c3s-magic/climate4impact-portal/archive/master.tar.gz > climate4impact.tar.gz
 RUN tar xvf climate4impact.tar.gz
 WORKDIR /src/climate4impact-portal-master
 ENV TOMCAT_LIBS=/usr/share/java/tomcat
