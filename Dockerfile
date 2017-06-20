@@ -126,7 +126,7 @@ RUN mv esg_trusted_certificates certificates
 # configure server
 RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
 RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
-RUN cp /src/climate4impact-portal-master/impactportal.war /usr/share/tomcat/webapps/
+RUN cp /src/climate4impact-portal/impactportal.war /usr/share/tomcat/webapps/
 ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 # TODO check why this is needed
