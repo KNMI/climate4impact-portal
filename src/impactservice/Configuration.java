@@ -8,7 +8,16 @@ import tools.MyXMLParser.XMLElement;
 
 public class Configuration {
 
-
+  static String portalMode = "c4i";
+  public static String getPortalMode(){
+    Debug.println("portalModea = [" + portalMode+"]");
+    
+    readConfig();
+    Debug.println("portalMode = [" + portalMode+"]");
+    //portalMode = "c3s-magic";
+    return portalMode;//"c3s-magic";//c4i
+  }
+  
   static long readConfigPolInterval = 0;;
   
   private static String impactWorkspace=null;//"/home/visadm/impactspace/";
@@ -70,7 +79,10 @@ public class Configuration {
     }
 
     impactWorkspace=configReader.getNodeValue("impactportal.impactworkspace");
-    
+    String _portalMode = configReader.getNodeValue("impactportal.portalmode");
+    if(_portalMode!=null){
+      portalMode=_portalMode;
+    }
     GlobalConfig.doConfig(configReader);
     DrupalConfig.doConfig(configReader);
     VercSearchConfig.doConfig(configReader);
@@ -79,6 +91,7 @@ public class Configuration {
     Admin.doConfig(configReader);
     ADAGUCServerConfig.doConfig(configReader);
     PyWPSServerConfig.doConfig(configReader);
+    WPSServicesConfig.doConfig(configReader);
     DownloadScriptConfig.doConfig(configReader);
     Oauth2Config.doConfig(configReader);
     DownscalingConfig.doConfig(configReader);
@@ -375,6 +388,17 @@ public class Configuration {
     public static String[] getADAGUCEnvironment() {
       readConfig();
       return environmentVariables;
+    }
+  }
+  
+  public static class WPSServicesConfig{
+    private static String[] wpsservices = { };
+    public static void doConfig(XMLElement  configReader){
+      wpsservices = configReader.getNodeValues("impactportal.wpsservices.url");
+    }
+    public static String[] getWPSServices() {
+      readConfig();
+      return wpsservices;
     }
   }
   

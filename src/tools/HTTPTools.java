@@ -193,7 +193,7 @@ public class HTTPTools extends HttpServlet {
       throws WebRequestBadStatusException, IOException, SSLPeerUnverifiedException, SSLException {
    // Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
     //Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
-    String connectToURL = makeCleanURL(url);
+    String connectToURL = url;//makeCleanURL(url);
  //   Debug.println("  Making GET: " + connectToURL);
     if (pemFile != null) {
       Debug.println("  Using private key: " + pemFile);
