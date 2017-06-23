@@ -300,6 +300,7 @@ public class LoginManager {
     /*Trying to get user info from X509 cert*/
     String CertOpenIdIdentifier = null;
     if (id == null) {
+      Debug.println("Trying to retrieve username from cert");
       String uniqueId = null;
       
       // org.apache.catalina.authenticator.SSLAuthenticator
@@ -319,6 +320,8 @@ public class LoginManager {
                 + CNIndex);
           }
         }
+      }else{
+        Debug.println("No cert provided");
       }
 
       
