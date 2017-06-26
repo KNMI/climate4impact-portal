@@ -665,7 +665,7 @@ var C4IProcessingInterface = function(options){
         html+="<td class=\"c4i-processing-report-table-noborder\"><button class=\"c4i-processing-report-table-value-viewablebutton\">Show</button></td></tr></table></td>";
       } else{
     	if(mimeType && mimeType=='image/png'){
-    		html+="<td class=\"c4i-processing-report-table-value\"><img src=\"data:image/png;base64, " +value+ "\" alt=\"Image\" /></td>";
+    		html+="<td class=\"c4i-processing-report-table-value\"><img class=\"c4i-processing-previewstyle\" src=\"data:image/png;base64, " +value+ "\" alt=\"Image\" /></td>";
     	}else{
     		html+="<td class=\"c4i-processing-report-table-value\">"+htmlEncode(value)+"</td>";
     	}

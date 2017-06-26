@@ -310,3 +310,9 @@ background:none !important;
 	overflow:scroll;
 	max-height:200px;
 }
+
+.c4i-processing-previewstyle {
+    vertical-align: middle;
+    max-height: 500px;
+    display: inline;
+}
