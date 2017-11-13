@@ -10,10 +10,10 @@ public class Configuration {
 
   static String portalMode = "c4i";
   public static String getPortalMode(){
-    Debug.println("portalModea = [" + portalMode+"]");
+    // Debug.println("portalModea = [" + portalMode+"]");
     
     readConfig();
-    Debug.println("portalMode = [" + portalMode+"]");
+    // Debug.println("portalMode = [" + portalMode+"]");
     //portalMode = "c3s-magic";
     return portalMode;//"c3s-magic";//c4i
   }
