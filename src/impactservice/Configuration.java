@@ -10,9 +10,7 @@ public class Configuration {
 
   static String portalMode = "c4i";
   public static String getPortalMode(){
-    
     readConfig();
-    //portalMode = "c3s-magic";
     return portalMode;//"c3s-magic";//c4i
   }
   
