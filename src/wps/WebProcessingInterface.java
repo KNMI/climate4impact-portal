@@ -19,6 +19,7 @@ import impactservice.ImpactUser;
 
 
 
+
 import javax.net.ssl.SSLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import tools.Debug;
+import tools.HTTPTools;
 import tools.MyXMLParser;
 import tools.Tools;
 import tools.MyXMLParser.Options;
@@ -49,6 +51,7 @@ public class WebProcessingInterface {
   private static String getWPSURL() {
     //return WPSURL;
     //return "http://mouflon.dkrz.de/wps?";
+    //return "https://compute-test.c3s-magic.eu:9000/wps?";
     return Configuration.getHomeURLHTTPS()+"/WPS?";
   }
   
@@ -86,7 +89,30 @@ public class WebProcessingInterface {
 
 	};
 	public static Vector<ProcessorDescriptor> getAvailableProcesses(HttpServletRequest request) {
-		
+	  boolean localWPS = isLocal();
+	  String WPSService = getWPSURL();
+
+	  try {
+		  String kvpWPSService = HTTPTools.getHTTPParam(request, "wpsservice");
+		  Debug.println("Found ["+kvpWPSService+"]");
+		  if(kvpWPSService!=null){
+		    if(WPSService.equals(kvpWPSService)== false){
+          Debug.println("replacing local WPS with ["+WPSService+"]" );
+
+		      WPSService = kvpWPSService;
+		      
+		      Debug.println("running remote WPS ["+WPSService+"]" );
+	        localWPS = false;
+		    }
+		  }
+		  
+		} catch (Exception e1) {
+      
+    }
+	  if(localWPS){
+	    Debug.println("running local WPS ["+WPSService+"]" );
+      
+	  }
 		Vector <ProcessorDescriptor> processorList = null;
 		//if(processorList==null){
 			processorList= new Vector<ProcessorDescriptor>() ;
@@ -97,12 +123,18 @@ public class WebProcessingInterface {
 				
 			
 		   
-		    if(isLocal() == false){
-		      getCapabilitiesTree.parse(new URL(getWPSURL()+getcaprequest));
+		    if(localWPS == false){
+		      String data = HTTPTools.makeHTTPGetRequestX509ClientAuthentication(
+		          WPSService+getcaprequest, 
+		          LoginManager.getUser(request).certificateFile, 
+		          Configuration.LoginConfig.getTrustStoreFile(), 
+		          Configuration.LoginConfig.getTrustStorePassword(), 
+		          100000);
+		      getCapabilitiesTree.parseString(data);//(new URL(WPSService+getcaprequest));
 		  
 		    }
 		    
-		    if(isLocal() == true){
+		    if(localWPS == true){
   				ByteArrayOutputStream stringOutputStream = new ByteArrayOutputStream();
   	      PyWPSServer.runPyWPS(request, null, stringOutputStream, getcaprequest, null);
   	      getCapabilitiesTree.parseString(stringOutputStream.toString());

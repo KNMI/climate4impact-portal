@@ -1,6 +1,7 @@
 package ogcservices;
 
 
+import impactservice.Configuration;
 import impactservice.GenericCart;
 import impactservice.LoginManager;
 
@@ -307,9 +308,23 @@ public class AdagucViewer extends HttpServlet {
 
 
       }else{
-        //Remote XML2JSON request to external WMS service
-        Debug.println("Converting XML to JSON for "+requestStr);
-        rootElement.parse(new URL(requestStr));
+        if(LoginManager.getUser(request)!=null){
+          Debug.println("Converting auth XML to JSON for "+requestStr);
+          String data = HTTPTools.makeHTTPGetRequestX509ClientAuthentication(
+              requestStr, 
+              LoginManager.getUser(request).certificateFile, 
+              Configuration.LoginConfig.getTrustStoreFile(), 
+              Configuration.LoginConfig.getTrustStorePassword(), 
+              100000);
+          rootElement.parseString(data);//(new URL(getWPSURL()+getcaprequest));
+          
+          Debug.println("[/"+requestStr+"]");
+          //Remote XML2JSON request to external WMS service
+          
+        }else{
+          Debug.println("Converting anon XML to JSON for "+requestStr);
+          rootElement.parse(new URL(requestStr));
+        }
       }
 
       response.setContentType("application/json");

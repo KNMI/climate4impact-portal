@@ -1,0 +1,117 @@
+
+nav .tb-menu {
+    /*border: 1px solid #222;*/
+    /*background-color: #111;*/
+    /*background-image: linear-gradient(#444, #111);*/
+    /*border-radius: 6px;*/
+    /*box-shadow: 0 1px 1px #777;*/
+}
+
+nav .tb-menu li {
+    /*border-right: 1px solid #222;*/
+    /*box-shadow: 1px 0 0 #444;*/
+}
+
+nav .tb-menu a:not(.btn) {
+    color: #FFF;
+    /*font-weight: normal;*/
+    /*text-shadow: 0 1px 0 #000;*/
+    transition: all .2s ease-in-out;
+}
+
+/*nav .tb-menu > li a.active,*/
+/*
+nav .tb-menu > li:hover a:not(.btn) {
+    background: #6D0D24;
+    color: #FFF !important;
+}
+*/
+
+nav .tb-menu > li:hover a:not(.btn) {
+    background: #6D0D24;
+    color: #FFF !important;
+}
+
+nav .tb-menu li:hover {
+    background: #AA1438;
+    color: #FFF !important;
+}
+
+
+nav .tb-menu li:hover > a:not(.btn) {
+    /*color: #fafafa;*/
+}
+
+*html nav .tb-menu li a:not(.btn):hover { /* IE6 only */
+    /*color: #fafafa;*/
+}
+
+/*  Sub-menu */
+nav .tb-menu ul {
+    background: #6D0D24;
+    /*
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.22);
+    border-radius: 3px;*/
+    transition: all .2s ease-in-out;
+    font-size: 0.85em;
+    font-size: 12px;
+}
+
+nav .tb-menu ul ul {
+    background: #6D0D24;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.22);
+
+    /*box-shadow: -1px 0 0 rgba(255,255,255,.3);      */
+}
+
+nav .tb-menu ul li {
+    /*box-shadow: 0 1px 0 #111, 0 2px 0 #666;
+    box-shadow: 0 1px 0 #F1F1F1, 0 2px 0 #F1F1F1;*/
+    color #FFF;
+}
+
+nav .tb-menu ul li a {
+    font-size: 14px;
+}
+
+nav .tb-menu ul li .nolink span {color: #FFF !important;font-size: 14px;}
+
+nav .tb-menu ul a:not(.btn) {
+    color: #444;
+    font-weight: normal;
+    /* border-top: 1px solid #eeeeee;*/
+}
+
+nav .tb-menu ul a:not(.btn):hover {
+    /*background-color: #019cde;*/
+    background-color: #AA1438;
+    color: #FFFFFF !important;
+    /*background-image: linear-gradient(#04acec, #0186ba);*/
+}
+
+/*nav .tb-menu ul li:first-child > a:after {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
+
+nav .tb-menu ul ul li:first-child a:after {
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+    border-right: 6px solid #3b3b3b;
+}
+
+nav .tb-menu ul li:first-child a:hover:after {
+    border-bottom-color: #04acec;
+}
+
+nav .tb-menu ul ul li:first-child a:hover:after {
+    border-right-color: #0299d3;
+    border-bottom-color: transparent;
+}*/
+
+nav .tb-menu a:hover {
+    background-color: #AA1438;
+    color: #000 !important;
+    display: block;
+}
+

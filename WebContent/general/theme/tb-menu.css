@@ -1,0 +1,148 @@
+/**
+ *
+ * Css3 Animated Dropdown Menu
+ *
+ * http://red-team-design.com/css3-animated-dropdown-menu/
+ */
+
+nav .tb-menu , nav .tb-menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav .tb-menu:before,
+nav .tb-menu:after {
+    content: "";
+    display: table;
+}
+
+nav .tb-menu:after {
+    clear: both;
+}
+
+nav .tb-menu  {
+    zoom:1;
+}
+
+nav .tb-menu li {
+    float: left;
+    /*border-right: 1px solid #222;*/
+    /*box-shadow: 1px 0 0 #444;*/
+    position: relative;
+}
+
+nav .tb-menu a {
+    float: left;
+    padding: 12px 20px;
+    /*text-transform: uppercase;*/
+    /*font: bold 12px Arial, Helvetica;*/
+    text-decoration: none;
+    /*color: #999;*/
+    /*text-shadow: 0 1px 0 #000;*/
+    /*border-bottom: solid 3px #00ebbe;*/
+
+}
+
+/*nav .tb-menu a span {
+    padding-right: 10px;
+}*/
+
+nav .tb-menu li:hover > a {
+    /*color: #fafafa;*/
+}
+
+nav .tb-menu ul {
+    margin: 20px 0 0 0;
+    _margin: 0; /*IE6 only*/
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    top: 48px;
+    left: 0;
+    z-index: 1;
+
+/*    background: #444;
+    background: linear-gradient(#444, #111);
+    box-shadow: 0 -1px 0 rgba(255,255,255,.3);
+    border-radius: 3px;
+    transition: all .2s ease-in-out;*/
+}
+
+nav .tb-menu li:hover > ul {
+    opacity: 1;
+    visibility: visible;
+    margin: 0;
+}
+
+nav .tb-menu ul ul {
+    top: 0;
+    left: 250px;
+    margin: 0 0 0 20px;
+    _margin: 0; /*IE6 only*/
+    /*box-shadow: -1px 0 0 rgba(255,255,255,.3);      */
+}
+
+nav .tb-menu .nav-shift ul {
+    left: -250px;
+    top: 0px;
+}
+
+nav .tb-menu ul li {
+    float: none;
+    display: block;
+    border: 0;
+    _line-height: 0; /*IE6 only*/
+    /*box-shadow: 0 1px 0 #111, 0 2px 0 #666;*/
+}
+
+nav .tb-menu ul li:last-child {
+    box-shadow: none;
+}
+
+nav .tb-menu ul a {
+    padding: 5px 15px;
+    width: 250px;
+    _height: 10px; /*IE6 only*/
+    display: block;
+    white-space: nowrap;
+    float: none;
+    text-transform: none;
+}
+
+nav .tb-menu ul li:first-child > a {
+    /*border-radius: 3px 3px 0 0;*/
+}
+
+nav .tb-menu ul li:first-child > a:after {
+    content: '';
+    position: absolute;
+    left: 40px;
+    top: -6px;
+/*    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #444;*/
+}
+
+nav .tb-menu ul ul li:first-child a:after {
+    left: -6px;
+    top: 50%;
+    margin-top: -6px;
+    border-left: 0;
+/*    border-bottom: 6px solid transparent;
+    border-top: 6px solid transparent;
+    border-right: 6px solid #3b3b3b;*/
+}
+
+nav .tb-menu ul li:first-child a:hover:after {
+    /*border-bottom-color: #04acec; */
+}
+
+nav .tb-menu ul ul li:first-child a:hover:after {
+/*    border-right-color: #0299d3;
+    border-bottom-color: transparent;  */
+}
+
+nav .tb-menu ul li:last-child > a {
+    /*border-radius: 0 0 3px 3px;*/
+}
