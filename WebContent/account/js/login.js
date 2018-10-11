@@ -13,6 +13,15 @@
       	logocls:'logo_UK',
       	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
       	needsusername:false
+      },{
+          id:'CEDA2',
+      	name:'Sign in with BADC/CEDA OpenID'   ,
+      	openidprefix:'https://ceda.ac.uk/openid/',
+      	createaccount:'https://services.ceda.ac.uk/cedasite/register/info/',        
+      	accountinfo:'https://services.ceda.ac.uk/cedasite/register/info/',
+      	logocls:'logo_UK',
+      	logo:'/impactportal/images/this_is_NOT_the_BADC_logo.jpg',
+      	needsusername:false
       },
       {
           id:'SMHI-NSC-LIU',
