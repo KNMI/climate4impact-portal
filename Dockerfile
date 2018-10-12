@@ -1,5 +1,5 @@
-FROM centos:7
-
+FROM centos/devtoolset-7-toolchain-centos7:7
+USER root
 #TODO: put maintainer here
 #MAINTAINER Climate4Impact Team at KNMI <?@knmi.nl>
 
@@ -61,15 +61,19 @@ RUN conda update -y conda && conda install -y \
     pydotplus
 
 RUN pip install python-magic
+RUN pip install Cython
+RUN pip install netcdftime
+
+
 
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
 #RUN conda install icu
 RUN conda install icu=56.1 -y
 
 # install icclim (will be conda in the future)
-RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
-RUN tar xvf 4.2.5.tar.gz
-WORKDIR /src/icclim-4.2.5
+RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.11.tar.gz
+RUN tar xvf 4.2.11.tar.gz
+WORKDIR /src/icclim-4.2.11
 RUN gcc -fPIC -g -c -Wall ./icclim/libC.c -o ./icclim/libC.o
 RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 RUN python setup.py install
@@ -116,7 +120,7 @@ WORKDIR /src/wpsprocesses
 RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4impactwpsscripts.tar.gz
 RUN tar xvf climate4impactwpsscripts.tar.gz
 
-# Install certificates
+# Install certificates TODO will be done via VOLUME
 RUN  mkdir -p /root/.globus/
 WORKDIR /root/.globus/
 RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
