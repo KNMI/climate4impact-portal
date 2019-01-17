@@ -1,4 +1,12 @@
-FROM centos:7
+FROM centos/devtoolset-7-toolchain-centos7:7
+USER root
+#TODO: put maintainer here
+#MAINTAINER Climate4Impact Team at KNMI <?@knmi.nl>
+
+VOLUME /config
+VOLUME /data
+
+EXPOSE 443
 
 RUN yum update -y && yum install -y \
     epel-release
@@ -28,8 +36,6 @@ RUN yum update -y && yum install -y \
     tomcat \
     gdal-devel
 
-
-
 RUN mkdir /scr
 WORKDIR /src
 
@@ -55,15 +61,19 @@ RUN conda update -y conda && conda install -y \
     pydotplus
 
 RUN pip install python-magic
+RUN pip install Cython
+RUN pip install netcdftime
+
+
 
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
 #RUN conda install icu
 RUN conda install icu=56.1 -y
 
 # install icclim (will be conda in the future)
-RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
-RUN tar xvf 4.2.5.tar.gz
-WORKDIR /src/icclim-4.2.5
+RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.11.tar.gz
+RUN tar xvf 4.2.11.tar.gz
+WORKDIR /src/icclim-4.2.11
 RUN gcc -fPIC -g -c -Wall ./icclim/libC.c -o ./icclim/libC.o
 RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 RUN python setup.py install
@@ -88,7 +98,8 @@ RUN tar xvf pywps-3.2.5.tar.gz
 WORKDIR /src
 RUN curl -L  https://github.com/KNMI/adaguc-server/archive/master.tar.gz > adaguc-server.tar.gz
 RUN tar xvf adaguc-server.tar.gz
-WORKDIR /src/adaguc-server-master
+RUN mv /src/adaguc-server-master /src/adaguc-server
+WORKDIR /src/adaguc-server
 ENV ADAGUCCOMPONENTS="-DENABLE_CURL -DADAGUC_USE_POSTGRESQL -DADAGUC_USE_SQLITE -DADAGUC_USE_GDAL"
 RUN bash compile.sh
 # Copy adaguc binaries to /usr/bin
@@ -96,37 +107,31 @@ RUN cp bin/* /usr/bin/
 
 # install impact portal
 WORKDIR /src
-RUN curl -L https://github.com/KNMI/climate4impact-portal/archive/master.tar.gz > climate4impact.tar.gz
-RUN tar xvf climate4impact.tar.gz
-WORKDIR /src/climate4impact-portal-master
+COPY build.xml /src/climate4impact-portal/
+COPY src /src/climate4impact-portal/src/
+COPY WebContent /src/climate4impact-portal/WebContent/
+WORKDIR /src/climate4impact-portal
 ENV TOMCAT_LIBS=/usr/share/java/tomcat
 RUN ant
 
 # install impactportal wps scripts
-RUN mkdir /wpsprocesses
-RUN mkdir /wpsoutputs
-WORKDIR /wpsprocesses
+RUN mkdir /src/wpsprocesses
+WORKDIR /src/wpsprocesses
 RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4impactwpsscripts.tar.gz
 RUN tar xvf climate4impactwpsscripts.tar.gz
 
-# Install certificates
+# Install certificates TODO will be done via VOLUME
 RUN  mkdir -p /root/.globus/
 WORKDIR /root/.globus/
 RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
 RUN tar -xvf esg_trusted_certificates.tar
 RUN mv esg_trusted_certificates certificates
 
-
-# Create impactportal workspace 
-RUN mkdir -p /data/c4i/climate4impact-portal/impactspace
-
 # configure server
 RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
 RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
-RUN cp /src/climate4impact-portal-master/impactportal.war /usr/share/tomcat/webapps/
+RUN cp /src/climate4impact-portal/impactportal.war /usr/share/tomcat/webapps/
 ENV IMPACTPORTAL_CONFIG=/config/config.xml
-
-EXPOSE 443
 
 # TODO check why this is needed
 RUN conda install icu -y
@@ -137,12 +142,10 @@ RUN conda install icu -y
 #CMD c_rehash /root/.globus/certificates
 
 #CMD /bin/bash
-CMD /usr/libexec/tomcat/server start
+CMD mkdir -p /data/wpsoutputs && \
+    mkdir -p /data/c4i/climate4impact-portal/impactspace && \
+    /usr/libexec/tomcat/server start
 
-
-RUN mkdir -p /config
-RUN chmod 777 /config
-VOLUME /config
 #Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
 #This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
 #Visit https://192.168.99.100/impactportal/ to go to the portal

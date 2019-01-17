@@ -51,6 +51,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -538,11 +539,12 @@ public class HTTPTools extends HttpServlet {
     sslcontext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
         new java.security.SecureRandom());
     SSLSocketFactory socketFactory = new SSLSocketFactory(sslcontext);
-
+    //socketFactory.setHostnameVerifier(new AllowAllHostnameVerifier());
     Scheme sch = new Scheme("https", socketFactory, 443);
 
     DefaultHttpClient httpclient = new DefaultHttpClient();
     httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+
     Debug.println("x509 http client has been created");
     return httpclient;
   }
