@@ -1,6 +1,9 @@
 package impactservice;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
+
 
 import tools.Debug;
 import tools.MyXMLParser.XMLElement;
@@ -67,7 +70,34 @@ public class Configuration {
     Debug.println("Reading configfile "+getConfigFile());
     XMLElement configReader = new XMLElement();
     try {
-      configReader.parseFile(getConfigFile());
+      String configFile = tools.Tools.readFile(getConfigFile());
+      /* Replace ${ENV.} with environment variable */
+      Set<String> foundValues = new HashSet<String>();
+      int start = 0, end = 0, index = -1;
+      do{
+        index = configFile.substring(start).indexOf("{ENV.");
+        if(index>=0){
+          start += index;
+          end = configFile.substring(start).indexOf("}");
+          if(end >=0){
+            end+=(start+1);
+              foundValues.add(configFile.substring(start, end));
+            start=end;
+          }else{
+            start+=5; /* In case } is missing, jump 5 places forward */
+          }
+        }
+      }while(index !=-1);
+      for(String key : foundValues) {
+        String envKey = key.substring(5,key.length()-1);
+        String envValue = System.getenv(envKey);
+        if(envValue == null){
+          throw new Exception("Environment variable ["+envKey+"] not set");
+        }
+        configFile = configFile.replace(key,envValue);
+      }
+      
+      configReader.parseString(configFile);
     } catch (Exception e) {
       Debug.println("Unable to read "+getConfigFile());
       configReader = null;
