@@ -917,7 +917,12 @@ var FileViewerInterface = function(options){
     
     xml2jsonrequestURL = options.adagucviewerservice+'SERVICE=XML2JSON&';
     
-    var service = WMJSgetServiceFromStore(WMSGetCapabiltiesURL);
+    var service = null;
+    try{
+    	service = WMJSGetServiceFromStore(WMSGetCapabiltiesURL);
+    }catch(e){
+    	service = WMJSgetServiceFromStore(WMSGetCapabiltiesURL);
+    }
     
     service.getCapabilities(function(){
       service.getLayerNames(

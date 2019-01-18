@@ -62,8 +62,7 @@ RUN conda update -y conda && conda install -y \
 
 RUN pip install python-magic
 RUN pip install Cython
-RUN pip install netcdftime
-
+RUN pip install netcdf4==1.3.1
 
 
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
@@ -71,11 +70,12 @@ RUN pip install netcdftime
 RUN conda install icu=56.1 -y
 
 # install icclim (will be conda in the future)
-RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.11.tar.gz
-RUN tar xvf 4.2.11.tar.gz
-WORKDIR /src/icclim-4.2.11
+RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
+RUN tar xvf 4.2.5.tar.gz
+WORKDIR /src/icclim-4.2.5
 RUN gcc -fPIC -g -c -Wall ./icclim/libC.c -o ./icclim/libC.o
 RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
+
 RUN python setup.py install
 
 # install clipc combine toolkit
@@ -105,15 +105,6 @@ RUN bash compile.sh
 # Copy adaguc binaries to /usr/bin
 RUN cp bin/* /usr/bin/
 
-# install impact portal
-WORKDIR /src
-COPY build.xml /src/climate4impact-portal/
-COPY src /src/climate4impact-portal/src/
-COPY WebContent /src/climate4impact-portal/WebContent/
-WORKDIR /src/climate4impact-portal
-ENV TOMCAT_LIBS=/usr/share/java/tomcat
-RUN ant
-
 # install impactportal wps scripts
 RUN mkdir /src/wpsprocesses
 WORKDIR /src/wpsprocesses
@@ -127,24 +118,35 @@ RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/ce
 RUN tar -xvf esg_trusted_certificates.tar
 RUN mv esg_trusted_certificates certificates
 
+# TODO check why this is needed
+RUN conda install icu -y
+
+# install impact portal
+WORKDIR /src
+COPY build.xml /src/climate4impact-portal/
+COPY src /src/climate4impact-portal/src/
+COPY WebContent /src/climate4impact-portal/WebContent/
+WORKDIR /src/climate4impact-portal
+ENV TOMCAT_LIBS=/usr/share/java/tomcat
+RUN ant
+
 # configure server
-RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_oryg.xml
+RUN mv /usr/share/tomcat/conf/server.xml /usr/share/tomcat/conf/server_org.xml
 RUN ln -s /config/server.xml /usr/share/tomcat/conf/server.xml
 RUN cp /src/climate4impact-portal/impactportal.war /usr/share/tomcat/webapps/
 ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
-# TODO check why this is needed
-RUN conda install icu -y
 
 # Insert local instance trustroot into  truststore
 #CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
 #CMD keytool -import -v -trustcacerts -alias tomcat -file /root/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
 #CMD c_rehash /root/.globus/certificates
 
-#CMD /bin/bash
 CMD mkdir -p /data/wpsoutputs && \
     mkdir -p /data/c4i/climate4impact-portal/impactspace && \
+    sed -i "s|\${EXTERNAL_ADDRESS_HTTPS}|${EXTERNAL_ADDRESS_HTTPS}|g" /config/pywps.cfg && \
     /usr/libexec/tomcat/server start
+
 
 #Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
 #This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
