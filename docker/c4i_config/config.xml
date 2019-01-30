@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<impactportal>
+  <!--
+  Please note fill in all *** with your own ID and credentials  
+  -->
+  
+  
+  <!-- Offline mode assumes a default user, requires no login and does not attempt to load CMS pages, useful for developing -->
+  <offlinemode>true</offlinemode>
+  
+  <!-- This used ID is used during development in offline mode,for example when no internet access is available -->
+  <defaultuseropenid>https://pcmdi9.llnl.gov/esgf-idp/openid/c4m</defaultuseropenid>
+  
+  <!-- The hostname of the server, using http and https-->
+  <serverurl></serverurl>
+  <serverurlhttps>{ENV.EXTERNAL_ADDRESS_HTTPS}</serverurlhttps>
+  
+  <statlogfile>/var/log/oper-impactportal_statistics.log</statlogfile>
+  
+  <!-- Downscaling portal settings -->
+  <downscaling>
+    <credential>
+      <username>climate4impact</username>
+      <password>***</password>
+    </credential>
+    <token>
+      <path>/home/c4m/impactspace/downscaling</path>
+      <filename>downscaling.cred</filename>
+      <dateformat>dd-MM-yyyy HH:mm:ss z</dateformat>
+    </token>
+    <dpbaseurl>http://meteo.unican.es/dp/</dpbaseurl>
+    <dprestbaseurl>http://meteo.unican.es/dp/rest</dprestbaseurl>
+    <dpbasesearchresturl>https://esg-dn1.nsc.liu.se/esg-search/search?</dpbasesearchresturl>
+  </downscaling>
+  
+  
+  
+  <!-- The CMS Drupal to harvest pages from -->
+  <drupalconfig>
+    <drupalhost>http://drupal/</drupalhost>
+    <drupalbaseurl>/</drupalbaseurl>
+    <drupaldirectory>/</drupaldirectory>
+    <username>drupal</username>
+    <password>***</password>
+  </drupalconfig>
+  
+  <!-- The ESGF search API for searching through the ESGF -->
+  <searchconfig>
+    <esgfsearchurl>https://esg-dn1.nsc.liu.se/esg-search/search?</esgfsearchurl>
+  </searchconfig>
+  
+  <!-- Local workspace, user info is stored here -->
+  <impactworkspace>/data/c4i/climate4impact-portal/impactspace</impactworkspace>
+  
+  
+  <oauth2>
+    <provider name="ceda">
+      <authloc>https://slcs.ceda.ac.uk/oauth/authorize</authloc>
+      <tokenloc>https://slcs.ceda.ac.uk/oauth/access_token</tokenloc>
+      <slcsserviceloc>https://slcs.ceda.ac.uk/oauth/certificate</slcsserviceloc>
+      <clientid>***</clientid>
+      <clientsecret>***</clientsecret>
+      <description>Sign in with CEDA via OAuth (beta)</description>
+      <registerlink>https://services.ceda.ac.uk/cedasite/register/info/</registerlink>
+      <logo>/impactportal/images/this_is_NOT_the_BADC_logo.jpg</logo>
+      <scope>https://slcs.ceda.ac.uk/oauth/certificate/</scope>
+    </provider>
+ 
+    <provider name="google">                                                                                                                                                                                                                                
+      <authloc>https://accounts.google.com/o/oauth2/auth</authloc>                                                                                                                                                                                          
+      <tokenloc>https://accounts.google.com/o/oauth2/token</tokenloc>                                                                                                                                                                                       
+      <clientid>***</clientid>                                                                                                                                                         
+      <clientsecret>***</clientsecret>                                                                                                                                                                                                 
+      <scope>email</scope>                                                                                                                                                                                                                                  
+      <logo>/impactportal/images/google.png</logo>                                                                                                                                                                                                          
+      <description>Sign in with Google (beta, no ESGF support)</description>                                                                                                                                                                                
+    </provider>                                                                                                                                                                                                                                             
+    
+    
+  </oauth2> 
+  <!-- Configure here your myproxy server to issue x509 slc certificates for x509 client authentication -->
+  <loginconfig>
+    <myproxyserverhost>https://pcmdi9.llnl.gov/esgf-idp/openid/c4m</myproxyserverhost>
+    <myproxyserverport>7512</myproxyserverport>
+   
+    <!-- Fake user has been created for development purposes, his ID is https://pcmdi9.llnl.gov/esgf-idp/openid/c4m . In production environment a dedicated myproxyserver should be set. -->
+   <myproxyserverusernameoverride>c4m</myproxyserverusernameoverride>
+    <myproxyserverpassword>***</myproxyserverpassword>
+   
+    
+    <!-- Set the CA trustroots by a java truststore and separate trusted SSL certificates, obtainable from  https://rainbow.llnl.gov/ -->
+    <truststorepassword>changeit</truststorepassword>
+    <truststorefile>/config/esg-truststore.ts</truststorefile>
+    <trustrootslocation>/root/.globus/certificates/</trustrootslocation>
+  </loginconfig>
+  
+  <!-- The email adresses used for the contact form -->
+  <expertcontact>
+    <mailaddresses>***</mailaddresses>
+  </expertcontact>
+  
+  <!-- Email where exceptions and errors are emailed -->
+  <admin>
+    <mailaddresses>***</mailaddresses>
+    <identifiers>***</identifiers>
+  </admin>
+  
+  <!-- The download template, located in the impactportal repository -->  
+  <downloadscriptconfig>
+    <downloadscripttemplate>/data/impactdev/impactportal/WebContent/account/wgettemplate</downloadscripttemplate>
+  </downloadscriptconfig>
+  
+  <!-- ADAGUC WMS configuration -->
+  <adagucserverconfig>
+    <adagucexecutable>/usr/bin/adagucserver</adagucexecutable>
+    <exportenvironment>ADAGUC_CONFIG=/config/adagucserver.xml</exportenvironment>
+    <exportenvironment>ADAGUC_PATH=/src/adaguc-server/</exportenvironment>
+    <exportenvironment>ADAGUC_LOGFILE=/var/log/adagucserver-wmswcs.log</exportenvironment>
+    <exportenvironment>ADAGUC_TMP=/tmp/</exportenvironment>
+    <exportenvironment>ADAGUC_DATARESTRICTION="SHOW_QUERYINFO|ALLOW_WCS|ALLOW_GFI|ALLOW_METADATA"</exportenvironment>
+  </adagucserverconfig>
+  
+  <pywpsconfig>
+    <pywpsexecutable>/src/pywps-pywps-3.2.5/wps.py</pywpsexecutable>
+    <exportenvironment>ADAGUC_CONFIG=/config/adagucserver.xml</exportenvironment>
+    <exportenvironment>ADAGUC_PATH=/src/adaguc-server/</exportenvironment>
+    <exportenvironment>ADAGUC_TMP=/tmp/</exportenvironment>
+    <exportenvironment>ADAGUC_LOGFILE=/var/log/adagucserver-wps.log</exportenvironment>
+    <exportenvironment>ADAGUC_DATARESTRICTION="SHOW_QUERYINFO|ALLOW_WCS|ALLOW_GFI|ALLOW_METADATA"</exportenvironment>
+    <exportenvironment>PATH=/miniconda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin</exportenvironment>
+    <exportenvironment>PYWPS_CFG=/config/pywps.cfg</exportenvironment>
+    <exportenvironment>PYWPS_PROCESSES=/src/wpsprocesses/impactwps-master/</exportenvironment>
+    <exportenvironment>PYWPS_TEMPLATES=/src/pywps-pywps-3.2.5/pywps/Templates</exportenvironment>
+    <exportenvironment>PORTAL_OUTPUT_PATH=/data/wpsoutputs/</exportenvironment>
+    <exportenvironment>USE_FONTCONFIG=False</exportenvironment>
+  </pywpsconfig>
+</impactportal>
+
+
+

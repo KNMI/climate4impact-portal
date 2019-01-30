@@ -34,7 +34,8 @@ RUN yum update -y && yum install -y \
     # java dependencies
     ant \
     tomcat \
-    gdal-devel
+    gdal-devel \
+    libssl1.0.0 libssl-dev
 
 RUN mkdir /scr
 WORKDIR /src
@@ -68,6 +69,8 @@ RUN pip install netcdf4==1.3.1
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
 #RUN conda install icu
 RUN conda install icu=56.1 -y
+
+ENV LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH
 
 # install icclim (will be conda in the future)
 RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
