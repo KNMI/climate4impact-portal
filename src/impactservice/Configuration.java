@@ -14,7 +14,7 @@ public class Configuration {
   static String portalMode = "c4i";
   public static String getPortalMode(){
     readConfig();
-    return portalMode;//"c3s-magic";//c4i
+    return portalMode;//"c3s-magic";//c4i//c4i-dev
   }
   
   static long readConfigPolInterval = 0;;

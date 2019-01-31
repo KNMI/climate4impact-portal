@@ -4,12 +4,12 @@
   Please note fill in all *** with your own ID and credentials  
   -->
   
-  
+  <portalmode>c4i-dev</portalmode>
   <!-- Offline mode assumes a default user, requires no login and does not attempt to load CMS pages, useful for developing -->
   <offlinemode>true</offlinemode>
   
   <!-- This used ID is used during development in offline mode,for example when no internet access is available -->
-  <defaultuseropenid>https://pcmdi9.llnl.gov/esgf-idp/openid/c4m</defaultuseropenid>
+  <defaultuseropenid>https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev</defaultuseropenid>
   
   <!-- The hostname of the server, using http and https-->
   <serverurl></serverurl>
@@ -36,12 +36,24 @@
   
   
   <!-- The CMS Drupal to harvest pages from -->
-  <drupalconfig>
+  <!-- Docker -->
+  <!-- <drupalconfig>
     <drupalhost>http://drupal/</drupalhost>
     <drupalbaseurl>/</drupalbaseurl>
     <drupaldirectory>/</drupaldirectory>
     <username>drupal</username>
     <password>***</password>
+  </drupalconfig>-->
+  
+   
+  <!-- The CMS Drupal to harvest pages from -->
+  <!-- C4I -->
+  <drupalconfig>
+    <drupalhost>https://climate4impact.eu</drupalhost>
+    <drupalbaseurl>/</drupalbaseurl>
+    <drupaldirectory>drupal/</drupaldirectory>
+    <username>drupal</username>
+    <password>secured</password>
   </drupalconfig>
   
   <!-- The ESGF search API for searching through the ESGF -->
@@ -83,10 +95,9 @@
     <myproxyserverhost>https://pcmdi9.llnl.gov/esgf-idp/openid/c4m</myproxyserverhost>
     <myproxyserverport>7512</myproxyserverport>
    
-    <!-- Fake user has been created for development purposes, his ID is https://pcmdi9.llnl.gov/esgf-idp/openid/c4m . In production environment a dedicated myproxyserver should be set. -->
-   <myproxyserverusernameoverride>c4m</myproxyserverusernameoverride>
-    <myproxyserverpassword>***</myproxyserverpassword>
-   
+    <!-- Fake user has been created for development purposes, his ID is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev  . In production environment a dedicated myproxyserver should be set. -->
+    <myproxyserverhost>slcs1.ceda.ac.uk</myproxyserverhost>
+    <myproxyserverport>7512</myproxyserverport>
     
     <!-- Set the CA trustroots by a java truststore and separate trusted SSL certificates, obtainable from  https://rainbow.llnl.gov/ -->
     <truststorepassword>changeit</truststorepassword>

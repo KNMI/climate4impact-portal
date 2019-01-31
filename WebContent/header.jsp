@@ -19,7 +19,7 @@ out.println("<!-- mode=["+mode+"] -->");
     
 %>
 
-<% if (mode.equals("c4i")){ %>   
+<% if (mode.indexOf("c4i") != -1){ %>   
  
   <div class="eimpactheader" style="z-index:2;"> 
     <div class="logo"><a href="/impactportal/"><img class="headerlogo" src="<%=Home%>images/IS-ENES2_logo_small.png" alt="IS-ENES2 Logo"/></a></div>

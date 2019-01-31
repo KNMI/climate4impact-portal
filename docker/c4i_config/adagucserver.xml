@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+ 
+  <!-- General settings -->
+  <Path value="{ADAGUC_PATH}/data/"/>
+  
+  <DataBase type="sqlite" parameters="/tmp/adagucdb"/> 
+  
+  <TempDir value="/tmp"/>
+  <CacheDocs enabled="false"/>
+  
+ <AutoResource enableautoopendap="true" enablelocalfile="true" enablecache="false" >
+    <!--<Dir basedir="/home/c4m/impactspace/" prefix=""/>-->
+  </AutoResource>
+ 
+  <!-- WMS settings -->
+  <WMS>
+    <Title>Impact Portal WMS Service</Title>
+    <Abstract>Impact Portal WMS Services</Abstract>
+    <RootLayer>
+      <Title>Impact Portal WMS Service</Title>
+      <Abstract></Abstract>
+    </RootLayer>
+    <TitleFont location="{ADAGUC_PATH}/data/fonts/FreeSans.ttf" size="19"/>
+    <SubTitleFont location="{ADAGUC_PATH}/data/fonts/FreeSans.ttf" size="10"/>
+    <DimensionFont location="{ADAGUC_PATH}/data/fonts/FreeSans.ttf" size="7"/>
+    <ContourFont location="{ADAGUC_PATH}/data/fonts/FreeSans.ttf" size="7"/>
+    <GridFont location="{ADAGUC_PATH}/data/fonts/FreeSans.ttf" size="5"/>
+  </WMS>
+ 
+  <!-- WCS settings -->
+  <WCS>
+    <Title>GFS Unidata (OGC on OPeNDAP)</Title>
+    <Label>wcsLabel</Label>
+    <WCSFormat name="netcdf" driver="ADAGUCNetCDF" mimetype="Content-Type:text/plain"/>
+  </WCS>
+ 
+  <!-- Projections -->
+  <Projection id="EPSG:3411" proj4="+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs"/>
+  <Projection id="EPSG:3412" proj4="+proj=stere +lat_0=-90 +lat_ts=-70 +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378273 +b=6356889.449 +units=m +no_defs"/>
+  <Projection id="EPSG:3575" proj4="+proj=laea +lat_0=90 +lon_0=10 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+  
+  <!--Geostationary -->
+  <Projection id="EPSG:3576" proj4="+proj=laea +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+  
+  <Projection id="EPSG:3857" proj4="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"/>
+  <Projection id="EPSG:4258" proj4="+proj=longlat +ellps=GRS80 +no_defs"/>
+  <Projection id="EPSG:4326" proj4="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"/>
+  <Projection id="CRS:84" proj4="+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"/>
+  <Projection id="EPSG:25831" proj4="+proj=utm +zone=31 +ellps=GRS80 +units=m +no_defs"/>
+  <Projection id="EPSG:25832" proj4="+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs"/>
+  <Projection id="EPSG:28992" proj4="+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +no_defs">
+  </Projection>
+  <Projection id="EPSG:7399" proj4="+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +units=m +no_defs "/>
+  <Projection id="EPSG:50001" proj4="+proj=stere +lat_ts=60.0 +lat_0=90 +lon_0=-111.0 +k_0=1.0 +x_0=3020946.0 +y_0=7622187.0 +units=m +ellps=WGS84 +datum=WGS84 +no_defs ">
+    <LatLonBox minx="-2000000"  miny="-2000000" maxx="10000000" maxy="8500000"/>
+  </Projection>
+  <Projection id="EPSG:54030" proj4="+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs "/>
+  <Projection id="EPSG:32661" proj4="+proj=stere +lat_0=90 +lat_ts=90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"/>
+  <Projection id="EPSG:40000" proj4="+proj=stere +ellps=WGS84 +lat_0=90 +lon_0=0 +no_defs"/>
+  <Projection id="EPSG:900913" proj4=" +proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs"/>
+  <Projection id="EPSG:102100" proj4="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"/>
+
+  <!-- Base layers, cascaded from another WMS service -->
+ 
+  <Layer type="cascaded" hidden="true">
+    <Group value="baselayers"/>
+    <Name force="true">overlay</Name>
+    <Title>overlay</Title>
+    <WMSLayer service="http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?" layer="nl_world_line"/>
+    <LatLonBox minx="-180"  miny="-90" maxx="180" maxy="90"/>
+  </Layer>
+  
+  <Legend name="land" type="colorRange">
+    <palette index="0"   color="#FFF0C3"/>
+    <palette index="240" color="#FFF0C3"/>
+  </Legend>
+  
+  <Legend name="ocean" type="colorRange">
+    <palette index="0"   color="#C2C2FF"/>
+    <palette index="240" color="#C2C2FF"/>
+  </Legend>
+  
+  <Style name="land">
+    <Legend fixedclasses="true" tickinterval="1" tickround="1" >land</Legend>
+    <Min>0.0</Min>
+    <Max>1.0</Max>
+    <NameMapping name="nearest"   title="Land color" abstract="Land color"/>
+  </Style>
+ 
+   <Style name="ocean">
+    <Legend fixedclasses="true" tickinterval="1" tickround="1" >ocean</Legend>
+    <Min>0.0</Min>
+    <Max>1.0</Max>
+    <NameMapping name="nearest"   title="Land Ocean" abstract="Ocean color"/>
+  </Style>
+  
+  <Layer type="baselayer" hidden="false">
+    <Group value="baselayers"/>
+    <Name force="true">ocean</Name>
+    <Title>ocean</Title>
+    <Variable>features</Variable>
+    <!--<WMSLayer service="http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?" layer="world_raster"/>
+    <LatLonBox minx="-180"  miny="-90" maxx="180" maxy="90"/>-->
+    <!--<FilePath>/data/software/adagucserver/data/datasets/worldcountries.geojson</FilePath>-->
+    <FilePath>/config/data/geojson/ne_110m_ocean.geojson</FilePath>
+    
+    <Styles>ocean</Styles>
+  </Layer>
+  <Layer type="baselayer"  hidden="false">
+    <Group value="baselayers"/>
+    <Name force="true">land</Name>
+    <Title>land</Title>
+    <Variable>features</Variable>
+    <!--<WMSLayer service="http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?" layer="world_raster"/>
+    <LatLonBox minx="-180"  miny="-90" maxx="180" maxy="90"/>-->
+    <!--<FilePath>/data/software/adagucserver/data/datasets/worldcountries.geojson</FilePath>-->
+    <FilePath>/config/data/geojson/ne_110m_land.geojson</FilePath>
+    
+    <Styles>land</Styles>
+  </Layer>
+  
+  <Layer type="baselayer" hidden="false">
+    <Group value="baselayers"/>
+    <Name force="true">baselayer</Name>
+    <Title>baselayer</Title>
+    <Variable>features</Variable>
+    <!--<WMSLayer service="http://geoservices.knmi.nl/cgi-bin/worldmaps.cgi?" layer="world_raster"/>
+    <LatLonBox minx="-180"  miny="-90" maxx="180" maxy="90"/>-->
+    <!--<FilePath>/data/software/adagucserver/data/datasets/worldcountries.geojson</FilePath>-->
+    <FilePath>/config/data/geojson/ne_110m_ocean.geojson</FilePath>
+    
+      <AdditionalLayer replace="false" style="land/nearest" >land</AdditionalLayer>
+
+    <Styles>ocean</Styles>
+  </Layer>
+ 
+  <Layer type="grid" hidden="true">
+    <Group value="baselayers"/>
+    <Name force="true">grid10</Name>
+    <Title>grid 10 degrees</Title>
+    <Grid resolution="10"/>
+    <WMSFormat name="image/png32"/>
+  </Layer>
+
+  <!--<Layer type="database">
+    <FilePath>/data/data/tasmax_day_CNRM-CM5_historical_r1i1p1_1890.nc</FilePath>
+    <Variable>tasmax</Variable>
+  </Layer>
+  
+  <Layer type="database">
+    <FilePath>/data/data/radar_nl/</FilePath>
+    <Variable>precipitation</Variable>
+    <Min>0</Min>
+    <Max>20</Max>
+  </Layer>
+  -->
+  <Include location="/config/adaguc_standard_name_mappings.xml"/>
+ 
+  <!-- End of configuration /-->
+</Configuration>
