@@ -55,12 +55,12 @@ mkdir ~/impactspace
 docker run -v ~/impactspace:/impactspace -v /etc/hosts:/etc/hosts -v `pwd`/docker/c4i_config:/config/ -p 444:444 -e EXTERNAL_HOSTNAME:${HOSTNAME} -e EXTERNAL_ADDRESS_HTTPS="https://${HOSTNAME}:444/" -it c4i
 ```
 # Log in
-* Visit https://<yourhostname>/impactportal/account/login.jsp
+* Visit ```https://<yourhostname>/impactportal/account/login.jsp```
 * Add an exception for your self signed certificate
 * Click "Show other providers" and select "Sign in with BADC/CEDA OpenID"
 * Use account cc4idev/cc4idev123!
 * Your openid is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev (this is preconfigured for the development env ./docker/c4i_config/config.xml)
 
 # Start working
-* Visit https://<yourhostname>/impactportal/account/processing.jsp
+* Visit ```https://<yourhostname>/impactportal/account/processing.jsp```
 
