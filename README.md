@@ -38,11 +38,21 @@ On your host, edit /etc/hosts and add a line:
 ```
 127.0.1.1       <yourhostname>
 ```
+You can find your hostname simply with
+```
+ hostname
+ ```
+
+# Make a folder for the impactspace 
+
+This folder is mounted using the docker run command.
+```
+mkdir ~/impactspace
+```
 
 # Start the docker container:
 ```
 docker run -v ~/impactspace:/impactspace -v /etc/hosts:/etc/hosts -v `pwd`/docker/c4i_config:/config/ -p 444:444 -e EXTERNAL_HOSTNAME:${HOSTNAME} -e EXTERNAL_ADDRESS_HTTPS="https://${HOSTNAME}:444/" -it c4i
-
 ```
 # Log in
 * Visit https://<yourhostname>/impactportal/account/login.jsp
