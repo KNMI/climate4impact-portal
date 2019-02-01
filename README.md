@@ -6,42 +6,51 @@ See https://dev.knmi.nl/projects/impactportal/wiki for details
 
 # Docker
 
+The docker can be used to setup the climate4impact portal on your own workstation. It uses a default user to obtain a credential from a myproxyserver. Using the provided configuration inside the ./docker/c4i_config folder you can only log in as the default user.
+
+## Known shortcomings:
+- Due to configuration limitations the portal can only be run on port 444 (2019-02-01). You need to change ./docker/c4i_config/server.xml and the docker run command if you want a different port.
+- The adaguc-server in this docker uses a sqlite database. Due to concurrent access to the sqlite database, sometimes a visualization of a datasets fails at the first time. Just press reload to see the visualization. This is a known bug with sqlite, with postgresql it works fine.
+- You can only login as the user which is configured in ./docker/c4i_config/config.xml
+
+# Clone the climate4impact-portal repository to your workstation
 ```
-# Clone the repo
 git clone https://github.com/maartenplieger/climate4impact-portal
 cd climate4impact-portal
+```
 # Build the docker
+```
 docker build -t c4i  .
+```
 # Create your own keystore
+```
 rm docker/c4i_config/c4i_keystore.jks
 keytool -genkey -noprompt -keypass password -alias tomcat \
   -keyalg RSA -storepass password -keystore ./docker/c4i_config/c4i_keystore.jks -deststoretype pkcs12 \
   -dname CN=${HOSTNAME}:444
+ ```
 # Update esg-truststore
-wget "https://github.com/ESGF/esgf-dist/raw/master/installer/certs/esg-truststore.ts" -O  ./docker/c4i_config/esg-truststore.ts
+```
 cd docker/c4i_config && bash refresh_certs.sh && cd ../../
-
-
 ```
 
-add to /etc/hosts
+On your host, edit /etc/hosts and add a line:
 ```
 127.0.1.1       <yourhostname>
 ```
 
-Start
+# Start the docker container:
 ```
-docker run  -v `pwd`/docker/c4i_config:/config/ -p 443:443 -e EXTERNAL_HOSTNAME:${HOSTNAME} -e EXTERNAL_ADDRESS_HTTPS="https://${HOSTNAME}/" -it c4i
-```
+docker run -v ~/impactspace:/impactspace -v /etc/hosts:/etc/hosts -v `pwd`/docker/c4i_config:/config/ -p 444:444 -e EXTERNAL_HOSTNAME:${HOSTNAME} -e EXTERNAL_ADDRESS_HTTPS="https://${HOSTNAME}:444/" -it c4i
 
+```
+# Log in
 * Visit https://<yourhostname>/impactportal/account/login.jsp
 * Add an exception for your self signed certificate
-* Click "Show other providers"
-* Select "Sign in with BADC/CEDA OpenID"
-* Use cc4idev/cc4idev123!
-* Your openid is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev (this is preconfigured for the development env)
+* Click "Show other providers" and select "Sign in with BADC/CEDA OpenID"
+* Use account cc4idev/cc4idev123!
+* Your openid is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev (this is preconfigured for the development env ./docker/c4i_config/config.xml)
 
-
-
-Visit https://<yourhostname>/impactportal/account/processing.jsp
+# Start working
+* Visit https://<yourhostname>/impactportal/account/processing.jsp
 

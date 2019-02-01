@@ -62,7 +62,7 @@
   </searchconfig>
   
   <!-- Local workspace, user info is stored here -->
-  <impactworkspace>/data/c4i/climate4impact-portal/impactspace</impactworkspace>
+  <impactworkspace>/impactspace</impactworkspace>
   
   
   <oauth2>
@@ -102,7 +102,7 @@
     <!-- Set the CA trustroots by a java truststore and separate trusted SSL certificates, obtainable from  https://rainbow.llnl.gov/ -->
     <truststorepassword>changeit</truststorepassword>
     <truststorefile>/config/esg-truststore.ts</truststorefile>
-    <trustrootslaocation>/root/.globus/esg_trusted_certificates/</trustrootslaocation>
+    <trustrootslocation>/config/certificates/</trustrootslocation>
   </loginconfig>
   
   <!-- The email adresses used for the contact form -->
@@ -124,14 +124,17 @@
   <!-- ADAGUC WMS configuration -->
   <adagucserverconfig>
     <adagucexecutable>/usr/bin/adagucserver</adagucexecutable>
+    
     <exportenvironment>ADAGUC_CONFIG=/config/adagucserver.xml</exportenvironment>
     <exportenvironment>ADAGUC_PATH=/src/adaguc-server/</exportenvironment>
     <exportenvironment>ADAGUC_LOGFILE=/var/log/adagucserver-wmswcs.log</exportenvironment>
     <exportenvironment>ADAGUC_TMP=/tmp/</exportenvironment>
     <exportenvironment>ADAGUC_DATARESTRICTION="SHOW_QUERYINFO|ALLOW_WCS|ALLOW_GFI|ALLOW_METADATA"</exportenvironment>
+    <exportenvironment>LD_LIBRARY_PATH="/opt/rh/devtoolset-7/root/usr/lib64:/opt/rh/devtoolset-7/root/usr/lib:/opt/rh/devtoolset-7/root/usr/lib64/dyninst:/opt/rh/devtoolset-7/root/usr/lib/dyninst:/opt/rh/devtoolset-7/root/usr/lib64:/opt/rh/devtoolset-7/root/usr/lib:/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/"</exportenvironment>
   </adagucserverconfig>
   
   <pywpsconfig>
+    <exportenvironment>LD_LIBRARY_PATH="/opt/rh/devtoolset-7/root/usr/lib64:/opt/rh/devtoolset-7/root/usr/lib:/opt/rh/devtoolset-7/root/usr/lib64/dyninst:/opt/rh/devtoolset-7/root/usr/lib/dyninst:/opt/rh/devtoolset-7/root/usr/lib64:/opt/rh/devtoolset-7/root/usr/lib:/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/"</exportenvironment>
     <pywpsexecutable>/src/pywps-pywps-3.2.5/wps.py</pywpsexecutable>
     <exportenvironment>ADAGUC_CONFIG=/config/adagucserver.xml</exportenvironment>
     <exportenvironment>ADAGUC_PATH=/src/adaguc-server/</exportenvironment>

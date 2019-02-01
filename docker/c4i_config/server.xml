@@ -70,12 +70,12 @@
     -->
     <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="20000"
-               redirectPort="443" />
+               redirectPort="444" />
     
     
     <Connector SSLEnabled="true" acceptCount="100" clientAuth="want" 
                disableUploadTimeout="true" enableLookups="true" maxThreads="25" 
-               port="443" keystoreFile="/config/c4i_keystore.jks" keystorePass="password" 
+               port="444" keystoreFile="/config/c4i_keystore.jks" keystorePass="password" 
                protocol="org.apache.coyote.http11.Http11NioProtocol" scheme="https" 
                truststoreFile="/config/esg-truststore.ts"  
                truststorePass="changeit"      
@@ -100,7 +100,7 @@
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector port="8009" protocol="AJP/1.3" redirectPort="443" />
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="444" />
 
 
     <!-- An Engine represents the entry point (within Catalina) that processes

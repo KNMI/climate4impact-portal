@@ -145,7 +145,7 @@ public class LoginManager {
     Debug.println("Setting proxy host:port as '"
         + Configuration.LoginConfig.getMyProxyServerHost() + ":"
         + Configuration.LoginConfig.getMyProxyServerPort() + "'");
-    // GSSCredential retcred = myProxy.get(null,"testyser","bbbbbghfhfh",10);
+    //
     try {
       String userName = Configuration.LoginConfig.getMyProxyDefaultUserName();
       if (userName == null) {
@@ -169,13 +169,19 @@ public class LoginManager {
         Debug.println("Setting myproxy identity authorization to " + identAuth);
         myProxy.setAuthorization(new org.globus.gsi.gssapi.auth.IdentityAuthorization(identAuth));
       }
+      
+      Debug.println("Using trust root path " + myProxy.getTrustRootPath());
+      String[] files = Tools.ls(myProxy.getTrustRootPath());
+      if (files == null) {
+        throw new Exception("No valid trust roots certificates found in path " + myProxy.getTrustRootPath());
+      }      
 
       ExtendedGSSCredential cred = (ExtendedGSSCredential) myProxy.get(
           userName, Configuration.LoginConfig.getMyProxyDefaultPassword(),
           60 * 60 * 24 * 7);
 
       try {
-        Debug.println(cred.getName().toString());
+        Debug.println("Credential obtained: " + cred.getName().toString());
         // DebugConsole.println(""+cred.getRemainingLifetime());
 
         Oid[] mechs = cred.getMechs();

@@ -4,7 +4,7 @@
   <!-- General settings -->
   <Path value="{ADAGUC_PATH}/data/"/>
   
-  <DataBase type="sqlite" parameters="/tmp/adagucdb"/> 
+  <DataBase dbtype="sqlite" parameters="/tmp/adagucdb"/> 
   
   <TempDir value="/tmp"/>
   <CacheDocs enabled="false"/>

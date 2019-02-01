@@ -1,3 +1,6 @@
 *.class
 build
 build/*
+*.pem
+docker/c4i_config/esg_trusted_certificates.tar
+docker/c4i_config/esg_trusted_certificates
