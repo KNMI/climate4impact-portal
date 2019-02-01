@@ -6,7 +6,7 @@
   
   <portalmode>c4i-dev</portalmode>
   <!-- Offline mode assumes a default user, requires no login and does not attempt to load CMS pages, useful for developing -->
-  <offlinemode>true</offlinemode>
+  <offlinemode>false</offlinemode>
   
   <!-- This used ID is used during development in offline mode,for example when no internet access is available -->
   <defaultuseropenid>https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev</defaultuseropenid>
@@ -92,17 +92,17 @@
   </oauth2> 
   <!-- Configure here your myproxy server to issue x509 slc certificates for x509 client authentication -->
   <loginconfig>
-    <myproxyserverhost>https://pcmdi9.llnl.gov/esgf-idp/openid/c4m</myproxyserverhost>
-    <myproxyserverport>7512</myproxyserverport>
-   
-    <!-- Fake user has been created for development purposes, his ID is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev  . In production environment a dedicated myproxyserver should be set. -->
     <myproxyserverhost>slcs1.ceda.ac.uk</myproxyserverhost>
     <myproxyserverport>7512</myproxyserverport>
-    
+   
+    <!-- Fake user has been created for development purposes, his ID is https://pcmdi9.llnl.gov/esgf-idp/openid/c4m . In production environment a dedicated myproxyserver should be set. -->
+    <myproxyserverusernameoverride>cc4idev</myproxyserverusernameoverride>
+    <myproxyserverpassword>cc4idev123!</myproxyserverpassword>
+   
     <!-- Set the CA trustroots by a java truststore and separate trusted SSL certificates, obtainable from  https://rainbow.llnl.gov/ -->
     <truststorepassword>changeit</truststorepassword>
     <truststorefile>/config/esg-truststore.ts</truststorefile>
-    <trustrootslocation>/root/.globus/certificates/</trustrootslocation>
+    <trustrootslaocation>/root/.globus/esg_trusted_certificates/</trustrootslaocation>
   </loginconfig>
   
   <!-- The email adresses used for the contact form -->

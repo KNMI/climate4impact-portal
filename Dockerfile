@@ -119,7 +119,7 @@ RUN  mkdir -p /root/.globus/
 WORKDIR /root/.globus/
 RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
 RUN tar -xvf esg_trusted_certificates.tar
-RUN mv esg_trusted_certificates certificates
+#RUN mv esg_trusted_certificates certificates
 
 # TODO check why this is needed
 RUN conda install icu -y
