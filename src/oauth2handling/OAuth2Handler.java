@@ -685,9 +685,9 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     // This section defines the use of the RSASSA-PKCS1-v1_5 signature algorithm
     // as defined in RFC 3447 [RFC3447], Section 8.2 (commonly known as PKCS#1),
     // using SHA-256 as the hash function. Note that the use of the
-    // RSASSA-PKCS1-v1_5 algorithm is described in FIPS 186-3 [FIPS.186‑3],
+    // RSASSA-PKCS1-v1_5 algorithm is described in FIPS 186-3 [FIPS.186-3],
     // Section 5.5, as is the SHA-256 cryptographic hash function, which is
-    // defined in FIPS 180-3 [FIPS.180‑3]. The reserved "alg" header parameter
+    // defined in FIPS 180-3 [FIPS.180-3]. The reserved "alg" header parameter
     // value "RS256" is used in the JWT Header Segment to indicate that the JWT
     // Crypto Segment contains an RSA SHA-256 signature.
     //
