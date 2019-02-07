@@ -8,7 +8,7 @@ See https://dev.knmi.nl/projects/impactportal/wiki for details
 
 The docker can be used to setup the climate4impact portal on your own workstation. It uses a default user to obtain a credential from a myproxyserver. Using the provided configuration inside the ./docker/c4i_config folder you can only log in as the default user.
 
-## Known shortcomings:
+## Known shortcomings of the development docker:
 - Due to configuration limitations the portal can only be run on port 444 (2019-02-01). You need to change ./docker/c4i_config/server.xml and the docker run command if you want a different port.
 - The adaguc-server in this docker uses a sqlite database. Due to concurrent access to the sqlite database, sometimes a visualization of a datasets fails at the first time. Just press reload to see the visualization. This is a known bug with sqlite, with postgresql it works fine.
 - You can only login as the user which is configured in ./docker/c4i_config/config.xml

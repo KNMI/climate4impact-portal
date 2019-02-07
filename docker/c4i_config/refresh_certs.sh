@@ -81,10 +81,10 @@ c_rehash ./certificates/
 ### Add the clipc CA ###
 
 echo "Putting impactportal CA into truststore"
-keytool -delete -alias maris-clipc-ca  -keystore esg-truststore.ts -storepass changeit > /dev/null
-keytool -import -v -trustcacerts -alias maris-clipc-ca -file maris.crt -keystore esg-truststore.ts -storepass changeit -noprompt
+keytool -delete -alias knmi_clipc_ca  -keystore esg-truststore.ts -storepass changeit > /dev/null
+keytool -import -v -trustcacerts -alias knmi_clipc_ca -file knmi_clipc_ca.pem -keystore esg-truststore.ts -storepass changeit -noprompt
 
-cp maris.crt ./certificates/
+cp knmi_clipc_ca.pem ./certificates/
 c_rehash ./certificates/
 
 
