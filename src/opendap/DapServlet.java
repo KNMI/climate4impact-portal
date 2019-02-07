@@ -114,6 +114,7 @@ public class DapServlet extends HttpServlet {
         return;
       }
     } catch (Exception e) {
+      Debug.printStackTrace(e);
       String message = "401 No user information provided: "+e.getMessage();
       response.setStatus(401);
       Debug.errprintln(message);

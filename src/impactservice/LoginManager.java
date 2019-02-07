@@ -9,6 +9,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -26,7 +31,9 @@ import javax.servlet.http.HttpSession;
 import oauth2handling.OAuth2Handler;
 import stats.StatLogger;
 
-import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -34,6 +41,7 @@ import org.ietf.jgss.Oid;
 import org.json.JSONObject;
 
 import impactservice.ImpactUser.UserSessionInfo;
+import nl.knmi.adaguc.security.PemX509Tools;
 import tools.Debug;
 import tools.HTTPTools;
 import tools.HTTPTools.WebRequestBadStatusException;
@@ -83,6 +91,12 @@ public class LoginManager {
   public static String impactportal_userid_cookie="C4I_ID";
   public static int impactportal_userid_cookie_durationsec = 3600*24;
 
+  LoginManager() {
+    Debug.println("LoginManager created");
+  }
+
+
+
   public static void getUserProxyService(ImpactUser user)
       throws MalformedURLException, WebRequestBadStatusException, Exception {
     // Test met openID URL
@@ -119,6 +133,50 @@ public class LoginManager {
       Debug.println("offline mode");
       return;
     }
+
+    if(user.getUserId().startsWith("google")){
+      Debug.println("************** CREATING CERTIFICATE FOR GOOGLE ***************");
+      try{
+        /*
+         * 
+         * keytool -import -v -trustcacerts -alias test -file /tmp/test.pem -keystore /nobackup/users/plieger/code/github/maartenplieger/c4i-portal/secrets/config-c4i/esg-truststore.ts -storepass changeit -noprompt
+Certificate was added to keystore
+
+         */
+
+        PemX509Tools.setup();
+        String clientCN = user.getUserId();
+
+        /* Step 1 - Initialize security provider and key generator*/
+        int keySize = 2048;
+        KeyPairGenerator keyGenkeyGeneratorRSA = KeyPairGenerator.getInstance("RSA");
+        keyGenkeyGeneratorRSA.initialize(keySize, new SecureRandom());
+
+        /* Step 4 - Generate KeyPair for CSR */
+        KeyPair keyPairCSR = keyGenkeyGeneratorRSA.generateKeyPair();
+
+        /* Step 5 - Generate CSR */
+        Debug.println("clientCN" + clientCN);
+        PKCS10CertificationRequest csr = PemX509Tools.createCSR("CN="+clientCN, keyPairCSR);
+
+        /* Step 6 - Sign CSR with CA */
+        PrivateKey caPrivateKey = PemX509Tools.readPrivateKeyFromPEM(Configuration.LoginConfig.getIssuerCAPrivateKey());
+        X509Certificate caCertificate = PemX509Tools.readCertificateFromPEM(Configuration.LoginConfig.getIssuerCACertificate());
+        X509Certificate signedCrt = PemX509Tools.signCSR(csr, caCertificate, caPrivateKey);
+
+        /* Step 7 - Write certificates in PEM format to fs */
+        Tools.mkdir(user.getWorkspace());
+        Tools.mkdir(user.getWorkspace() + "certs");
+        user.certificateFile = user.getWorkspace() + "certs/" + "creds.pem";
+        String clientCertLocation = user.certificateFile;
+        Tools.writeFile(clientCertLocation, PemX509Tools.certificateToPemString(signedCrt) + PemX509Tools.privateKeyToPemString(keyPairCSR.getPrivate()));  
+        user.setLoginInfo("Credential retrieved via impactportal PemX509Tools.");
+      }catch(Exception e) {
+        Debug.printStackTrace(e);
+        throw new Exception("Unable to create local certificate");
+      }
+      return;
+    };
 
     // Retrieve myproxy service info from openID URL
     user.userMyProxyService = null;
@@ -162,21 +220,23 @@ public class LoginManager {
       Debug.println("Setting username to " + userName + ":"
           + Configuration.LoginConfig.getMyProxyDefaultPassword());
 
-      
-      
+
+
       String identAuth = Configuration.LoginConfig.getMyProxyServerIdendityAuthorization();
       if(identAuth != null){
         Debug.println("Setting myproxy identity authorization to " + identAuth);
         myProxy.setAuthorization(new org.globus.gsi.gssapi.auth.IdentityAuthorization(identAuth));
       }
-      
       Debug.println("Using trust root path " + myProxy.getTrustRootPath());
       String[] files = Tools.ls(myProxy.getTrustRootPath());
       if (files == null) {
         throw new Exception("No valid trust roots certificates found in path " + myProxy.getTrustRootPath());
       }      
 
-      ExtendedGSSCredential cred = (ExtendedGSSCredential) myProxy.get(
+      Debug.println("Getting credential");
+
+      ExtendedGSSCredential cred = null;
+      cred = (ExtendedGSSCredential) myProxy.get(
           userName, Configuration.LoginConfig.getMyProxyDefaultPassword(),
           60 * 60 * 24 * 7);
 
@@ -210,7 +270,7 @@ public class LoginManager {
     }
     Debug.println("Credentials for user " + user.getUserId() + " retrieved");
   }
-  
+
   public static String getUserFromCookie(HttpServletRequest request){
     long currentTime = tools.DateFunctions.getCurrentDateInMillis();
     String foundUserId = null;
@@ -223,7 +283,7 @@ public class LoginManager {
       while (iter.hasNext()) {
         Entry<String, UserSessionInfo> entry = iter.next();
         Debug.println(""+(currentTime-entry.getValue().accessTime));
-        
+
         if((currentTime-entry.getValue().accessTime)>impactportal_userid_cookie_durationsec*1000){
           Debug.println("Removing session, because too old: "+(currentTime-entry.getValue().accessTime));
           iter.remove();
@@ -248,11 +308,11 @@ public class LoginManager {
    */
   public static ImpactUser getUserAndRegisterCookie(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
-    
+
     if(response!=null){
       Debug.println("getUserAndRegisterCookie");
     }
-    
+
     String id = null;
     String accessToken = null;
 
@@ -260,7 +320,7 @@ public class LoginManager {
     if (Configuration.GlobalConfig.isInOfflineMode() == true) {
       id = Configuration.GlobalConfig.getDefaultUser();
     }
-    
+
     /*Get user from access token provided in the request, usually commandline access*/
     if (id == null ) {
       try{
@@ -275,13 +335,13 @@ public class LoginManager {
       }catch(Exception e){
       }
     }
-    
+
     /*Simply get user from browser session*/
     if(id == null){
       HttpSession session = request.getSession();
       id = (String) session.getAttribute("user_identifier");
     }
-    
+
     /*Get user from OAuth2*/
     if (id == null) {
       try {
@@ -302,19 +362,19 @@ public class LoginManager {
       }
     }
 
-    
+
     /*Trying to get user info from X509 cert*/
     String CertOpenIdIdentifier = null;
     if (id == null) {
       Debug.println("Trying to retrieve username from cert");
       String uniqueId = null;
-      
+
       // org.apache.catalina.authenticator.SSLAuthenticator
       X509Certificate[] certs = (X509Certificate[]) request
           .getAttribute("javax.servlet.request.X509Certificate");
       if (null != certs && certs.length > 0) {
         X509Certificate cert = certs[0];
-        
+
         uniqueId = "x509_"+cert.getSerialNumber();
         String subjectDN = cert.getSubjectDN().toString();
         //Debug.println("getSubjectDN: " + subjectDN);
@@ -330,11 +390,11 @@ public class LoginManager {
         Debug.println("No cert provided");
       }
 
-      
+
       if (CertOpenIdIdentifier != null) {
         id = CertOpenIdIdentifier;
         try{
-          
+
           accessToken = uniqueId+"_"+CertOpenIdIdentifier;
           //Debug.println("Unique id = ["+accessToken+"]");
           request.getSession().setAttribute("openid_identifier",id);
@@ -343,7 +403,7 @@ public class LoginManager {
         }
       }
     }
-    
+
     /* Get user from climate4impact cookie */
     if(id == null){
       String userIdFromCookie = getUserFromCookie(request);
@@ -352,9 +412,9 @@ public class LoginManager {
         Debug.println("Retrieved user_identifier from climate4impact cookie");
         request.getSession().setAttribute("user_identifier",id);
       }
-      Debug.errprintln("Get User from cooke: "+id);
+      Debug.errprintln("Get User from cookie: "+id);
     }
-    
+
     /* Still no user found... */
     if (id == null) {
       throw new WebRequestBadStatusException(401,
@@ -363,14 +423,14 @@ public class LoginManager {
 
     ImpactUser user = getUser(id);
 
-    
+
     user.setAttributesFromHTTPRequestSession(request,response,accessToken);
-    
+
     try {
       checkLogin(user);
     } catch (Exception e) {
     }
-    
+
     return user;
   }
 
@@ -401,8 +461,8 @@ public class LoginManager {
     return getUserAndRegisterCookie(request, null);
   }
 
-  
-  
+
+
   public static String makeUserIdString(String userId){
     if (userId == null)
       return null;
@@ -413,7 +473,7 @@ public class LoginManager {
     return userId;
   }
 
-  
+
   public static ImpactUser doesUserExist(String userId) {
     if (userId == null)return null;
     userId = makeUserIdString(userId);
@@ -425,7 +485,7 @@ public class LoginManager {
     }
     return null;
   }
-  
+
   /**
    * Get user based on his/hers userId
    * 
@@ -445,7 +505,7 @@ public class LoginManager {
 
     users.add(user);
 
-    
+
     /* NOTE CHECKLOGIN SHOULD NOT YET BE CALLED, AS USER ATTRIBUTES FROM SESSION OR NOT YET RETRIEVED. E.G. OpenID is not yet known */
     /* We do this for google accounts, to allow x509 cert creation for CLIPC */
     if(user.getUserId().startsWith("google")){
@@ -566,7 +626,7 @@ public class LoginManager {
       throw new Exception("Unable to validate credential for user "
           + user.getUserId() + "\n" + e.getMessage());
     }
-    
+
     /* Check if OpenID is same as ID from certificate */
     String CertOpenIdIdentifier = null;
     String[] dnItems = cert.getSubjectDN().toString().split(", ");
@@ -577,7 +637,7 @@ public class LoginManager {
             + CNIndex);
       }
     }
-    
+
     if(user.getOpenId()!=null && CertOpenIdIdentifier!=null){
       if(!user.getOpenId().equals(CertOpenIdIdentifier)){
         Debug.errprintln("Certificate ID is different from OpenID:");
@@ -589,9 +649,9 @@ public class LoginManager {
         }
       }
     }
-    
-  
-    
+
+
+
   }
 
   /**
@@ -754,8 +814,8 @@ public class LoginManager {
       }
     } catch (Exception e) {
     }
-    
-    
+
+
 
     request.getSession().setAttribute("access_token", null);
     request.getSession().setAttribute("openid_identifier", null);

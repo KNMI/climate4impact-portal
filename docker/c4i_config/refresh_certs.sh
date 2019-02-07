@@ -12,6 +12,7 @@ echo | openssl s_client -connect accounts.google.com:443 2>&1 | sed -ne '/-BEGIN
 keytool -delete -alias accounts.google.com  -keystore esg-truststore.ts -storepass changeit > /dev/null
 keytool -import -v -trustcacerts -alias accounts.google.com -file accounts.google.com.pem -keystore esg-truststore.ts -storepass changeit -noprompt
 
+
 # 
 # echo "Putting cert for ceda.ac.uk"
 # echo | openssl s_client -connect ceda.ac.uk:443 2>&1 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'  > ceda.ac.uk.pem
@@ -66,6 +67,24 @@ keytool -import -v -trustcacerts -alias climate4impact-tomcat-ca -file climate4i
 
 #3) Put this certificate from climate4impact-tomcat-ca.pem into the globus truststore
 cp climate4impact-tomcat-ca.pem ./certificates/
+c_rehash ./certificates/
+
+### Add the impactportal CA for issuing certificates in the truststore as well ###
+
+echo "Putting impactportal CA into truststore"
+keytool -delete -alias climate4impact-certissuer-ca  -keystore esg-truststore.ts -storepass changeit > /dev/null
+keytool -import -v -trustcacerts -alias climate4impact-certissuer-ca -file impactportal_CA.pem -keystore esg-truststore.ts -storepass changeit -noprompt
+
+cp impactportal_CA.pem ./certificates/
+c_rehash ./certificates/
+
+### Add the clipc CA ###
+
+echo "Putting impactportal CA into truststore"
+keytool -delete -alias maris-clipc-ca  -keystore esg-truststore.ts -storepass changeit > /dev/null
+keytool -import -v -trustcacerts -alias maris-clipc-ca -file maris.crt -keystore esg-truststore.ts -storepass changeit -noprompt
+
+cp maris.crt ./certificates/
 c_rehash ./certificates/
 
 

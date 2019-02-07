@@ -29,6 +29,15 @@ keytool -genkey -noprompt -keypass password -alias tomcat \
   -keyalg RSA -storepass password -keystore ./docker/c4i_config/c4i_keystore.jks -deststoretype pkcs12 \
   -dname CN=${HOSTNAME}:444
  ```
+ 
+# Create your own CA for issuing certificates
+
+```
+openssl genrsa -out docker/c4i_config/impactportal_CA.key 2048
+openssl req -x509 -days 3650 -new -nodes -key docker/c4i_config/impactportal_CA.key -sha256 -out docker/c4i_config/impactportal_CA.pem -subj '/O=IS_ENES/OU=KNMI/CN=IMPACTPORTAL_CA'
+```
+The certificate of the CA (impactportal_CA.pem) is added to the trustroots and truststore in the following steps.
+
 # Update esg-truststore
 ```
 cd docker/c4i_config && bash refresh_certs.sh && cd ../../

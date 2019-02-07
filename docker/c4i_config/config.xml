@@ -103,6 +103,8 @@
     <truststorepassword>changeit</truststorepassword>
     <truststorefile>/config/esg-truststore.ts</truststorefile>
     <trustrootslocation>/config/certificates/</trustrootslocation>
+    <issuer_ca_certificate>/config/issuer_ca_certificate.pem</issuer_ca_certificate>
+    <issuer_ca_privatekey>/config/issuer_ca_privatekey.key</issuer_ca_privatekey>
   </loginconfig>
   
   <!-- The email adresses used for the contact form -->
