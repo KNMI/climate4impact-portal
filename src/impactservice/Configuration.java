@@ -14,7 +14,7 @@ public class Configuration {
   static String portalMode = "c4i";
   public static String getPortalMode(){
     readConfig();
-    return portalMode;//"c3s-magic";//c4i
+    return portalMode;//"c3s-magic";//c4i//c4i-dev
   }
   
   static long readConfigPolInterval = 0;;
@@ -99,7 +99,7 @@ public class Configuration {
       
       configReader.parseString(configFile);
     } catch (Exception e) {
-      Debug.println("Unable to read "+getConfigFile());
+      Debug.println("Unable to read "+getConfigFile() + " " + e.getMessage());
       configReader = null;
       return;
     }
@@ -344,6 +344,13 @@ public class Configuration {
     private static String myProxyDefaultPassword = "<defaultpassword>";
     private static String trustRootsLocation = null;
     
+    /* impactportalCertificateIssuer_CACertificate */
+    private static String issuerCACertificate = null;
+    /* impactportalCertificateIssuer_CAPrivateKey */
+    private static String issuerCAPrivatekey = null;
+    
+    
+    
     // myProxyDefaultUserName should be null, because in that case the openid identifier from the current user is used.
     // It can be set to override a custom username, e.g. in case of testing on a workstation.
     private static String myProxyDefaultUserName = null;
@@ -356,6 +363,8 @@ public class Configuration {
       myProxyDefaultUserName = configReader.getNodeValue("impactportal.loginconfig.myproxyserverusernameoverride");
       myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
       trustRootsLocation = configReader.getNodeValue("impactportal.loginconfig.trustrootslocation");
+      issuerCACertificate = configReader.getNodeValue("impactportal.loginconfig.issuer_ca_certificate");
+      issuerCAPrivatekey = configReader.getNodeValue("impactportal.loginconfig.issuer_ca_privatekey");
       
       Debug.println("Setting javax.net.ssl.trustStore to "+trustStoreFile);
       System.setProperty("javax.net.ssl.trustStore",trustStoreFile);
@@ -370,10 +379,9 @@ public class Configuration {
     public static String getTrustStorePassword(){readConfig();return trustStorePassword;}
     public static String getMyProxyDefaultPassword(){readConfig();return myProxyDefaultPassword;}
     public static String getMyProxyDefaultUserName(){readConfig();return myProxyDefaultUserName;}
-
-    public static String getTrustRootsLocation() {
-      return trustRootsLocation;
-    }
+    public static String getTrustRootsLocation() {readConfig(); return trustRootsLocation; }
+    public static String getIssuerCACertificate() {readConfig(); return issuerCACertificate; }
+    public static String getIssuerCAPrivateKey() {readConfig(); return issuerCAPrivatekey; }
 
     
   }

@@ -1,0 +1,536 @@
+<Configuration>
+
+  <!--Legends -->
+  <Legend name="Tg_woltnhoff" type="colorRange">
+    <palette index="000" red="143" green="133" blue="186"/>
+    <palette index="006" red="079" green="072" blue="149"/>
+    <palette index="012" red="000" green="057" blue="128"/>
+    <palette index="018" red="000" green="084" blue="157"/>
+    <palette index="024" red="000" green="112" blue="184"/>
+    <palette index="030" red="000" green="139" blue="208"/>
+    <palette index="036" red="000" green="158" blue="205"/>
+    <palette index="042" red="001" green="168" blue="186"/>
+    <palette index="048" red="045" green="183" blue="185"/>
+    <palette index="054" red="000" green="153" blue="161"/>
+    <palette index="060" red="000" green="125" blue="143"/>
+    <palette index="066" red="000" green="113" blue="109"/>
+    <palette index="072" red="001" green="089" blue="047"/>
+    <palette index="078" red="000" green="109" blue="051"/>
+    <palette index="084" red="040" green="154" blue="067"/>
+    <palette index="090" red="118" green="184" blue="086"/>
+    <palette index="096" red="149" green="195" blue="107"/>
+    <palette index="102" red="175" green="203" blue="082"/>
+    <palette index="108" red="197" green="213" blue="080"/>
+    <palette index="120" red="222" green="219" blue="000"/>
+    <palette index="126" red="241" green="229" blue="031"/>
+    <palette index="132" red="255" green="240" blue="063"/>
+    <palette index="138" red="255" green="244" blue="129"/>
+    <palette index="144" red="255" green="246" blue="177"/>
+    <palette index="150" red="255" green="241" blue="196"/>
+    <palette index="156" red="255" green="231" blue="171"/>
+    <palette index="162" red="253" green="213" blue="144"/>
+    <palette index="168" red="250" green="193" blue="114"/>
+    <palette index="174" red="247" green="170" blue="066"/>
+    <palette index="180" red="239" green="127" blue="001"/>
+    <palette index="186" red="235" green="105" blue="009"/>
+    <palette index="192" red="232" green="079" blue="019"/>
+    <palette index="198" red="228" green="046" blue="024"/>
+    <palette index="204" red="227" green="000" blue="027"/>
+    <palette index="210" red="209" green="000" blue="024"/>
+    <palette index="216" red="189" green="010" blue="029"/>
+    <palette index="222" red="152" green="027" blue="033"/>
+    <palette index="228" red="102" green="038" blue="036"/>
+    <palette index="234" red="080" green="041" blue="036"/>
+    <palette index="240" red="080" green="041" blue="036"/>
+  </Legend>
+  
+  <Legend name="temperature" type="colorRange">
+    <palette index="0"   red="0"  green="60" blue="123"/>
+    <palette index="30"  red="0"  green="100"   blue="140"/>
+    <palette index="60"  red="8"    green="130"   blue="206"/>
+    <palette index="85"  red="132"    green="211"   blue="255"/>
+    <palette index="120" red="247"   green="247" blue="247"/>
+    <palette index="155" red="255"   green="195" blue="57"/>
+    <palette index="180" red="232"  green="28" blue="0"/>
+    <palette index="210" red="165"  green="0" blue="0"/>
+    <palette index="240" red="90"   green="0" blue="0"/>
+  </Legend>
+  
+   <Legend name="mean-surface-temperature_c7e4" type="interval">
+    <palette min="0"   max="13"  red="30"  green="92"  blue="179"/>
+    <palette min="13"  max="27"  red="23"  green="111" blue="193"/>
+    <palette min="27"  max="40"  red="11"  green="142" blue="216"/>
+    <palette min="40"  max="53"  red="4"   green="161" blue="230"/>
+    <palette min="53"  max="67"  red="25"  green="181" blue="241"/>
+    <palette min="67"  max="80"  red="51"  green="188" blue="207"/>
+    <palette min="80"  max="93"  red="102" green="204" blue="206"/>
+    <palette min="93"  max="107"  red="153" green="219" blue="184"/>
+    <palette min="107" max="120"  red="192" green="229" blue="136"/>
+    <palette min="120" max="133" red="204" green="230" blue="75" />
+    <palette min="133" max="147" red="243" green="240" blue="29" />
+    <palette min="147" max="160" red="254" green="222" blue="39" />
+    <palette min="160" max="173" red="252" green="199" blue="7"  />
+    <palette min="173" max="187" red="248" green="157" blue="14" />
+    <palette min="187" max="200" red="245" green="114" blue="21" />
+    <palette min="200" max="213" red="241" green="71"  blue="28" />
+    <palette min="213" max="227" red="219" green="30"  blue="38" />
+    <palette min="227" max="240" red="164" green="38"  blue="44" />
+  </Legend>
+  
+  <Legend name="mean-surface-temperature_c7e4_cr" type="colorRange">
+    <palette index="0"   red="30"  green="92"  blue="179"/>
+    <palette index="14"  red="23"  green="111" blue="193"/>
+    <palette index="28"  red="11"  green="142" blue="216"/>
+    <palette index="42"  red="4"   green="161" blue="230"/>
+    <palette index="56"  red="25"  green="181" blue="241"/>
+    <palette index="71"  red="51"  green="188" blue="207"/>
+    <palette index="85"  red="102" green="204" blue="206"/>
+    <palette index="99"  red="153" green="219" blue="184"/>
+    <palette index="113" red="192" green="229" blue="136"/>
+    <palette index="127" red="204" green="230" blue="75" />
+    <palette index="141" red="243" green="240" blue="29" />
+    <palette index="155" red="254" green="222" blue="39" />
+    <palette index="169" red="252" green="199" blue="7"  />
+    <palette index="184" red="248" green="157" blue="14" />
+    <palette index="198" red="245" green="114" blue="21" />
+    <palette index="212" red="241" green="71"  blue="28" />
+    <palette index="226" red="219" green="30"  blue="38" />
+    <palette index="240" red="164" green="38"  blue="44" />
+  </Legend>
+  
+  <Style name="temperature_c7e4">
+     <Legend fixedclasses="true" tickinterval="10" tickround="2">mean-surface-temperature_c7e4</Legend>
+    <Min>0</Min>
+    <Max>200</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Temperature" abstract="Temperature"/>
+  </Style>
+  
+ 
+   
+  <!-- JRC Styles -->
+  
+  <Legend name="JRC-GSL" type="interval">
+    <palette index="0"   red="76"  green="31"  blue="153"/> <!--120-->
+    <palette index="17"  red="105" green="60"  blue="154"/>
+    <palette index="34"  red="134" green="89"  blue="165"/>
+    <palette index="51"  red="161" green="118" blue="174"/>
+    <palette index="69"  red="188" green="154" blue="183"/>
+    <palette index="86"  red="210" green="193" blue="185"/>
+    <palette index="103" red="239" green="230" blue="190"/> <!--240-->
+    <palette index="120" red="235" green="243" blue="190"/> <!--260-->
+    <palette index="137" red="197" green="224" blue="150"/> <!--280-->
+    <palette index="154" red="159" green="202" blue="118"/> <!--300-->
+    <palette index="172" red="121" green="181" blue="87"/> <!--320-->
+    <palette index="189" red="88"  green="165" blue="58"/> <!--340-->
+    <palette index="206" red="51"  green="148" blue="34"/> <!--360-->
+    <palette index="223" red="230" green="0"   blue="0"/> <!--380-->
+  </Legend>
+  
+  
+  
+  <Legend name="temperature-inv" type="colorRange">
+    <palette index="0" red="90"   green="0" blue="0"/>
+    <palette index="30" red="165"  green="0" blue="0"/>
+    <palette index="60" red="232"  green="28" blue="0"/>
+    <palette index="85" red="255"   green="195" blue="57"/>
+    <palette index="120" red="247"   green="247" blue="247"/>
+    <palette index="155"  red="132"    green="211"   blue="255"/>
+    <palette index="180"  red="8"    green="130"   blue="206"/>
+    <palette index="210"  red="0"  green="100"   blue="140"/>
+    <palette index="240"   red="0"  green="60" blue="123"/>
+  </Legend>
+  
+  
+    <Legend name="isoluminant" type="colorRange">
+    <palette index="0"   red="216"  green="15" blue="15"/>
+    <palette index="48"  red="134"  green="134"   blue="0"/>
+    <palette index="96"  red="0"    green="151"   blue="0"/>
+    <palette index="144"  red="0"    green="143"   blue="143"/>
+    <palette index="192" red="81"   green="253" blue="247"/>
+    <palette index="240" red="183"   green="0" blue="183"/>
+  </Legend>
+  
+  <Legend name="elevation" type="colorRange">
+    <palette index="0"   red="0"   green="191" blue="191"/>
+    <palette index="48"  red="0"   green="255" blue="0"/>
+    <palette index="96"  red="255" green="255" blue="0"/>
+    <palette index="144" red="255" green="127" blue="0"/>
+    <palette index="192" red="191" green="127" blue="63"/>
+    <palette index="240" red="20"  green="20"  blue="20"/>
+  </Legend>
+  
+      
+  <Style name="elevation">
+    <Legend fixedclasses="true" tickinterval="1" tickround="1">elevation</Legend>
+    <Min>0.0</Min>
+    <Max>10</Max>
+    <NameMapping name="nearest"   title="Elevation colors" abstract="Drawing images with elevation colors"/>
+  </Style>
+  
+  <Style name="isoluminant">
+    <Legend fixedclasses="true" tickinterval="1" tickround="1">isoluminant</Legend>
+    <Min>0.0</Min>
+    <Max>10</Max>
+    <NameMapping name="nearest"   title="Isoluminant colors" abstract="Drawing images with isoluminant colors"/>
+  </Style>
+  
+  
+  <Style name="JRC-GSL">
+    <Legend fixed="true" tickinterval="20">JRC-GSL</Legend>
+    <Min>100</Min>
+    <Max>380</Max>
+    <ShadeInterval>1</ShadeInterval>
+    <ContourLine width="1.0" linecolor="#000000" textcolor="#000000" textformatting="" interval="15"/>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="GSL" abstract="GSL amount with nearest neighbour interpolation"/>
+    <NameMapping name="nearestcontour"  title="GSL Contours" abstract="GSL amount with contour lines"/>
+    <NameMapping name="shaded"          title="GSL Shaded" abstract="GSL amount in discrete classes"/>
+    <NameMapping name="contour"         title="GSL Contours" abstract="GSL amount with contour lines"/>
+    <NameMapping name="shadedcontour"   title="GSL Shaded + Contours" abstract="GSL amount in discrete classes and contour lines"/>
+    <StandardNames standard_name="GSL" />
+    <LegendGraphic value="/data/webgis/is-enes/climate4impact/config/JRC-GSL-Legend.png"/>
+  </Style>
+  
+  <Style name="SPI3">
+    <Legend fixed="true" tickinterval="1">temperature-inv</Legend>
+    <Min>-5</Min>
+    <Max>5</Max>
+    <ShadeInterval>1</ShadeInterval>
+    <ContourLine width="1.0" linecolor="#000000" textcolor="#000000" textformatting="" classes="0"/>
+    
+    
+    <RenderMethod>nearest,nearestcontour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="SPI3" abstract="SPI3 amount with nearest neighbour interpolation"/>
+    <NameMapping name="nearestcontour"  title="SPI3 Contours" abstract="SPI3 amount with contour lines"/>
+    <NameMapping name="shaded"          title="SPI3 Shaded" abstract="SPI3 amount in discrete classes"/>
+    <NameMapping name="contour"         title="SPI3 Contours" abstract="SPI3 amount with contour lines"/>
+    <NameMapping name="shadedcontour"   title="SPI3 Shaded + Contours" abstract="SPI3 amount in discrete classes and contour lines"/>
+    <StandardNames standard_name="SPI3" units="standard deviations"/>
+  </Style>
+  
+  
+  <!-- Gerics Uncertainty styles -->
+  
+ <Legend name="uncertainty" type="colorRange">
+    <palette index="000" red="255" green="255" blue="255"/>
+    <palette index="060" red="196" green="196" blue="196"/>
+    <palette index="120" red="252" green="209" blue="112"/>
+    <palette index="180" red="249" green="145" blue="45"/>
+    <palette index="240" red="191" green="25" blue="35"/>
+  </Legend>
+  <Style name="uncertainty">
+    <Legend fixed="true" tickinterval="1">uncertainty</Legend>
+    <Min>1</Min>
+    <Max>5</Max>
+    <ValueRange min="1" max="5"/>
+    <RenderMethod>stippling,nearest</RenderMethod>
+    <Stippling distancex="22" distancey="22" discradius="7"/>
+    <NameMapping name="nearest"         title="Uncertainty" abstract="Uncertainty"/>
+    <NameMapping name="stippling"         title="Uncertainty stippled" abstract="Uncertainty stippled"/>
+    <StandardNames standard_name="uncertainty"/>
+  </Style>
+  
+
+    <!-- Legends for Ioannis Bistinas <y.bistinas@reading.ac.uk> 2016-09-16 -->
+  
+  <Legend name="earth" type="svg" file="/data/webgis/is-enes/climate4impact/config/svggradientlegends/earth.svg"/>
+
+   <Style name="earth_days">
+    <Legend fixedclasses="true" tickround="1">earth</Legend>
+    <Min>0</Min>
+    <Max>365</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Snow amount in days" abstract="lwe_thickness_of_surface_snow_amount"/>
+    <StandardNames standard_name="lwe_thickness_of_surface_snow_amount" units="^day.*$"/>
+  </Style>
+  
+  
+  <Style name="earth_mm">
+    <Legend fixedclasses="true" tickround="1">earth</Legend>
+    <Min>0</Min>
+    <Max>25</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Snow amount in mm" abstract="lwe_thickness_of_surface_snow_amount"/>
+    <StandardNames standard_name="lwe_thickness_of_surface_snow_amount" units="mm"/>
+  </Style>
+  
+  
+  
+  
+  <!--Styles -->
+  <Style name="auto">
+    <Legend>temperature</Legend>
+    <Scale>0</Scale>
+    <Offset>0</Offset>
+    <RenderMethod>nearest,bilinear</RenderMethod>
+    <StandardNames standard_name="*"/>
+    <NameMapping name="nearest"         title="Stretched" abstract="Stretched to min/max values"/>
+    <NameMapping name="bilinear"        title="Stretched bilinear" abstract="Stretched to min/max values with bilinear interpolation"/>
+    <!--<NameMapping name="point"           title="Stretched points" abstract="Stretched to min/max values for point data"/>-->
+  </Style>
+  
+    
+  <!-- Indicator styles -->
+
+  <Style name="auto-elevation">
+    <Legend>elevation</Legend>
+    <Scale>0</Scale>
+    <Offset>0</Offset>
+    <RenderMethod>nearest</RenderMethod>
+    <StandardNames standard_name="*"/>
+    <NameMapping name="nearest"         title="Stretched with elevation colors" abstract="Stretched to min/max values"/>
+
+    <!--<NameMapping name="point"           title="Stretched points" abstract="Stretched to min/max values for point data"/>-->
+  </Style>
+
+  <Style name="mean-surface-temperature_c7e4_cr">
+    <Legend>mean-surface-temperature_c7e4_cr</Legend>
+    <Scale>0</Scale>
+    <Offset>0</Offset>
+    <RenderMethod>nearest,bilinear</RenderMethod>
+    <StandardNames standard_name="*"/>
+    <NameMapping name="nearest"         title="Stretched with temperature legend" abstract="Stretched to min/max values"/>
+    <NameMapping name="bilinear"        title="Stretched bilinear with temperature legend" abstract="Stretched to min/max values with bilinear interpolation"/>
+    <NameMapping name="point"           title="Stretched points" abstract="Stretched to min/max values for point data"/>
+  </Style>
+  
+  <Style name="autopoint">
+    <Legend>temperature</Legend>
+    <Scale>0</Scale>
+    <Offset>0</Offset>
+    <RenderMethod>point</RenderMethod>
+    <StandardNames standard_name="*"/>
+    <NameMapping name="point"           title="Stretched for point data" abstract="Stretched to min/max values for point data"/>
+  </Style>
+  
+  <Legend name="bluewhitered" type="colorRange">
+    <palette index="0"   red="0"  green="60" blue="123"/> 
+    <palette index="30"  red="0"  green="100"   blue="140"/> 
+    <palette index="60"  red="8"    green="130"   blue="206"/> 
+    <palette index="85"  red="132"    green="211"   blue="255"/> 
+    <palette index="120" red="247"   green="247" blue="247"/>
+    <palette index="155" red="255"   green="195" blue="57"/> 
+    <palette index="180" red="232"  green="28" blue="0"/> 
+    <palette index="210" red="165"  green="0" blue="0"/> 
+    <palette index="240" red="90"   green="0" blue="0"/>  
+  </Legend>   
+  
+    <Legend name="precipcolors" type="colorRange">
+    <palette index="0"   red="248"   green="228"   blue="162"/> 
+    <palette index="40"  red="218"   green="228"   blue="176"/> 
+    <palette index="80"  red="180"   green="204"   blue="113"/> 
+    <palette index="120" red="138"   green="181"   blue="059"/> 
+    <palette index="160" red="086"   green="168"   blue="148"/> 
+    <palette index="200" red="000"   green="134"   blue="189"/> 
+    <palette index="240" red="042"   green="066"   blue="143"/> 
+  </Legend>
+  
+  <Legend name="whitealpha" type="colorRange">
+    <palette index="0"   red="255"   green="255"   blue="255"  alpha="0"/> 
+    <palette index="240" red="255" green="255"   blue="255"    alpha="255"/> 
+  </Legend>
+  
+  <Style name="pressure_Pa">
+    <Legend fixed="true">bluewhitered</Legend>
+    <Min>95000</Min>
+    <Max>105000</Max>
+    <ShadeInterval>500</ShadeInterval>
+    <ContourLine width="1.2" linecolor="#000000" textcolor="#000000" textformatting="%2.0f" interval="5000"/>
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="1000.0"/>
+    <RenderMethod>nearest,shaded,contour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Pressure" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="Pressure contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="Pressure shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="Pressure bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="Pressure nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="Pressure bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="Pressure shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="air_pressure_at_sea_level" units="Pa"/>
+  </Style>
+  
+  <Style name="temperature_K">
+    <Legend fixed="true">bluewhitered</Legend>
+    <Min>240</Min>
+    <Max>310</Max>
+    <ShadeInterval>5</ShadeInterval>
+    <ContourLine width="1.2" linecolor="#000000" textcolor="#000000" textformatting="%2.0f" interval="10"/>
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="5"/>
+    <RenderMethod>nearest,shaded,nearestcontour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Temperature" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="Temperature contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="Temperature shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="Temperature bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="Temperature nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="Temperature bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="Temperature shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="air_temperature" units="K"/>
+  </Style>
+  
+    <Style name="temperature_C">
+    <Legend fixed="true">bluewhitered</Legend>
+    <Min>-30</Min>
+    <Max>30</Max>
+    <ShadeInterval>5</ShadeInterval>
+    <ContourLine width="1.2" linecolor="#000000" textcolor="#000000" textformatting="%2.0f" interval="10"/>
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="5"/>
+    <RenderMethod>nearest,shaded,nearestcontour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Temperature" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="Temperature contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="Temperature shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="Temperature bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="Temperature nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="Temperature bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="Temperature shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="air_temperature" units="Celsius"/>
+  </Style>
+  
+  <Style name="precipitation_kgm2s">
+    <Legend fixed="true">bluewhitered</Legend>
+    <Min>0.0001</Min>
+    <Max>0.0005</Max>
+    <Log>10</Log>
+    <ShadeInterval>0.00005</ShadeInterval>
+     <ValueRange min=".0001" max="10000000"/>
+    
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="0.00005"/>
+    <RenderMethod>nearest,shaded,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Precipitation" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="Precipitation contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="Precipitation shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="Precipitation bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="Precipitation nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="Precipitation bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="Precipitation shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="precipitation_flux" units="kg m-2 s-1"/>
+  </Style>
+  
+  
+  <Style name="specific_humidity">
+    <Legend fixed="true">bluewhitered</Legend>
+    <Min>0</Min>
+    <Max>0.025</Max>
+    <ShadeInterval>0.002</ShadeInterval>
+     
+    
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="0.002"/>
+    <RenderMethod>nearest,shaded,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="SpecificHumidty" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="SpecificHumidty contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="SpecificHumidty shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="SpecificHumidty bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="SpecificHumidty nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="SpecificHumidty bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="SpecificHumidty shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="specific_humidity"/>
+  </Style>
+  
+   <Style name="relative_humidity">
+    <Legend tickinterval="10" fixed="true">bluewhitered</Legend>
+    <Min>0</Min>
+    <Max>100</Max>
+    <ShadeInterval>10</ShadeInterval>
+     
+    <ContourLine width="2.3" linecolor="#000000" textcolor="#000000" textformatting="%0.1f" classes="50"/>
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="%0.1f" interval="10"/>
+    
+    <RenderMethod>nearest,shaded,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="RelativeHumidty" abstract="Rendered with nearest neighbour interpolation"/>
+    <NameMapping name="contour"         title="RelativeHumidty contour " abstract="Contourlines on a transparent background"/>
+    <NameMapping name="shaded"          title="RelativeHumidty shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="RelativeHumidty bilinear" abstract="Shaded"/>
+    <NameMapping name="nearestcontour"  title="RelativeHumidty nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="RelativeHumidty bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="RelativeHumidty shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="relative_humidity"/>
+  </Style>
+  
+   <Style name="percentage-alpha">
+    <Legend fixed="true">whitealpha</Legend>
+    <Min>0</Min>
+    <Max>100</Max>
+    <ShadeInterval>10</ShadeInterval>
+     
+    
+    <ContourLine width="3" linecolor="#0000FF" textcolor="#000000" textformatting="" classes="50"/>
+    <RenderMethod>nearest,bilinear,bilinearcontour,nearestcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Percentage with transparency" abstract="Nearest neighbour interpolation"/>
+    <NameMapping name="shaded"          title="Percentage with transparency shaded" abstract="Shaded"/>
+    <NameMapping name="bilinear"        title="Percentage with transparency bilinear" abstract="Bilinear rendering"/>
+    <NameMapping name="nearestcontour"  title="Percentage with transparency nearest + contours" abstract="Contours with nearest neighbour interpolated background"/>
+    <NameMapping name="bilinearcontour" title="Percentage with transparency bilinear + contours" abstract="Contours with bilinear interpolated background"/>
+    <NameMapping name="shadedcontour"   title="Percentage with transparency shaded + contours" abstract="Contours with shaded background"/>
+    <StandardNames standard_name="sea_ice_area_fraction" units="%"/>
+  </Style>
+  
+  <Style name="precipitation_amount_kg_m2">
+    <Legend fixed="true">precipcolors</Legend>
+    <Min>0</Min>
+    <Max>10</Max>
+    <ShadeInterval>1</ShadeInterval>
+     
+    
+    
+    
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval="1"/>
+    <RenderMethod>nearest,bilinear,shaded,contour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Nearest neighbour" abstract="Precipitation amount with nearest neighbour interpolation"/>
+    <NameMapping name="shaded"          title="shaded" abstract="Precipitation amount in discrete classes"/>
+    <NameMapping name="bilinear"        title="bilinear" abstract="Precipitation amount in continuous colors"/>
+    <NameMapping name="shadedcontour"   title="shaded + contours" abstract="Precipitation amount in discrete classes and contour lines"/>
+    <StandardNames standard_name="precipitation_amount" units="kg m-2"/>
+ 
+    
+  </Style>
+  
+  <Style name="water_evaporation_amount">
+    <Legend fixed="true">precipcolors</Legend>
+    <Min>0</Min>
+    <Max>5</Max>
+    <ShadeInterval>.5</ShadeInterval>
+     
+    
+    
+    
+    <ContourLine width=".3" linecolor="#000000" textcolor="#000000" textformatting="" interval=".5"/>
+    <RenderMethod>nearest,bilinear,shaded,contour,shadedcontour</RenderMethod>
+    <NameMapping name="nearest"         title="Nearest neighbour" abstract="Evaporation amount with nearest neighbour interpolation"/>
+    <NameMapping name="shaded"          title="shaded" abstract="Evaporation amount in discrete classes"/>
+    <NameMapping name="bilinear"        title="bilinear" abstract="Evaporation amount in continuous colors"/>
+    <NameMapping name="shadedcontour"   title="shaded + contours" abstract="Evaporation amount in discrete classes and contour lines"/>
+    <StandardNames standard_name="water_evaporation_amount" units="kg m-2"/>
+  </Style>
+  
+
+   <Style name="Stretched-0-25">
+    <Legend fixed="true" tickinterval="5">temperature</Legend>
+    <Min>0</Min>
+    <Max>25</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Stretched 0-25" abstract="Stretched 0-25"/>
+     <StandardNames standard_name="*"/>
+  </Style>
+  
+  <Style name="Stretched-0-50">
+    <Legend fixed="true" tickinterval="10">temperature</Legend>
+    <Min>0</Min>
+    <Max>50</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Stretched 0-50" abstract="Stretched 0-50"/>
+     <StandardNames standard_name="*"/>
+  </Style>
+
+  
+  <Style name="Stretched-0-100">
+    <Legend fixed="true" tickinterval="10">temperature</Legend>
+    <Min>0</Min>
+    <Max>100</Max>
+    <RenderMethod>nearest</RenderMethod>
+    <NameMapping name="nearest"         title="Stretched 0-100" abstract="Stretched 0-100"/>
+     <StandardNames standard_name="*"/>
+  </Style>
+  
+
+  
+</Configuration>
+  

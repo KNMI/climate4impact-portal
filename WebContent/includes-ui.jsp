@@ -5,7 +5,7 @@
     </script>
    
 <% String mode = Configuration.getPortalMode();//c4i %>
-<% if (mode.equals("c4i")){ %>   
+<% if (mode.indexOf("c4i") != -1){ %>   
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Climate impact portal | For exploration, visualization and analysis of climate model data</title>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" >

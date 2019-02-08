@@ -34,7 +34,8 @@ RUN yum update -y && yum install -y \
     # java dependencies
     ant \
     tomcat \
-    gdal-devel
+    gdal-devel \
+    libssl1.0.0 libssl-dev
 
 RUN mkdir /scr
 WORKDIR /src
@@ -68,6 +69,8 @@ RUN pip install netcdf4==1.3.1
 # PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
 #RUN conda install icu
 RUN conda install icu=56.1 -y
+
+ENV LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH
 
 # install icclim (will be conda in the future)
 RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
@@ -111,12 +114,9 @@ WORKDIR /src/wpsprocesses
 RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4impactwpsscripts.tar.gz
 RUN tar xvf climate4impactwpsscripts.tar.gz
 
-# Install certificates TODO will be done via VOLUME
-RUN  mkdir -p /root/.globus/
-WORKDIR /root/.globus/
-RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
-RUN tar -xvf esg_trusted_certificates.tar
-RUN mv esg_trusted_certificates certificates
+# It seems that the org.globus.myproxy.MyProxy getTrustRootsLocation is always in the ${USER}/.globus/certificates folder, still unable to configure this.
+RUN mkdir -p /root/.globus/
+RUN ln -s /config/certificates /root/.globus/certificates
 
 # TODO check why this is needed
 RUN conda install icu -y
@@ -137,14 +137,19 @@ RUN cp /src/climate4impact-portal/impactportal.war /usr/share/tomcat/webapps/
 ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 
-# Insert local instance trustroot into  truststore
-#CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
-#CMD keytool -import -v -trustcacerts -alias tomcat -file /root/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
-#CMD c_rehash /root/.globus/certificates
+RUN mkdir /impactspace
+
+# TODO Check why tomcat env is different from this env
+RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
+
+# Remember: Insert local instance trustroot into  truststore
+
 
 CMD mkdir -p /data/wpsoutputs && \
+    mkdir -p /data/pywpstmp && \
     mkdir -p /data/c4i/climate4impact-portal/impactspace && \
-    sed -i "s|\${EXTERNAL_ADDRESS_HTTPS}|${EXTERNAL_ADDRESS_HTTPS}|g" /config/pywps.cfg && \
+    cp /config/pywps_template.cfg /config/pywps.cfg && sed -i "s|\${EXTERNAL_ADDRESS_HTTPS}|${EXTERNAL_ADDRESS_HTTPS}|g" /config/pywps.cfg && \
+    export LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH && \
     /usr/libexec/tomcat/server start
 
 

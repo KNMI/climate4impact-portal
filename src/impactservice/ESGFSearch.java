@@ -201,7 +201,7 @@ public class ESGFSearch {
     Debug.println("desribeservice "+identifier);
     data = getFileFromImpactStorage((String)identifier);
     if(data == null){
-      Debug.errprintln("Ünable to get descriptions for search items:"+identifier+"\n");
+      Debug.errprintln("Unable to get descriptions for search items:"+identifier+"\n");
     }
     return data;
    

@@ -54,17 +54,19 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
-import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.gridforum.jgss.ExtendedGSSCredential;
-import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
 import impactservice.Configuration;
+
+import nl.knmi.adaguc.security.PemX509Tools;
 
 
 
@@ -145,7 +147,7 @@ public class HTTPTools extends HttpServlet {
     public String getMessage() {
       
       //if(statusCode == 401){
-        return statusCode+": "+ org.apache.commons.httpclient.HttpStatus.getStatusText(statusCode); 
+        return statusCode+": "+ statusCode; 
       //}
       //return ""+statusCode;
     }
@@ -211,18 +213,22 @@ public class HTTPTools extends HttpServlet {
     String result = null;
     String redirectLocation = null;
     try {
-      DefaultHttpClient httpclient = null;
+      HttpClient httpclient = null;
 
       if (pemFile == null || trustRootsFile == null || trustRootsPassword == null) {
         
-        httpclient = new DefaultHttpClient();
         
         if(basicAuthUserName!=null&&basicAuthPassword!=null){
-        
-          CredentialsProvider provider = httpclient.getCredentialsProvider();
-          UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(basicAuthUserName, basicAuthPassword);
-          
+          CredentialsProvider provider = new BasicCredentialsProvider();
+          UsernamePasswordCredentials credentials
+           = new UsernamePasswordCredentials(basicAuthUserName, basicAuthPassword);
           provider.setCredentials(AuthScope.ANY, credentials);
+            
+          httpclient = HttpClientBuilder.create()
+            .setDefaultCredentialsProvider(provider)
+            .build();
+        }else{
+          httpclient = HttpClientBuilder.create().build();
         }
         
         
@@ -231,8 +237,13 @@ public class HTTPTools extends HttpServlet {
 
         
       } else {
-        httpclient = createHTTPClientFromGSSCredential(pemFile, trustRootsFile,
-            trustRootsPassword);
+        PemX509Tools.setup();
+        httpclient = new PemX509Tools().getHTTPClientForPEMBasedClientAuthPEM(
+            trustRootsFile,
+            trustRootsPassword.toCharArray(), 
+            pemFile
+            ); 
+       
       }
 
       HttpGet httpget = new HttpGet(connectToURL);
@@ -251,9 +262,9 @@ public class HTTPTools extends HttpServlet {
       if(timeOutMs <=0){
         timeOutMs = 15000;
       }
-      HttpParams httpParams = httpclient.getParams();
-      HttpConnectionParams.setConnectionTimeout(httpParams, timeOutMs); // http.connection.timeout
-      HttpConnectionParams.setSoTimeout(httpParams, timeOutMs); // http.socket.timeout
+//      HttpParams httpParams = httpclient.getParams();
+//      HttpConnectionParams.setConnectionTimeout(httpParams, timeOutMs); // http.connection.timeout
+//      HttpConnectionParams.setSoTimeout(httpParams, timeOutMs); // http.socket.timeout
       
       
       response = httpclient.execute(httpget);
@@ -485,69 +496,69 @@ public class HTTPTools extends HttpServlet {
     return a;
   }
 
-  public static DefaultHttpClient createHTTPClientFromGSSCredential(
-      String pemFile, String trustRootsFile, String trustRootsPassword)
-      throws GSSException, KeyStoreException, NoSuchAlgorithmException,
-      CertificateException, IOException, UnrecoverableKeyException,
-      KeyManagementException {
-
-    Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
-    Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
-    ExtendedGSSManager m = (ExtendedGSSManager) ExtendedGSSManager
-        .getInstance();
-    GlobusGSSCredentialImpl cred = (GlobusGSSCredentialImpl) m
-        .createCredential(Tools.readBytes(pemFile),
-            ExtendedGSSCredential.IMPEXP_OPAQUE,
-            GSSCredential.DEFAULT_LIFETIME, null, GSSCredential.ACCEPT_ONLY);
-
-    PrivateKey privateKey = cred.getPrivateKey();// KeyFactory.getInstance("RSA").
-                                                 // generatePrivate(new
-                                                 // PKCS8EncodedKeySpec(derFile.privateKeyDER));
-    Certificate certificate = cred.getCertificateChain()[0];
-
-    // Create a new keyStore to load TrustRoots, Certificates and Keys in.
-    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-    // Load trustroots
-    FileInputStream trustStoreStream = new FileInputStream(new File(
-        trustRootsFile));
-    
-    try {
-      keyStore.load(trustStoreStream, "changeit".toCharArray());
-    } finally {
-      try {
-        trustStoreStream.close();
-      } catch (Exception ignore) {
-      }
-    }
-    trustStoreStream.close();
-
-    // Set key and certificate
-    keyStore.setKeyEntry("privateKeyAlias", privateKey,
-        trustRootsPassword.toCharArray(), new Certificate[] { certificate });
-
-    // Create a trustmanager
-    TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-    tmf.init(keyStore);
-
-    // Create a keymanager
-    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-    kmf.init(keyStore, trustRootsPassword.toCharArray());
-
-    // Setup SSL context
-    SSLContext sslcontext = SSLContext.getInstance("SSL");
-    sslcontext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
-        new java.security.SecureRandom());
-    SSLSocketFactory socketFactory = new SSLSocketFactory(sslcontext);
-    //socketFactory.setHostnameVerifier(new AllowAllHostnameVerifier());
-    Scheme sch = new Scheme("https", socketFactory, 443);
-
-    DefaultHttpClient httpclient = new DefaultHttpClient();
-    httpclient.getConnectionManager().getSchemeRegistry().register(sch);
-
-    Debug.println("x509 http client has been created");
-    return httpclient;
-  }
+//  public static DefaultHttpClient createHTTPClientFromGSSCredential(
+//      String pemFile, String trustRootsFile, String trustRootsPassword)
+//      throws GSSException, KeyStoreException, NoSuchAlgorithmException,
+//      CertificateException, IOException, UnrecoverableKeyException,
+//      KeyManagementException {
+//
+//    Debug.println("createHTTPClientFromGSSCredential, trustrootsfile:"+trustRootsFile);
+//    Debug.println("createHTTPClientFromGSSCredential, pemFile:"+pemFile);
+//    ExtendedGSSManager m = (ExtendedGSSManager) ExtendedGSSManager
+//        .getInstance();
+//    GlobusGSSCredentialImpl cred = (GlobusGSSCredentialImpl) m
+//        .createCredential(Tools.readBytes(pemFile),
+//            ExtendedGSSCredential.IMPEXP_OPAQUE,
+//            GSSCredential.DEFAULT_LIFETIME, null, GSSCredential.ACCEPT_ONLY);
+//
+//    PrivateKey privateKey = cred.getPrivateKey();// KeyFactory.getInstance("RSA").
+//                                                 // generatePrivate(new
+//                                                 // PKCS8EncodedKeySpec(derFile.privateKeyDER));
+//    Certificate certificate = cred.getCertificateChain()[0];
+//
+//    // Create a new keyStore to load TrustRoots, Certificates and Keys in.
+//    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+//
+//    // Load trustroots
+//    FileInputStream trustStoreStream = new FileInputStream(new File(
+//        trustRootsFile));
+//    
+//    try {
+//      keyStore.load(trustStoreStream, "changeit".toCharArray());
+//    } finally {
+//      try {
+//        trustStoreStream.close();
+//      } catch (Exception ignore) {
+//      }
+//    }
+//    trustStoreStream.close();
+//
+//    // Set key and certificate
+//    keyStore.setKeyEntry("privateKeyAlias", privateKey,
+//        trustRootsPassword.toCharArray(), new Certificate[] { certificate });
+//
+//    // Create a trustmanager
+//    TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+//    tmf.init(keyStore);
+//
+//    // Create a keymanager
+//    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+//    kmf.init(keyStore, trustRootsPassword.toCharArray());
+//
+//    // Setup SSL context
+//    SSLContext sslcontext = SSLContext.getInstance("SSL");
+//    sslcontext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+//        new java.security.SecureRandom());
+//    SSLSocketFactory socketFactory = new SSLSocketFactory(sslcontext);
+//    //socketFactory.setHostnameVerifier(new AllowAllHostnameVerifier());
+//    Scheme sch = new Scheme("https", socketFactory, 443);
+//
+//    DefaultHttpClient httpclient = new DefaultHttpClient();
+//    httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+//
+//    Debug.println("x509 http client has been created");
+//    return httpclient;
+//  }
 
   /**
    * Finds a KVP from the querystring. Returns null if not found.

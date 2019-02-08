@@ -1,3 +1,4 @@
+<%@page import="impactservice.Configuration"%>
 <div class="c4i-login-screen">
 <!-- Preferred identity provider:-->
 
@@ -15,7 +16,12 @@
 <!-- We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).-->
 <br/>You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a><br/>
 <br/><br/><br/>
-<!--  <button class="c4i-login-screen-showothersbutton">&raquo; Show other providers...</button>-->
+<%
+if (impactservice.Configuration.getPortalMode().equals("c4i-dev")) {
+	out.print("<button class=\"c4i-login-screen-showothersbutton\">&raquo; Show other providers...</button>");
+}
+%>
+
 <div class="c4i-login-screen-others">
 
 
