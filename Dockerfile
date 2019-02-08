@@ -114,12 +114,6 @@ WORKDIR /src/wpsprocesses
 RUN curl -L https://github.com/KNMI/impactwps/archive/master.tar.gz > climate4impactwpsscripts.tar.gz
 RUN tar xvf climate4impactwpsscripts.tar.gz
 
-# # Install certificates TODO will be done via VOLUME
-# RUN  mkdir -p /root/.globus/
-# WORKDIR /root/.globus/
-# RUN curl -L https://raw.githubusercontent.com/ESGF/esgf-dist/master/installer/certs/esg_trusted_certificates.tar > esg_trusted_certificates.tar
-# RUN tar -xvf esg_trusted_certificates.tar
-# #RUN mv esg_trusted_certificates certificates
 # It seems that the org.globus.myproxy.MyProxy getTrustRootsLocation is always in the ${USER}/.globus/certificates folder, still unable to configure this.
 RUN mkdir -p /root/.globus/
 RUN ln -s /config/certificates /root/.globus/certificates
@@ -148,10 +142,8 @@ RUN mkdir /impactspace
 # TODO Check why tomcat env is different from this env
 RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
 
-# Insert local instance trustroot into  truststore
-#CMD keytool  -export -alias tomcat -rfc -file /root/.globus/certificates/tomcat.pem -keystore /config/c4i_keystore.jks -storepass password
-#CMD keytool -import -v -trustcacerts -alias tomcat -file /root/.globus/certificates/tomcat.pem -keystore /config/esg-truststore.ts -storepass changeit -noprompt
-#CMD c_rehash /root/.globus/certificates
+# Remember: Insert local instance trustroot into  truststore
+
 
 CMD mkdir -p /data/wpsoutputs && \
     mkdir -p /data/pywpstmp && \
