@@ -73,9 +73,9 @@ RUN conda install icu=56.1 -y
 ENV LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH
 
 # install icclim (will be conda in the future)
-RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
-RUN tar xvf 4.2.5.tar.gz
-WORKDIR /src/icclim-4.2.5
+RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.13.tar.gz
+RUN tar xvf 4.2.13.tar.gz
+WORKDIR /src/icclim-4.2.13
 RUN gcc -fPIC -g -c -Wall ./icclim/libC.c -o ./icclim/libC.o
 RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 
@@ -140,7 +140,7 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 RUN mkdir /impactspace
 
 # TODO Check why tomcat env is different from this env
-RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
+#RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
 
 # Remember: Insert local instance trustroot into  truststore
 
