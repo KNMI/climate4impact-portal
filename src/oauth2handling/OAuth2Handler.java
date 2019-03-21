@@ -29,6 +29,7 @@ package oauth2handling;
 
 import impactservice.Configuration;
 import impactservice.Configuration.Oauth2Config.Oauth2Settings;
+import nl.knmi.adaguc.security.PemX509Tools;
 import impactservice.LoginManager;
 
 import java.io.ByteArrayInputStream;
@@ -73,10 +74,9 @@ import org.apache.oltu.oauth2.client.response.OAuthAccessTokenResponse;
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -495,58 +495,22 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     .println("Step 3 - Make SLCS certificate request to external OAuth2 service");
     UserInfo userInfo = new UserInfo();
     userInfo.user_identifier = null;//retrieved from slc x509 CN
-    Security.addProvider(new BouncyCastleProvider());
-
-    PublicKey publicKey = null;
-    PrivateKey privateKey = null;
-    KeyPairGenerator keyGen = null;
-
+    PemX509Tools.setup();
     // Generate KeyPair
     Debug.println("  Step 3.1 - Generate KeyPair");
-    try {
-      keyGen = KeyPairGenerator.getInstance("RSA");
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      return null;
-    }
-    keyGen.initialize(2048, new SecureRandom());
-    KeyPair keypair = keyGen.generateKeyPair();
-    publicKey = keypair.getPublic();
-    privateKey = keypair.getPrivate();
 
+    int keySize = 2048;
+    KeyPairGenerator keyGenkeyGeneratorRSA = KeyPairGenerator.getInstance("RSA");
+    keyGenkeyGeneratorRSA.initialize(keySize, new SecureRandom());
     // Generate Certificate Signing Request
     Debug.println("  Step 3.2 - Generate CSR");
     String CSRinPEMFormat = null;
-    try {
-
-      PKCS10CertificationRequest a = new PKCS10CertificationRequest(
-          "SHA256withRSA", new X509Name("CN=Requested Test Certificate"),
-          publicKey, null, privateKey);
-      StringWriter str = new StringWriter();
-      PEMWriter pemWriter = new PEMWriter(str);
-      pemWriter.writeObject(a);
-      pemWriter.close();
-      str.close();
-
-      CSRinPEMFormat = str.toString();
-      Debug.println("  CSR Seems OK");
-    } catch (InvalidKeyException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (NoSuchAlgorithmException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (NoSuchProviderException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (SignatureException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+    KeyPair keyPairCSR = keyGenkeyGeneratorRSA.generateKeyPair();
+    
+    PKCS10CertificationRequest csr = PemX509Tools.createCSR("CN=Requested Test Certificate", keyPairCSR);
+    CSRinPEMFormat = PemX509Tools.certificateToPemString(csr);
+    Debug.println("  CSR Seems OK");
+  
     Debug.println("  Step 3.3 - Use SLCS service with CSR and OAuth2 access_token");
 
     KVPKey key = new KVPKey();
@@ -595,17 +559,7 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
       throw new Exception("Unable to retrieve SLC from SLCS");
     }
 
-    String privateKeyInPemFormat = null;
-    try {
-      StringWriter str = new StringWriter();
-      PEMWriter pemWriter = new PEMWriter(str);
-      pemWriter.writeObject(privateKey);
-      pemWriter.close();
-      str.close();
-      privateKeyInPemFormat = str.toString();
-    } catch (Exception e) {
-
-    }
+    String privateKeyInPemFormat = PemX509Tools.privateKeyToPemString(keyPairCSR.getPrivate());
 
     Debug.println("Finished request");
 
@@ -685,9 +639,9 @@ keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file  slcs.ceda.ac.uk -
     // This section defines the use of the RSASSA-PKCS1-v1_5 signature algorithm
     // as defined in RFC 3447 [RFC3447], Section 8.2 (commonly known as PKCS#1),
     // using SHA-256 as the hash function. Note that the use of the
-    // RSASSA-PKCS1-v1_5 algorithm is described in FIPS 186-3 [FIPS.186‑3],
+    // RSASSA-PKCS1-v1_5 algorithm is described in FIPS 186-3 [FIPS.186-3],
     // Section 5.5, as is the SHA-256 cryptographic hash function, which is
-    // defined in FIPS 180-3 [FIPS.180‑3]. The reserved "alg" header parameter
+    // defined in FIPS 180-3 [FIPS.180-3]. The reserved "alg" header parameter
     // value "RS256" is used in the JWT Header Segment to indicate that the JWT
     // Crypto Segment contains an RSA SHA-256 signature.
     //

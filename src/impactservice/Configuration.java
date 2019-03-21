@@ -1,6 +1,9 @@
 package impactservice;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
+
 
 import tools.Debug;
 import tools.MyXMLParser.XMLElement;
@@ -10,10 +13,8 @@ public class Configuration {
 
   static String portalMode = "c4i";
   public static String getPortalMode(){
-    
     readConfig();
-    //portalMode = "c3s-magic";
-    return portalMode;//"c3s-magic";//c4i
+    return portalMode;//"c3s-magic";//c4i//c4i-dev
   }
   
   static long readConfigPolInterval = 0;;
@@ -69,9 +70,36 @@ public class Configuration {
     Debug.println("Reading configfile "+getConfigFile());
     XMLElement configReader = new XMLElement();
     try {
-      configReader.parseFile(getConfigFile());
+      String configFile = tools.Tools.readFile(getConfigFile());
+      /* Replace ${ENV.} with environment variable */
+      Set<String> foundValues = new HashSet<String>();
+      int start = 0, end = 0, index = -1;
+      do{
+        index = configFile.substring(start).indexOf("{ENV.");
+        if(index>=0){
+          start += index;
+          end = configFile.substring(start).indexOf("}");
+          if(end >=0){
+            end+=(start+1);
+              foundValues.add(configFile.substring(start, end));
+            start=end;
+          }else{
+            start+=5; /* In case } is missing, jump 5 places forward */
+          }
+        }
+      }while(index !=-1);
+      for(String key : foundValues) {
+        String envKey = key.substring(5,key.length()-1);
+        String envValue = System.getenv(envKey);
+        if(envValue == null){
+          throw new Exception("Environment variable ["+envKey+"] not set");
+        }
+        configFile = configFile.replace(key,envValue);
+      }
+      
+      configReader.parseString(configFile);
     } catch (Exception e) {
-      Debug.println("Unable to read "+getConfigFile());
+      Debug.println("Unable to read "+getConfigFile() + " " + e.getMessage());
       configReader = null;
       return;
     }
@@ -316,6 +344,13 @@ public class Configuration {
     private static String myProxyDefaultPassword = "<defaultpassword>";
     private static String trustRootsLocation = null;
     
+    /* impactportalCertificateIssuer_CACertificate */
+    private static String issuerCACertificate = null;
+    /* impactportalCertificateIssuer_CAPrivateKey */
+    private static String issuerCAPrivatekey = null;
+    
+    
+    
     // myProxyDefaultUserName should be null, because in that case the openid identifier from the current user is used.
     // It can be set to override a custom username, e.g. in case of testing on a workstation.
     private static String myProxyDefaultUserName = null;
@@ -328,6 +363,8 @@ public class Configuration {
       myProxyDefaultUserName = configReader.getNodeValue("impactportal.loginconfig.myproxyserverusernameoverride");
       myProxyDefaultPassword = configReader.getNodeValue("impactportal.loginconfig.myproxyserverpassword");
       trustRootsLocation = configReader.getNodeValue("impactportal.loginconfig.trustrootslocation");
+      issuerCACertificate = configReader.getNodeValue("impactportal.loginconfig.issuer_ca_certificate");
+      issuerCAPrivatekey = configReader.getNodeValue("impactportal.loginconfig.issuer_ca_privatekey");
       
       Debug.println("Setting javax.net.ssl.trustStore to "+trustStoreFile);
       System.setProperty("javax.net.ssl.trustStore",trustStoreFile);
@@ -342,10 +379,9 @@ public class Configuration {
     public static String getTrustStorePassword(){readConfig();return trustStorePassword;}
     public static String getMyProxyDefaultPassword(){readConfig();return myProxyDefaultPassword;}
     public static String getMyProxyDefaultUserName(){readConfig();return myProxyDefaultUserName;}
-
-    public static String getTrustRootsLocation() {
-      return trustRootsLocation;
-    }
+    public static String getTrustRootsLocation() {readConfig(); return trustRootsLocation; }
+    public static String getIssuerCACertificate() {readConfig(); return issuerCACertificate; }
+    public static String getIssuerCAPrivateKey() {readConfig(); return issuerCAPrivatekey; }
 
     
   }

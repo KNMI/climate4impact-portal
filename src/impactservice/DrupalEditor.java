@@ -200,7 +200,7 @@ public class DrupalEditor {
 				el.name = "";
 				el.attributes="";
 				el.parent=breadCrumbs;
-				if(breadCrumbs.getNumNodes()>3)el.content = " » " + titleNode.content.trim();else 	el.content = titleNode.content.trim();
+				if(breadCrumbs.getNumNodes()>3)el.content = " > " + titleNode.content.trim();else 	el.content = titleNode.content.trim();
 				// Print breadcrumbs
 				returnMessage+="<div class=\"breadcrumb\">\n";for(int j=0;j<breadCrumbs.getNumNodes();j++){if(!breadCrumbs.getNode(j).content.equals("Home")){returnMessage+=breadCrumbs.getNode(j).printTree();}}
 

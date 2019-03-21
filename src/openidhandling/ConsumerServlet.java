@@ -75,11 +75,7 @@ public class ConsumerServlet extends javax.servlet.http.HttpServlet {
 		// proxyProps.setProxyName("proxy.example.com");
 		// proxyProps.setProxyPort(8080);
 		// HttpClientFactory.setProxyProperties(proxyProps);
-		try {
-			this.manager = new ConsumerManager();
-		} catch (ConsumerException e) {
-			e.printStackTrace();
-		}
+  	this.manager = new ConsumerManager();
 		manager.setAssociations(new InMemoryConsumerAssociationStore());
 		manager.setNonceVerifier(new InMemoryNonceVerifier(5000));
 	}

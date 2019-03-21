@@ -24,7 +24,7 @@ try{
   <div class="footerlogos">
   
 <% String mode = Configuration.getPortalMode();//c4i %>
-<% if (mode.equals("c4i")){ %>   
+<% if (mode.indexOf("c4i") != -1){ %>   
     <table class="footerlogos">
     <tr>
     <td><a href="http://europa.eu/index_en.htm" target="_blank">

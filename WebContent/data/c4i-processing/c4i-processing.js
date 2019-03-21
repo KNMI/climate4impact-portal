@@ -604,7 +604,7 @@ var C4IProcessingInterface = function(options){
     html+="<span class=\"c4i-processing-report-container\">";
     //html+="<b>Processing report</b><br/>";
     html+="<table class=\"c4i-processing-table c4i-processing-report-table\">";
-    html+="<tr><th>Identifier</th><th>Title</th><th>Type</th><th>Value</th></tr>";
+    html+="<tr><th>Identifier</th><th>Title</th><th>Type</th><th>MimeType</th><th>Value</th></tr>";
     var keys = c4iProcessingGetKeys(data);
     if(c4iProcessingIndexOf(keys,'0')==-1){
       data={'0':data};
@@ -622,10 +622,23 @@ var C4IProcessingInterface = function(options){
         type = item.Data.LiteralData.attr.dataType;
       }
       
+
+      var mimeType="";
+      if(item.Data && item.Data.ComplexData && item.Data.ComplexData.attr && item.Data.ComplexData.attr.mimeType){
+    	  mimeType = item.Data.ComplexData.attr.mimeType;
+      }
+      
+      
       var value="";
       if(item.Data && item.Data.LiteralData && item.Data.LiteralData.value){
         value = item.Data.LiteralData.value;
+      }else{
+    	if(item.Data && item.Data.ComplexData && item.Data.ComplexData.value){
+    	  value = item.Data.ComplexData.value;
+    	}
       }
+      
+      
       
       if(c4iProcessingStartsWith(value,"base64:")){
         value = decodeBase64(value.substring("base64:".length));
@@ -635,6 +648,7 @@ var C4IProcessingInterface = function(options){
       
       
       html+="<td class=\"c4i-processing-report-table-type\">"+type+"</td>";
+      html+="<td class=\"c4i-processing-report-table-type\">"+mimeType+"</td>";
       
       if( (literalDataValueLowerCase.indexOf("dap")!=-1&&
           literalDataValueLowerCase.indexOf("http")!=-1 &&
@@ -650,7 +664,11 @@ var C4IProcessingInterface = function(options){
         html+="<table><tr><td class=\"c4i-processing-report-table-noborder\"><span class=\"c4i-processing-report-table-value-viewable\">"+htmlEncode(value)+"</span></td>";
         html+="<td class=\"c4i-processing-report-table-noborder\"><button class=\"c4i-processing-report-table-value-viewablebutton\">Show</button></td></tr></table></td>";
       } else{
-        html+="<td class=\"c4i-processing-report-table-value\">"+htmlEncode(value)+"</td>";
+    	if(mimeType && mimeType=='image/png'){
+    		html+="<td class=\"c4i-processing-report-table-value\"><img class=\"c4i-processing-previewstyle\" src=\"data:image/png;base64, " +value+ "\" alt=\"Image\" /></td>";
+    	}else{
+    		html+="<td class=\"c4i-processing-report-table-value\">"+htmlEncode(value)+"</td>";
+    	}
       }
       
       
@@ -806,7 +824,8 @@ var C4IProcessingInterface = function(options){
     
     /* Creates an input field for the process input */
     var createDataInput = function(DataInput){
-      //console.log(DataInput);
+
+      if( !DataInput.Identifier)return;
       var inputname = DataInput.Identifier.value;
       var myabstract="";
       
@@ -912,6 +931,12 @@ var C4IProcessingInterface = function(options){
         DataInputs = ProcessDescription.Execute.DataInputs.Input;
       }
     }
+    
+    // Single inputs are not nested into an array, check it out:
+    if (DataInputs.attr){
+    	DataInputs = [].concat(DataInputs);
+    }
+
     if(DataInputs){
       var keys = c4iProcessingGetKeys(DataInputs);
       keys=keys.sort();

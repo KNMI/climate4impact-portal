@@ -1,7 +1,12 @@
+<%@page import="impactservice.Configuration"%>
 <div class="c4i-login-screen">
-Preferred identity provider:
+<!-- Preferred identity provider:-->
 
 <div class="oauth2loginbox" onclick="oauthClick('ceda');"> <a class="oauth2loginbutton" href="#"><img src="/impactportal/images/this_is_NOT_the_BADC_logo.jpg"> Sign in with CEDA/BADC</a><span class="c4i_openidcompositor_registerspan"><a class="c4i_openidcompositor_registerlink" href="https://services.ceda.ac.uk/cedasite/register/info/"><i> Register</i></a></span></div>
+<br/>
+<div class="oauth2loginbox" onclick="oauthClick('google');"> 
+	<a class="oauth2loginbutton" href="#"><img src="/impactportal/images/google.png"> Sign in with Google (No ESGF support)</a><span class="c4i_openidcompositor_registerspan"></span></div>
+
 <!--
 <div onclick="openDialog('CEDA')" class="oauth2loginbox"> <a href="#" class="oauth2loginbutton">
 <img src="/impactportal/images/this_is_NOT_the_BADC_logo.jpg">Login at BADC/CEDA</a>
@@ -11,7 +16,12 @@ Preferred identity provider:
 <!-- We are working on <a href="/impactportal/account/OAuth2.jsp">OAuth2</a> support (beta).-->
 <br/>You can use the same account to access all datanodes: <a href="/impactportal/help/howto.jsp?q=create_esgf_account">HowTo.</a><br/>
 <br/><br/><br/>
-<button class="c4i-login-screen-showothersbutton">&raquo; Show other providers...</button>
+<%
+if (impactservice.Configuration.getPortalMode().equals("c4i-dev")) {
+	out.print("<button class=\"c4i-login-screen-showothersbutton\">&raquo; Show other providers...</button>");
+}
+%>
+
 <div class="c4i-login-screen-others">
 
 
