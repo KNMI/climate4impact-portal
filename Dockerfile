@@ -24,55 +24,38 @@ RUN yum update -y && yum install -y \
     udunits2 \
     udunits2-devel \
     make \
-    # conda dependency
     bzip2 \
-    # adaguc dependencies
     libxml2-devel \
     cairo-devel \
     gd-devel \
     postgresql-devel \
-    # java dependencies
     ant \
     tomcat \
     gdal-devel \
     libssl1.0.0 libssl-dev
 
-RUN mkdir /scr
+RUN yum update -y && yum install -y python-devel
+
 WORKDIR /src
 
-# conda
-RUN curl -L -O https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-RUN bash ./Miniconda2-latest-Linux-x86_64.sh -p /miniconda -b
-ENV PATH=/miniconda/bin:${PATH}
-RUN conda update -y conda
-RUN conda config --add channels conda-forge
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python get-pip.py
 
-# isntall python dependencies
 RUN yes | pip install --upgrade pip
-RUN conda update -y conda && conda install -y \
-    lxml \
-    numpy \
-    scipy \
-    netcdf4 \
-    python-dateutil \
-    isodate \
-    psycopg2 \
-    requests \
-    prov \
-    pydotplus
-
 RUN pip install python-magic
 RUN pip install Cython
-RUN pip install netcdf4==1.3.1
+RUN pip install netcdf4 \
+                netcdftime \
+                isodate \
+                requests \
+                pydotplus \
+                prov \
+                scipy \
+                numpy \
+                psycopg2 \
+                python-dateutil
 
-
-# PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
-#RUN conda install icu
-RUN conda install icu=56.1 -y
-
-ENV LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH
-
-# install icclim (will be conda in the future)
+# install icclim
 RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.13.tar.gz
 RUN tar xvf 4.2.13.tar.gz
 WORKDIR /src/icclim-4.2.13
@@ -118,9 +101,6 @@ RUN tar xvf climate4impactwpsscripts.tar.gz
 RUN mkdir -p /root/.globus/
 RUN ln -s /config/certificates /root/.globus/certificates
 
-# TODO check why this is needed
-RUN conda install icu -y
-
 # install impact portal
 WORKDIR /src
 COPY build.xml /src/climate4impact-portal/
@@ -139,20 +119,9 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 RUN mkdir /impactspace
 
-# TODO Check why tomcat env is different from this env
-#RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
-
 # Remember: Insert local instance trustroot into  truststore
-
-
 CMD mkdir -p /data/wpsoutputs && \
     mkdir -p /data/pywpstmp && \
     mkdir -p /data/c4i/climate4impact-portal/impactspace && \
     cp /config/pywps_template.cfg /config/pywps.cfg && sed -i "s|\${EXTERNAL_ADDRESS_HTTPS}|${EXTERNAL_ADDRESS_HTTPS}|g" /config/pywps.cfg && \
-    export LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH && \
     /usr/libexec/tomcat/server start
-
-
-#Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
-#This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
-#Visit https://192.168.99.100/impactportal/ to go to the portal
