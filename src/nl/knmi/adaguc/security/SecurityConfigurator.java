@@ -3,7 +3,6 @@ package nl.knmi.adaguc.security;
 import java.util.Vector;
 
 import impactservice.Configuration;
-import lombok.Synchronized;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.ElementNotFoundException;
 import nl.knmi.adaguc.tools.MyXMLParser.XMLElement;

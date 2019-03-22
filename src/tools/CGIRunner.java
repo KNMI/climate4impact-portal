@@ -25,6 +25,7 @@ public class CGIRunner {
     class StderrPrinter implements ProcessRunner.StatusPrinterInterface{
       StringBuffer errorMessages = new StringBuffer();
       public void print(byte[] message,int bytesRead) {
+        Debug.errprintln(new String(message));
         errorMessages.append(new String(message,0,bytesRead));
       }
       public void setError(String message) {
@@ -124,15 +125,15 @@ public class CGIRunner {
   
     ProcessRunner.StatusPrinterInterface stdoutPrinter = new StdoutPrinter(outputStream);
     ProcessRunner.StatusPrinterInterface stderrPrinter = new StderrPrinter();
-//
-//    Debug.println("Environment:");
-//    for(int j=0;j<environmentVariables.length;j++){
-//      Debug.println(environmentVariables[j]);
-//    }
-//    Debug.println("Commands:");
-//    for(int j=0;j<commands.length;j++){
-//      Debug.println(commands[j]);
-//    }
+
+    Debug.println("Environment:");
+    for(int j=0;j<environmentVariables.length;j++){
+      Debug.println(environmentVariables[j]);
+    }
+    Debug.println("Commands:");
+    for(int j=0;j<commands.length;j++){
+      Debug.println(commands[j]);
+    }
     
     ProcessRunner processRunner = new ProcessRunner (stdoutPrinter,stderrPrinter,environmentVariables,directory);
     
