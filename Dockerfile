@@ -15,8 +15,6 @@ RUN yum clean all && yum groupinstall -y "Development tools"
 
 RUN yum update -y && yum install -y \
     hdf5-devel \
-    netcdf \
-    netcdf-devel \
     proj \
     proj-devel \
     sqlite \
@@ -32,11 +30,16 @@ RUN yum update -y && yum install -y \
     ant \
     tomcat \
     gdal-devel \
-    libssl1.0.0 libssl-dev
-
-RUN yum update -y && yum install -y python-devel
+    libssl1.0.0 \
+    libssl-dev \
+    python-devel
 
 WORKDIR /src
+
+RUN yum install -y curl-devel
+# Install specific version of netcdf
+RUN curl -L https://github.com/Unidata/netcdf-c/archive/v4.6.1.tar.gz > /src/netcdf-4.6.1.tar.gz && tar -xzvf netcdf-4.6.1.tar.gz
+RUN cd /src/netcdf-c-4.6.1 && ./configure --prefix /usr && make -j4 && make install
 
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 RUN python get-pip.py
@@ -44,7 +47,7 @@ RUN python get-pip.py
 RUN yes | pip install --upgrade pip
 RUN pip install python-magic
 RUN pip install Cython
-RUN pip install netcdf4 \
+RUN pip install netcdf4==1.4.1 \
                 netcdftime \
                 isodate \
                 requests \
@@ -52,7 +55,7 @@ RUN pip install netcdf4 \
                 prov \
                 scipy \
                 numpy \
-                psycopg2 \
+                psycopg2-binary \
                 python-dateutil
 
 # install icclim
@@ -65,7 +68,7 @@ RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 RUN python setup.py install
 
 # install clipc combine toolkit
-RUN pip install https://dev.knmi.nl/projects/clipccombine/repository/raw/dist/clipc_combine_process-1.6.tar.gz
+RUN pip install https://dev.knmi.nl/projects/clipccombine/repository/raw/dist/clipc_combine_process-1.7.tar.gz
 
 # install provenance toolkit
 WORKDIR /src
@@ -118,6 +121,8 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 
 RUN mkdir /impactspace
+
+RUN cp /usr/lib/libnetcdf.so.13 /usr/lib64
 
 # Remember: Insert local instance trustroot into  truststore
 CMD mkdir -p /data/wpsoutputs && \
