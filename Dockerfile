@@ -68,11 +68,11 @@ RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 RUN python setup.py install
 
 # install clipc combine toolkit
-RUN pip install https://dev.knmi.nl/projects/clipccombine/repository/raw/dist/clipc_combine_process-1.7.tar.gz
+RUN pip install https://github.com/maartenplieger/clipc-combine-toolkit/raw/master/dist/clipc_combine_process-1.7.tar.gz
 
 # install provenance toolkit
 WORKDIR /src
-RUN curl -L -O https://github.com/KNMI/wps_prov/archive/master.tar.gz
+RUN curl -L -O https://github.com/maartenplieger/wps_prov/archive/master.tar.gz
 RUN tar xvf master.tar.gz
 WORKDIR /src/wps_prov-master
 RUN python setup.py install
