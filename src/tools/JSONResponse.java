@@ -74,7 +74,7 @@ public class JSONResponse {
 
   private String userId = null;
   private String message = "";
-  private String mimetype = "application/json";
+  private String mimetype = "application/javascript";
   private String jsonp = null;
   private int statusCode = 200;
   private String redirectURL = null;

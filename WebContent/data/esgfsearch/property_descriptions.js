@@ -299,6 +299,7 @@ var property_descriptions = {
     "clipc": "Constructing Europe's Climate Information Portal",
     "cmip3": "Coupled Model Intercomparison Project Phase 3 (basis for IPCC AR4)",
     "CMIP5": "Coupled Model Intercomparison Project Phase 5 (basis for IPCC AR5)",
+    "CMIP6": "Coupled Model Intercomparison Project Phase 6",
     "CORDEX": "Coordinated Regional Climate Downscaling Experiment",
     "CORDEX-Adjust": "Bias-adjusted CORDEX simulations", 
     "CREATE-IP": "Collaborative REAnalysis Technical Environment – Intercomparison Procject",

@@ -146,12 +146,168 @@ public class Search {
     
     String identifier = "ESGFSearch.getFacets"+esgfQuery;
     
-    String XML = DiskCache.get(cacheLocation, identifier+".xml",searchCacheTimeValiditySec);
-    if(XML == null){
+    Debug.println("cacheLocation" + cacheLocation);
+    String JSON = DiskCache.get(cacheLocation, identifier+".json",searchCacheTimeValiditySec);
+    if(JSON == null){
+      Debug.println("No cache available");
       String url = searchEndPoint+esgfQuery;
       try {
-        XML = HTTPTools.makeHTTPGetRequest(new URL(url),searchGetTimeOutMS);
-        DiskCache.set(cacheLocation,identifier+".xml",XML);
+        String XML = HTTPTools.makeHTTPGetRequest(new URL(url),searchGetTimeOutMS);
+        MyXMLParser.XMLElement el = new MyXMLParser.XMLElement();
+        
+        try {
+          el.parseString(XML);
+        } catch (Exception e1) {
+          r.setErrorMessage("Unable to parse XML",500);
+          return r;
+        }
+        
+        
+        JSONObject facetsObj = new JSONObject();
+      
+        
+        try {
+          Vector<XMLElement> lst=el.get("response").getList("lst");
+          
+          for(XMLElement a : lst){
+            
+            try{
+              if(a.getAttrValue("name").equals("facet_counts")){
+                Vector<XMLElement> facet_counts=a.getList("lst");
+                for(XMLElement facet_count : facet_counts){
+                  if(facet_count.getAttrValue("name").equals("facet_fields")){
+                    Vector<XMLElement> facet_fields=facet_count.getList("lst");
+                    for(XMLElement facet_field : facet_fields){
+                     
+                      Vector<XMLElement> facet_names=facet_field.getList("int");
+                      SortedMap<String,Integer> sortedFacetElements = new TreeMap<String,Integer>();
+                      for(XMLElement facet_name : facet_names){
+                        sortedFacetElements.put(facet_name.getAttrValue("name"),Integer.parseInt(facet_name.getValue()));
+                      }
+                    
+                      JSONObject facet = new JSONObject();
+                      
+                      //int first = 0;
+                      for (SortedMap.Entry<String, Integer> entry : sortedFacetElements.entrySet()){
+                        //if(first <5){
+                        //Debug.println(entry.getKey());
+                        //first++;
+                          facet.put(entry.getKey(), entry.getValue());
+                        //}
+                      }
+                      facetsObj.put(facet_field.getAttrValue("name"),facet);
+                    }
+                  }
+                }
+              }
+            }catch(Exception e){
+              r.setErrorMessage("No name attribute",500);
+              return r;
+            }
+          }
+          
+          
+          facetsObj.put("time_start_stop",new JSONArray("[1850%2F1950]"));
+          facetsObj.put("bbox",new JSONArray("[0]"));
+          facetsObj.put("query",new JSONArray("[0]"));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        
+        
+        
+        JSONObject result = new JSONObject();
+        JSONObject responseObj = new JSONObject();
+        result.put("response",responseObj);
+        
+        responseObj.put("limit",searchLimit);
+        if (query.contains("clear=")){
+          responseObj.put("query", "");
+        } else {
+          responseObj.put("query", query);
+        }
+        
+       
+        
+        JSONArray searchResults = new JSONArray(); 
+        
+        try {
+          Vector<XMLElement> result1=el.get("response").getList("result");
+          
+          for(XMLElement a : result1){
+            
+            try{
+              if(a.getAttrValue("name").equals("response")){
+                responseObj.put("numfound",Integer.parseInt(a.getAttrValue("numFound")));
+                Vector<XMLElement> doclist=a.getList("doc");
+                
+                for(XMLElement doc : doclist){
+                  //Debug.println(doc.toString());
+                  String esgfurl = "";
+                  String esgfid = "";
+                  String esgfdatanode = "";
+                  JSONObject searchResult = new JSONObject();
+                  searchResults.put(searchResult);
+                  Vector<XMLElement> arrlist = doc.getList("arr");
+                  Vector<XMLElement> strlist = doc.getList("str");
+                  for(XMLElement arr : arrlist){
+                    String attrName = arr.getAttrValue("name");
+                    if(attrName.equals("url")){
+                      String urlToCheck = arr.get("str").getValue().split("#")[0];
+                      urlToCheck = urlToCheck.split("\\|")[0];
+                      searchResult.put("url",urlToCheck);
+                      esgfurl = urlToCheck;
+                    }
+                  }
+                  for(XMLElement str : strlist){
+                    String attrName = str.getAttrValue("name");
+                    if(attrName.equals("id")){
+                      esgfid=str.getValue().split("\\|")[0];
+                      searchResult.put("esgfid",esgfid);
+                    }
+                    if(attrName.equals("data_node")){
+                      esgfdatanode=str.getValue().split("\\|")[0];
+                      searchResult.put("data_node",esgfdatanode);
+                    }
+
+                  }
+                  
+                  //Compose the unique id;
+                  if(esgfdatanode.length()==0){
+                    esgfdatanode = esgfurl;
+                  }
+                  searchResult.put("id",esgfdatanode+"::"+esgfid);
+                  
+                }
+              }
+            }catch(Exception e){
+              r.setErrorMessage("No name attribute",500);
+              return r;
+            }
+          }
+          
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        
+        try {
+          responseObj.put("results",searchResults );
+        } catch (JSONException e) {
+          r.setException("JSONException unable to put response", e);
+          return r;
+        }
+        
+        try {
+          result.put("facets", facetsObj);
+        } catch (JSONException e) {
+          r.setException("JSONException unable to put facets", e);
+          return r;
+        }
+        JSON = result.toString();
+       
+        
+      
+        DiskCache.set(cacheLocation,identifier+".json", JSON);
       } catch (MalformedURLException e2) {
         r.setException("MalformedURLException",e2,url);
         return r;
@@ -162,163 +318,14 @@ public class Search {
         r.setException("IOException",e2,url);
         return r;
       }
+    }else {
+      Debug.println("Using cache");
     }
     
     
+    r.setMessage(JSON);
     
-    MyXMLParser.XMLElement el = new MyXMLParser.XMLElement();
-    
-    try {
-      el.parseString(XML);
-    } catch (Exception e1) {
-      r.setErrorMessage("Unable to parse XML",500);
-      return r;
-    }
-    
-    JSONObject facetsObj = new JSONObject();
-  
-    
-    try {
-      Vector<XMLElement> lst=el.get("response").getList("lst");
-      
-      for(XMLElement a : lst){
-        
-        try{
-          if(a.getAttrValue("name").equals("facet_counts")){
-            Vector<XMLElement> facet_counts=a.getList("lst");
-            for(XMLElement facet_count : facet_counts){
-              if(facet_count.getAttrValue("name").equals("facet_fields")){
-                Vector<XMLElement> facet_fields=facet_count.getList("lst");
-                for(XMLElement facet_field : facet_fields){
-                 
-                  Vector<XMLElement> facet_names=facet_field.getList("int");
-                  SortedMap<String,Integer> sortedFacetElements = new TreeMap<String,Integer>();
-                  for(XMLElement facet_name : facet_names){
-                    sortedFacetElements.put(facet_name.getAttrValue("name"),Integer.parseInt(facet_name.getValue()));
-                  }
-                
-                  JSONObject facet = new JSONObject();
-                  
-                  //int first = 0;
-                  for (SortedMap.Entry<String, Integer> entry : sortedFacetElements.entrySet()){
-                    //if(first <5){
-                    //Debug.println(entry.getKey());
-                    //first++;
-                      facet.put(entry.getKey(), entry.getValue());
-                    //}
-                  }
-                  facetsObj.put(facet_field.getAttrValue("name"),facet);
-                }
-              }
-            }
-          }
-        }catch(Exception e){
-          r.setErrorMessage("No name attribute",500);
-          return r;
-        }
-      }
-      
-      
-      facetsObj.put("time_start_stop",new JSONArray("[1850%2F1950]"));
-      facetsObj.put("bbox",new JSONArray("[0]"));
-      facetsObj.put("query",new JSONArray("[0]"));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    
-    
-    JSONObject result = new JSONObject();
-    JSONObject responseObj = new JSONObject();
-    result.put("response",responseObj);
-    
-    responseObj.put("limit",searchLimit);
-    if (query.contains("clear=")){
-      responseObj.put("query", "");
-    } else {
-      responseObj.put("query", query);
-    }
-    
-   
-    
-    JSONArray searchResults = new JSONArray(); 
-    
-    try {
-      Vector<XMLElement> result1=el.get("response").getList("result");
-      
-      for(XMLElement a : result1){
-        
-        try{
-          if(a.getAttrValue("name").equals("response")){
-            responseObj.put("numfound",Integer.parseInt(a.getAttrValue("numFound")));
-            Vector<XMLElement> doclist=a.getList("doc");
-            
-            for(XMLElement doc : doclist){
-              //Debug.println(doc.toString());
-              String esgfurl = "";
-              String esgfid = "";
-              String esgfdatanode = "";
-              JSONObject searchResult = new JSONObject();
-              searchResults.put(searchResult);
-              Vector<XMLElement> arrlist = doc.getList("arr");
-              Vector<XMLElement> strlist = doc.getList("str");
-              for(XMLElement arr : arrlist){
-                String attrName = arr.getAttrValue("name");
-                if(attrName.equals("url")){
-                  String urlToCheck = arr.get("str").getValue().split("#")[0];
-                  urlToCheck = urlToCheck.split("\\|")[0];
-                  searchResult.put("url",urlToCheck);
-                  esgfurl = urlToCheck;
-                }
-              }
-              for(XMLElement str : strlist){
-                String attrName = str.getAttrValue("name");
-                if(attrName.equals("id")){
-                  esgfid=str.getValue().split("\\|")[0];
-                  searchResult.put("esgfid",esgfid);
-                }
-                if(attrName.equals("data_node")){
-                  esgfdatanode=str.getValue().split("\\|")[0];
-                  searchResult.put("data_node",esgfdatanode);
-                }
 
-              }
-              
-              //Compose the unique id;
-              if(esgfdatanode.length()==0){
-                esgfdatanode = esgfurl;
-              }
-              searchResult.put("id",esgfdatanode+"::"+esgfid);
-              
-            }
-          }
-        }catch(Exception e){
-          r.setErrorMessage("No name attribute",500);
-          return r;
-        }
-      }
-      
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    
-    try {
-      responseObj.put("results",searchResults );
-    } catch (JSONException e) {
-      r.setException("JSONException unable to put response", e);
-      return r;
-    }
-    
-    try {
-      result.put("facets", facetsObj);
-    } catch (JSONException e) {
-      r.setException("JSONException unable to put facets", e);
-      return r;
-    }
-   
-    r.setMessage(result.toString());
-  
-    
     return r;
   }
 
