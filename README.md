@@ -66,7 +66,10 @@ docker run -v ~/impactspace:/impactspace -v /etc/hosts:/etc/hosts -v `pwd`/docke
 # Log in
 * Visit ```https://<yourhostname>/impactportal/account/login.jsp```
 * Add an exception for your self signed certificate
-* Click "Show other providers" and select "Sign in with BADC/CEDA OpenID"
+* Click "Show other providers"
+![Show other providers](/WebContent/images/signinother/showotherproviders.png)
+* Select "Sign in with BADC/CEDA OpenID"
+![Show other providers](/WebContent/images/signinother/showotherproviders_ceda.png)
 * Use account cc4idev/cc4idev123!
 * Your openid is https://ceda.ac.uk/openid/C4I-Dev.C4I-Dev (this is preconfigured for the development env ./docker/c4i_config/config.xml)
 
