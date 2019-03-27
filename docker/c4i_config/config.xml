@@ -102,7 +102,7 @@
     <!-- Set the CA trustroots by a java truststore and separate trusted SSL certificates, obtainable from  https://rainbow.llnl.gov/ -->
     <truststorepassword>changeit</truststorepassword>
     <truststorefile>/config/esg-truststore.ts</truststorefile>
-    <trustrootslocation>/config/certificates/</trustrootslocation>
+    <trustrootslocation>/root/.globus/certificates/</trustrootslocation>
     <issuer_ca_certificate>/config/impactportal_CA.pem</issuer_ca_certificate>
     <issuer_ca_privatekey>/config/impactportal_CA.key</issuer_ca_privatekey>
   </loginconfig>

@@ -15,8 +15,13 @@ echo | openssl s_client -connect slcs.ceda.ac.uk:443 2>&1 | sed -ne '/-BEGIN CER
 keytool -delete -alias slcs.ceda.ac.uk  -keystore esg-truststore.ts -storepass changeit > /dev/null
 keytool -import -v -trustcacerts -alias slcs.ceda.ac.uk -file ./certificates/slcs.ceda.ac.uk.pem -keystore esg-truststore.ts -storepass changeit -noprompt
 
-rm ./certificates/accounts.google.com.pem
-rm ./certificates/slcs.ceda.ac.uk.pem
+echo "Putting cert for slcs1.ceda.ac.uk:7512"
+echo | openssl s_client -connect slcs1.ceda.ac.uk:7512 2>&1 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'  > ./certificates/slcs1.ceda.ac.uk_7512.pem
+keytool -delete -alias slcs1.ceda.ac.uk_7512  -keystore esg-truststore.ts -storepass changeit > /dev/null
+keytool -import -v -trustcacerts -alias slcs1.ceda.ac.uk_7512 -file ./certificates/slcs1.ceda.ac.uk_7512.pem -keystore esg-truststore.ts -storepass changeit -noprompt
+
+#rm ./certificates/accounts.google.com.pem
+#rm ./certificates/slcs.ceda.ac.uk.pem
 
 ### Instal ESGF certs ###
 #rm -rf esg_trusted_certificates*
@@ -46,7 +51,6 @@ keytool -import -v -trustcacerts -alias climate4impact-tomcat-ca -file climate4i
 
 #3) Put this certificate from climate4impact-tomcat-ca.pem into the globus truststore
 cp climate4impact-tomcat-ca.pem ./certificates/
-c_rehash ./certificates/
 
 ### Add the impactportal CA for issuing certificates in the truststore as well ###
 
@@ -55,7 +59,6 @@ keytool -delete -alias climate4impact-certissuer-ca  -keystore esg-truststore.ts
 keytool -import -v -trustcacerts -alias climate4impact-certissuer-ca -file impactportal_CA.pem -keystore esg-truststore.ts -storepass changeit -noprompt
 
 cp impactportal_CA.pem ./certificates/
-c_rehash ./certificates/
 
 ### Add the clipc CA ###
 
@@ -64,7 +67,10 @@ keytool -delete -alias knmi_clipc_ca  -keystore esg-truststore.ts -storepass cha
 keytool -import -v -trustcacerts -alias knmi_clipc_ca -file knmi_clipc_ca.pem -keystore esg-truststore.ts -storepass changeit -noprompt
 
 cp knmi_clipc_ca.pem ./certificates/
+
+
+
 c_rehash ./certificates/
 
-
+echo "[OK] Finished refreshing certificates."
 popd
