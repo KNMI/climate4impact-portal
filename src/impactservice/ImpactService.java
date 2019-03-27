@@ -572,7 +572,7 @@ public class ImpactService extends HttpServlet {
 
 
   private void handleSearchRequest(HttpServletRequest request, HttpServletResponse response,JSONMessageDecorator errorResponder) throws ServletException, IOException {
-    response.setContentType("application/json");
+    response.setContentType("application/javascript");
     Debug.println("SERVICE SEARCH: "+request.getQueryString());
     //Params: URLEncoded verquery, pagenumber, pagesize.
     // Mode=distinct|search

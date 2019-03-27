@@ -450,7 +450,7 @@ public class Configuration {
     
     public static String[] getPyWPSExecutable() {
       readConfig();
-      String commands[]={PyWPSExecutable};
+      String commands[]=PyWPSExecutable.split(" ");
       return commands;
     }
     

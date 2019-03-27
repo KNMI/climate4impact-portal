@@ -15,8 +15,6 @@ RUN yum clean all && yum groupinstall -y "Development tools"
 
 RUN yum update -y && yum install -y \
     hdf5-devel \
-    netcdf \
-    netcdf-devel \
     proj \
     proj-devel \
     sqlite \
@@ -24,69 +22,57 @@ RUN yum update -y && yum install -y \
     udunits2 \
     udunits2-devel \
     make \
-    # conda dependency
     bzip2 \
-    # adaguc dependencies
     libxml2-devel \
     cairo-devel \
     gd-devel \
     postgresql-devel \
-    # java dependencies
     ant \
     tomcat \
     gdal-devel \
-    libssl1.0.0 libssl-dev
+    libssl1.0.0 \
+    libssl-dev \
+    python-devel
 
-RUN mkdir /scr
 WORKDIR /src
 
-# conda
-RUN curl -L -O https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-RUN bash ./Miniconda2-latest-Linux-x86_64.sh -p /miniconda -b
-ENV PATH=/miniconda/bin:${PATH}
-RUN conda update -y conda
-RUN conda config --add channels conda-forge
+RUN yum install -y curl-devel
+# Install specific version of netcdf
+RUN curl -L https://github.com/Unidata/netcdf-c/archive/v4.6.1.tar.gz > /src/netcdf-4.6.1.tar.gz && tar -xzvf netcdf-4.6.1.tar.gz
+RUN cd /src/netcdf-c-4.6.1 && ./configure --prefix /usr && make -j4 && make install
 
-# isntall python dependencies
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python get-pip.py
+
 RUN yes | pip install --upgrade pip
-RUN conda update -y conda && conda install -y \
-    lxml \
-    numpy \
-    scipy \
-    netcdf4 \
-    python-dateutil \
-    isodate \
-    psycopg2 \
-    requests \
-    prov \
-    pydotplus
-
 RUN pip install python-magic
 RUN pip install Cython
-RUN pip install netcdf4==1.3.1
+RUN pip install netcdf4==1.4.1 \
+                netcdftime \
+                isodate \
+                requests \
+                pydotplus \
+                prov \
+                scipy \
+                numpy \
+                psycopg2-binary \
+                python-dateutil
 
-
-# PyWPS does not work with versions higher than 56 for icu due some missing shared library issues
-#RUN conda install icu
-RUN conda install icu=56.1 -y
-
-ENV LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH
-
-# install icclim (will be conda in the future)
-RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.5.tar.gz
-RUN tar xvf 4.2.5.tar.gz
-WORKDIR /src/icclim-4.2.5
+# install icclim
+RUN curl -L -O https://github.com/cerfacs-globc/icclim/archive/4.2.13.tar.gz
+RUN tar xvf 4.2.13.tar.gz
+WORKDIR /src/icclim-4.2.13
 RUN gcc -fPIC -g -c -Wall ./icclim/libC.c -o ./icclim/libC.o
 RUN gcc -shared -o ./icclim/libC.so ./icclim/libC.o
 
 RUN python setup.py install
 
 # install clipc combine toolkit
-RUN pip install https://dev.knmi.nl/projects/clipccombine/repository/raw/dist/clipc_combine_process-1.6.tar.gz
+RUN pip install https://github.com/maartenplieger/clipc-combine-toolkit/raw/master/dist/clipc_combine_process-1.7.tar.gz
 
 # install provenance toolkit
 WORKDIR /src
-RUN curl -L -O https://github.com/KNMI/wps_prov/archive/master.tar.gz
+RUN curl -L -O https://github.com/maartenplieger/wps_prov/archive/master.tar.gz
 RUN tar xvf master.tar.gz
 WORKDIR /src/wps_prov-master
 RUN python setup.py install
@@ -118,9 +104,6 @@ RUN tar xvf climate4impactwpsscripts.tar.gz
 RUN mkdir -p /root/.globus/
 RUN ln -s /config/certificates /root/.globus/certificates
 
-# TODO check why this is needed
-RUN conda install icu -y
-
 # install impact portal
 WORKDIR /src
 COPY build.xml /src/climate4impact-portal/
@@ -139,20 +122,11 @@ ENV IMPACTPORTAL_CONFIG=/config/config.xml
 
 RUN mkdir /impactspace
 
-# TODO Check why tomcat env is different from this env
-RUN cp /miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/lib* /usr/lib64/ 
+RUN cp /usr/lib/libnetcdf.so.13 /usr/lib64
 
 # Remember: Insert local instance trustroot into  truststore
-
-
 CMD mkdir -p /data/wpsoutputs && \
     mkdir -p /data/pywpstmp && \
     mkdir -p /data/c4i/climate4impact-portal/impactspace && \
     cp /config/pywps_template.cfg /config/pywps.cfg && sed -i "s|\${EXTERNAL_ADDRESS_HTTPS}|${EXTERNAL_ADDRESS_HTTPS}|g" /config/pywps.cfg && \
-    export LD_LIBRARY_PATH=/miniconda/pkgs/openssl-1.0.2p-h14c3975_1002/lib/:$LD_LIBRARY_PATH && \
     /usr/libexec/tomcat/server start
-
-
-#Build with  docker build  -t climate4impact-portal ./climate4impact-portal/Docker/
-#This docker container needs to be runned with custom configuration settings:  docker run -i -t -p 443:443 -v $HOME/config:/config climate4impact-portal
-#Visit https://192.168.99.100/impactportal/ to go to the portal

@@ -80,6 +80,7 @@ var SearchInterface = function(options){
   var impactCatalogBrowserEndPoint;
   
   var primaryFacets = ["project", "variable", "time_frequency", "experiment", "domain", "model","access","time_start_stop","bbox","query"];
+  var primaryFacetsForQuery=["project,variable,time_frequency,experiment,domain,model,access"];
   var facetNameMapping = {
     "project":"Project",
     "variable":"Parameter",
@@ -110,15 +111,18 @@ var SearchInterface = function(options){
       "time_frequency": "Frequency at which model data are archived (is not equal to model time step). Note that for some (high) frequencies instantaneous model states are stored, generally for daily and longer periods average states over that period are stored. See respective netcdf metadata for exact details."
  };
   var query = options.query;
-  if(query == null){
-    var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
-    query=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
-    if (query.length==0) {
-      query="clear=onload";
-    }
+  // var query = "";//project=CMIP5&variable=tas&time_frequency=day&experiment=historical&model=EC-EARTH&";
+  var hashQuery=(window.location.hash).replace("#","");//data_node=albedo2.dkrz.de&experiment=rcp45&project=CMIP5&time_frequency=day&variable=tas&model=EC-EARTH&";
+  if (hashQuery.length > 0) {
+	  query = hashQuery 
   }
+  if (query.length==0) {
+	query="clear=onload";
+  }
+
   query= query.replace("#","");
   query = query.replaceAll("&amp;","&");
+  console.log(query);
  //query="variable=tas";
   var currentFacetList = undefined;
   var currentSelectedFacet = undefined;
@@ -265,7 +269,7 @@ var SearchInterface = function(options){
 //	  window.location.hash="clear";
 //   //   getAllFacets();
 //    });
-    
+    loadAndDisplayFacet("project");
     getAllFacets();
     
     propertyChooser["project"] = new NestedPropertyChooser(esgfsearch_pc_project);
@@ -630,7 +634,12 @@ var SearchInterface = function(options){
       callback(facet);
     };
     
-    var url = impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query);
+    
+    var url = impactESGFSearchEndPoint+"service=search&request=getfacets&facet="+primaryFacetsForQuery+"&query="+encodeURIComponent(query);
+    if (listAllFacets) {
+    	url = impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query);
+    }
+    console.log("url="+url);
     $.ajax({
       url: url,
           crossDomain:true,
@@ -919,6 +928,7 @@ var SearchInterface = function(options){
   * Happens when a facet, e.g. standard_name, model, experiment is clicked
   */
   var loadAndDisplayFacet = function(facetName){
+	 console.log("loadAndDisplayFacet", facetName);
     var facetselectordiv=rootElement.find(".c4i-esgfsearch-selectfacet-container");
     facetselectordiv.block();
     getPropertiesForFacetName({name:facetName,
@@ -1171,7 +1181,12 @@ var SearchInterface = function(options){
       generatePropertyListSelector(currentFacetList,currentSelectedFacet);
     };
 
-    var url=impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1);
+    var url=impactESGFSearchEndPoint+"service=search&request=getfacets&facet="+primaryFacetsForQuery+"&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1);
+    var url = impactESGFSearchEndPoint+"service=search&request=getfacets&facet="+primaryFacetsForQuery+"&query="+encodeURIComponent(query);
+    if (listAllFacets) {
+    	url=impactESGFSearchEndPoint+"service=search&request=getfacets&query="+encodeURIComponent(query)+"&pagelimit=25&pagenumber="+(currentPage-1);
+    }
+    console.log("url="+url);
     $.ajax({
       url: url,
       crossDomain:true,

@@ -39,10 +39,19 @@ var esgfsearch_pc_project={
    "tilewidth":"200px",
   "properties":[
     {
-      "shortname": "CMIP5",
+      "shortname": "CMIP",
       "color":     esgfsearch_currentcolorscheme.color1,
       "tooltip":   "global relatively low resolution climate projection data",
       "children": [
+				   {
+					    "name":      "CMIP6",
+					    "longname":  "Coupled Model Intercomparison Project Phase 6",
+					    "shortname": "GCM data <a target=\"_blank\" href=\"http://cmip-pcmdi.llnl.gov/cmip6/\">CMIP6 project page</a>",
+					    "tooltip":   "global climate projection data used for latest IPCC report "
+				   },
+                   {
+	                     /* can we insert a blank line so as to create two groups within the temperature box */
+	               },
                    {
                      "name":      "CMIP5",
                      "longname":  "Coupled Model Intercomparison Project Phase 5",

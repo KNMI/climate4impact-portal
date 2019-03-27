@@ -10,9 +10,10 @@
     <property name="target" value="1.7"/>
     <property name="source" value="1.7"/>
     <path id="Web App Libraries.libraryclasspath">
-        <pathelement location="WebContent/WEB-INF/lib/bcpkix-jdk15on-161.jar"/>
-        <pathelement location="WebContent/WEB-INF/lib/bcprov-jdk15on-161.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/bcpkix-jdk15on-1.50.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/bcprov-jdk15on-1.50.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/commons-io-2.6.jar"/>
+    	<pathelement location="WebContent/WEB-INF/lib/commons-lang3-3.8.1.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/gss-2.1.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/guice-4.2.2.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/httpclient-4.5.2.jar"/>
@@ -22,16 +23,15 @@
         <pathelement location="WebContent/WEB-INF/lib/json.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/jsse-2.1.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/jstl-1.2.jar"/>
-        <pathelement location="WebContent/WEB-INF/lib/lombok.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/mailapi.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/myproxy-2.1.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/netcdfAll-4.6.12.jar"/>
-        <pathelement location="WebContent/WEB-INF/lib/nl.knmi.adaguc.tools-1.0.16.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/openid4java-1.0.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/org.apache.oltu.commons.encodedtoken-1.0.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/org.apache.oltu.oauth2.client-1.0.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/org.apache.oltu.oauth2.common-1.0.0.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/org.apache.oltu.oauth2.jwt-1.0.0.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/spring-core-5.1.5.RELEASE.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/spring-security-core-5.1.3.RELEASE.jar"/>
         <pathelement location="WebContent/WEB-INF/lib/ssl-proxies-2.1.0.jar"/>
     </path>

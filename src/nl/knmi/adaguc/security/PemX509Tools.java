@@ -65,9 +65,10 @@ import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+//import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -79,7 +80,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.ietf.jgss.GSSException;
 
-import lombok.Getter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 
@@ -98,7 +98,7 @@ public class PemX509Tools {
 	 * @author maartenplieger
 	 *
 	 */
-	@Getter
+	
 	public class X509Info{
 		public X509Info(String certOpenIdIdentifier, String uniqueId2) {
 			this.uniqueId = uniqueId2;
@@ -106,6 +106,8 @@ public class PemX509Tools {
 		}
 		String uniqueId;
 		String CN;
+		String getCN() { return CN; }
+		String getUniqueId() { return uniqueId; }
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class PemX509Tools {
 	 * @author maartenplieger
 	 *
 	 */
-	@Getter
+	
 	public class X509UserCertAndKey{
 		public X509UserCertAndKey(X509Certificate userSlCertificate, PrivateKey privateKey) {
 			this.userSlCertificate = userSlCertificate;
@@ -121,6 +123,8 @@ public class PemX509Tools {
 		}
 		X509Certificate userSlCertificate;
 		PrivateKey privateKey;
+		PrivateKey getPrivateKey () { return privateKey; }
+		X509Certificate getUserSlCertificate () { return userSlCertificate; }
 	}
 
 	/**
@@ -270,7 +274,7 @@ public class PemX509Tools {
 	 */
 	public static String certificateToPemString(Object certHolder) throws IOException {
 		StringWriter str = new StringWriter();
-		JcaPEMWriter pemWriter = new JcaPEMWriter(str);
+		PEMWriter pemWriter = new PEMWriter(str);
 		pemWriter.writeObject(certHolder);
 		pemWriter.close();
 		str.close();
@@ -294,7 +298,7 @@ public class PemX509Tools {
 
 	public static String privateKeyToPemString(PrivateKey certHolder) throws IOException {
 		StringWriter str = new StringWriter();
-		JcaPEMWriter pemWriter = new JcaPEMWriter(str);
+		PEMWriter pemWriter = new PEMWriter(str);
 		pemWriter.writeObject(certHolder);
 		pemWriter.close();
 		str.close();
